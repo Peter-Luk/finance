@@ -1,13 +1,13 @@
 from sqlite3 import connect
 from SQLiteHelper import Query
-from os import sep
-from sys import platform, argv, version_info
+from utilities import filepath
+from sys import argv, version_info
 
-file_name = 'Sec12'
-if platform == 'win32':file_drive, file_path = '%s:'%'C', sep.join(('dbTable', 'sqlite3'))
-if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', 'data', 'sqlite3'))
-if platform in ('linux', 'linux2'):file_drive, file_path = '', sep.join(('data', 'data', 'com.termux', 'files', 'home', 'data', 'sqlite3'))
-fullpath = sep.join((file_drive, file_path, file_name))
+# file_name = 'Sec12'
+# if platform == 'win32':file_drive, file_path = '%s:'%'C', sep.join(('dbTable', 'sqlite3'))
+# if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', 'data', 'sqlite3'))
+# if platform in ('linux', 'linux2'):file_drive, file_path = '', sep.join(('data', 'data', 'com.termux', 'files', 'home', 'data', 'sqlite3'))
+fullpath = filepath('Sec12')
 
 class Equities(Query):
     def __init__(self, connection=connect(fullpath)):

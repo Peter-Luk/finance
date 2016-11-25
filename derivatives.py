@@ -1,8 +1,8 @@
 from sqlite3 import connect
 from SQLiteHelper import Query
 from utilities import filepath, gr
-from sys import argv, platform, version_info
-from os import sep, environ
+from sys import argv, version_info
+from os import environ
 from datetime import datetime
 
 fullpath, today = filepath('Futures'), datetime.today()
