@@ -1,7 +1,7 @@
-from sys import platform
+from os import sys, linesep
+from sys import argv, platform
 from derivatives import Analyser, Futures, connect, fullpath, today, waf, estimate
 from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
-from sys import argv
 from utilities import IP
 
 import cherrypy
@@ -21,12 +21,12 @@ class Inputter(object):
         hd = HEAD(TITLE('Daily statistic recording'))
         ops = [OPTION(v,{'value':v}) for v in waf()]
         if today.day == ltd['%s'%today.year][today.month-1]:ops = [OPTION(v,{'value':v}) for v in waf(1)]
-        sl = SELECT('\n'.join([str(v) for v in ops]),{'name':'contract'})
+        sl = SELECT(linesep.join([str(v) for v in ops]),{'name':'contract'})
         btn = BUTTON('Amend',{'type':'submit'})
-        trs = [TR('\n'.join([str(x) for x in [TD(LABEL('Contract: ')),TD('\n'.join([str(v) for v in [sl, btn]]),{'align':'right'})]]))]
-        trs.extend([TR('\n'.join([str(v) for v in [TD('%s: '%u.capitalize(),{'align':'right'}),TD(INPUT({'type':'text','name':u}))]])) for u in ['open','high','low','close','volume']])
-        bd = BODY(FORM(TABLE('\n'.join([str(v) for v in trs])),{'method':'post','action':'append'}))
-        return str(HTML('\n'.join([str(v) for v in [hd,bd]])))
+        trs = [TR(linesep.join([str(x) for x in [TD(LABEL('Contract: ')),TD(linesep.join([str(v) for v in [sl, btn]]),{'align':'right'})]]))]
+        trs.extend([TR(linesep.join([str(v) for v in [TD('%s: '%u.capitalize(),{'align':'right'}),TD(INPUT({'type':'text','name':u}))]])) for u in ['open','high','low','close','volume']])
+        bd = BODY(FORM(TABLE(linesep.join([str(v) for v in trs])),{'method':'post','action':'append'}))
+        return str(HTML(linesep.join([str(v) for v in [hd,bd]])))
 
     @cherrypy.expose
     def append(self, contract, open, high, low, close, volume):
@@ -41,7 +41,7 @@ class Inputter(object):
         res = fu.show(criteria={'date':today.date()})
         if len(res):
             bd = BODY(TABLE(TR(TD("%s record(s) add on '%s'"%(len(res), today.date())))))
-        return str(HTML('\n'.join([str(v) for v in [hd,bd]])))
+        return str(HTML(linesep.join([str(v) for v in [hd,bd]])))
 
 class Analysor(object):
     @cherrypy.expose
@@ -55,11 +55,11 @@ class Analysor(object):
             keys.sort()
             tds = [TD('date'.capitalize())]
             tds.extend([TD(v.upper(),{'align':'center'}) for v in methods])
-            trs.extend([TR(TD(B(f),{'colspan':'5','align':'center'})),TR('\n'.join([str(v) for v in tds]))])
-            trs.extend([TR('\n'.join([str(v) for v in [TD('%s:'% k),TD('%0.3f'%res[k]['wma10'],{'align':'center'}),TD('%0.3f'%res[k]['kama10'],{'align':'center'}),TD('%0.3f'%res[k]['ema10'],{'align':'center'}),TD('%0.5f'%res[k]['hv10'],{'align':'center'})]])) for k in keys])
+            trs.extend([TR(TD(B(f),{'colspan':'5','align':'center'})),TR(linesep.join([str(v) for v in tds]))])
+            trs.extend([TR(linesep.join([str(v) for v in [TD('%s:'% k),TD('%0.3f'%res[k]['wma10'],{'align':'center'}),TD('%0.3f'%res[k]['kama10'],{'align':'center'}),TD('%0.3f'%res[k]['ema10'],{'align':'center'}),TD('%0.5f'%res[k]['hv10'],{'align':'center'})]])) for k in keys])
         hd = HEAD(TITLE('Analysis Report'))
-        bd = BODY(TABLE('\n'.join([str(v) for v in trs]),{'width':'600'}))
-        return str(HTML('\n'.join([str(v) for v in [hd,bd]])))
+        bd = BODY(TABLE(linesep.join([str(v) for v in trs]),{'width':'600'}))
+        return str(HTML(linesep.join([str(v) for v in [hd,bd]])))
 
 class Estimator(object):
     @cherrypy.expose
@@ -67,19 +67,26 @@ class Estimator(object):
         hd = HEAD(TITLE('Estimate session range'))
         ops = [OPTION(v,{'value':v}) for v in waf()]
         if today.day == ltd['%s'%today.year][today.month - 1]:ops = [OPTION(v,{'value':v}) for v in waf(1)]
-        sl = SELECT('\n'.join([str(v) for v in ops]),{'name':'contract'})
+        sl = SELECT(linesep.join([str(v) for v in ops]),{'name':'contract'})
         btn = BUTTON('Estimate',{'type':'submit'})
-        trs = [TR('\n'.join([str(v) for v in [TD(LABEL('Contract: ')),TD('\n'.join([str(u) for u in [sl,btn]]),{'align':'right'})]]))]
-        trs.append(TR('\n'.join([str(v) for v in [TD('Pivot Point',{'align':'right'}),TD(INPUT({'type':'text','name':'pp'}))]])))
-        bd = BODY(FORM(TABLE('\n'.join([str(v) for v in trs])),{'method':'post','action':'process_request'}))
-        return str(HTML('\n'.join([str(v) for v in [hd,bd]])))
+        trs = [TR(linesep.join([str(v) for v in [TD(LABEL('Contract: ')),TD(linesep.join([str(u) for u in [sl,btn]]),{'align':'right'})]]))]
+        trs.append(TR(linesep.join([str(v) for v in [TD('Pivot Point',{'align':'right'}),TD(INPUT({'type':'text','name':'pp'}))]])))
+        bd = BODY(FORM(TABLE(linesep.join([str(v) for v in trs])),{'method':'post','action':'process_request'}))
+        return str(HTML(linesep.join([str(v) for v in [hd,bd]])))
 
     @cherrypy.expose
-    def process_request(self,contract,pp):
+    def process_request(self, contract, pp):
         an = Analyser(contract)
         res = an._Analyser__cur.execute("SELECT %s FROM %s WHERE code='%s'"%('id','records',contract)).fetchall()
         if res:
-            trs = '\n'.join([str(TR(TD('%s' % v))) for v in estimate(pp,contract).split('\n')])
+            trs, eres = '', estimate(pp, contract)
+            if type(eres) is str:
+                for v in eres.split(linesep):
+                    trs += str(TR(TD(v)))
+            elif type(eres) is dict:
+                for v in list(eres.keys()):
+                    trs += str(TR(TD('%s (est.): %i to %i / %i to %i' % ((v,) + eres[v]['upper'] + eres[v]['lower']))))
+#                trs.extend([str(TR(TD('%s: %i, %i  %i, %i' % (v,)+eres[v]['upper']+eres[v]['lower']))) for v in list(eres.keys())])
             return str(HTML('%s\n%s'%(HEAD(TITLE('Estimate for %s'%contract)),BODY(TABLE(trs)))))
 
 if __name__ == '__main__':

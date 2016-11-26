@@ -1,8 +1,8 @@
 from sqlite3 import connect
 from SQLiteHelper import Query
 from utilities import filepath, gr
+from os import linesep, environ
 from sys import argv, version_info
-from os import environ
 from datetime import datetime
 
 fullpath, today = filepath('Futures'), datetime.today()
@@ -53,7 +53,7 @@ def waf(delta=0):
     futures += [''.join((f,dex(delta+1))) for f in futures_type[:-2]]
     return tuple(futures)
 
-def estimate(pp, icode=waf()[0], gr=1/gr, extended=False):
+def estimate(pp, icode=waf()[0], gr=1/gr, extended=False, programmatic=False):
     thdr,rf = [],('session','open','high','low','close','volume')
     an = Analyser(icode)
     adate,ancur,ti = an._Analyser__unique_date(),an._Analyser__cur,an._Analyser__fu._Futures__table
@@ -84,7 +84,7 @@ def estimate(pp, icode=waf()[0], gr=1/gr, extended=False):
     dru = tuple([int(round(float(pp)+x,0)) for x in [(1-gr)*(dh-dl),gr*(dh-dl)]])
     drl = tuple([int(round(float(pp)-x,0)) for x in [(1-gr)*(dh-dl),gr*(dh-dl)]])
 
-    rstr,uday = ["Session delta (est.): %i to %i / %i to %i,"%(sru+srl)],an._Analyser__unique_date()
+    rstr, rdata, uday = ["Session delta (est.): %i to %i / %i to %i,"%(sru+srl)], {'Session':{'upper':sru, 'lower':srl}}, an._Analyser__unique_date()
     if extended:
         for i in avail_indicators[:-1]:
             if uday:
@@ -93,7 +93,9 @@ def estimate(pp, icode=waf()[0], gr=1/gr, extended=False):
                 iru = tuple([int(round(ivalue+x,0)) for x in [(1-gr)*(sh-sl),gr*(sh-sl)]])
                 irl = tuple([int(round(ivalue-x,0)) for x in [(1-gr)*(sh-sl),gr*(sh-sl)]])
                 rstr.append("'%s': %i to %i / %i to %i,"%((i.upper(),)+iru+irl))
+                rdata['%s'%i.upper()] = {'upper':iru, 'lower':irl}
     rstr.append("Daily delta (est.): %i to %i / %i to %i and"%(dru+drl))
+    rdata['Daily'] = {'upper':dru, 'lower':drl}
     mrf = (rf[0],rf[-2])
     dm = ancur.execute("SELECT %s, %s FROM  %s WHERE date='%s' AND code='%s'" % (mrf + (ti,adate[-2],icode))).fetchall()
     if dm:mc = float(dm[0][-1])
@@ -102,7 +104,9 @@ def estimate(pp, icode=waf()[0], gr=1/gr, extended=False):
     gru = tuple([int(round(float(pp)+x,0)) for x in [(1-gr)*(do-mc),gr*(do-mc)]])
     grl = tuple([int(round(float(pp)-x,0)) for x in [(1-gr)*(do-mc),gr*(do-mc)]])
     rstr.append("Gap (est.): %i to %i / %i to %i."%(gru+grl))
-    return '\n'.join(rstr)
+    rdata['Gap'] = {'upper':gru, 'lower':grl}
+    if programmatic:return rdata
+    return linesep.join(rstr)
 
 def indicate(code=waf()):
     methods,ti,qstr,ui,ii,plstr = ('wma','kama','ema','hv'),'indicators',[],0,0,'s'
