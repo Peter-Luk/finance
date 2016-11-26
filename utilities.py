@@ -3,6 +3,13 @@ from os import sep, environ
 import socket
 gr = 1.61803399
 
+ltd = {"2015":(30, 27, 31, 30, 29, 30, 31, 31, 30, 30, 30, 31)}
+ltd["2016"] = (29, 29, 31, 29, 31, 30, 29, 31, 30, 31, 30, 30)
+ltd["2017"] = (31, 28, 31, 28, 31, 30, 31, 31, 29, 31, 30, 29)
+
+futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'March':'H', 'April':'J', 'May':'K', 'June':'M', 'July':'N', 'August':'Q', 'September':'U', 'October':'V', 'November':'X', 'December':'Z'}
+avail_indicators, cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)
+
 def filepath(name, drive='C'):
     if platform == 'win32':file_drive, file_path = '%s:'%drive, sep.join(('Users', 'Peter Luk', 'data', 'sqlite3'))
     if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', 'data', 'sqlite3'))

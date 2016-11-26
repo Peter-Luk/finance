@@ -1,13 +1,12 @@
-from sqlite3 import connect
-from SQLiteHelper import Query
-from utilities import filepath, gr
 from os import linesep, environ
 from sys import argv, version_info
+from sqlite3 import connect
 from datetime import datetime
+from SQLiteHelper import Query
+from utilities import futures_type, month_initial, avail_indicators, cal_month, filepath, gr
 
 fullpath, today = filepath('Futures'), datetime.today()
-futures_type, month_initial, year,month, month_string = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'March':'H', 'April':'J', 'May':'K', 'June':'M', 'July':'N', 'August':'Q', 'September':'U', 'October':'V', 'November':'X', 'December':'Z'}, '%i' % today.year, today.month, today.strftime('%B')
-avail_indicators, __cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)
+year, month, month_string = '%i' % today.year, today.month, today.strftime('%B')
 
 def __ms(contract):
         if version_info.major == 2:action = raw_input('(I)nsert / (A)nalysis: ')
@@ -33,7 +32,7 @@ def __ms(contract):
 
 def calandex():
     idx, __m = (), []
-    for i in __cal_month:
+    for i in cal_month:
         delta_month = i - month
         if i < month:delta_month += 12
         __m.append(delta_month)

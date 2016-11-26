@@ -2,13 +2,9 @@ from os import linesep
 from sys import argv, platform
 from derivatives import Analyser, Futures, connect, fullpath, today, waf, estimate
 from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
-from utilities import IP
+from utilities import ltd, IP
 
 import cherrypy
-
-ltd = {"2015":(30, 27, 31, 30, 29, 30, 31, 31, 30, 30, 30, 31)}
-ltd["2016"] = (29, 29, 31, 29, 31, 30, 29, 31, 30, 31, 30, 30)
-ltd["2017"] = (31, 28, 31, 28, 31, 30, 31, 31, 29, 31, 30, 29)
 
 server_host, server_port = IP('public').address, 80
 if len(argv) > 1:server_host = argv[1]
