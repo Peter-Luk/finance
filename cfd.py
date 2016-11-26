@@ -1,4 +1,4 @@
-from os import sys, linesep
+from os import linesep
 from sys import argv, platform
 from derivatives import Analyser, Futures, connect, fullpath, today, waf, estimate
 from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
@@ -86,8 +86,7 @@ class Estimator(object):
             elif type(eres) is dict:
                 for v in list(eres.keys()):
                     trs += str(TR(TD('%s (est.): %i to %i / %i to %i' % ((v,) + eres[v]['upper'] + eres[v]['lower']))))
-#                trs.extend([str(TR(TD('%s: %i, %i  %i, %i' % (v,)+eres[v]['upper']+eres[v]['lower']))) for v in list(eres.keys())])
-            return str(HTML('%s\n%s'%(HEAD(TITLE('Estimate for %s'%contract)),BODY(TABLE(trs)))))
+            return str(HTML('%s%s%s' % (HEAD(TITLE('Estimate for %s'%contract)), linesep, BODY(TABLE(trs)))))
 
 if __name__ == '__main__':
     cherrypy.tree.mount(Inputter())
