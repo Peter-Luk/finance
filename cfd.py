@@ -16,7 +16,8 @@ class Inputter(object):
     def index(self):
         hd = HEAD(TITLE('Daily statistic recording'))
         ops = [OPTION(v,{'value':v}) for v in waf()]
-        if today.day == ltd['%s'%today.year][today.month-1]:ops = [OPTION(v,{'value':v}) for v in waf(1)]
+#        if today.day == ltd['%s'%today.year][today.month-1]:ops = [OPTION(v,{'value':v}) for v in waf(1)]
+        if today.day == ltd(today.year, today.month):ops = [OPTION(v,{'value':v}) for v in waf(1)]
         sl = SELECT(linesep.join([str(v) for v in ops]),{'name':'contract'})
         btn = BUTTON('Amend',{'type':'submit'})
         trs = [TR(linesep.join([str(x) for x in [TD(LABEL('Contract: ')),TD(linesep.join([str(v) for v in [sl, btn]]),{'align':'right'})]]))]
@@ -62,7 +63,8 @@ class Estimator(object):
     def index(self):
         hd = HEAD(TITLE('Estimate session range'))
         ops = [OPTION(v,{'value':v}) for v in waf()]
-        if today.day == ltd['%s'%today.year][today.month - 1]:ops = [OPTION(v,{'value':v}) for v in waf(1)]
+#        if today.day == ltd['%s'%today.year][today.month - 1]:ops = [OPTION(v,{'value':v}) for v in waf(1)]
+        if today.day == ltd(today.year, today.month):ops = [OPTION(v,{'value':v}) for v in waf(1)]
         sl = SELECT(linesep.join([str(v) for v in ops]),{'name':'contract'})
         btn = BUTTON('Estimate',{'type':'submit'})
         trs = [TR(linesep.join([str(v) for v in [TD(LABEL('Contract: ')),TD(linesep.join([str(u) for u in [sl,btn]]),{'align':'right'})]]))]

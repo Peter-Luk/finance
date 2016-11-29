@@ -1,11 +1,25 @@
 from sys import platform, version_info
 from os import sep, environ
+from datetime import datetime
 import socket
 gr = 1.61803399
 
-ltd = {"2015":(30, 27, 31, 30, 29, 30, 31, 31, 30, 30, 30, 31)}
-ltd["2016"] = (29, 29, 31, 29, 31, 30, 29, 31, 30, 31, 30, 30)
-ltd["2017"] = (31, 28, 31, 28, 31, 30, 31, 31, 29, 31, 30, 29)
+ph = {'2015':{'1':(1,), '2':(19, 20), '4':(3, 6, 7), '5':(25,), '7':(1,), '9':(28,), '10':(1, 21), '12':(25,)}}
+ph['2016'] = {'1':(1,), '2':(8, 9, 10), '3':(25, 28), '4':(4,), '5':(2,), '6':(9,), '7':(1,), '9':(16,), '10':(10,), '12':(26, 27)}
+ph['2017'] = {'1':(2, 30, 31), '4':(4, 14,17), '5':(1, 3, 30), '10':(2, 5), '12':(25, 26)}
+
+def ltd(year=datetime.today().year, month=datetime.today().month, excluded=[]):
+    t, ld = 0, [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    if not(year % 4):ld[1] += 1
+    day = ld[month - 1]
+    while t < 1:
+        if datetime(year, month, day).weekday() < 5:t += 1
+        day -= 1
+    return day + 1
+
+#ltd = {"2015":(29, 26, 30, 29, 28, 29, 30, 28, 29, 29, 27, 30)}
+#ltd["2016"] = (28, 26, 30, 28, 30, 29, 28, 30, 29, 28, 29, 29)
+#ltd["2017"] = (30, 27, 30, 27, 30, 29, 28, 30, 28, 30, 29, 28)
 
 futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'March':'H', 'April':'J', 'May':'K', 'June':'M', 'July':'N', 'August':'Q', 'September':'U', 'October':'V', 'November':'X', 'December':'Z'}
 avail_indicators, cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)
