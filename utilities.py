@@ -13,13 +13,13 @@ def ltd(year=datetime.today().year, month=datetime.today().month, excluded=[]):
     if not(year % 4):ld[1] += 1
     day = ld[month - 1]
     while t < 1:
-        if datetime(year, month, day).weekday() < 5:t += 1
+#        if datetime(year, month, day).weekday() < 5:t += 1
+        if datetime(year, month, day).weekday() < 5:
+            if '%s'%month in ph['%s'%year].keys():
+                 if day not in ph['%s'%year]['%s'%month]:t += 1
+            else:t+=1
         day -= 1
     return day + 1
-
-#ltd = {"2015":(29, 26, 30, 29, 28, 29, 30, 28, 29, 29, 27, 30)}
-#ltd["2016"] = (28, 26, 30, 28, 30, 29, 28, 30, 29, 28, 29, 29)
-#ltd["2017"] = (30, 27, 30, 27, 30, 29, 28, 30, 28, 30, 29, 28)
 
 futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'March':'H', 'April':'J', 'May':'K', 'June':'M', 'July':'N', 'August':'Q', 'September':'U', 'October':'V', 'November':'X', 'December':'Z'}
 avail_indicators, cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)
