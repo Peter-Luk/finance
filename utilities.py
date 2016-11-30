@@ -12,12 +12,15 @@ def ltd(year=datetime.today().year, month=datetime.today().month, excluded=[]):
     t, ld = 0, [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if not(year % 4):ld[1] += 1
     day = ld[month - 1]
+    if excluded:
+        if '%'%year in excluded.keys():
+            if '%s'%month in excluded['%s'%year].keys():
+                if day not in excluded['%s'%year]['%s'%month]:t += 1
     while t < 1:
-#        if datetime(year, month, day).weekday() < 5:t += 1
         if datetime(year, month, day).weekday() < 5:
             if '%s'%month in ph['%s'%year].keys():
                  if day not in ph['%s'%year]['%s'%month]:t += 1
-            else:t+=1
+            else:t += 1
         day -= 1
     return day + 1
 
