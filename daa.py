@@ -129,7 +129,7 @@ class Methods():
 
     def bb(self, data, date=None):
         md = self.sma(data, date, 'hl')
-        if type(md) is float:hr = self.bbw(data, date) / 2
+        if type(md) is float:hr = self.bbw(data, date) / 2.
         else:return md
         return rnd(md - hr), rnd(md + hr)
 
