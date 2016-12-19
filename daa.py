@@ -1,5 +1,5 @@
-from utilities import rnd, gr
-from statistics import stdev, mean
+from utilities import rnd, gr, average
+from statistics import stdev
 
 class Methods():
     def __init__(self, ratio=None):
@@ -62,8 +62,8 @@ class Methods():
             else:
                 for di in rdate:
                     if atype.lower() == 'hl':
-                        if rdate.index(di) == 0:res.append(mean((data[di]['high'], data[di]['low'])))
-                        else:res.append(mean((data[di]['high'], data[di]['low'])) * kratio + res[-1] * (1. - kratio))
+                        if rdate.index(di) == 0:res.append(average((data[di]['high'], data[di]['low'])))
+                        else:res.append(average((data[di]['high'], data[di]['low'])) * kratio + res[-1] * (1. - kratio))
                     elif atype.lower() == 'h':
                         if rdate.index(di) == 0:res.append(data[di]['high'])
                         else:res.append(data[di]['high'] * kratio + res[-1] * (1. - kratio))
@@ -79,11 +79,11 @@ class Methods():
         if not(period):period = self.__period
         res, rdate = [], self.date_range(data, date, period)
         d_change = data[rdate[-1]]['close'] - data[rdate[0]]['close']
-        if atype.lower() == 'hl':d_change = mean((data[rdate[-1]]['high'], data[rdate[-1]]['low'])) - mean((data[rdate[0]]['high'], data[rdate[0]]['low']))
+        if atype.lower() == 'hl':d_change = average((data[rdate[-1]]['high'], data[rdate[-1]]['low'])) - average((data[rdate[0]]['high'], data[rdate[0]]['low']))
         i, tmp = 0, []
         while i < len(rdate) - 1:
             tmp.append(abs(data[rdate[i + 1]]['close'] - data[rdate[i]]['close']))
-            if atype.lower() == 'hl':tmp.append(abs(mean((data[rdate[i + 1]]['high'], data[rdate[i + 1]]['low'])) - mean((data[rdate[i]]['high'], data[rdate[i]]['low']))))
+            if atype.lower() == 'hl':tmp.append(abs(average((data[rdate[i + 1]]['high'], data[rdate[i + 1]]['low'])) - average((data[rdate[i]]['high'], data[rdate[i]]['low']))))
             i += 1
         t_range = sum(tmp)
         e_ratio = abs(d_change / t_range)
@@ -96,8 +96,8 @@ class Methods():
         else:
             for di in rdate:
                 if atype.lower() == 'hl':
-                    if rdate.index(di) == 0:res.append(mean((data[di]['high'], data[di]['low'])))
-                    else:res.append(mean((data[di]['high'], data[di]['low'])) * kratio + res[-1] * (1 - kratio))
+                    if rdate.index(di) == 0:res.append(average((data[di]['high'], data[di]['low'])))
+                    else:res.append(average((data[di]['high'], data[di]['low'])) * kratio + res[-1] * (1 - kratio))
                 else:
                     if rdate.index(di) == 0:res.append(data[di]['close'])
                     else:res.append(data[di]['close'] * kratio + res[-1] * (1 - kratio))
@@ -110,9 +110,9 @@ class Methods():
         else:
             for di in rdate:
                 if atype.lower() == 'hl':
-                    res.append(mean((data[di]['high'], data[di]['low'])))
+                    res.append(average((data[di]['high'], data[di]['low'])))
                 else:res.append(data[di]['close'])
-            return mean(res)
+            return float(average(res))
 
     def wma(self, data, date=None, atype='c', period=None):
         if not(period):period = self.__period
@@ -123,13 +123,13 @@ class Methods():
                 do = sum((data[di]['high'], data[di]['low']))
                 r2.append(do)
                 if atype.lower() == 'hl':
-                    r1.append(float(mean((data[di]['high'], data[di]['low']))) * do)
+                    r1.append(float(average((data[di]['high'], data[di]['low']))) * do)
                 else:r1.append(float(data[di]['close']) * do)
             return sum(r1) / sum(r2)
 
     def bb(self, data, date=None):
         md = self.sma(data, date, 'hl')
-        if type(md) is float:hr = self.bbw(data, date) / 2.
+        if type(md) is float:hr = self.bbw(data, date) / 2
         else:return md
         return rnd(md - hr), rnd(md + hr)
 
@@ -148,8 +148,8 @@ class Methods():
                 datakeys = list(data.keys())
                 datakeys.sort()
                 if atype.lower() == 'hl':
-                    chl = mean((data[di]['high'], data[di]['low']))
-                    t = chl - mean((data[datakeys[datakeys.index(di) - 1]]['high'], data[datakeys[datakeys.index(di) - 1]]['low']))
+                    chl = average((data[di]['high'], data[di]['low']))
+                    t = chl - average((data[datakeys[datakeys.index(di) - 1]]['high'], data[datakeys[datakeys.index(di) - 1]]['low']))
                     if t > 0:r1.append(chl)
                     else:r2.append(chl)
                 else:
@@ -158,4 +158,4 @@ class Methods():
 #                    else:r2.append(data[di]['close'])
                     if t > 0:r1.append(float(t))
                     else:r2.append(float(-t))
-            return 100 - 100 / (1 + mean(r1) / mean(r2))
+            return 100 - 100 / (1 + average(r1) / average(r2))
