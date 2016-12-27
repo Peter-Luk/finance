@@ -32,7 +32,7 @@ def filepath(name, drive='C'):
     if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', 'data', 'sqlite3'))
     if platform in ('linux', 'linux2'):
         file_drive, place = '', 'shared'
-        if ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):place = 'external'
+        if ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):place = 'external-1'
         file_path = sep.join(('data', 'data', 'com.termux', 'files', 'home', 'storage', place, 'data', 'sqlite3'))
     return sep.join((file_drive, file_path, name))
 
