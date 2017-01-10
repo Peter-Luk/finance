@@ -1,5 +1,7 @@
 from sqlite3 import connect
 from utilities import filepath
+from statistics import mean
+
 f_cur = connect(filepath('Futures')).cursor()
 mf7 = f_cur.execute("SELECT date, session, open, high, low, close FROM records WHERE code='MHIF7' ORDER BY date ASC, session DESC").fetchall()
 
@@ -23,11 +25,7 @@ def atr(data, period=12):
         hdr[tr[i][0]] = tr[i][-1]
         if tr[i][0] not in daterange:daterange.append(tr[i][0])
         i += 1
-#
-#    t_delta = 0.
-#    for d in daterange[:period]:t_delta += hdr[d]
-#    res[daterange[:period][-1]] = t_delta / period
-#    for d in daterange[period:]:t_delta = res[daterange[d - 1] * 11 + hdr[d]
-#    res[d] = t_delta / period
-#    return res
-    return hdr
+
+    res[daterange[period - 1]] = mean([hdr[x] for x in daterange[:period]])
+    for d in daterange[period:]:res[d] = (res[daterange[daterange.index(d) - 1]] * (period - 1) + hdr[d]) / period
+    return res
