@@ -1,11 +1,11 @@
 from sqlite3 import connect
-from utilities import filepath
+from utilities import gr, rnd, filepath
 from statistics import mean
 
 f_cur = connect(filepath('Futures')).cursor()
 mf7 = f_cur.execute("SELECT date, session, open, high, low, close FROM records WHERE code='MHIF7' ORDER BY date ASC, session DESC").fetchall()
 
-def atr(data, period=5):
+def atr(data, period=rnd(20/gr)):
     res, r_date, tr, i, hdr = {}, [], [], 0, {}
     tr.append([data[0][0], data[0][1], data[0][-3] - data[0][-2]])
     i += 1
