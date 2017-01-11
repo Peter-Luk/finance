@@ -1,12 +1,15 @@
 from sqlite3 import connect
 from utilities import gr, rnd, filepath
 from statistics import mean
+from SQLiteHelper import Query
 
-f_cur = connect(filepath('Futures')).cursor()
-mf7 = f_cur.execute("SELECT date, session, open, high, low, close FROM records WHERE code='MHIF7' ORDER BY date ASC, session DESC").fetchall()
+dFile, dTable, fdReq = 'Futures', 'records', ('date','session','open','high','low','close')
 
-def atr(data, period=rnd(20/gr)):
+def atr(code, period=rnd(20/gr)):
+    futures = Query(connect(filepath(dFile)))
+    data = futures.show(dTable, fields=fdReq, criteria={'code':code.upper()})
     res, r_date, tr, i, hdr = {}, [], [], 0, {}
+
     tr.append([data[0][0], data[0][1], data[0][-3] - data[0][-2]])
     i += 1
     while i < len(data):
