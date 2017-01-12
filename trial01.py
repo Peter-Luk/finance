@@ -27,7 +27,8 @@ class I2(Query):
         del(self.__table)
         del(self.__Query)
 
-    def atr(self, **args):
+#    @property
+    def ATR(self, **args):
         date = datetime.today().strftime('%Y-%m-%d')
         if 'date' in args.keys():date = args['date']
         res, r_date, tr, i, hdr = {}, [], [], 0, {}
