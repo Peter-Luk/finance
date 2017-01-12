@@ -44,7 +44,7 @@ class I2(Query):
                 if self.__data[i][-3] > self.__data[i - 1][-1]:ma, mi = self.__data[i][-3], self.__data[i - 1][-1]
                 elif self.__data[i][-2] < self.__data[i - 1][-1]:mi, ma = self.__data[i][-2], self.__data[i - 1][-1]
             tr.append([self.__data[i][0], self.__data[i][1], ma - mi])
-            i += 1 
+            i += 1
         i = 0
         while i < len(tr):
             hdr[tr[i][0]] = tr[i][-1]
