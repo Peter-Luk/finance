@@ -46,6 +46,7 @@ class I2(Query):
                 elif self.__data[i][-2] < self.__data[i - 1][-1]:mi, ma = self.__data[i][-2], self.__data[i - 1][-1]
             tr.append([self.__data[i][0], self.__data[i][1], ma - mi])
             i += 1
+
         i = 0
         while i < len(tr):
             hdr[tr[i][0]] = tr[i][-1]
@@ -59,3 +60,37 @@ class I2(Query):
         rkeys.sort()
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
+
+    def EMA(self, **args):
+        date, type = datetime.today().strftime('%Y-%m-%d'), 'C'
+        if 'date' in args.keys():date = args['date']
+        if 'type' in args.keys():type = args['type']
+        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+
+        tr.append([self.__data[0][0], self.__data[0][1], self.__data[0][-3] - self.__data[0][-2]])
+        i += 1
+        while i < len(self.__data):
+            if self.__data[i][0] == self.__data[i - 1][0]:
+                if self.__data[i][-3] > self.__data[i - 1][-3]:ma = self.__data[i][-3]
+                else:ma = self.__data[i - 1][-3]
+                if self.__data[i][-2] < self.__data[i - 1][-2]:mi = self.__data[i][-2]
+                else:mi = self.__data[i - 1][-2]
+            else:
+                if self.__data[i][-3] > self.__data[i - 1][-1]:ma, mi = self.__data[i][-3], self.__data[i - 1][-1]
+                elif self.__data[i][-2] < self.__data[i - 1][-1]:mi, ma = self.__data[i][-2], self.__data[i - 1][-1]
+            tr.append([self.__data[i][0], self.__data[i][1], ma - mi])
+            i += 1
+
+#        i = 0
+#        while i < len(tr):
+#            hdr[tr[i][0]] = tr[i][-1]
+#            if tr[i][0] not in r_date:r_date.append(tr[i][0])
+#            i += 1
+
+#        res[r_date[self.__period - 1]] = mean([hdr[x] for x in r_date[:self.__period]])
+#        for d in r_date[self.__period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (self.__period - 1) + hdr[d]) / self.__period
+
+#        rkeys = list(res.keys())
+#        rkeys.sort()
+#        if date in rkeys:return res[date]
+#        return res[rkeys[-1]]
