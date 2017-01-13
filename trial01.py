@@ -28,6 +28,7 @@ class I2:
     def ATR(self, **args):
         date = datetime.today().strftime('%Y-%m-%d')
         if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():self.__period = args['period']
         res, r_date, tr, i, hdr = {}, [], [], 0, {}
 
         tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
