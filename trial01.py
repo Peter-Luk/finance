@@ -26,9 +26,9 @@ class I2:
         del(self.__table)
 
     def ATR(self, **args):
-        date = datetime.today().strftime('%Y-%m-%d')
+        date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():self.__period = args['period']
+        if 'period' in args.keys():period = args['period']
         res, r_date, tr, i, hdr = {}, [], [], 0, {}
 
         tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
@@ -51,8 +51,8 @@ class I2:
             if tr[i][0] not in r_date:r_date.append(tr[i][0])
             i += 1
 
-        res[r_date[self.__period - 1]] = mean([hdr[x] for x in r_date[:self.__period]])
-        for d in r_date[self.__period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (self.__period - 1) + hdr[d]) / self.__period
+        res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
+        for d in r_date[period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
 
         rkeys = list(res.keys())
         rkeys.sort()
