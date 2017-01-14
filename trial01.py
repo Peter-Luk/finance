@@ -58,3 +58,10 @@ class I2:
         rkeys.sort()
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
+
+    def daatr(self, **args):
+        date, period = None, 5
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        if date:return self.ATR(date=date, period=period) - self.ATR(date=date)
+        else: return self.ATR(period=period) - self.ATR()
