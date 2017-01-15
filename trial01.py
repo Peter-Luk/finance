@@ -7,6 +7,7 @@ db_name, db_table = 'Futures', 'records'
 
 class I2:
     def __init__(self, **args):
+        self.trade_day = []
         self.__period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
         if 'code' in args.keys():self.__code = args['code']
         if 'period' in args.keys():self.__period = args['period']
@@ -16,14 +17,17 @@ class I2:
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
         self.__data = self.__conn.cursor().execute("SELECT * FROM %s WHERE code='%s'" % (self.__table, self.__code.upper())).fetchall()
+        for i in range(len(self.__data)):
+            if self.__data[i]['date'] not in self.trade_day:self.trade_day.append(self.__data[i]['date'])
 
     def __del__(self):
-        self.__data = self.__data = self.__code = self.__period = self.__db = self.__table = None
+        self.__data = self.__data = self.__code = self.__period = self.__db = self.__table = self.trade_day = None
         del(self.__data)
         del(self.__code)
         del(self.__period)
         del(self.__db)
         del(self.__table)
+        del(self.trade_day)
 
     def ATR(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
