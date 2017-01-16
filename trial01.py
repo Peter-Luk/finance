@@ -67,13 +67,13 @@ class I2:
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
-        if 'option' in args.keys():option = args['option'] 
+        if 'option' in args.keys():option = args['option']
         res, r_date, tr, i, hdr = {}, [], [], 0, {}
 
 #        tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
-        if option.upper() = 'C':tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['close']])
-        if option.upper() = 'HL':tr.append([self.__data[0]['date'], self.__data[0]['session'], mean(self.__data[0]['high'], self.__data[0]['low'])])
-        if option.upper() = 'A':tr.append([self.__data[0]['date'], self.__data[0]['session'], mean(self.__data[0]['open'], self.__data[0]['high'], self.__data[0]['low'], self.__data[0]['close'])])
+        if option.upper() == 'C':tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['close']])
+        if option.upper() == 'HL':tr.append([self.__data[0]['date'], self.__data[0]['session'], mean(self.__data[0]['high'], self.__data[0]['low'])])
+        if option.upper() == 'A':tr.append([self.__data[0]['date'], self.__data[0]['session'], mean(self.__data[0]['open'], self.__data[0]['high'], self.__data[0]['low'], self.__data[0]['close'])])
         i += 1
         while i < len(self.__data):
             if self.__data[i]['date'] == self.__data[i - 1]['date']:
