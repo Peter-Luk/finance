@@ -70,21 +70,10 @@ class I2:
         if 'option' in args.keys():option = args['option']
         res, r_date, tr, i, hdr = {}, [], [], 0, {}
 
-#        tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
-        if option.upper() == 'C':tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['close']])
-        if option.upper() == 'HL':tr.append([self.__data[0]['date'], self.__data[0]['session'], mean(self.__data[0]['high'], self.__data[0]['low'])])
-        if option.upper() == 'A':tr.append([self.__data[0]['date'], self.__data[0]['session'], mean(self.__data[0]['open'], self.__data[0]['high'], self.__data[0]['low'], self.__data[0]['close'])])
-        i += 1
         while i < len(self.__data):
-            if self.__data[i]['date'] == self.__data[i - 1]['date']:
-                if self.__data[i]['high'] > self.__data[i - 1]['high']:ma = self.__data[i]['high']
-                else:ma = self.__data[i - 1]['high']
-                if self.__data[i]['low'] < self.__data[i - 1]['low']:mi = self.__data[i]['low']
-                else:mi = self.__data[i - 1]['low']
-            else:
-                if self.__data[i]['high'] > self.__data[i - 1]['close']:ma, mi = self.__data[i]['high'], self.__data[i - 1]['close']
-                elif self.__data[i]['low'] < self.__data[i - 1]['close']:mi, ma = self.__data[i]['low'], self.__data[i - 1]['close']
-            tr.append([self.__data[i]['date'], self.__data[i]['session'], ma - mi])
+            if option.upper() == 'C':tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close']])
+            if option.upper() == 'HL':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean(self.__data[i]['high'], self.__data[i]['low'])])
+            if option.upper() == 'A':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean(self.__data[i]['open'], self.__data[i]['high'], self.__data[i]['low'], self.__data[i]['close'])])
             i += 1
 
         i = 0
