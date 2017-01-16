@@ -63,6 +63,44 @@ class I2:
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
 
+    def EMA(self, **args):
+        date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        if 'option' in args.keys():option = args['option'] 
+        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+
+#        tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
+        if option.upper() = 'C':tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['close']])
+        if option.upper() = 'HL':tr.append([self.__data[0]['date'], self.__data[0]['session'], mean(self.__data[0]['high'], self.__data[0]['low'])])
+        if option.upper() = 'A':tr.append([self.__data[0]['date'], self.__data[0]['session'], mean(self.__data[0]['open'], self.__data[0]['high'], self.__data[0]['low'], self.__data[0]['close'])])
+        i += 1
+        while i < len(self.__data):
+            if self.__data[i]['date'] == self.__data[i - 1]['date']:
+                if self.__data[i]['high'] > self.__data[i - 1]['high']:ma = self.__data[i]['high']
+                else:ma = self.__data[i - 1]['high']
+                if self.__data[i]['low'] < self.__data[i - 1]['low']:mi = self.__data[i]['low']
+                else:mi = self.__data[i - 1]['low']
+            else:
+                if self.__data[i]['high'] > self.__data[i - 1]['close']:ma, mi = self.__data[i]['high'], self.__data[i - 1]['close']
+                elif self.__data[i]['low'] < self.__data[i - 1]['close']:mi, ma = self.__data[i]['low'], self.__data[i - 1]['close']
+            tr.append([self.__data[i]['date'], self.__data[i]['session'], ma - mi])
+            i += 1
+
+        i = 0
+        while i < len(tr):
+            hdr[tr[i][0]] = tr[i][-1]
+            if tr[i][0] not in r_date:r_date.append(tr[i][0])
+            i += 1
+
+        res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
+        for d in r_date[period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
+
+        rkeys = list(res.keys())
+        rkeys.sort()
+        if date in rkeys:return res[date]
+        return res[rkeys[-1]]
+
     def daatr(self, **args):
         date, period = None, 5
         if 'date' in args.keys():date = args['date']
