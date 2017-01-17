@@ -97,7 +97,7 @@ class I2:
         if 'period' in args.keys():period = args['period']
         if 'option' in args.keys():option = args['option']
         width, base = self.ATR(date=date, period=period), self.EMA(date=date, period=period, option=option)
-        return (rnd(base - width * gr / 2), rnd(base + width * gr / 2))
+        return (rnd(base - width * gr), rnd(base + width * gr))
 
     def daatr(self, **args):
         date, period = None, 5
