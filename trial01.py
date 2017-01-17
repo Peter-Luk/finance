@@ -73,14 +73,14 @@ class I2:
         while i < len(self.__data):
             if option.upper() == 'C':tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close']])
             if option.upper() == 'HL':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['high'], self.__data[i]['low']])])
-            if option.upper() == 'A':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['open'], self.__data[i]['high'], self.__data[i]['low'], self.__data[i]['close']])])
+            if option.upper() == 'F':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['open'], self.__data[i]['high'], self.__data[i]['low'], self.__data[i]['close']])])
             i += 1
 
         i = 0
         while i < len(tr):
             hdr[tr[i][0]] = tr[i][-1]
             if tr[i][0] not in r_date:r_date.append(tr[i][0])
-            elif option.upper() == 'HL' or option.upper() == 'A':hdr[tr[i][0]] = mean([tr[i - 1][-1], tr[i][-1]])
+            elif option.upper() == 'HL' or option.upper() == 'F':hdr[tr[i][0]] = mean([tr[i - 1][-1], tr[i][-1]])
             i += 1
 
         res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
@@ -90,6 +90,14 @@ class I2:
         rkeys.sort()
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
+
+    def KC(self, **args):
+        date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        if 'option' in args.keys():option = args['option']
+        width, base = self.ATR(date=date, period=period), self.EMA(date=date, period=period, option=option)
+        return (rnd(base - width * gr / 2), rnd(base + width * gr / 2))
 
     def daatr(self, **args):
         date, period = None, 5
