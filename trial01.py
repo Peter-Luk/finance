@@ -80,7 +80,6 @@ class I2:
         while i < len(tr):
             hdr[tr[i][0]] = tr[i][-1]
             if tr[i][0] not in r_date:r_date.append(tr[i][0])
-            elif option.upper() == 'HL' or option.upper() == 'F':hdr[tr[i][0]] = mean([tr[i - 1][-1], tr[i][-1]])
             i += 1
 
         res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
@@ -108,7 +107,6 @@ class I2:
         while i < len(tr):
             hdr[tr[i][0]] = tr[i][-1]
             if tr[i][0] not in r_date:r_date.append(tr[i][0])
-            elif option.upper() == 'HL' or option.upper() == 'F':hdr[tr[i][0]] = mean([tr[i - 1][-1], tr[i][-1]])
             i += 1
 
         for i in range(len(r_date) - period):
