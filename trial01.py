@@ -117,6 +117,33 @@ class I2:
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
 
+    def WMA(self, **args):
+        date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        if 'option' in args.keys():option = args['option']
+        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+
+        while i < len(self.__data):
+            if option.upper() == 'C':tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close'], self.__data[i]['volume']])
+            if option.upper() == 'HL':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['high'], self.__data[i]['low']]),self.__data[i]['volume']])
+            if option.upper() == 'F':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['open'], self.__data[i]['high'], self.__data[i]['low'], self.__data[i]['close']]),self.__data[i]['vo;ume']])
+            i += 1
+
+        i = 0
+        while i < len(tr):
+            hdr[tr[i][0]] = tr[i][-2:]
+            if tr[i][0] not in r_date:r_date.append(tr[i][0])
+            i += 1
+
+        for i in range(len(r_date) - period):
+            res[r_date[period + i]] = sum([hdr[r_date[x]][0] * hdr[r_date[x]][-1] for x in range(i, period + i)]) / sum([hdr[r_date[x]][-1] for x in range(i, period + i)])
+
+        rkeys = list(res.keys())
+        rkeys.sort()
+        if date in rkeys:return res[date]
+        return res[rkeys[-1]]
+
     def KC(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if 'date' in args.keys():date = args['date']
