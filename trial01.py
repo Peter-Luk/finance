@@ -90,6 +90,37 @@ class I2:
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
 
+    def RSI(self, **args):
+        date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+
+        while i < len(self.__data):
+            tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close']])
+            i += 1
+
+        i = 1
+        while i < len(tr):
+            hdr[tr[i][0]] = tr[i][-1] - tr[i - 1][-1]
+            if tr[i][0] not in r_date:r_date.append(tr[i][0])
+            i += 1
+
+        i, ag, al = period, {}, {}
+        hkeys = list(hdr.keys())
+        hkeys.sort()
+        while i < len(hkeys):
+#            if hdr[hkeys[i]]
+            i += 1
+
+        for i in range(len(r_date) - period):
+            res[r_date[period + i]] = mean([hdr[r_date[x]] for x in range(i, period + i)])
+
+        rkeys = list(res.keys())
+        rkeys.sort()
+        if date in rkeys:return res[date]
+        return res[rkeys[-1]]
+
     def SMA(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if 'date' in args.keys():date = args['date']
