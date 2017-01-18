@@ -97,7 +97,12 @@ class I2:
         res, r_date, tr, i, hdr = {}, [], [], 0, {}
 
         while i < len(self.__data):
-            tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close']])
+            if self.__data[i]['date'] in r_date:
+                if self.__data[i]['session'] == 'A':tr[self.__data[i]['date']] = self.__data[i]['close']
+            else:
+                r_date.append(self.__data[i]['date'])
+                tr[self.__data[i]['date']] = self.__data[i]['close']
+#            tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close']])
             i += 1
 
         i = 1
