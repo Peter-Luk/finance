@@ -94,7 +94,7 @@ class I2:
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
-        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+        res, r_date, tr, i, hdr = {}, [], {}, 0, {}
 
         while i < len(self.__data):
             if self.__data[i]['date'] in r_date:
@@ -102,13 +102,11 @@ class I2:
             else:
                 r_date.append(self.__data[i]['date'])
                 tr[self.__data[i]['date']] = self.__data[i]['close']
-#            tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close']])
             i += 1
 
         i = 1
-        while i < len(tr):
-            hdr[tr[i][0]] = tr[i][-1] - tr[i - 1][-1]
-            if tr[i][0] not in r_date:r_date.append(tr[i][0])
+        while i < len(r_date):
+            hdr[r_date[i]] = tr[r_date[i]] - tr[r_date[i - 1]]
             i += 1
 
         i, ag, al = period, {}, {}
@@ -118,8 +116,8 @@ class I2:
 #            if hdr[hkeys[i]]
             i += 1
 
-        for i in range(len(r_date) - period):
-            res[r_date[period + i]] = mean([hdr[r_date[x]] for x in range(i, period + i)])
+        res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
+        for d in r_date[period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
 
         rkeys = list(res.keys())
         rkeys.sort()
