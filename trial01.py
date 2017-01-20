@@ -68,18 +68,18 @@ class I2:
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
         if 'option' in args.keys():option = args['option']
-        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+        res, r_date, i, hdr = {}, [], 0, {}
 
         while i < len(self.__data):
-            if option.upper() == 'C':tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close']])
-            if option.upper() == 'HL':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['high'], self.__data[i]['low']])])
-            if option.upper() == 'F':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['open'], self.__data[i]['high'], self.__data[i]['low'], self.__data[i]['close']])])
-            i += 1
-
-        i = 0
-        while i < len(tr):
-            hdr[tr[i][0]] = tr[i][-1]
-            if tr[i][0] not in r_date:r_date.append(tr[i][0])
+            if self.__data[i]['date'] in r_date:
+                if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
+                if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
+                if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
+            else:
+                r_date.append(self.__data[i]['date'])
+                if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
+                if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
+                if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
             i += 1
 
         res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
@@ -131,18 +131,18 @@ class I2:
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
         if 'option' in args.keys():option = args['option']
-        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+        res, r_date, i, hdr = {}, [], 0, {}
 
         while i < len(self.__data):
-            if option.upper() == 'C':tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close']])
-            if option.upper() == 'HL':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['high'], self.__data[i]['low']])])
-            if option.upper() == 'F':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['open'], self.__data[i]['high'], self.__data[i]['low'], self.__data[i]['close']])])
-            i += 1
-
-        i = 0
-        while i < len(tr):
-            hdr[tr[i][0]] = tr[i][-1]
-            if tr[i][0] not in r_date:r_date.append(tr[i][0])
+            if self.__data[i]['date'] in r_date:
+                if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
+                if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
+                if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
+            else:
+                r_date.append(self.__data[i]['date'])
+                if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
+                if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
+                if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
             i += 1
 
         for i in range(len(r_date) - period):
@@ -158,18 +158,18 @@ class I2:
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
         if 'option' in args.keys():option = args['option']
-        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+        res, r_date, i, hdr = {}, [], 0, {}
 
         while i < len(self.__data):
-            if option.upper() == 'C':tr.append([self.__data[i]['date'], self.__data[i]['session'], self.__data[i]['close'], self.__data[i]['volume']])
-            if option.upper() == 'HL':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['high'], self.__data[i]['low']]),self.__data[i]['volume']])
-            if option.upper() == 'F':tr.append([self.__data[i]['date'], self.__data[i]['session'], mean([self.__data[i]['open'], self.__data[i]['high'], self.__data[i]['low'], self.__data[i]['close']]),self.__data[i]['vo;ume']])
-            i += 1
-
-        i = 0
-        while i < len(tr):
-            hdr[tr[i][0]] = tr[i][-2:]
-            if tr[i][0] not in r_date:r_date.append(tr[i][0])
+            if self.__data[i]['date'] in r_date:
+                if option.upper() == 'C':hdr[self.__data[i]['date']] = (self.__data[i]['close'], self.__data[i]['volume'])
+                if option.upper() == 'HL':hdr[self.__data[i]['date']] = (mean([self.__data[i]['high'], self.__data[i]['low']]), self.__data[i]['volume'])
+                if option.upper() == 'F':hdr[self.__data[i]['date']] = (mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']]), self.__data[i]['volume'])
+            else:
+                r_date.append(self.__data[i]['date'])
+                if option.upper() == 'C':hdr[self.__data[i]['date']] = (self.__data[i]['close'], self.__data[i]['volume'])
+                if option.upper() == 'HL':hdr[self.__data[i]['date']] = (mean([self.__data[i]['high'], self.__data[i]['low']]), self.__data[i]['volume'])
+                if option.upper() == 'F':hdr[self.__data[i]['date']] = (mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']]), self.__data[i]['volume'])
             i += 1
 
         for i in range(len(r_date) - period):
