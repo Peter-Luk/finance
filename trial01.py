@@ -112,12 +112,21 @@ class I2:
         i, ag, al = period, {}, {}
         hkeys = list(hdr.keys())
         hkeys.sort()
-        while i < len(hkeys):
-#            if hdr[hkeys[i]]
-            i += 1
-
-        res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
-        for d in r_date[period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
+        for i in range(period, len(hkeys)):
+            if i == period:
+                tg, tl = 0, 0
+                for j in range(i - period, i):
+                    if hdr[hkeys[j]] > 0:tg += hdr[hkeys[j]]
+                    if hdr[hkeys[j]] < 0:tl += hdr[hkeys[j]]
+                ag[hkeys[i]], al[hkeys[i]] = tg / period, abs(tl) / period
+            else:
+                if hdr[hkeys[i]] > 0:
+                    ag[hkeys[i]] = (ag[hkeys[i - 1]] * (period - 1) + hdr[hkeys[i]]) / period
+                    al[hkeys[i]] = al[hkeys[i - 1]] * (period - 1) / period
+                if hdr[hkeys[i]] < 0:
+                    ag[hkeys[i]] = ag[hkeys[i - 1]] * (period - 1) / period
+                    al[hkeys[i]] = (al[hkeys[i - 1]] * (period - 1) + abs(hdr[hkeys[i]])) / period
+            res[hkeys[i]] = 100 - 100 / ( 1 + float(ag[hkeys[i]]) / al[hkeys[i]])
 
         rkeys = list(res.keys())
         rkeys.sort()
