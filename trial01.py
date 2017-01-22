@@ -29,6 +29,14 @@ class I2:
         del(self.__table)
         del(self.trade_day)
 
+    def __gt0(self, x):
+        if x > 0:return True
+        return False
+
+    def __lt0(self, x):
+        if x < 0:return True
+        return False
+
     def ATR(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if 'date' in args.keys():date = args['date']
@@ -94,39 +102,35 @@ class I2:
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
-        res, r_date, tr, i, hdr = {}, [], {}, 0, {}
+        res, trade_day, tr, i, hdr = {}, [], {}, 0, {}
 
         while i < len(self.__data):
-            if self.__data[i]['date'] in r_date:
+            if self.__data[i]['date'] in trade_day:
                 if self.__data[i]['session'] == 'A':tr[self.__data[i]['date']] = self.__data[i]['close']
             else:
-                r_date.append(self.__data[i]['date'])
+                trade_day.append(self.__data[i]['date'])
                 tr[self.__data[i]['date']] = self.__data[i]['close']
             i += 1
 
         i = 1
-        while i < len(r_date):
-            hdr[r_date[i]] = tr[r_date[i]] - tr[r_date[i - 1]]
+        while i < len(trade_day):
+            hdr[trade_day[i]] = tr[trade_day[i]] - tr[trade_day[i - 1]]
             i += 1
 
         i, ag, al = period, {}, {}
-        hkeys = list(hdr.keys())
-        hkeys.sort()
-        for i in range(period, len(hkeys)):
+        trade_day = list(hdr.keys())
+        trade_day.sort()
+        for i in range(period, len(trade_day)):
             if i == period:
-                tg, tl = 0, 0
-                for j in range(i - period, i):
-                    if hdr[hkeys[j]] > 0:tg += hdr[hkeys[j]]
-                    if hdr[hkeys[j]] < 0:tl += hdr[hkeys[j]]
-                ag[hkeys[i]], al[hkeys[i]] = tg / period, abs(tl) / period
+                ag[trade_day[i]], al[trade_day[i]] = sum(list(filter(self.__gt0, [hdr[trade_day[j]] for j in range(i - period, i)]))) / period, abs(sum(list(filter(self.__lt0, [hdr[trade_day[j]] for j in range(i - period, i)])))) / period
             else:
-                if hdr[hkeys[i]] > 0:
-                    ag[hkeys[i]] = (ag[hkeys[i - 1]] * (period - 1) + hdr[hkeys[i]]) / period
-                    al[hkeys[i]] = al[hkeys[i - 1]] * (period - 1) / period
-                if hdr[hkeys[i]] < 0:
-                    ag[hkeys[i]] = ag[hkeys[i - 1]] * (period - 1) / period
-                    al[hkeys[i]] = (al[hkeys[i - 1]] * (period - 1) + abs(hdr[hkeys[i]])) / period
-            res[hkeys[i]] = 100 - 100 / ( 1 + float(ag[hkeys[i]]) / al[hkeys[i]])
+                if hdr[trade_day[i]] > 0:
+                    ag[trade_day[i]] = (ag[trade_day[i - 1]] * (period - 1) + hdr[trade_day[i]]) / period
+                    al[trade_day[i]] = al[trade_day[i - 1]] * (period - 1) / period
+                if hdr[trade_day[i]] < 0:
+                    ag[trade_day[i]] = ag[trade_day[i - 1]] * (period - 1) / period
+                    al[trade_day[i]] = (al[trade_day[i - 1]] * (period - 1) + abs(hdr[trade_day[i]])) / period
+            res[trade_day[i]] = 100 - 100 / ( 1 + float(ag[trade_day[i]]) / al[trade_day[i]])
 
         rkeys = list(res.keys())
         rkeys.sort()
