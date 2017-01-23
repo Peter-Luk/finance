@@ -81,8 +81,11 @@ class I2:
         while i < len(self.__data):
             if self.__data[i]['date'] in r_date:
                 if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
-                if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
-                if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
+                if option.upper() == 'HL':
+#                    ph, pl = hdr
+                    hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
+                if option.upper() == 'F':
+                    hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
             else:
                 r_date.append(self.__data[i]['date'])
                 if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
@@ -184,7 +187,7 @@ class I2:
             i += 1
 
         for i in range(len(r_date) - period):
-            res[r_date[period + i]] = sum([hdr[r_date[x]][0] * hdr[r_date[x]][-1] for x in range(i, period + i)]) / sum([hdr[r_date[x]][-1] for x in range(i, period + i)])
+            res[r_date[period + i]] = sum([hdr[r_date[x]][0] * hdr[r_date[x]][-1] for x in range(i, period + i)]) / float(sum([hdr[r_date[x]][-1] for x in range(i, period + i)]))
 
         rkeys = list(res.keys())
         rkeys.sort()
