@@ -208,3 +208,13 @@ class I2:
         if 'period' in args.keys():period = args['period']
         if date:return self.ATR(date=date, period=period) - self.ATR(date=date)
         else: return self.ATR(period=period) - self.ATR()
+
+def summary(**args):
+    if 'code' in args.keys():
+        code = args['code']
+        mf = I2(code=code)
+        period, tday = mf._I2__period, mf.trade_day
+        ltd, hdr = len(tday), 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
+        for i in range(period + 1, ltd):
+            hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
+        return hdr
