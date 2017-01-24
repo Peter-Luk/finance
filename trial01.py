@@ -124,7 +124,7 @@ class I2:
 
         for i in range(slow, len(trade_day)):
             sfc, ssc = 2. / (fast + 1), 2. / (slow + 1)
-            sc[trade_day[i]] = ((er[trade_day[i]] * (sfc - ssc)) + ssc) ** 2
+            sc[trade_day[i]] = (er[trade_day[i]] * (sfc - ssc) + ssc) ** 2
 
         for i in range(slow, len(trade_day)):
             if i == slow:res[trade_day[i]] = self.EMA(date=trade_day[i])
