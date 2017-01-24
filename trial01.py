@@ -101,6 +101,40 @@ class I2:
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
 
+    def KAMA(self, **args):
+        date, slow, period = datetime.today().strftime('%Y-%m-%d'), rnd(self.__period * gr), self.__period
+        fast = rnd(period / gr)
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        if 'slow' in args.keys():slow = args['slow']
+        if 'fast' in args.keys():fast = args['fast']
+        res, trade_day, tr, i, hdr, er, sc = {}, [], {}, 0, {}, {}, {}
+
+        while i < len(self.__data):
+            if self.__data[i]['date'] in trade_day:
+                if self.__data[i]['session'] == 'A':tr[self.__data[i]['date']] = self.__data[i]['close']
+            else:
+                trade_day.append(self.__data[i]['date'])
+                tr[self.__data[i]['date']] = self.__data[i]['close']
+            i += 1
+
+        for i in range(period, len(trade_day)):
+            ch, vo = abs(tr[trade_day[i]] - tr[trade_day[i-period]]), sum([abs(tr[trade_day[x]] - tr[trade_day[x - 1]]) for x in range(i-period, i)])
+            er[trade_day[i]] = ch / float(vo)
+
+        for i in range(slow, len(trade_day)):
+            sfc, ssc = 2. / (fast + 1), 2. / (slow + 1)
+            sc[trade_day[i]] = ((er[trade_day[i]] * (sfc - ssc)) + ssc) ** 2
+
+        for i in range(slow, len(trade_day)):
+            if i == slow:res[trade_day[i]] = self.EMA(date=trade_day[i])
+            else:res[trade_day[i]] = res[trade_day[i - 1]] + sc[trade_day[i]] * (tr[trade_day[i]] - res[trade_day[i - 1]])
+
+        rkeys = list(res.keys())
+        rkeys.sort()
+        if date in rkeys:return res[date]
+        return res[rkeys[-1]]
+
     def RSI(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if 'date' in args.keys():date = args['date']
@@ -214,7 +248,7 @@ def summary(**args):
         code = args['code']
         mf = I2(code=code)
         period, tday = mf._I2__period, mf.trade_day
-        ltd, hdr = len(tday), 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
-        for i in range(period + 1, ltd):
-            hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
+        ltd, hdr = len(tday), 'Date\t\tSMA\t\tEMA\t\tWMA\t\tKAMA\t\tRSI'
+        for i in range(rnd(period  * gr), ltd):
+            hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
         return hdr
