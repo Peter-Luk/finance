@@ -247,11 +247,13 @@ def summary(**args):
         code = args['code']
         mf = I2(code=code)
         period, tday = mf._I2__period, mf.trade_day
-        ltd, hdr = len(tday), 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
+        ltd = len(tday)
         if ltd > rnd(period * gr):
+            hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tKAMA\t\tRSI'
             for i in range(rnd(period  * gr), ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
         else:
+            hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\t\tRSI'
             for i in range(period, ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
         return hdr
