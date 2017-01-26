@@ -253,7 +253,7 @@ def summary(**args):
             for i in range(rnd(period  * gr), ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
         else:
-            hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\t\tRSI'
+            hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
             for i in range(period, ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
         return hdr
