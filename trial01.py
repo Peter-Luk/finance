@@ -82,7 +82,6 @@ class I2:
             if self.__data[i]['date'] in r_date:
                 if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
                 if option.upper() == 'HL':
-#                    ph, pl = hdr
                     hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
                 if option.upper() == 'F':
                     hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
@@ -248,7 +247,11 @@ def summary(**args):
         code = args['code']
         mf = I2(code=code)
         period, tday = mf._I2__period, mf.trade_day
-        ltd, hdr = len(tday), 'Date\t\tSMA\t\tEMA\t\tWMA\t\tKAMA\t\tRSI'
-        for i in range(rnd(period  * gr), ltd):
-            hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
+        ltd, hdr = len(tday), 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
+        if ltd > rnd(period * gr):
+            for i in range(rnd(period  * gr), ltd):
+                hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
+        else:
+            for i in range(period, ltd):
+                hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
         return hdr
