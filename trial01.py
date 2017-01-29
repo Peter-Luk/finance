@@ -243,6 +243,8 @@ class I2:
         else: return self.ATR(period=period) - self.ATR()
 
 def summary(**args):
+    format = 'raw'
+    if 'format' in args.keys():format = args['format']
     if 'code' in args.keys():
         code = args['code']
         mf = I2(code=code)
@@ -250,12 +252,12 @@ def summary(**args):
         ltd = len(tday)
         if ltd > rnd(period * gr):
             hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tKAMA\t\tRSI'
-            if 'format' in args.keys() and args['format'].lower() == 'html':pass
+            if format.lower() == 'html':pass
             for i in range(rnd(period  * gr), ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
         else:
-            if 'format' in args.keys() and args['format'].lower() == 'html':pass
             hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
+            if format.lower() == 'html':pass
             for i in range(period, ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
         return hdr
