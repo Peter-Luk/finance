@@ -244,7 +244,9 @@ class I2:
 
 def summary(**args):
     format = 'raw'
-    if 'format' in args.keys():format = args['format']
+    if 'format' in args.keys():
+        format = args['format']
+        from tags import TR, TD
     if 'code' in args.keys():
         code = args['code']
         mf = I2(code=code)
