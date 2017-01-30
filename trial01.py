@@ -256,8 +256,7 @@ def summary(**args):
         if ltd > rnd(period * gr):
             if format.lower() == 'html':
                 hdr += TH(TR(TD('date'.capitalize()),TD('sma'.upper()),TD('ema'.upper()),TD('wma'.upper()),TD('kama'.upper()),TD('rsi'.upper())))
-            hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tKAMA\t\tRSI'
-            if format.lower() == 'html':pass
+            else:hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tKAMA\t\tRSI'
             for i in range(rnd(period  * gr), ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
         else:
