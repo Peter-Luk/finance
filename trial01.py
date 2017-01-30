@@ -254,6 +254,8 @@ def summary(**args):
         period, tday = mf._I2__period, mf.trade_day
         ltd = len(tday)
         if ltd > rnd(period * gr):
+            if format.lower() == 'html':
+                hdr += TH(TR(TD('date'.capitalize()),TD('sma'.upper()),TD('ema'.upper()),TD('wma'.upper()),TD('kama'.upper()),TD('rsi'.upper())))
             hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tKAMA\t\tRSI'
             if format.lower() == 'html':pass
             for i in range(rnd(period  * gr), ltd):
