@@ -246,9 +246,10 @@ def summary(**args):
     format = 'raw'
     if 'format' in args.keys():
         format = args['format']
-        from tags import TR, TD
+        from tags import HTML, TITLE, TABLE, TH, TR, TD
     if 'code' in args.keys():
         code = args['code']
+        if format.lower() == 'html':hdr = TITLE("`%s` analyse" % code.upper())
         mf = I2(code=code)
         period, tday = mf._I2__period, mf.trade_day
         ltd = len(tday)
