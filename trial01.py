@@ -260,7 +260,9 @@ def summary(**args):
             for i in range(rnd(period  * gr), ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
         else:
-            hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
+            if format.lower() == 'html':
+                trs = TH(TR('\n'.join([str(x) for x in [TD('date'.capitalize()),TD('sma'.upper()),TD('ema'.upper()),TD('wma'.upper()),TD('rsi'.upper())]])))
+            else:hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
             if format.lower() == 'html':pass
             for i in range(period, ltd):
                 hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
