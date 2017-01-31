@@ -2,6 +2,7 @@ import sqlite3 as lite
 from utilities import gr, rnd, filepath
 from datetime import datetime
 from statistics import mean
+# from tags import HTML, TITLE, TABLE, TH, TR, TD
 
 db_name, db_table = 'Futures', 'records'
 
@@ -243,27 +244,30 @@ class I2:
         else: return self.ATR(period=period) - self.ATR()
 
 def summary(**args):
-    format = 'raw'
+    o_format = 'raw'
     if 'format' in args.keys():
-        format = args['format']
+        o_format = args['format'].lower()
         from tags import HTML, TITLE, TABLE, TH, TR, TD
     if 'code' in args.keys():
-        code = args['code']
-        if format.lower() == 'html':hdr = TITLE("`%s` analyse" % code.upper())
-        mf = I2(code=code)
+        f_code = args['code'].upper()
+        if o_format == 'html':hdr = TITLE("`%s` analyse" % code)
+        mf = I2(code=f_code)
         period, tday = mf._I2__period, mf.trade_day
         ltd = len(tday)
         if ltd > rnd(period * gr):
-            if format.lower() == 'html':
-                hdr += TH(TR('\n'.join([str(x) for x in [TD('date'.capitalize()),TD('sma'.upper()),TD('ema'.upper()),TD('wma'.upper()),TD('kama'.upper()),TD('rsi'.upper())]])))
-            else:hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tKAMA\t\tRSI'
-            for i in range(rnd(period  * gr), ltd):
-                hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
+            i_fields = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI')
+            if o_format == 'html':
+                trs = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
+            else:hdr = '\t\t'.join(i_fields)
+            for i in range(rnd(period * gr), ltd):
+#                hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % (tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
+                hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % (tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
         else:
-            if format.lower() == 'html':
-                trs = TH(TR('\n'.join([str(x) for x in [TD('date'.capitalize()),TD('sma'.upper()),TD('ema'.upper()),TD('wma'.upper()),TD('rsi'.upper())]])))
-            else:hdr = 'Date\t\tSMA\t\tEMA\t\tWMA\t\tRSI'
-            if format.lower() == 'html':pass
+            i_fields = ('Date', 'SMA', 'EMA', 'WMA', 'RSI')
+            if o_format == 'html':
+                trs = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
+            else:hdr = '\t\t'.join(i_fields)
+            if o_format == 'html':pass
             for i in range(period, ltd):
-                hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f'%(tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
+                hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f' % (tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
         return hdr
