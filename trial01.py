@@ -262,7 +262,9 @@ def summary(**args):
                 i_values = []
                 for x in i_fields[1:]:
                     i_values.append(eval('mf.%s(date="%s")' % (x, tday[i])))
-                hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % ((tday[i],) + tuple(i_values))
+                if o_format == 'html':pass
+                else:
+                    hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % ((tday[i],) + tuple(i_values))
         else:
             i_fields = ('Date', 'SMA', 'EMA', 'WMA', 'RSI')
             if o_format == 'html':
@@ -272,5 +274,7 @@ def summary(**args):
                 i_values = []
                 for x in i_fields[1:]:
                     i_values.append(eval('mf.%s(date="%s")' % (x, tday[i])))
-                hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % ((tday[i],) + tuple(i_values))
+                if o_format == 'html':pass
+                else:
+                    hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % ((tday[i],) + tuple(i_values))
         return hdr
