@@ -256,25 +256,27 @@ def summary(**args):
         if ltd > rnd(period * gr):
             i_fields = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI')
             if o_format == 'html':
-                trs = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
+                th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
             else:hdr = '\t\t'.join(i_fields)
             for i in range(rnd(period * gr), ltd):
-                i_values = []
+                i_values, trs = [], []
                 for x in i_fields[1:]:
                     i_values.append(eval('mf.%s(date="%s")' % (x, tday[i])))
-                if o_format == 'html':pass
+                if o_format == 'html':
+                    trs.append(TR('\n'.join([str(TD(x)) for x in ((tday[i],) + tuple(i_values))])))
                 else:
                     hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % ((tday[i],) + tuple(i_values))
         else:
             i_fields = ('Date', 'SMA', 'EMA', 'WMA', 'RSI')
             if o_format == 'html':
-                trs = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
+                th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
             else:hdr = '\t\t'.join(i_fields)
             for i in range(period, ltd):
-                i_values = []
+                i_values, trs = [], []
                 for x in i_fields[1:]:
                     i_values.append(eval('mf.%s(date="%s")' % (x, tday[i])))
-                if o_format == 'html':pass
+                if o_format == 'html':
+                    trs.append(TR('\n'.join([str(TD(x)) for x in ((tday[i],) + tuple(i_values))])))
                 else:
                     hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % ((tday[i],) + tuple(i_values))
         return hdr
