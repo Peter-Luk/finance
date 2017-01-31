@@ -2,7 +2,6 @@ import sqlite3 as lite
 from utilities import gr, rnd, filepath
 from datetime import datetime
 from statistics import mean
-# from tags import HTML, TITLE, TABLE, TH, TR, TD
 
 db_name, db_table = 'Futures', 'records'
 
@@ -260,14 +259,18 @@ def summary(**args):
                 trs = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
             else:hdr = '\t\t'.join(i_fields)
             for i in range(rnd(period * gr), ltd):
-#                hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % (tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
-                hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % (tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.KAMA(date=tday[i]),mf.RSI(date=tday[i]))
+                i_values = []
+                for x in i_fields[1:]:
+                    i_values.append(eval('mf.%s(date="%s")' % (x, tday[i])))
+                hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % ((tday[i],) + tuple(i_values))
         else:
             i_fields = ('Date', 'SMA', 'EMA', 'WMA', 'RSI')
             if o_format == 'html':
                 trs = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
             else:hdr = '\t\t'.join(i_fields)
-            if o_format == 'html':pass
             for i in range(period, ltd):
-                hdr += '\n%s:\t%0.3f\t%0.3f\t%0.3f\t%0.3f' % (tday[i],mf.SMA(date=tday[i]),mf.EMA(date=tday[i]),mf.WMA(date=tday[i]),mf.RSI(date=tday[i]))
+                i_values = []
+                for x in i_fields[1:]:
+                    i_values.append(eval('mf.%s(date="%s")' % (x, tday[i])))
+                hdr += '\t'.join(('\n%s:',) + tuple(['%0.3f' for k in i_fields[1:]])) % ((tday[i],) + tuple(i_values))
         return hdr
