@@ -255,26 +255,21 @@ def summary(**args):
         ltd = len(tday)
         if ltd > rnd(period * gr):
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI'), []
-            if o_format == 'html':
-                th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
+            if o_format == 'html':th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
             else:hdr = '\t\t'.join(i_fields)
             for i in range(rnd(period * gr), ltd):
                 i_values = []
-                for x in i_fields[1:]:
-                    i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
+                for x in i_fields[1:]:i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
                 if o_format == 'html':trs.append(TR('\n'.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
                 else:hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
         else:
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'RSI'), []
-            if o_format == 'html':
-                th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
+            if o_format == 'html':th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
             else:hdr = '\t\t'.join(i_fields)
             for i in range(period, ltd):
                 i_values = []
-                for x in i_fields[1:]:
-                    i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
+                for x in i_fields[1:]:i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
                 if o_format == 'html':trs.append(TR('\n'.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
                 else:hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
-        if o_format == 'html':
-            hdr = str(HTML('\n'.join([str(x) for x in [hdr, TABLE('\n'.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))))]])))
+        if o_format == 'html':hdr = str(HTML('\n'.join([str(x) for x in [hdr, TABLE('\n'.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))))]])))
         return hdr
