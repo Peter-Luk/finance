@@ -249,7 +249,7 @@ def summary(**args):
         from tags import HTML, TITLE, TABLE, TH, TR, TD
     if 'code' in args.keys():
         f_code = args['code'].upper()
-        if o_format == 'html':hdr = TITLE("`%s` analyse" % code)
+        if o_format == 'html':hdr = TITLE("`%s` analyse" % f_code)
         mf = I2(code=f_code)
         period, tday = mf._I2__period, mf.trade_day
         ltd = len(tday)
@@ -275,4 +275,6 @@ def summary(**args):
                     i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
                 if o_format == 'html':trs.append(TR('\n'.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
                 else:hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
+        if o_format == 'html':
+            hdr = str(HTML('\n'.join([str(x) for x in [hdr, TABLE('\n'.join(str(y) for y in ((th,) + tuple(trs))))]])))
         return hdr
