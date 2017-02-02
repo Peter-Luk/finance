@@ -255,6 +255,8 @@ def summary(**args):
         ltd = len(tday)
         if 'date' in args.keys():
             if args['date'] in tday:ltd = tday.index(args['date']) + 1
+            elif o_format == 'html':return str(HTML('\n'.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
+            else:return 'Sorry, date entry invalid!'
         if ltd > rnd(period * gr):
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI'), []
             if o_format == 'html':th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
