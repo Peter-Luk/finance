@@ -35,7 +35,6 @@ def filepath(name, drive='C'):
         if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((environ['HOME'], 'data', 'sqlite3'))
         elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
             place = 'external-1'
-#        file_path = sep.join(('data', 'data', 'com.termux', 'files', 'home', 'storage', place, 'data', 'sqlite3'))
             file_path = sep.join((environ['HOME'], 'storage', place, 'data', 'sqlite3'))
     return sep.join((file_drive, file_path, name))
 
