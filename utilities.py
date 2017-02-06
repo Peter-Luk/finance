@@ -32,11 +32,7 @@ def filepath(name, **args):
         reqval, file_drive, file_path = ('drive', 'path'), environ['HOMEDRIVE'], environ['HOMEPATH']
         for i in reqval:
             if i in args.keys():exec("file_%s = '%s'" % (i, args[i]))
-#        file_drive, file_path = drive, path
-#        if not drive:file_drive = environ['HOMEDRIVE']
         file_path = sep.join((file_drive, file_path, 'data', 'sqlite3'))
-#        if path:file_path = sep.join((file_drive, path, 'data', 'sqlite3'))
-#        else:file_path = sep.join((file_drive, environ['HOMEPATH'], 'data', 'sqlite3'))
     if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', 'data', 'sqlite3'))
     if platform in ('linux', 'linux2'):
         place = 'shared'
