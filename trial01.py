@@ -158,7 +158,7 @@ class I2:
         trade_day.sort()
         for i in range(period, len(trade_day)):
             if i == period:
-                ag[trade_day[i]], al[trade_day[i]] = sum(list(filter(self.__gt0, [hdr[trade_day[j]] for j in range(i - period, i)]))) / period, abs(sum(list(filter(self.__lt0, [hdr[trade_day[j]] for j in range(i - period, i)])))) / float(period)
+                ag[trade_day[i]], al[trade_day[i]] = sum(list(filter(self.__gt0, [hdr[trade_day[j]] for j in range(i - period, i)]))) / float(period), abs(sum(list(filter(self.__lt0, [hdr[trade_day[j]] for j in range(i - period, i)])))) / float(period)
             else:
                 if hdr[trade_day[i]] > 0:
                     ag[trade_day[i]] = (ag[trade_day[i - 1]] * (period - 1) + hdr[trade_day[i]]) / period

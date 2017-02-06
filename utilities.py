@@ -27,22 +27,23 @@ def ltd(year=datetime.today().year, month=datetime.today().month, excluded=[]):
 futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'March':'H', 'April':'J', 'May':'K', 'June':'M', 'July':'N', 'August':'Q', 'September':'U', 'October':'V', 'November':'X', 'December':'Z'}
 avail_indicators, cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)
 
-def filepath(name, drive=None, path=None):
+def filepath(name, **args):
     if platform == 'win32':
-        file_drive, file_path = drive, path
-        if not drive:file_drive = environ['HOMEDRIVE']
-        if path:file_path = sep.join((file_drive, path, 'data', 'sqlite3'))
-        else:file_path = sep.join((file_drive, environ['HOMEPATH'], 'data', 'sqlite3'))
+        reqval, file_drive, file_path = ('drive', 'path'), environ['HOMEDRIVE'], environ['HOMEPATH']
+        for i in reqval:
+            if i in args.keys():exec("file_%s = '%s'" % (i, args[i]))
+#        file_drive, file_path = drive, path
+#        if not drive:file_drive = environ['HOMEDRIVE']
+        file_path = sep.join((file_drive, file_path, 'data', 'sqlite3'))
+#        if path:file_path = sep.join((file_drive, path, 'data', 'sqlite3'))
+#        else:file_path = sep.join((file_drive, environ['HOMEPATH'], 'data', 'sqlite3'))
     if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', 'data', 'sqlite3'))
     if platform in ('linux', 'linux2'):
         place = 'shared'
-        if 'ACTUAL_HOME' in environ.keys():
-            if path:file_path = sep.join((path, 'data', 'sqlite3'))
-            else:file_path = sep.join((environ['HOME'], 'data', 'sqlite3'))
+        if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((environ['HOME'], 'data', 'sqlite3'))
         elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
             place = 'external-1'
-            if path:file_path = sep.join((path, 'storage', place, 'data', 'sqlite3'))
-            else:file_path = sep.join((environ['HOME'], 'storage', place, 'data', 'sqlite3'))
+            file_path = sep.join((environ['HOME'], 'storage', place, 'data', 'sqlite3'))
     return sep.join((file_path, name))
 
 def rnd(n, decimal_place=0):
