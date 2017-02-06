@@ -33,7 +33,6 @@ def filepath(name, drive=None, path=None):
         if not drive:file_drive = environ['HOMEDRIVE']
         if path:file_path = sep.join((file_drive, path, 'data', 'sqlite3'))
         else:file_path = sep.join((file_drive, environ['HOMEPATH'], 'data', 'sqlite3'))
-#        file_drive, file_path = drive, sep.join((environ['HOMEPATH'], 'data', 'sqlite3'))
     if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', 'data', 'sqlite3'))
     if platform in ('linux', 'linux2'):
         place = 'shared'
