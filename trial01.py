@@ -1,5 +1,5 @@
 import sqlite3 as lite
-from .utilities import gr, rnd, filepath
+from utilities import gr, rnd, filepath
 from datetime import datetime
 from statistics import mean
 
