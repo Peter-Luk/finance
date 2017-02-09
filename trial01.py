@@ -252,7 +252,13 @@ class I2:
                 if 'date' in i.keys() and i['date'] == date:test.append[i]
             if len(test) > 1:
                 for i in test:
-                    if i['session'] == 'M':do, so = i['open'], i['open'] 
+                    so, sc, sh, sl, dh, dl = i['open'], i['close'], i['high'], i['low'], i['high'], i['low']
+                    if i['session'] == 'M':do = i['open']
+                    if i['session'] == 'A':
+                        if i['low'] < dl:dl = i['low']
+                        if i['high'] > dh:dh = i['high']
+                        do = i['close']
+            elif len(test) == 1:
         except:pass
 #
 def summary(**args):
