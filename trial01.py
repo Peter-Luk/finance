@@ -259,7 +259,7 @@ class I2:
                         if i['high'] > dh:dh = i['high']
                         do = i['close']
             elif len(test) == 1:so, sc, sh, sl, do, dc, dh, dl = i['open'], i['close'], i['high'], i['low'], i['open'], i['close'], i['high'], i['low']
-            dr, sr = dh - dl, sh - sl
+            dr, sr, gap = dh - dl, sh - sl, abs(pivot_point - sc)
         except:pass
 #
 def summary(**args):
