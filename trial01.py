@@ -258,7 +258,7 @@ class I2:
                         if i['low'] < dl:dl = i['low']
                         if i['high'] > dh:dh = i['high']
                         do = i['close']
-            elif len(test) == 1:
+            elif len(test) == 1:so, sc, sh, sl, do, dc, dh, dl = i['open'], i['close'], i['high'], i['low'], i['open'], i['close'], i['high'], i['low']
         except:pass
 #
 def summary(**args):
