@@ -16,7 +16,7 @@ class I2:
 
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
-        self.__data = self.__conn.cursor().execute("SELECT * FROM %s WHERE code='%s'" % (self.__table, self.__code.upper())).fetchall()
+        self.__data = self.__conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (self.__table, self.__code.upper())).fetchall()
         for i in range(len(self.__data)):
             if self.__data[i]['date'] not in self.trade_day:self.trade_day.append(self.__data[i]['date'])
 
@@ -241,7 +241,20 @@ class I2:
         if 'period' in args.keys():period = args['period']
         if date:return self.ATR(date=date, period=period) - self.ATR(date=date)
         else: return self.ATR(period=period) - self.ATR()
-
+#
+    def estimate(self, **args):
+        try:
+            for k in list(args.keys()):exec("%s = '%s'" % (k, args[k]))
+            if pivot_point:pivot_point = int(pivot_point)
+            if not(date):date = self.trade_day[-1]
+            test = []
+            for i in self.__data:
+                if 'date' in i.keys() and i['date'] == date:test.append[i]
+            if len(test) > 1:
+                for i in test:
+                    if i['session'] == 'M':do, so = i['open'], i['open'] 
+        except:pass
+#
 def summary(**args):
     o_format = 'raw'
     if 'format' in args.keys():

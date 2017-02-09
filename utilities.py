@@ -3,13 +3,18 @@ from os import sep, environ
 from datetime import datetime
 import socket
 gr = 1.61803399
+###
+today = datetime.today()
+year, month, month_string = '%i' % today.year, today.month, today.strftime('%B')
 
+###
 ph = {'2015':{'1':(1,), '2':(19, 20), '4':(3, 6, 7), '5':(25,), '7':(1,), '9':(28,), '10':(1, 21), '12':(25,)}}
 ph['2016'] = {'1':(1,), '2':(8, 9, 10), '3':(25, 28), '4':(4,), '5':(2,), '6':(9,), '7':(1,), '9':(16,), '10':(10,), '12':(26, 27)}
 ph['2017'] = {'1':(2, 30, 31), '4':(4, 14, 17), '5':(1, 3, 30), '10':(2, 5), '12':(25, 26)}
 ph['2018'] = {'1':(1,), '2':(16, 19), '3':(30,), '4':(2, 5), '5':(1, 22), '6':(18,), '7':(2,), '9':(25,), '10':(1, 17), '12':(25, 26)}
 
-def ltd(year=datetime.today().year, month=datetime.today().month, excluded=[]):
+# def ltd(year=datetime.today().year, month=datetime.today().month, excluded={}):
+def ltd(year=year, month=month, excluded={}):
     t, ld = 0, [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if not(year % 4):ld[1] += 1
     day = ld[month - 1]
@@ -27,7 +32,21 @@ def ltd(year=datetime.today().year, month=datetime.today().month, excluded=[]):
 
 futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'March':'H', 'April':'J', 'May':'K', 'June':'M', 'July':'N', 'August':'Q', 'September':'U', 'October':'V', 'November':'X', 'December':'Z'}
 avail_indicators, cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)
+###
 
+def dex(n=0):
+    if n in range(12):
+        n_month, n_year = month + n, today.year
+        if n_month > 12 and n_month != n_month % 12:n_month, n_year = n_month % 12, n_year + 1
+        return month_initial[datetime(n_year, n_month, 1).strftime('%B')] + ('%i' % n_year)[-1]
+    else:print("Out of range (0 - 11)")
+
+def waf(delta=0):
+    futures = [''.join((f,dex(delta))) for f in futures_type[:-2]]
+    futures += [''.join((f,dex(delta+1))) for f in futures_type[:-2]]
+    return tuple(futures)
+
+###
 def filepath(name, **args):
     if platform == 'win32':
         reqval, file_drive, file_path = ('drive', 'path'), environ['HOMEDRIVE'], environ['HOMEPATH']
