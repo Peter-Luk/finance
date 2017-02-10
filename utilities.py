@@ -1,5 +1,5 @@
 from sys import platform, version_info
-from os import sep, environ
+from os import linesep, sep, environ
 from datetime import datetime
 import socket
 gr = 1.61803399

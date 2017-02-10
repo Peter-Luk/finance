@@ -1,5 +1,5 @@
 import sqlite3 as lite
-from utilities import gr, rnd, filepath
+from utilities import gr, rnd, filepath, linesep
 from datetime import datetime
 from statistics import mean
 
@@ -244,21 +244,22 @@ class I2:
 #
     def estimate(self, **args):
         try:
-            for k in list(args.keys()):exec("%s = '%s'" % (k, args[k]))
-            if pivot_point:pivot_point = int(pivot_point)
-            if not(date):date = self.trade_day[-1]
-            test = []
+            if 'pivot_point' in args.keys():pivot_point = int(args['pivot_point'])
+            t_date, programmatic = self.trade_day[-1], False
+            if 'date' in args.keys():t_date = args['date']
+            if 'programmatic'in args.keys():programmatic = args['programmatic']
+            hdr = []
             for i in self.__data:
-                if 'date' in i.keys() and i['date'] == date:test.append[i]
-            if len(test) > 1:
-                for i in test:
+                if i['date'] == t_date:hdr.append(i)
+            if len(hdr) > 1:
+                for i in hdr:
                     so, sc, sh, sl, dh, dl = i['open'], i['close'], i['high'], i['low'], i['high'], i['low']
                     if i['session'] == 'M':do = i['open']
                     if i['session'] == 'A':
                         if i['low'] < dl:dl = i['low']
                         if i['high'] > dh:dh = i['high']
                         do = i['close']
-            elif len(test) == 1:so, sc, sh, sl, do, dc, dh, dl = i['open'], i['close'], i['high'], i['low'], i['open'], i['close'], i['high'], i['low']
+            elif len(hdr) == 1:so, sc, sh, sl, do, dc, dh, dl = i['open'], i['close'], i['high'], i['low'], i['open'], i['close'], i['high'], i['low']
             dr, sr, gap = dh - dl, sh - sl, abs(pivot_point - sc)
             sru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*sr,gr*sr]])
             srl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*sr,gr*sr]])
