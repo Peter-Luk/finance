@@ -260,6 +260,20 @@ class I2:
                         do = i['close']
             elif len(test) == 1:so, sc, sh, sl, do, dc, dh, dl = i['open'], i['close'], i['high'], i['low'], i['open'], i['close'], i['high'], i['low']
             dr, sr, gap = dh - dl, sh - sl, abs(pivot_point - sc)
+            sru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*sr,gr*sr]])
+            srl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*sr,gr*sr]])
+            dru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*dr,gr*dr]])
+            drl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*dr,gr*dr]])
+            gru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*gap,gr*gap]])
+            grl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*gap,gr*gap]])
+
+            rstr, rdata = ["Session delta (est.): %i to %i / %i to %i,"%(sru+srl)], {'Session':{'upper':sru, 'lower':srl}}
+            rstr.append("Daily delta (est.): %i to %i / %i to %i and"%(dru+drl))
+            rdata['Daily'] = {'upper':dru, 'lower':drl}
+            rstr.append("Gap (est.): %i to %i / %i to %i."%(gru+grl))
+            rdata['Gap'] = {'upper':gru, 'lower':grl}
+            if programmatic:return rdata
+            return linesep.join(rstr)
         except:pass
 #
 def summary(**args):
