@@ -37,6 +37,33 @@ class I2:
         if x < 0:return True
         return False
 
+    def sort_by(self, **args):
+        if 'field' in args.keys():field = args['field']
+        if 'value' in args.keys():value = args['value']
+        res, hdr ={}, []
+        for i in self.__data:
+            if value == i[field]:hdr.append(i)
+        if len(hdr) > 1:
+            for i in hdr:
+                if i['session'] == 'A':
+                    dc, so, sc, sr = i['close'], i['open'], i['close'], i['high'] - i['low']
+                    if sh:
+                        dh, dl = sh, sl
+                        if i['high'] > dh:dh = i['high']
+                        if i['low'] < dl:dl = i['low']
+                else:
+                    do, sh, sl = i['open'], i['high'], i['low']
+                    sr = sh - sl
+            dr = dh - dl
+            res['A'] = {'range':sr, 'open':so, 'close':sc}
+            res['D'] = {'range':dr, 'open':do, 'close':dc}
+        else:
+            so, sc, sr = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'] - hdr[0]['low']
+            do, dc, dr = so, sc, sr
+            res[hdr[0]['session']] = {'range':sr, 'open':so, 'close':sc}
+            res['D'] = {'range':dr, 'open':do, 'close':dc}
+        return res
+
     def ATR(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if 'date' in args.keys():date = args['date']
