@@ -56,12 +56,11 @@ class I2:
                     sr = sh - sl
             dr = dh - dl
             res['A'] = {'range':sr, 'open':so, 'close':sc}
-            res['D'] = {'range':dr, 'open':do, 'close':dc}
         else:
             so, sc, sr = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'] - hdr[0]['low']
             do, dc, dr = so, sc, sr
             res[hdr[0]['session']] = {'range':sr, 'open':so, 'close':sc}
-            res['D'] = {'range':dr, 'open':do, 'close':dc}
+        res['D'] = {'range':dr, 'open':do, 'close':dc}
         return res
 
     def ATR(self, **args):
