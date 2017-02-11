@@ -37,7 +37,7 @@ class I2:
         if x < 0:return True
         return False
 
-    def sort_by(self, **args):
+    def __rangefinder(self, **args):
         if 'field' in args.keys():field = args['field']
         if 'value' in args.keys():value = args['value']
         res, hdr ={}, []
@@ -275,19 +275,12 @@ class I2:
             t_date, programmatic = self.trade_day[-1], False
             if 'date' in args.keys():t_date = args['date']
             if 'programmatic'in args.keys():programmatic = args['programmatic']
-            hdr = []
-            for i in self.__data:
-                if i['date'] == t_date:hdr.append(i)
-            if len(hdr) > 1:
-                for i in hdr:
-                    so, sc, sh, sl, dh, dl = i['open'], i['close'], i['high'], i['low'], i['high'], i['low']
-                    if i['session'] == 'M':do = i['open']
-                    if i['session'] == 'A':
-                        if i['low'] < dl:dl = i['low']
-                        if i['high'] > dh:dh = i['high']
-                        do = i['close']
-            elif len(hdr) == 1:so, sc, sh, sl, do, dc, dh, dl = i['open'], i['close'], i['high'], i['low'], i['open'], i['close'], i['high'], i['low']
-            dr, sr, gap = dh - dl, sh - sl, abs(pivot_point - sc)
+
+            hdr = self.__rangefinder(field='date', value=t_date)
+            dr, gap = hdr['D']['range'], abs(pivot_point - hdr['D']['close'])
+            if 'A' in hdr.keys():sr = hdr['A']['range']
+            elif 'M' in hdr.keys():sr = hdr['M']['range']
+
             sru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*sr,gr*sr]])
             srl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*sr,gr*sr]])
             dru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*dr,gr*dr]])
