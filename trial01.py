@@ -295,6 +295,8 @@ class I2:
         rdata['Gap'] = {'upper':gru, 'lower':grl}
         if o_format == 'html':
             from tags import HTML, TITLE, TABLE, TH, TR, TD, TBODY
+            hstr = str(TITLE("Estimation of %s with reference on '%s'" % (self.__code.upper(), t_date)))
+            return hstr
         if programmatic:return rdata
         return linesep.join(rstr)
 #
