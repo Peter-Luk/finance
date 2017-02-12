@@ -271,9 +271,10 @@ class I2:
     def estimate(self, **args):
         if 'pivot_point' in args.keys():pivot_point = int(args['pivot_point'])
         else:return "Essential value ('pivot _point') is obmitted"
-        t_date, programmatic = self.trade_day[-1], False
+        t_date, programmatic, o_format = self.trade_day[-1], False, 'raw'
         if 'date' in args.keys():t_date = args['date']
         if 'programmatic'in args.keys():programmatic = args['programmatic']
+        if 'format'in args.keys():o_format = args['format'].lower()
 
         hdr = self.__rangefinder(field='date', value=t_date)
         dr, gap = hdr['D']['range'], abs(pivot_point - hdr['D']['close'])
@@ -292,6 +293,8 @@ class I2:
         rdata['Daily'] = {'upper':dru, 'lower':drl}
         rstr.append("Gap (est.): %i to %i / %i to %i."%(gru+grl))
         rdata['Gap'] = {'upper':gru, 'lower':grl}
+        if o_format == 'html':
+            from tags import HTML, TITLE, TABLE, TH, TR, TD, TBODY
         if programmatic:return rdata
         return linesep.join(rstr)
 #
