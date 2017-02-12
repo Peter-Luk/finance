@@ -269,32 +269,31 @@ class I2:
         else: return self.ATR(period=period) - self.ATR()
 #
     def estimate(self, **args):
-        try:
-            if 'pivot_point' in args.keys():pivot_point = int(args['pivot_point'])
-            t_date, programmatic = self.trade_day[-1], False
-            if 'date' in args.keys():t_date = args['date']
-            if 'programmatic'in args.keys():programmatic = args['programmatic']
+        if 'pivot_point' in args.keys():pivot_point = int(args['pivot_point'])
+        else:return "Essential value ('pivot _point') is obmitted"
+        t_date, programmatic = self.trade_day[-1], False
+        if 'date' in args.keys():t_date = args['date']
+        if 'programmatic'in args.keys():programmatic = args['programmatic']
 
-            hdr = self.__rangefinder(field='date', value=t_date)
-            dr, gap = hdr['D']['range'], abs(pivot_point - hdr['D']['close'])
-            if 'A' in hdr.keys():sr = hdr['A']['range']
-            elif 'M' in hdr.keys():sr = hdr['M']['range']
+        hdr = self.__rangefinder(field='date', value=t_date)
+        dr, gap = hdr['D']['range'], abs(pivot_point - hdr['D']['close'])
+        if 'A' in hdr.keys():sr = hdr['A']['range']
+        elif 'M' in hdr.keys():sr = hdr['M']['range']
 
-            sru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*sr,gr*sr]])
-            srl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*sr,gr*sr]])
-            dru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*dr,gr*dr]])
-            drl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*dr,gr*dr]])
-            gru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*gap,gr*gap]])
-            grl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*gap,gr*gap]])
+        sru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*sr,gr*sr]])
+        srl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*sr,gr*sr]])
+        dru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*dr,gr*dr]])
+        drl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*dr,gr*dr]])
+        gru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*gap,gr*gap]])
+        grl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*gap,gr*gap]])
 
-            rstr, rdata = ["Session delta (est.): %i to %i / %i to %i,"%(sru+srl)], {'Session':{'upper':sru, 'lower':srl}}
-            rstr.append("Daily delta (est.): %i to %i / %i to %i and"%(dru+drl))
-            rdata['Daily'] = {'upper':dru, 'lower':drl}
-            rstr.append("Gap (est.): %i to %i / %i to %i."%(gru+grl))
-            rdata['Gap'] = {'upper':gru, 'lower':grl}
-            if programmatic:return rdata
-            return linesep.join(rstr)
-        except:pass
+        rstr, rdata = ["Session delta (est.): %i to %i / %i to %i,"%(sru+srl)], {'Session':{'upper':sru, 'lower':srl}}
+        rstr.append("Daily delta (est.): %i to %i / %i to %i and"%(dru+drl))
+        rdata['Daily'] = {'upper':dru, 'lower':drl}
+        rstr.append("Gap (est.): %i to %i / %i to %i."%(gru+grl))
+        rdata['Gap'] = {'upper':gru, 'lower':grl}
+        if programmatic:return rdata
+        return linesep.join(rstr)
 #
 def summary(**args):
     o_format = 'raw'
