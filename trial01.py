@@ -288,10 +288,10 @@ class I2:
         gru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*gap, gr*gap]])
         grl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*gap, gr*gap]])
 
-        rstr, rdata = ['Session delta (est.): ' + sep.join(['%i to %i' % x for x in [sru, srl]])], {'Session':{'upper':sru, 'lower':srl}}
-        rstr.append('Daily delta (est.): ' + sep.join(['%i to %i' % x for x in [dru, drl]]))
+        rstr, rdata = ['Session delta (est.): ' + (' %s ' % sep).join(['%i to %i' % x for x in [sru, srl]])], {'Session':{'upper':sru, 'lower':srl}}
+        rstr.append('Daily delta (est.): ' + (' %s ' % sep).join(['%i to %i' % x for x in [dru, drl]]))
         rdata['Daily'] = {'upper':dru, 'lower':drl}
-        rstr.append('Gap (est.): ' + sep.join(['%i to %i' % x for x in [gru, grl]]))
+        rstr.append('Gap (est.): ' + (' %s ' % sep).join(['%i to %i' % x for x in [gru, grl]]))
         rdata['Gap'] = {'upper':gru, 'lower':grl}
 
         if o_format == 'html':
