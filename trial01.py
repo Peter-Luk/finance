@@ -281,22 +281,26 @@ class I2:
         if 'A' in hdr.keys():sr = hdr['A']['range']
         elif 'M' in hdr.keys():sr = hdr['M']['range']
 
-        sru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*sr,gr*sr]])
-        srl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*sr,gr*sr]])
-        dru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*dr,gr*dr]])
-        drl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*dr,gr*dr]])
-        gru = tuple([int(round(float(pivot_point)+x,0)) for x in [(1-gr)*gap,gr*gap]])
-        grl = tuple([int(round(float(pivot_point)-x,0)) for x in [(1-gr)*gap,gr*gap]])
+        sru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*sr, gr*sr]])
+        srl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*sr, gr*sr]])
+        dru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*dr, gr*dr]])
+        drl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*dr, gr*dr]])
+        gru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*gap, gr*gap]])
+        grl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*gap, gr*gap]])
 
         rstr, rdata = ["Session delta (est.): %i to %i / %i to %i,"%(sru+srl)], {'Session':{'upper':sru, 'lower':srl}}
         rstr.append("Daily delta (est.): %i to %i / %i to %i and"%(dru+drl))
         rdata['Daily'] = {'upper':dru, 'lower':drl}
         rstr.append("Gap (est.): %i to %i / %i to %i."%(gru+grl))
         rdata['Gap'] = {'upper':gru, 'lower':grl}
+
         if o_format == 'html':
-            from tags import HTML, TITLE, TABLE, TH, TR, TD, TBODY
-            hstr = str(TITLE("Estimation of %s with reference on '%s'" % (self.__code.upper(), t_date)))
-            return hstr
+            from tags import HTML, TITLE, TABLE, TH, TR, TD
+            title = TITLE("Estimate of %s with reference on '%s'" % (self.__code.upper(), t_date))
+            trs = [TR(linesep.join([str(TD(x)) for x in [TD('Session delta (est.):'), TD(sru[0]), TD('to'), TD(sru[-1]), TD('and'), TD(srl[0]), TD('to'), TD(srl[-1])]]))]
+            trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Daily delta (est.):'), TD(dru[0]), TD('to'), TD(dru[-1]), TD('and'), TD(drl[0]), TD('to'), TD(drl[-1])]])))
+            trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Gap (est.):'), TD(gru[0]), TD('to'), TD(gru[-1]), TD('and'), TD(grl[0]), TD('to'), TD(grl[-1])]])))
+            return str(HTML(linesep.join([str(x) for x in [title, TABLE(linesep.join(str(y) for y in trs))]])))
         if programmatic:return rdata
         return linesep.join(rstr)
 #
