@@ -63,6 +63,11 @@ class I2:
         res['D'] = {'range':dr, 'open':do, 'close':dc}
         return res
 
+    def amend(self, **args):
+        for k, v in args.keys():
+            if k in ['old', 'new', 'criteria']:exec('%s = %s' % (k, v))
+        pass
+
     def ATR(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if 'date' in args.keys():date = args['date']
