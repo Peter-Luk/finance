@@ -279,7 +279,11 @@ class I2:
         hdr = self.__rangefinder(field='date', value=t_date)
         dr, gap = hdr['D']['range'], abs(pivot_point - hdr['D']['close'])
         if 'A' in hdr.keys():sr = hdr['A']['range']
-        elif 'M' in hdr.keys():sr = hdr['M']['range']
+        elif 'M' in hdr.keys():
+            sr = hdr['M']['range']
+            i_date = self.trade_day[self.trade_day.index(t_date) - 1]
+            hdr2 = self.__rangefinder(field='date', value=i_date)
+            dr = hdr2['D']['range']
 
         sru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*sr, gr*sr]])
         srl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*sr, gr*sr]])
