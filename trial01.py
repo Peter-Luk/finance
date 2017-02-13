@@ -1,5 +1,5 @@
 import sqlite3 as lite
-from utilities import gr, rnd, filepath, linesep
+from utilities import gr, rnd, filepath, sep, linesep
 from datetime import datetime
 from statistics import mean
 
@@ -288,18 +288,18 @@ class I2:
         gru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*gap, gr*gap]])
         grl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*gap, gr*gap]])
 
-        rstr, rdata = ["Session delta (est.): %i to %i / %i to %i,"%(sru+srl)], {'Session':{'upper':sru, 'lower':srl}}
-        rstr.append("Daily delta (est.): %i to %i / %i to %i and"%(dru+drl))
+        rstr, rdata = ['Session delta (est.): ' + sep.join(['%i to %i' % x for x in [sru, srl]])], {'Session':{'upper':sru, 'lower':srl}}
+        rstr.append('Daily delta (est.): ' + sep.join(['%i to %i' % x for x in [dru, drl]]))
         rdata['Daily'] = {'upper':dru, 'lower':drl}
-        rstr.append("Gap (est.): %i to %i / %i to %i."%(gru+grl))
+        rstr.append('Gap (est.): ' + sep.join(['%i to %i' % x for x in [gru, grl]]))
         rdata['Gap'] = {'upper':gru, 'lower':grl}
 
         if o_format == 'html':
             from tags import HTML, TITLE, TABLE, TH, TR, TD
             title = TITLE("Estimate of %s with reference on '%s'" % (self.__code.upper(), t_date))
-            trs = [TR(linesep.join([str(TD(x)) for x in [TD('Session delta (est.):'), TD(sru[0]), TD('to'), TD(sru[-1]), TD('and'), TD(srl[0]), TD('to'), TD(srl[-1])]]))]
-            trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Daily delta (est.):'), TD(dru[0]), TD('to'), TD(dru[-1]), TD('and'), TD(drl[0]), TD('to'), TD(drl[-1])]])))
-            trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Gap (est.):'), TD(gru[0]), TD('to'), TD(gru[-1]), TD('and'), TD(grl[0]), TD('to'), TD(grl[-1])]])))
+            trs = [TR(linesep.join([str(TD(x)) for x in [TD('Session delta (est.):'), TD(sru[0]), TD('to'), TD(sru[-1]), TD(sep), TD(srl[0]), TD('to'), TD(srl[-1])]]))]
+            trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Daily delta (est.):'), TD(dru[0]), TD('to'), TD(dru[-1]), TD(sep), TD(drl[0]), TD('to'), TD(drl[-1])]])))
+            trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Gap (est.):'), TD(gru[0]), TD('to'), TD(gru[-1]), TD(sep), TD(grl[0]), TD('to'), TD(grl[-1])]])))
             return str(HTML(linesep.join([str(x) for x in [title, TABLE(linesep.join(str(y) for y in trs))]])))
         if programmatic:return rdata
         return linesep.join(rstr)
@@ -317,28 +317,28 @@ def summary(**args):
         ltd = len(tday)
         if 'date' in args.keys():
             if args['date'] in tday:ltd = tday.index(args['date']) + 1
-            elif o_format == 'html':return str(HTML('\n'.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
+            elif o_format == 'html':return str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
             else:return 'Sorry, date entry invalid!'
         if ltd > rnd(period * gr):
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI'), []
-            if o_format == 'html':th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
+            if o_format == 'html':th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
             else:hdr = '\t\t'.join(i_fields)
             for i in range(rnd(period * gr), ltd):
                 i_values = []
                 for x in i_fields[1:]:i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
-                if o_format == 'html':trs.append(TR('\n'.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
+                if o_format == 'html':trs.append(TR(linesep.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
                 else:hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
         elif ltd > period:
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'RSI'), []
-            if o_format == 'html':th = TH(TR('\n'.join([str(TD(x)) for x in i_fields])))
+            if o_format == 'html':th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
             else:hdr = '\t\t'.join(i_fields)
             for i in range(period, ltd):
                 i_values = []
                 for x in i_fields[1:]:i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
-                if o_format == 'html':trs.append(TR('\n'.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
+                if o_format == 'html':trs.append(TR(linesep.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
                 else:hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
         if ltd <= period:
-            if o_format == 'html':hdr = str(HTML('\n'.join([str(x) for x in [hdr, 'Sorry, not enough data!']])))
+            if o_format == 'html':hdr = str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, not enough data!']])))
             else:hdr = 'Sorry, not enough data!'
-        elif o_format == 'html':hdr = str(HTML('\n'.join([str(x) for x in [hdr, TABLE('\n'.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))))]])))
+        elif o_format == 'html':hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))))]])))
         return hdr
