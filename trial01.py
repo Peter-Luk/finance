@@ -303,12 +303,13 @@ class I2:
             hdr2 = self.__rangefinder(field='date', value=i_date)
             dr = hdr2['D']['range']
 
-        sru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*sr, gr*sr]])
-        srl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*sr, gr*sr]])
-        dru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*dr, gr*dr]])
-        drl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*dr, gr*dr]])
-        gru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-gr)*gap, gr*gap]])
-        grl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-gr)*gap, gr*gap]])
+        ogr = 1. / gr
+        sru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-ogr)*sr, ogr*sr]])
+        srl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-ogr)*sr, ogr*sr]])
+        dru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-ogr)*dr, ogr*dr]])
+        drl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-ogr)*dr, ogr*dr]])
+        gru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-ogr)*gap, ogr*gap]])
+        grl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-ogr)*gap, ogr*gap]])
 
         rstr, rdata = ['Session delta (est.): ' + (' %s ' % sep).join(['%i to %i' % x for x in [sru, srl]])], {'Session':{'upper':sru, 'lower':srl}}
         rstr.append('Daily delta (est.): ' + (' %s ' % sep).join(['%i to %i' % x for x in [dru, drl]]))
