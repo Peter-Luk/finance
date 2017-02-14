@@ -21,8 +21,9 @@ class I2:
             if self.__data[i]['date'] not in self.trade_day:self.trade_day.append(self.__data[i]['date'])
 
     def __del__(self):
-        self.__data = self.__data = self.__code = self.__period = self.__db = self.__table = self.trade_day = None
+        self.__data = self.__conn = self.__code = self.__period = self.__db = self.__table = self.trade_day = None
         del(self.__data)
+        del(self.__conn)
         del(self.__code)
         del(self.__period)
         del(self.__db)
@@ -63,10 +64,17 @@ class I2:
         res['D'] = {'range':dr, 'open':do, 'close':dc}
         return res
 
-    def amend(self, **args):
+    def append(self, **args):
+        date = datetime.today().strftime('%Y-%m-%d')
+        if 'date' in args.keys():date = args['date']
         for k, v in args.keys():
-            if k in ['old', 'new', 'criteria']:exec('%s = %s' % (k, v))
-        pass
+            if k in ['session', 'open', 'high', 'low', 'close', 'volume']:exec('%s = %s' % (k, v))
+        if session == 'A':
+            hdr = self.__rangefinder(field='date', value=date)
+            if hdr and (hdr[0]['session'] == 'M'):volume -= hdr['volume']
+        sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % (self.__table, 'date', 'code', 'session', 'open', 'high', 'low', 'close', 'volume', date, self.__code, session, open, high, low, close, volume)
+        self.__conn.cursor().execute(sq_str)
+
 
     def ATR(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period

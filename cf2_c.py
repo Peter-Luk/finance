@@ -26,6 +26,10 @@ class Inputter(object):
         bd = BODY(FORM(TABLE(linesep.join([str(v) for v in trs])),{'method':'post','action':'append'}))
         return str(HTML(linesep.join([str(v) for v in [hd,bd]])))
 
+    @cherrypy.expose
+    def append(self, contract, open, high, low, close, volume):
+        i2 = I2(code=contract)
+
 class Estimator(object):
     @cherrypy.expose
     def index(self):
