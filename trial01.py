@@ -66,15 +66,20 @@ class I2:
 
     def append(self, **args):
         date = datetime.today().strftime('%Y-%m-%d')
-        if 'date' in args.keys():date = args['date']
-        for k, v in args.keys():
-            if k in ['session', 'open', 'high', 'low', 'close', 'volume']:exec('%s = %s' % (k, v))
-        if session == 'A':
-            hdr = self.__rangefinder(field='date', value=date)
-            if hdr and (hdr[0]['session'] == 'M'):volume -= hdr['volume']
-        sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % (self.__table, 'date', 'code', 'session', 'open', 'high', 'low', 'close', 'volume', date, self.__code, session, open, high, low, close, volume)
-        self.__conn.cursor().execute(sq_str)
-
+        if 'date' not in args.keys():args['date'] = date
+        kt, vt = ('date', 'session', 'code'), (args['date'], args['session'], self.__code)
+        for k, v in args.items():
+            if k not in ['date', 'session', 'code']:
+                kt += (k,)
+                vt += (v,)
+        try:
+            if args['session'] == 'A':
+                hdr = self.__rangefinder(field='date', value=date)
+                if hdr and (hdr[0]['session'] == 'M'):args['volume'] -= hdr['volume']
+            sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % (self.__table,) + kt + vt
+            self.__conn.cursor().execute(sq_str)
+            self.__conn.commit()
+        except:self.__conn.rollback()
 
     def ATR(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period

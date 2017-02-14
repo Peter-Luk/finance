@@ -3,7 +3,7 @@ from sys import argv, platform
 from derivatives import Analyser, Futures, connect, fullpath, estimate
 from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
 from utilities import ltd, today, waf, IP
-from trial01 import I2
+from trial01 import I2, summary
 
 import cherrypy
 
@@ -28,7 +28,13 @@ class Inputter(object):
 
     @cherrypy.expose
     def append(self, contract, open, high, low, close, volume):
+        from datetime import datetime
+        today, session = datetime.today(), 'M'
+        date, hour, minute = today.date().strftime('%Y-%m-%d'), today.hour, today.minute
+        if (hour > 11) and (minute > 56):session = 'A'
         i2 = I2(code=contract)
+        i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
+        print(summary(code=contract.upper(), format='html'))
 
 class Estimator(object):
     @cherrypy.expose
