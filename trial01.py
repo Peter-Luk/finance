@@ -79,6 +79,7 @@ class I2:
             sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % (self.__table,) + kt + vt
             self.__conn.cursor().execute(sq_str)
             self.__conn.commit()
+            print(summary(code=self.__code, format='html'))
         except:self.__conn.rollback()
 
     def ATR(self, **args):
