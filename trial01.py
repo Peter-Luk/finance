@@ -364,5 +364,5 @@ def summary(**args):
         if ltd <= period:
             if o_format == 'html':hdr = str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, not enough data!']])))
             else:hdr = 'Sorry, not enough data!'
-        elif o_format == 'html':hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))))]])))
+        elif o_format == 'html':hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))),{'width':'100%'})]])))
         return hdr
