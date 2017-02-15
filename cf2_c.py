@@ -1,6 +1,5 @@
 from os import linesep
 from sys import argv, platform
-from derivatives import Analyser, Futures, connect, fullpath, estimate
 from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
 from utilities import ltd, today, waf, IP
 from trial01 import I2, summary
@@ -35,7 +34,7 @@ class Inputter(object):
         ops = [OPTION(v,{'value':v}) for v in waf()]
         if today.day == ltd(today.year, today.month):ops = [OPTION(v,{'value':v}) for v in waf(1)]
         sl = SELECT(linesep.join([str(v) for v in ops]),{'name':'contract'})
-        btn = BUTTON('Amend',{'type':'submit'})
+        btn = BUTTON('Append',{'type':'submit'})
         trs = [TR(linesep.join([str(x) for x in [TD(LABEL('Contract: ')),TD(linesep.join([str(v) for v in [sl, btn]]),{'align':'right'})]]))]
         trs.extend([TR(linesep.join([str(v) for v in [TD('%s: '%u.capitalize(),{'align':'right'}),TD(INPUT({'type':'text','name':u}))]])) for u in ['open','high','low','close','volume']])
         bd = BODY(FORM(TABLE(linesep.join([str(v) for v in trs])),{'method':'post','action':'append'}))
