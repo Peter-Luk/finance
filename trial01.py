@@ -69,14 +69,14 @@ class I2:
         if 'date' not in args.keys():args['date'] = date
         kt, vt = ('date', 'session', 'code'), (args['date'], args['session'], self.__code)
         for k, v in args.items():
-            if k not in ['date', 'session', 'code']:
+            if k not in ['date', 'session', 'code', 'volume']:
                 kt += (k,)
                 vt += (v,)
         try:
             if args['session'] == 'A':
                 hdr = self.__rangefinder(field='date', value=date)
                 if hdr and (hdr[0]['session'] == 'M'):args['volume'] -= hdr['volume']
-            sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % (self.__table,) + kt + vt
+            sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % (self.__table,) + kt + ('volume',) + vt + (args['volume'],)
             self.__conn.cursor().execute(sq_str)
             self.__conn.commit()
             print(summary(code=self.__code, format='html'))
