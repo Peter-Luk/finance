@@ -290,10 +290,11 @@ class I2:
     def estimate(self, **args):
         if 'pivot_point' in args.keys():pivot_point = int(args['pivot_point'])
         else:return "Essential value ('pivot _point') is obmitted"
-        t_date, programmatic, o_format = self.trade_day[-1], False, 'raw'
+        t_date, programmatic, o_format, concise = self.trade_day[-1], False, 'raw', False
         if 'date' in args.keys():t_date = args['date']
         if 'programmatic'in args.keys():programmatic = args['programmatic']
         if 'format'in args.keys():o_format = args['format'].lower()
+        if 'concise'in args.keys():concise = args['concise']
 
         hdr = self.__rangefinder(field='date', value=t_date)
         dr, gap = hdr['D']['range'], abs(pivot_point - hdr['D']['close'])
@@ -321,9 +322,12 @@ class I2:
         if o_format == 'html':
             from tags import HTML, TITLE, TABLE, TH, TR, TD
             title = TITLE("Estimate of %s with reference on '%s'" % (self.__code.upper(), t_date))
-            trs = [TR(linesep.join([str(TD(x)) for x in [TD('Session delta (est.):'), TD(sru[0]), TD('to'), TD(sru[-1]), TD(sep), TD(srl[0]), TD('to'), TD(srl[-1])]]))]
-            trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Daily delta (est.):'), TD(dru[0]), TD('to'), TD(dru[-1]), TD(sep), TD(drl[0]), TD('to'), TD(drl[-1])]])))
-            trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Gap (est.):'), TD(gru[0]), TD('to'), TD(gru[-1]), TD(sep), TD(grl[0]), TD('to'), TD(grl[-1])]])))
+            if concise:
+                trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
+            else:
+                trs = [TR(linesep.join([str(TD(x)) for x in [TD('Session delta (est.):'), TD(sru[0]), TD('to'), TD(sru[-1]), TD(sep), TD(srl[0]), TD('to'), TD(srl[-1])]]))]
+                trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Daily delta (est.):'), TD(dru[0]), TD('to'), TD(dru[-1]), TD(sep), TD(drl[0]), TD('to'), TD(drl[-1])]])))
+                trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Gap (est.):'), TD(gru[0]), TD('to'), TD(gru[-1]), TD(sep), TD(grl[0]), TD('to'), TD(grl[-1])]])))
             return str(HTML(linesep.join([str(x) for x in [title, TABLE(linesep.join(str(y) for y in trs))]])))
         if programmatic:return rdata
         return linesep.join(rstr)

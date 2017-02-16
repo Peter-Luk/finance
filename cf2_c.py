@@ -66,7 +66,8 @@ class Estimator(object):
     @cherrypy.expose
     def proceed(self, contract, pp):
         i2 = I2(code=contract)
-        return i2.estimate(pivot_point=pp, format='html')
+#         return i2.estimate(pivot_point=pp)
+        return i2.estimate(pivot_point=pp, format='html', concise=True)
 
 if __name__ == '__main__':
     cherrypy.tree.mount(Inputter())
@@ -74,4 +75,3 @@ if __name__ == '__main__':
     cherrypy.tree.mount(Analysor(),'/analyse')
     cherrypy.engine.start()
     cherrypy.engine.block()
-
