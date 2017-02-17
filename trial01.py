@@ -124,17 +124,12 @@ class I2:
         res, r_date, i, hdr = {}, [], 0, {}
 
         while i < len(self.__data):
-            if self.__data[i]['date'] in r_date:
-                if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
-                if option.upper() == 'HL':
-                    hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
-                if option.upper() == 'F':
-                    hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
-            else:
-                r_date.append(self.__data[i]['date'])
-                if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
-                if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
-                if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
+            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
+            if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
+            if option.upper() == 'L':hdr[self.__data[i]['date']] = self.__data[i]['low']
+            if option.upper() == 'H':hdr[self.__data[i]['date']] = self.__data[i]['high']
+            if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
+            if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
             i += 1
 
         res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
@@ -263,6 +258,22 @@ class I2:
         rkeys.sort()
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
+
+    def APZ(self, **args):
+        date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        if 'option' in args.keys():option = args['option']
+        res, r_date, i = {}, [], 0
+
+        while i < len(self.__data):
+            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
+            i += 1
+
+        for i in range(len(r_date) - period):
+            eh = [self.EMA(date=r_date[period + i - j], period=period, option='H') for j in range(period)]
+            el = [self.EMA(date=r_date[period + i - j], period=period, option='L') for j in range(period)]
+            res[r_date[period + i]] = tuple([rnd(self.SMA(date=r_date[period + i], period=period, option=option) + x) for x in [self.BBW(date=r_date[period + i], period=period) / 2, -self.BBW(date=r_date[period + i], period=period) / 2]])
 
     def BB(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
