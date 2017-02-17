@@ -6,7 +6,7 @@ from trial01 import I2, summary
 
 import cherrypy
 
-server_host, server_port = IP('public').address, 80
+server_host, server_port = IP('public').address, 2028
 if len(argv) > 1:server_host = argv[1]
 if platform in ('linux', 'linux2'):server_port = 2080
 cherrypy.config.update({'server.socket_host': server_host,'server.socket_port': server_port})
@@ -48,7 +48,7 @@ class Inputter(object):
         if (hour > 11) and (minute > 56):session = 'A'
         i2 = I2(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
-        return summary(code=contract, format='html')
+#         return summary(code=contract, format='html')
 
 class Estimator(object):
     @cherrypy.expose
