@@ -49,19 +49,20 @@ class I2:
                 if i['session'] == 'A':
                     dc, so, sc, sr = i['close'], i['open'], i['close'], i['high'] - i['low']
                     if sh:
-                        dh, dl = sh, sl
+
+                        dh, dl, dv = sh, sl, sv + i['volume']
                         if i['high'] > dh:dh = i['high']
                         if i['low'] < dl:dl = i['low']
                 else:
-                    do, sh, sl = i['open'], i['high'], i['low']
+                    do, sh, sl, sv = i['open'], i['high'], i['low'], i['volume']
                     sr = sh - sl
             dr = dh - dl
-            res['A'] = {'range':sr, 'open':so, 'close':sc}
+            res['A'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv}
         else:
-            so, sc, sr = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'] - hdr[0]['low']
-            do, dc, dr = so, sc, sr
-            res[hdr[0]['session']] = {'range':sr, 'open':so, 'close':sc}
-        res['D'] = {'range':dr, 'open':do, 'close':dc}
+            so, sc, sr, sv = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'] - hdr[0]['low'], hdr[0]['volume']
+            do, dc, dr, dv = so, sc, sr, sv
+            res['M'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv}
+        res['D'] = {'range':dr, 'open':do, 'close':dc, 'volume':dv}
         return res
 
     def append(self, **args):
@@ -75,7 +76,8 @@ class I2:
 #        try:
         if args['session'] == 'A':
             hdr = self.__rangefinder(field='date', value=date)
-            if hdr and (hdr[0]['session'] == 'M'):args['volume'] -= hdr[0]['volume']
+#            if hdr and (hdr[0]['session'] == 'M'):args['volume'] -= hdr[0]['volume']
+            if 'M' in hdr.keys():args['volume'] -= hdr['M']['volume']
         istr = (self.__table,) + kt + ('volume',) + vt + (args['volume'],)
         sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % istr
         self.__conn.cursor().execute(sq_str)
