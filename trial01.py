@@ -1,7 +1,7 @@
 import sqlite3 as lite
 from utilities import gr, rnd, filepath, sep, linesep
 from datetime import datetime
-from statistics import mean
+from statistics import mean, stdev
 
 db_name, db_table = 'Futures', 'records'
 
@@ -218,6 +218,25 @@ class I2:
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
 
+    def BBW(self, **args):
+        date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        res, r_date, i, hdr = {}, [], 0, {}
+
+        while i < len(self.__data):
+            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
+            hdr[self.__data[i]['date']] = self.__data[i]['high'] - self.__data[i]['low']
+            i += 1
+
+        for i in range(len(r_date) - period):
+            res[r_date[period + i]] = 2 * 2 * stdev([hdr[r_date[x]] for x in range(i, period + i)]) / gr
+
+        rkeys = list(res.keys())
+        rkeys.sort()
+        if date in rkeys:return res[date]
+        return res[rkeys[-1]]
+
     def SMA(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if 'date' in args.keys():date = args['date']
@@ -239,6 +258,25 @@ class I2:
 
         for i in range(len(r_date) - period):
             res[r_date[period + i]] = mean([hdr[r_date[x]] for x in range(i, period + i)])
+
+        rkeys = list(res.keys())
+        rkeys.sort()
+        if date in rkeys:return res[date]
+        return res[rkeys[-1]]
+
+    def BB(self, **args):
+        date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if 'date' in args.keys():date = args['date']
+        if 'period' in args.keys():period = args['period']
+        if 'option' in args.keys():option = args['option']
+        res, r_date, i = {}, [], 0
+
+        while i < len(self.__data):
+            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
+            i += 1
+
+        for i in range(len(r_date) - period):
+            res[r_date[period + i]] = tuple([rnd(self.SMA(date=r_date[period + i], period=period, option=option) + x) for x in [self.BBW(date=r_date[period + i], period=period) / 2, -self.BBW(date=r_date[period + i], period=period) / 2]])
 
         rkeys = list(res.keys())
         rkeys.sort()
