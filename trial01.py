@@ -76,7 +76,6 @@ class I2:
 #        try:
         if args['session'] == 'A':
             hdr = self.__rangefinder(field='date', value=date)
-#            if hdr and (hdr[0]['session'] == 'M'):args['volume'] -= hdr[0]['volume']
             if 'M' in hdr.keys():args['volume'] -= hdr['M']['volume']
         istr = (self.__table,) + kt + ('volume',) + vt + (args['volume'],)
         sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % istr
@@ -120,28 +119,35 @@ class I2:
         return res[rkeys[-1]]
 
     def EMA(self, **args):
-        date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        data, date, period, option = self.__data, datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if 'data' in args.keys():data = args['data']
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
         if 'option' in args.keys():option = args['option']
-        res, r_date, i, hdr = {}, [], 0, {}
+        if type(data[0]) in (int, float):
+            res, kratio = [], 2. / (1 + period)
+            for i in range(len(data)):
+                if i == 0:res.append(data[i])
+                else:res.append(data[i] * kratio + res[-1] * (1. - kratio))
+            return res[-1]
+        else:
+            res, r_date, i, hdr = {}, [], 0, {}
+            while i < len(data):
+                if data[i]['date'] not in r_date:r_date.append(data[i]['date'])
+                if option.upper() == 'C':hdr[data[i]['date']] = data[i]['close']
+                if option.upper() == 'L':hdr[data[i]['date']] = data[i]['low']
+                if option.upper() == 'H':hdr[data[i]['date']] = data[i]['high']
+                if option.upper() == 'HL':hdr[data[i]['date']] = mean([data[i]['high'], data[i]['low']])
+                if option.upper() == 'F':hdr[data[i]['date']] = mean([data[i]['high'], data[i]['low'],data[i]['open'], data[i]['close']])
+                i += 1
 
-        while i < len(self.__data):
-            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
-            if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
-            if option.upper() == 'L':hdr[self.__data[i]['date']] = self.__data[i]['low']
-            if option.upper() == 'H':hdr[self.__data[i]['date']] = self.__data[i]['high']
-            if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
-            if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
-            i += 1
+            res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
+            for d in r_date[period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
 
-        res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
-        for d in r_date[period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
-
-        rkeys = list(res.keys())
-        rkeys.sort()
-        if date in rkeys:return res[date]
-        return res[rkeys[-1]]
+            rkeys = list(res.keys())
+            rkeys.sort()
+            if date in rkeys:return res[date]
+            return res[rkeys[-1]]
 
     def KAMA(self, **args):
         date, slow, period = datetime.today().strftime('%Y-%m-%d'), rnd(self.__period * gr), self.__period
