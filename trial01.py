@@ -277,9 +277,14 @@ class I2:
         for i in range(len(r_date) - period):
             eh = [self.EMA(date=r_date[period + i - j], period=period, option='H') for j in range(period)]
             el = [self.EMA(date=r_date[period + i - j], period=period, option='L') for j in range(period)]
-            vv = self.EMA([eh[i] for i in range(len(eh))], period = len(eh)) - self.EMA([el[i] for i in range(len(el))], period = len(el))
-            ema = self.EMA(date=date, option='hl', period=period)
-            return rnd(ema - (vv / 2)), rnd(ema + (vv / 2))
+            vv = self.EMA(data=[eh[i] for i in range(len(eh))], period=len(eh)) - self.EMA(data=[el[i] for i in range(len(el))], period=len(el))
+            ema = self.EMA(date=r_date[period + i - j], option='HL', period=period)
+            res[r_date[period + i]] = rnd(ema - (vv / 2)), rnd(ema + (vv / 2))
+
+        rkeys = list(res.keys())
+        rkeys.sort()
+        if date in rkeys:return res[date]
+        return res[rkeys[-1]]
 
     def BB(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
