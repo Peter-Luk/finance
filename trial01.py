@@ -274,12 +274,12 @@ class I2:
             if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
             i += 1
 
-        for i in range(len(r_date) - period):
-            eh = [self.EMA(date=r_date[period + i - j], period=period, option='H') for j in range(period)]
-            el = [self.EMA(date=r_date[period + i - j], period=period, option='L') for j in range(period)]
+        for i in range(period, len(r_date)):
+            eh = [self.EMA(date=r_date[i - j], period=period, option='H') for j in range(period)]
+            el = [self.EMA(date=r_date[i - j], period=period, option='L') for j in range(period)]
             vv = self.EMA(data=[eh[i] for i in range(len(eh))], period=len(eh)) - self.EMA(data=[el[i] for i in range(len(el))], period=len(el))
-            ema = self.EMA(date=r_date[period + i - j], option='HL', period=period)
-            res[r_date[period + i]] = rnd(ema - (vv / 2)), rnd(ema + (vv / 2))
+            ema = self.EMA(date=r_date[i], option='HL', period=period)
+            res[r_date[i]] = rnd(ema - (vv / 2)), rnd(ema + (vv / 2))
 
         rkeys = list(res.keys())
         rkeys.sort()
