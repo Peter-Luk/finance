@@ -277,7 +277,7 @@ class I2:
         for i in range(period, len(r_date)):
             eh = [self.EMA(date=r_date[i - j], period=period, option='H') for j in range(period)]
             el = [self.EMA(date=r_date[i - j], period=period, option='L') for j in range(period)]
-            vv = self.EMA(data=[eh[i] for i in range(len(eh))], period=len(eh)) - self.EMA(data=[el[i] for i in range(len(el))], period=len(el))
+            vv = self.EMA(data=[eh[j] for j in range(len(eh))], period=len(eh)) - self.EMA(data=[el[j] for j in range(len(el))], period=len(el))
             ema = self.EMA(date=r_date[i], option='HL', period=period)
             res[r_date[i]] = rnd(ema - (vv / 2)), rnd(ema + (vv / 2))
 
