@@ -77,8 +77,8 @@ class I2:
         if args['session'] == 'A':
             hdr = self.__rangefinder(field='date', value=date)
             if 'M' in hdr.keys():args['volume'] -= hdr['M']['volume']
-        istr = (self.__table,) + kt + ('volume',) + vt + (args['volume'],)
-        sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % istr
+#        return (self.__table,) + kt + ('volume',) + vt + (args['volume'],)
+        sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % (self.__table,) + kt + ('volume',) + vt + (args['volume'],)
         self.__conn.cursor().execute(sq_str)
         self.__conn.commit()
         print(summary(code=self.__code, format='html'))
