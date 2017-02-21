@@ -81,7 +81,6 @@ class I2:
         try:
             self.__conn.cursor().execute(sq_str)
             self.__conn.commit()
-#            print(summary(code=self.__code, format='html'))
         except:self.__conn.rollback()
 
     def ATR(self, **args):
@@ -341,7 +340,7 @@ class I2:
         if 'period' in args.keys():period = args['period']
         if date:return self.ATR(date=date, period=period) - self.ATR(date=date)
         else: return self.ATR(period=period) - self.ATR()
-#
+
     def estimate(self, **args):
         if 'pivot_point' in args.keys():pivot_point = int(args['pivot_point'])
         else:return "Essential value ('pivot _point') is obmitted"
@@ -386,7 +385,7 @@ class I2:
             return str(HTML(linesep.join([str(x) for x in [title, TABLE(linesep.join(str(y) for y in trs))]])))
         if programmatic:return rdata
         return linesep.join(rstr)
-#
+
 def summary(**args):
     o_format = 'raw'
     if 'format' in args.keys():
