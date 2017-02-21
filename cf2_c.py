@@ -48,7 +48,7 @@ class Inputter(object):
         if (hour > 11) and (minute > 56):session = 'A'
         i2 = I2(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
-#         return summary(code=contract, format='html')
+        return summary(code=contract, format='html')
 
 class Estimator(object):
     @cherrypy.expose

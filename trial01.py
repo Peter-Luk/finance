@@ -82,7 +82,6 @@ class I2:
             self.__conn.cursor().execute(sq_str)
             self.__conn.commit()
 #            print(summary(code=self.__code, format='html'))
-            return summary(code=self.__code, format='html')
         except:self.__conn.rollback()
 
     def ATR(self, **args):
