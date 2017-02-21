@@ -45,7 +45,8 @@ class Inputter(object):
         from datetime import datetime
         today, session = datetime.today(), 'M'
         date, hour, minute = today.date().strftime('%Y-%m-%d'), today.hour, today.minute
-        if (hour > 11) and (minute > 56):session = 'A'
+        if hour > 11:session = 'A'
+        elif (hour == 11) and (minute > 56):session = 'A'
         i2 = I2(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
         return summary(code=contract, format='html')
