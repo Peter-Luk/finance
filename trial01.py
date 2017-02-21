@@ -81,7 +81,8 @@ class I2:
         try:
             self.__conn.cursor().execute(sq_str)
             self.__conn.commit()
-            print(summary(code=self.__code, format='html'))
+#            print(summary(code=self.__code, format='html'))
+            return summary(code=self.__code, format='html')
         except:self.__conn.rollback()
 
     def ATR(self, **args):
@@ -368,10 +369,10 @@ class I2:
         gru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-ogr)*gap, ogr*gap]])
         grl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-ogr)*gap, ogr*gap]])
 
-        rstr, rdata = ['Session delta (est.): ' + (' %s ' % sep).join(['%i to %i' % x for x in [sru, srl]])], {'Session':{'upper':sru, 'lower':srl}}
-        rstr.append('Daily delta (est.): ' + (' %s ' % sep).join(['%i to %i' % x for x in [dru, drl]]))
+        rstr, rdata = ['Session delta (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [sru, srl]])], {'Session':{'upper':sru, 'lower':srl}}
+        rstr.append('Daily delta (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [dru, drl]]))
         rdata['Daily'] = {'upper':dru, 'lower':drl}
-        rstr.append('Gap (est.): ' + (' %s ' % sep).join(['%i to %i' % x for x in [gru, grl]]))
+        rstr.append('Gap (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [gru, grl]]))
         rdata['Gap'] = {'upper':gru, 'lower':grl}
 
         if o_format == 'html':
