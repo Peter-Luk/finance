@@ -57,12 +57,12 @@ class I2:
                     do, sh, sl, sv = i['open'], i['high'], i['low'], i['volume']
                     sr = sh - sl
             dr = dh - dl
-            res['A'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv}
+            res['A'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
         else:
             so, sc, sr, sv = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'] - hdr[0]['low'], hdr[0]['volume']
             do, dc, dr, dv = so, sc, sr, sv
-            res['M'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv}
-        res['D'] = {'range':dr, 'open':do, 'close':dc, 'volume':dv}
+            res['M'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
+        res['D'] = {'range':dr, 'open':do, 'close':dc, 'volume':dv, 'high':dh, 'low':dl}
         return res
 
     def append(self, **args):
@@ -246,21 +246,27 @@ class I2:
         if 'period' in args.keys():period = args['period']
         if 'option' in args.keys():option = args['option']
         res, r_date, i, hdr = {}, [], 0, {}
-
+        sp = {}
         while i < len(self.__data):
             if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
-            if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
-            if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
-            if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
+#            if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
+#            if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
+#            if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
             i += 1
 
-        for i in range(len(r_date) - period):
-            res[r_date[period + i]] = mean([hdr[r_date[x]] for x in range(i, period + i)])
+        for d in r_date:
+            if r_date.index(d) == 0:
+                sp[d] = self.__data[0]['low']
+                if self.__data[0]['close'] < self.__data[0]['open']:sp[d] = self.__data[0]['high']
+            else:pass
+        return sp
+#        for i in range(len(r_date) - period):
+#            res[r_date[period + i]] = mean([hdr[r_date[x]] for x in range(i, period + i)])
 
-        rkeys = list(res.keys())
-        rkeys.sort()
-        if date in rkeys:return res[date]
-        return res[rkeys[-1]]
+#        rkeys = list(res.keys())
+#        rkeys.sort()
+#        if date in rkeys:return res[date]
+#        return res[rkeys[-1]]
 #
     def SMA(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
