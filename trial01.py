@@ -59,8 +59,9 @@ class I2:
             dr = dh - dl
             res['A'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
         else:
-            so, sc, sr, sv = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'] - hdr[0]['low'], hdr[0]['volume']
-            do, dc, dr, dv = so, sc, sr, sv
+            so, sc, sh, sl, sv = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'], hdr[0]['low'], hdr[0]['volume']
+            do, dc, sr, dv = so, sc, sh -sl, sv
+            dr, dh, dl = sr, sh, sl
             res['M'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
         res['D'] = {'range':dr, 'open':do, 'close':dc, 'volume':dv, 'high':dh, 'low':dl}
         return res
