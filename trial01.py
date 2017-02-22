@@ -240,7 +240,7 @@ class I2:
         if date in rkeys:return res[date]
         return res[rkeys[-1]]
 #
-   def SAR(self, **args):
+    def SAR(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
