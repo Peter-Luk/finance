@@ -257,8 +257,9 @@ class I2:
 
         for d in r_date:
             if r_date.index(d) == 0:
-                sp[d] = self.__data[0]['low']
-                if self.__data[0]['close'] < self.__data[0]['open']:sp[d] = self.__data[0]['high']
+                tmp = self.__rangefinder(field='date', value=d)
+                sp[d] = tmp['D']['low']
+                if tmp['D']['close'] < tmp['D']['open']:sp[d] = tmp['D']['high']
             else:pass
         return sp
 #        for i in range(len(r_date) - period):
