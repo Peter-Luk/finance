@@ -255,10 +255,10 @@ class I2:
 #            if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
             i += 1
 
-        for d in r_date:
-            if r_date.index(d) == 0:
-                tmp = self.__rangefinder(field='date', value=d)
-                sp[d] = tmp['D']['low']
+        for d in range(1,len(r_date)):
+            if d == 1:
+                tmp = self.__rangefinder(field='date', value=r_date[d - 1])
+                sp[r_date[d]] = tmp['D']['low']
                 if tmp['D']['close'] < tmp['D']['open']:sp[d] = tmp['D']['high']
             else:pass
         return sp
