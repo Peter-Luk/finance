@@ -12,7 +12,6 @@ def fdc(**args):
             hdr = mf._I2__rangefinder(field='date', value=i)['D']
             hdr['date'] = i
             data.append(hdr)
-        d_keys = list(data[0].keys())
-        for dk in d_keys:dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
+        for dk in list(data[0].keys()):dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
         return pandas.DataFrame(dd)
     except:pass
