@@ -150,7 +150,7 @@ class I2:
             return res[rkeys[-1]]
 
     def KAMA(self, **args):
-        date, slow, period = datetime.today().strftime('%Y-%m-%d'), rnd(self.__period * gr), self.__period
+        date, slow, period = datetime.today().strftime('%Y-%m-%d'), self.__period, self.__period
         fast = rnd(period / gr)
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
