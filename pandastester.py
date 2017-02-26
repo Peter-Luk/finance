@@ -21,6 +21,6 @@ def fdc(**args):
             data, ilist = {}, ('SMA', 'WMA', 'EMA', 'KAMA', 'RSI')
             for i in ilist:
                 data[i] = [eval("mf.%s(date='%s')" % (i, mf.trade_day[j])) for j in range(mf._I2__period, len(mf.trade_day))]
-            data['Date'] = [mf.trade_day[i] for i in range(mf._I2__period, len(mf.trade_day))]
+            data['Date'] = [pandas.Timestamp(mf.trade_day[i]) for i in range(mf._I2__period, len(mf.trade_day))]
             return pandas.DataFrame(data)
     except:pass
