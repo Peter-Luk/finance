@@ -14,7 +14,6 @@ def fdc(**args):
             for i in r_date:
                 hdr = mf._I2__rangefinder(field='date', value=i)['D']
                 hdr['date'] = pandas.Timestamp(i)
-        d_keys = list(data[0].keys())
                 data.append(hdr)
             for dk in list(data[0].keys()):dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
             return pandas.DataFrame(dd)
