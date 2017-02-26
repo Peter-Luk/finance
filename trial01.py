@@ -431,15 +431,6 @@ def summary(**args):
             if args['date'] in tday:ltd = tday.index(args['date']) + 1
             elif o_format == 'html':return str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
             else:return 'Sorry, date entry invalid!'
-#        if ltd > rnd(period * gr):
-#            i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI'), []
-#            if o_format == 'html':th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
-#            else:hdr = '\t\t'.join(i_fields)
-#            for i in range(rnd(period * gr), ltd):
-#                i_values = []
-#                for x in i_fields[1:]:i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
-#                if o_format == 'html':trs.append(TR(linesep.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
-#                else:hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
         if ltd > period:
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI'), []
             if o_format == 'html':th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
