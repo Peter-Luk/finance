@@ -3,7 +3,6 @@ import pandas
 import numpy
 
 def fdc(**args):
-#    try:
     mf = I2(code=args['code'])
     data, hdr, dd, r_date = [], {}, {}, mf.trade_day
     for i in r_date:
@@ -16,7 +15,6 @@ def fdc(**args):
         hdr = []
         for j in range(len(r_date)):
             if j < mf._I2__period:hdr.append(numpy.nan)
-            else:hdr.append(eval("mf.%s(date='%s')" % (i, mf.trade_day[j])))
+            else:hdr.append(eval("mf.%s(date='%s')" % (i, r_date[j])))
         dd[i] = hdr
     return pandas.DataFrame(dd)
-#    except:pass
