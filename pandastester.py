@@ -14,7 +14,7 @@ def fdc(**args):
     ilist = ('SMA', 'WMA', 'EMA', 'KAMA', 'RSI')
     for i in ilist:
         hdr = []
-        for j in len(r_date):
+        for j in range(len(r_date)):
             if j > mf._I2__period:hdr.append(eval("mf.%s(date='%s')" % (i, mf.trade_day[j])))
             else:hdr.append(numpy.nan)
         dd[i] = hdr
