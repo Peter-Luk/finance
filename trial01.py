@@ -405,7 +405,7 @@ class I2:
 
         if o_format == 'html':
             from tags import HTML, TITLE, TABLE, TH, TR, TD
-            title = TITLE("Estimate of %s with reference on '%s'" % (self.__code.upper(), t_date))
+            title = TITLE("Estimate of %s with reference on '%s' base on Pivot Point: %i" % (self.__code.upper(), t_date, pivot_point))
             if concise:
                 trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
             else:
