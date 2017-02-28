@@ -2,7 +2,12 @@ from os import linesep
 from sys import argv, platform
 from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
 from utilities import ltd, today, waf, IP
-from trial01 import I2, summary
+panda = False
+try:
+    from pandastester import I2
+    panda = True
+except:
+    from trial01 import I2, summary
 
 import cherrypy
 
