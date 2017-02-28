@@ -19,11 +19,11 @@ cherrypy.config.update({'server.socket_host': server_host,'server.socket_port': 
 class Analysor(object):
     @cherrypy.expose
     def index(self):
-        hd = HEAD(TITLE('Estimate session range'))
+        hd = HEAD(TITLE('Analyse records'))
         ops = [OPTION(v, {'value':v}) for v in waf()]
         if today.day == ltd(today.year, today.month):ops = [OPTION(v, {'value':v}) for v in waf(1)]
         sl = SELECT(linesep.join([str(v) for v in ops]), {'name':'contract'})
-        btn = BUTTON('Estimate', {'type':'submit'})
+        btn = BUTTON('Analyse', {'type':'submit'})
         trs = [TR(linesep.join([str(v) for v in [TD(LABEL('Contract: ')), TD(linesep.join([str(u) for u in [sl,btn]]), {'align':'right'})]]))]
         bd = BODY(FORM(TABLE(linesep.join([str(v) for v in trs])), {'method':'post', 'action':'proceed'}))
         return str(HTML(linesep.join([str(v) for v in [hd,bd]])))
