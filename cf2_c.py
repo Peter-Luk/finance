@@ -4,7 +4,7 @@ from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OP
 from utilities import ltd, today, waf, IP
 panda = False
 try:
-    from pandastester import I2
+    from pandastester import I2, fdc
     panda = True
 except:
     from trial01 import I2, summary
@@ -30,6 +30,7 @@ class Analysor(object):
 
     @cherrypy.expose
     def proceed(self, contract):
+        if panda: return fdc(code=contract).to_html()
         return summary(code=contract, format='html')
 
 class Inputter(object):
@@ -54,6 +55,7 @@ class Inputter(object):
         elif (hour == 12) and (minute > 56): session = 'A'
         i2 = I2(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
+        if panda: return fdc(code=contract).to_html()
         return summary(code=contract, format='html')
 
 class Estimator(object):
@@ -74,17 +76,17 @@ class Estimator(object):
         i2 = I2(code=contract)
         return i2.estimate(pivot_point=pp, format='html', concise=True)
 
-class Pandasify(object):
-    @cherrypy.expose
-    def index(self):
-        from pandastester import fdc
-        t = fdc(code='mhih7')
-        return t.to_html()
+# class Pandasify(object):
+#     @cherrypy.expose
+#     def index(self):
+#         from pandastester import fdc
+#         t = fdc(code='mhih7')
+#         return t.to_html()
 
 if __name__ == '__main__':
     cherrypy.tree.mount(Inputter())
     cherrypy.tree.mount(Estimator(), '/estimate')
     cherrypy.tree.mount(Analysor(), '/analyse')
-    cherrypy.tree.mount(Pandasify(), '/pandas')
+#     cherrypy.tree.mount(Pandasify(), '/pandas')
     cherrypy.engine.start()
     cherrypy.engine.block()
