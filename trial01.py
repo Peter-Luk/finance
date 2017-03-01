@@ -39,11 +39,11 @@ class I2:
         return False
 
     def __rangefinder(self, **args):
-        if 'field' in args.keys():field = args['field']
-        if 'value' in args.keys():value = args['value']
+        if 'field' in args.keys(): field = args['field']
+        if 'value' in args.keys(): value = args['value']
         res, hdr ={}, []
         for i in self.__data:
-            if value == i[field]:hdr.append(i)
+            if value == i[field]: hdr.append(i)
         if len(hdr) > 1:
             for i in hdr:
                 if i['session'] == 'A':
@@ -152,19 +152,15 @@ class I2:
     def KAMA(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         fast, slow = rnd(period / gr ** 2), period
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        if 'slow' in args.keys():slow = args['slow']
-        if 'fast' in args.keys():fast = args['fast']
-        res, trade_day, tr, i, hdr, er, sc = {}, [], {}, 0, {}, {}, {}
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        if 'slow' in args.keys(): slow = args['slow']
+        if 'fast' in args.keys(): fast = args['fast']
+        res, trade_day, tr, hdr, er, sc = {}, self.trade_day, {}, {}, {}, {}
 
-        while i < len(self.__data):
-            if self.__data[i]['date'] in trade_day:
-                if self.__data[i]['session'] == 'A':tr[self.__data[i]['date']] = self.__data[i]['close']
-            else:
-                trade_day.append(self.__data[i]['date'])
-                tr[self.__data[i]['date']] = self.__data[i]['close']
-            i += 1
+        for d in trade_day:
+            tmp = self.__rangefinder(field='date', value=d)['D']
+            tr[d] = tmp['close']
 
         for i in range(period, len(trade_day)):
             ch, vo = abs(tr[trade_day[i]] - tr[trade_day[i-period]]), sum([abs(tr[trade_day[x]] - tr[trade_day[x - 1]]) for x in range(i-period, i)])
@@ -175,29 +171,24 @@ class I2:
             sc[trade_day[i]] = (er[trade_day[i]] * (sfc - ssc) + ssc) ** 2
 
         for i in range(slow, len(trade_day)):
-            if i == slow:res[trade_day[i]] = self.EMA(date=trade_day[i])
-            else:res[trade_day[i]] = res[trade_day[i - 1]] + sc[trade_day[i]] * (tr[trade_day[i]] - res[trade_day[i - 1]])
+            if i == slow: res[trade_day[i]] = self.EMA(date=trade_day[i])
+            else: res[trade_day[i]] = res[trade_day[i - 1]] + sc[trade_day[i]] * (tr[trade_day[i]] - res[trade_day[i - 1]])
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
     def RSI(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        res, trade_day, tr, i, hdr = {}, [], {}, 0, {}
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        res, trade_day, tr, hdr, i = {}, self.trade_day, {}, {}, 1
 
-        while i < len(self.__data):
-            if self.__data[i]['date'] in trade_day:
-                if self.__data[i]['session'] == 'A':tr[self.__data[i]['date']] = self.__data[i]['close']
-            else:
-                trade_day.append(self.__data[i]['date'])
-                tr[self.__data[i]['date']] = self.__data[i]['close']
-            i += 1
+        for d in trade_day:
+            tmp = self.__rangefinder(field='date', value=d)['D']
+            tr[d] = tmp['close']
 
-        i = 1
         while i < len(trade_day):
             hdr[trade_day[i]] = tr[trade_day[i]] - tr[trade_day[i - 1]]
             i += 1
@@ -219,26 +210,25 @@ class I2:
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
     def BBW(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        res, r_date, i, hdr = {}, [], 0, {}
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        res, r_date, hdr = {}, self.trade_day, {}
 
-        while i < len(self.__data):
-            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
-            hdr[self.__data[i]['date']] = self.__data[i]['high'] - self.__data[i]['low']
-            i += 1
+        for d in r_date:
+            tmp = self.__rangefinder(field='date', value=d)['D']
+            hdr[d] = tmp['range']
 
         for i in range(len(r_date) - period):
             res[r_date[period + i]] = 2 * 2 * stdev([hdr[r_date[x]] for x in range(i, period + i)]) / gr
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 #
     def SAR(self, **args):
@@ -311,43 +301,38 @@ class I2:
 
     def BB(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        if 'option' in args.keys():option = args['option']
-        res, r_date, i = {}, [], 0
-
-        while i < len(self.__data):
-            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
-            i += 1
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        if 'option' in args.keys(): option = args['option']
+        res, r_date, i = {}, self.trade_day
 
         for i in range(len(r_date) - period):
             res[r_date[period + i]] = tuple([rnd(self.SMA(date=r_date[period + i], period=period, option=option) + x) for x in [self.BBW(date=r_date[period + i], period=period) / 2, -self.BBW(date=r_date[period + i], period=period) / 2]])
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
     def WMA(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        if 'option' in args.keys():option = args['option']
-        res, r_date, i, hdr = {}, [], 0, {}
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        if 'option' in args.keys(): option = args['option']
+        res, r_date, hdr = {}, self.trade_day, {}
 
-        while i < len(self.__data):
-            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
-            if option.upper() == 'C':hdr[self.__data[i]['date']] = (self.__data[i]['close'], self.__data[i]['volume'])
-            if option.upper() == 'HL':hdr[self.__data[i]['date']] = (mean([self.__data[i]['high'], self.__data[i]['low']]), self.__data[i]['volume'])
-            if option.upper() == 'F':hdr[self.__data[i]['date']] = (mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']]), self.__data[i]['volume'])
-            i += 1
+        for d in r_date:
+            tmp = self.__rangefinder(field='date', value=d)['D']
+            if option.upper() == 'C': hdr[d] = (tmp['close'], tmp['volume'])
+            elif option.upper() == 'HL': hdr[d] = (mean([tmp['high'], tmp['low']]), tmp['volume'])
+            elif option.upper() == 'F': hdr[d] = (mean([tmp['open'], tmp['close'], tmp['high'], tmp['low']]), tmp['volume'])
 
         for i in range(len(r_date) - period):
             res[r_date[period + i]] = sum([hdr[r_date[x]][0] * hdr[r_date[x]][-1] for x in range(i, period + i)]) / float(sum([hdr[r_date[x]][-1] for x in range(i, period + i)]))
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
     def KC(self, **args):
@@ -366,17 +351,17 @@ class I2:
         else: return self.ATR(period=period) - self.ATR()
 
     def estimate(self, **args):
-        if 'pivot_point' in args.keys():pivot_point = int(args['pivot_point'])
-        else:return "Essential value ('pivot _point') is obmitted"
+        if 'pivot_point' in args.keys(): pivot_point = int(args['pivot_point'])
+        else: return "Essential value ('pivot _point') is obmitted"
         t_date, programmatic, o_format, concise = self.trade_day[-1], False, 'raw', False
-        if 'date' in args.keys():t_date = args['date']
-        if 'programmatic'in args.keys():programmatic = args['programmatic']
-        if 'format'in args.keys():o_format = args['format'].lower()
-        if 'concise'in args.keys():concise = args['concise']
+        if 'date' in args.keys(): t_date = args['date']
+        if 'programmatic'in args.keys(): programmatic = args['programmatic']
+        if 'format'in args.keys(): o_format = args['format'].lower()
+        if 'concise'in args.keys(): concise = args['concise']
 
         hdr = self.__rangefinder(field='date', value=t_date)
         dr, gap = hdr['D']['range'], abs(pivot_point - hdr['D']['close'])
-        if 'A' in hdr.keys():sr = hdr['A']['range']
+        if 'A' in hdr.keys(): sr = hdr['A']['range']
         elif 'M' in hdr.keys():
             sr = hdr['M']['range']
             i_date = self.trade_day[self.trade_day.index(t_date) - 1]
