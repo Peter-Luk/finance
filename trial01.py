@@ -120,33 +120,33 @@ class I2:
 
     def EMA(self, **args):
         data, date, period, option = self.__data, datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'data' in args.keys():data = args['data']
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        if 'option' in args.keys():option = args['option']
+        if 'data' in args.keys(): data = args['data']
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        if 'option' in args.keys(): option = args['option']
         if type(data[0]) in (int, float):
             res, kratio = [], 2. / (1 + period)
             for i in range(len(data)):
-                if i == 0:res.append(data[i])
-                else:res.append(data[i] * kratio + res[-1] * (1. - kratio))
+                if i == 0: res.append(data[i])
+                else: res.append(data[i] * kratio + res[-1] * (1. - kratio))
             return res[-1]
         else:
-            res, r_date, i, hdr = {}, [], 0, {}
-            while i < len(data):
-                if data[i]['date'] not in r_date:r_date.append(data[i]['date'])
-                if option.upper() == 'C':hdr[data[i]['date']] = data[i]['close']
-                if option.upper() == 'L':hdr[data[i]['date']] = data[i]['low']
-                if option.upper() == 'H':hdr[data[i]['date']] = data[i]['high']
-                if option.upper() == 'HL':hdr[data[i]['date']] = mean([data[i]['high'], data[i]['low']])
-                if option.upper() == 'F':hdr[data[i]['date']] = mean([data[i]['high'], data[i]['low'],data[i]['open'], data[i]['close']])
-                i += 1
+            res, r_date, hdr = {}, self.trade_day, {}
+
+            for d in r_date:
+                tmp = self.__rangefinder(field='date', value=d)['D']
+                if option.upper() == 'C': hdr[d] = tmp['close']
+                elif option.upper() == 'H': hdr[d] = tmp['high']
+                elif option.upper() == 'L': hdr[d] = tmp['low']
+                elif option.upper() == 'HL': hdr[d] = mean([tmp['high'], tmp['low']])
+                elif option.upper() == 'F': hdr[d] = mean([tmp['open'], tmp['close'], tmp['high'], tmp['low']])
 
             res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
-            for d in r_date[period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
+            for d in r_date[period:]: res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
 
             rkeys = list(res.keys())
             rkeys.sort()
-            if date in rkeys:return res[date]
+            if date in rkeys: return res[date]
             return res[rkeys[-1]]
 
     def KAMA(self, **args):
