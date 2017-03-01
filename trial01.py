@@ -275,14 +275,13 @@ class I2:
         if 'date' in args.keys():date = args['date']
         if 'period' in args.keys():period = args['period']
         if 'option' in args.keys():option = args['option']
-        res, r_date, i, hdr = {}, [], 0, {}
+        res, r_date, i, hdr = {}, self.trade_day, 0, {}
 
-        while i < len(self.__data):
-            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
-            if option.upper() == 'C':hdr[self.__data[i]['date']] = self.__data[i]['close']
-            if option.upper() == 'HL':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low']])
-            if option.upper() == 'F':hdr[self.__data[i]['date']] = mean([self.__data[i]['high'], self.__data[i]['low'],self.__data[i]['open'], self.__data[i]['close']])
-            i += 1
+        for d in r_date:
+            tmp = self.__rangefinder(field='date', value=d)['D']
+            if option.upper() == 'C': hdr[d] = tmp['close']
+            elif option.upper() == 'HL': hdr[d] = mean([tmp['high'], tmp['low']])
+            elif option.upper() == 'F': hdr[d] = mean([tmp['open'], tmp['close'], tmp['high'], tmp['low']])
 
         for i in range(len(r_date) - period):
             res[r_date[period + i]] = mean([hdr[r_date[x]] for x in range(i, period + i)])
