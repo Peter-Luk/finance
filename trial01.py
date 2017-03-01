@@ -272,10 +272,10 @@ class I2:
 #
     def SMA(self, **args):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        if 'option' in args.keys():option = args['option']
-        res, r_date, i, hdr = {}, self.trade_day, 0, {}
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        if 'option' in args.keys(): option = args['option']
+        res, r_date, hdr = {}, self.trade_day, {}
 
         for d in r_date:
             tmp = self.__rangefinder(field='date', value=d)['D']
@@ -288,19 +288,14 @@ class I2:
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
     def APZ(self, **args):
-        date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        if 'option' in args.keys():option = args['option']
-        res, r_date, i = {}, [], 0
-
-        while i < len(self.__data):
-            if self.__data[i]['date'] not in r_date:r_date.append(self.__data[i]['date'])
-            i += 1
+        date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        res, r_date= {}, self.trade_day
 
         for i in range(period, len(r_date)):
             eh = [self.EMA(date=r_date[i - j], period=period, option='H') for j in range(period)]
@@ -311,7 +306,7 @@ class I2:
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
     def BB(self, **args):
