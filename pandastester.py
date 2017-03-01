@@ -14,7 +14,7 @@ def fdc(**args):
     for i in ilist:
         hdr = []
         for j in range(len(r_date)):
-            if j > mf._I2__period: hdr.append('%0.3f' % eval("mf.%s(date='%s')" % (i, r_date[j])))
+            if j > mf._I2__period: hdr.append(float('%0.3f' % eval("mf.%s(date='%s')" % (i, r_date[j]))))
             else: hdr.append(numpy.nan)
         dd[i] = hdr
     return pandas.DataFrame(dd)
