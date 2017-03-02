@@ -304,7 +304,7 @@ class I2:
         if 'date' in args.keys(): date = args['date']
         if 'period' in args.keys(): period = args['period']
         if 'option' in args.keys(): option = args['option']
-        res, r_date, i = {}, self.trade_day
+        res, r_date = {}, self.trade_day
 
         for i in range(len(r_date) - period):
             res[r_date[period + i]] = tuple([rnd(self.SMA(date=r_date[period + i], period=period, option=option) + x) for x in [self.BBW(date=r_date[period + i], period=period) / 2, -self.BBW(date=r_date[period + i], period=period) / 2]])
