@@ -9,16 +9,16 @@ class I2:
     def __init__(self, **args):
         self.trade_day = []
         self.__period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
-        if 'code' in args.keys():self.__code = args['code']
-        if 'period' in args.keys():self.__period = args['period']
-        if 'db_name' in args.keys():self.__db = args['db_name']
-        if 'db_table' in args.keys():self.__table = args['db_table']
+        if 'code' in args.keys(): self.__code = args['code']
+        if 'period' in args.keys(): self.__period = args['period']
+        if 'db_name' in args.keys(): self.__db = args['db_name']
+        if 'db_table' in args.keys(): self.__table = args['db_table']
 
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
         self.__data = self.__conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (self.__table, self.__code.upper())).fetchall()
         for i in range(len(self.__data)):
-            if self.__data[i]['date'] not in self.trade_day:self.trade_day.append(self.__data[i]['date'])
+            if self.__data[i]['date'] not in self.trade_day: self.trade_day.append(self.__data[i]['date'])
 
     def __del__(self):
         self.__data = self.__conn = self.__code = self.__period = self.__db = self.__table = self.trade_day = None
@@ -68,8 +68,8 @@ class I2:
 
     def append(self, **args):
         date = datetime.today().strftime('%Y-%m-%d')
-        if 'date' not in args.keys():args['date'] = date
-        if 'volume' in args.keys():volume = int(args['volume'])
+        if 'date' not in args.keys(): args['date'] = date
+        if 'volume' in args.keys(): volume = int(args['volume'])
         kt, vt = ('date', 'session', 'code'), (args['date'], args['session'], self.__code.upper())
         for k, v in args.items():
             if k not in ['date', 'session', 'code', 'volume']:
@@ -77,45 +77,41 @@ class I2:
                 vt += (int(v),)
         if args['session'] == 'A':
             hdr = self.__rangefinder(field='date', value=date)
-            if 'M' in hdr.keys():volume -= hdr['M']['volume']
+            if 'M' in hdr.keys(): volume -= hdr['M']['volume']
         sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % ((self.__table,) + kt + ('volume',) + vt + (volume,))
         try:
             self.__conn.cursor().execute(sq_str)
             self.__conn.commit()
-        except:self.__conn.rollback()
+        except: self.__conn.rollback()
 
     def ATR(self, **args):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        res, r_date, tr, i, hdr = {}, [], [], 0, {}
+        if 'date' in args.keys(): date = args['date']
+        if 'period' in args.keys(): period = args['period']
+        res, r_date, tr, i, hdr = {}, self.trade_day, [], 0, {}
 
         tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
         i += 1
         while i < len(self.__data):
             if self.__data[i]['date'] == self.__data[i - 1]['date']:
-                if self.__data[i]['high'] > self.__data[i - 1]['high']:ma = self.__data[i]['high']
-                else:ma = self.__data[i - 1]['high']
-                if self.__data[i]['low'] < self.__data[i - 1]['low']:mi = self.__data[i]['low']
-                else:mi = self.__data[i - 1]['low']
+                if self.__data[i]['high'] > self.__data[i - 1]['high']: ma = self.__data[i]['high']
+                else: ma = self.__data[i - 1]['high']
+                if self.__data[i]['low'] < self.__data[i - 1]['low']: mi = self.__data[i]['low']
+                else: mi = self.__data[i - 1]['low']
             else:
-                if self.__data[i]['high'] > self.__data[i - 1]['close']:ma, mi = self.__data[i]['high'], self.__data[i - 1]['close']
-                elif self.__data[i]['low'] < self.__data[i - 1]['close']:mi, ma = self.__data[i]['low'], self.__data[i - 1]['close']
+                if self.__data[i]['high'] > self.__data[i - 1]['close']: ma, mi = self.__data[i]['high'], self.__data[i - 1]['close']
+                elif self.__data[i]['low'] < self.__data[i - 1]['close']: mi, ma = self.__data[i]['low'], self.__data[i - 1]['close']
             tr.append([self.__data[i]['date'], self.__data[i]['session'], ma - mi])
             i += 1
 
-        i = 0
-        while i < len(tr):
-            hdr[tr[i][0]] = tr[i][-1]
-            if tr[i][0] not in r_date:r_date.append(tr[i][0])
-            i += 1
+        for i in range(len(tr)): hdr[tr[i][0]] = tr[i][-1]
 
         res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
-        for d in r_date[period:]:res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
+        for d in r_date[period:]: res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
     def EMA(self, **args):
@@ -385,14 +381,13 @@ class I2:
         if o_format == 'html':
             from tags import HTML, TITLE, TABLE, TH, TR, TD
             title = TITLE("Estimate of %s with reference on '%s' base on Pivot Point: %i" % (self.__code.upper(), t_date, pivot_point))
-            if concise:
-                trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
+            if concise: trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
             else:
                 trs = [TR(linesep.join([str(TD(x)) for x in [TD('Session delta (est.):'), TD(sru[0]), TD('to'), TD(sru[-1]), TD(sep), TD(srl[0]), TD('to'), TD(srl[-1])]]))]
                 trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Daily delta (est.):'), TD(dru[0]), TD('to'), TD(dru[-1]), TD(sep), TD(drl[0]), TD('to'), TD(drl[-1])]])))
                 trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Gap (est.):'), TD(gru[0]), TD('to'), TD(gru[-1]), TD(sep), TD(grl[0]), TD('to'), TD(grl[-1])]])))
             return str(HTML(linesep.join([str(x) for x in [title, TABLE(linesep.join(str(y) for y in trs))]])))
-        if programmatic:return rdata
+        if programmatic: return rdata
         return linesep.join(rstr)
 
 def summary(**args):
@@ -402,25 +397,25 @@ def summary(**args):
         from tags import HTML, TITLE, TABLE, TH, TR, TD
     if 'code' in args.keys():
         f_code = args['code'].upper()
-        if o_format == 'html':hdr = TITLE("`%s` analyse" % f_code)
+        if o_format == 'html': hdr = TITLE("`%s` analyse" % f_code)
         mf = I2(code=f_code)
         period, tday = mf._I2__period, mf.trade_day
         ltd = len(tday)
         if 'date' in args.keys():
-            if args['date'] in tday:ltd = tday.index(args['date']) + 1
-            elif o_format == 'html':return str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
-            else:return 'Sorry, date entry invalid!'
+            if args['date'] in tday: ltd = tday.index(args['date']) + 1
+            elif o_format == 'html': return str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
+            else: return 'Sorry, date entry invalid!'
         if ltd > period:
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI'), []
-            if o_format == 'html':th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
-            else:hdr = '\t\t'.join(i_fields)
+            if o_format == 'html': th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
+            else: hdr = '\t\t'.join(i_fields)
             for i in range(period, ltd):
                 i_values = []
-                for x in i_fields[1:]:i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
-                if o_format == 'html':trs.append(TR(linesep.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
-                else:hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
+                for x in i_fields[1:]: i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
+                if o_format == 'html': trs.append(TR(linesep.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
+                else: hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
         if ltd <= period:
-            if o_format == 'html':hdr = str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, not enough data!']])))
-            else:hdr = 'Sorry, not enough data!'
-        elif o_format == 'html':hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))),{'width':'100%'})]])))
+            if o_format == 'html': hdr = str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, not enough data!']])))
+            else: hdr = 'Sorry, not enough data!'
+        elif o_format == 'html': hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))),{'width':'100%'})]])))
         return hdr
