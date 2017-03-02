@@ -13,8 +13,10 @@ def fdc(**args):
     ilist = ('SMA', 'WMA', 'EMA', 'KAMA', 'RSI')
     for i in ilist:
         hdr = []
-        for j in range(len(r_date)):
-            if j > mf._I2__period: hdr.append(float('%0.3f' % eval("mf.%s(date='%s')" % (i, r_date[j]))))
+        for d in r_date:
+            if r_date.index(d) > mf._I2__period: hdr.append(float('%0.3f' % eval("mf.%s(date='%s')" % (i, d))))
+#         for j in range(len(r_date)):
+#             if j > mf._I2__period: hdr.append(float('%0.3f' % eval("mf.%s(date='%s')" % (i, r_date[j]))))
             else: hdr.append(numpy.nan)
         dd[i] = hdr
     return pandas.DataFrame(dd)
