@@ -1,6 +1,5 @@
 from trial01 import I2
 import pandas as pd
-import numpy
 
 def fdc(**args):
     mf, option, dd = I2(code=args['code']), 'basic', {}
@@ -14,7 +13,7 @@ def fdc(**args):
             hdr = mf._I2__rangefinder(field='date', value=i)['D']
             hdr['date'] = pd.Timestamp(i)
             data.append(hdr)
-        for dk in ('date', 'open', 'high', 'low', 'close'): dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
+        for dk in ('date', 'open', 'high', 'low', 'close'): dd[dk.capitalize()] = [data[i][dk] for i in range(len(r_date))]
     elif option == 'indicators':
         ilist = ('SMA', 'WMA', 'EMA', 'KAMA')
         dd['Date'] = []
