@@ -16,12 +16,12 @@ def fdc(**args):
             data.append(hdr)
         for dk in ('date', 'open', 'high', 'low', 'close'): dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
     elif option == 'indicators':
-        ilist, hdr = ('SMA', 'WMA', 'EMA', 'KAMA'), []
+        ilist = ('SMA', 'WMA', 'EMA', 'KAMA')
         dd['Date'] = []
         for d in r_date:
             if r_date.index(d) > mf._I2__period:dd['Date'].append(d)
         for i in ilist:
-            for d in dd['Date']:
-                hdr.append(float('%0.3f' % eval("mf.%s(date='%s')" % (i, d))))
+#            for d in dd['Date']:
+            hdr = [float('%0.3f' % eval("mf.%s(date='%s')" % (i, d))) for d in dd['Date']]
             dd[i] = hdr
     return pandas.DataFrame(dd)
