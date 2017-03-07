@@ -19,6 +19,6 @@ def fdc(**args):
         ilist = ('SMA', 'WMA', 'EMA', 'KAMA')
         dd['Date'] = []
         for d in r_date:
-            if r_date.index(d) > mf._I2__period: dd['Date'].append(d)
+            if r_date.index(d) > mf._I2__period: dd['Date'].append(pd.Timestamp(d))
         for i in ilist: dd[i] = [float('%0.3f' % eval("mf.%s(date='%s')" % (i, d))) for d in dd['Date']]
     return pd.DataFrame(dd)
