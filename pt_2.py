@@ -11,7 +11,7 @@ def fdc(**args):
         data, hdr = [], {}
         for i in r_date:
             hdr = mf._I2__rangefinder(field='date', value=i)['D']
-            hdr['date'] = pd.Timestamp(i)
+#            hdr['date'] = pd.Timestamp(i)
             data.append(hdr)
         for dk in ('date', 'open', 'high', 'low', 'close'): dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
     elif option == 'I':
