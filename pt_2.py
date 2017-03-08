@@ -20,4 +20,5 @@ def fdc(**args):
         dd['WMA'] = [mf.WMA(date=i) for i in r_date]
         dd['EMA'] = [mf.EMA(date=i) for i in r_date]
         dd['KAMA'] = [mf.KAMA(date=i) for i in r_date]
+        dd['RSI'] = [mf.RSI(date=i) for i in r_date]
     return pd.DataFrame(dd)
