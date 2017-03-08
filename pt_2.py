@@ -3,14 +3,14 @@ import pandas as pd
 
 class Pen:
     def __init__(self, **args):
-        if 'code' in args.keys(): code = args['code']
+        if 'code' in args.keys(): self.code = args['code']
 
     def __del__(self):
-        code = None
-        del(code)
+        self.code = None
+        del(self.code)
 
     def fdc(self, **args):
-        mf, option, dd = I2(code=code), 'B', {}
+        mf, option, dd = I2(code=self.code), 'B', {}
         if 'option' in args.keys():option = args['option']
 
         if option == 'B':
