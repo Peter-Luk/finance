@@ -10,7 +10,7 @@ class Pen:
         del(code)
 
     def fdc(self, **args):
-        mf, option, dd = I2(code=self.code), 'B', {}
+        mf, option, dd = I2(code=code), 'B', {}
         if 'option' in args.keys():option = args['option']
 
         if option == 'B':
