@@ -30,7 +30,7 @@ class Analysor(object):
 
     @cherrypy.expose
     def proceed(self, contract):
-        if panda: return fdc(code=contract).to_html()
+        if panda: return fdc(code=contract, option='I').to_html()
         return summary(code=contract, format='html')
 
 class Inputter(object):
@@ -55,7 +55,7 @@ class Inputter(object):
         elif (hour == 12) and (minute > 56): session = 'A'
         i2 = I2(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
-        if panda: return fdc(code=contract).to_html()
+        if panda: return fdc(code=contract, option='I').to_html()
         return summary(code=contract, format='html')
 
 class Estimator(object):
