@@ -4,7 +4,7 @@ from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OP
 from utilities import ltd, today, waf, IP
 panda = False
 try:
-    from pt_2 import I2, fdc
+    from pt_2 import I2, Pen
     panda = True
 except:
     from trial01 import I2, summary
@@ -30,7 +30,7 @@ class Analysor(object):
 
     @cherrypy.expose
     def proceed(self, contract):
-        if panda: return fdc(code=contract, option='I').to_html()
+        if panda: return Pen(code=contract).fdc(option='I').to_html()
         return summary(code=contract, format='html')
 
 class Inputter(object):
@@ -55,7 +55,7 @@ class Inputter(object):
         elif (hour == 12) and (minute > 56): session = 'A'
         i2 = I2(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
-        if panda: return fdc(code=contract, option='I').to_html()
+        if panda: return Pen(code=contract).fdc(option='I').to_html()
         return summary(code=contract, format='html')
 
 class Estimator(object):
