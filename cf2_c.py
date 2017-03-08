@@ -4,7 +4,7 @@ from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OP
 from utilities import ltd, today, waf, IP
 panda = False
 try:
-    from pandastester import I2, fdc
+    from pt_2 import I2, fdc
     panda = True
 except:
     from trial01 import I2, summary
