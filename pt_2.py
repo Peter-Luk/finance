@@ -39,7 +39,7 @@ class Pen:
         plt.plot(ti.Date, ti.WMA, label='WMA')
         plt.plot(ti.Date, ti.EMA, label='EMA')
         plt.plot(ti.Date, ti.KAMA, label='KAMA')
-        plt.plot(tb.Date, tb.Close, linestyle='bx', label='Close')
+        plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
         plt.grid(True)
         plt.subplot(212)
         plt.title('%s : RSI' % self.code.upper())
