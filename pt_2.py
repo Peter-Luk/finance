@@ -33,10 +33,8 @@ class Pen:
     def board(self, **args):
         import matplotlib.pyplot as plt
         ti, tb = self.fdc(option='I'), self.fdc()
-#        plt.figure(1)
         plt.subplot(211)
         plt.plot(ti.Date, ti.SMA, ti.Date, ti.WMA, ti.Date, ti.EMA, ti.Date, ti.KAMA)
         plt.plot(tb.Date, tb.Close, 'bx')
         plt.subplot(212)
         plt.plot(ti.Date, ti.RSI)
-#        plt.show()
