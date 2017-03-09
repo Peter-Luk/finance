@@ -34,7 +34,11 @@ class Pen:
         import matplotlib.pyplot as plt
         ti, tb = self.fdc(option='I'), self.fdc()
         plt.subplot(211)
+        plt.title('%s : with various MA indicators and daily close' % self.code.upper())
         plt.plot(ti.Date, ti.SMA, ti.Date, ti.WMA, ti.Date, ti.EMA, ti.Date, ti.KAMA)
         plt.plot(tb.Date, tb.Close, 'bx')
+        plt.grid(True)
         plt.subplot(212)
+        plt.title('%s : RSI' % self.code.upper())
         plt.plot(ti.Date, ti.RSI)
+        plt.grid(True)
