@@ -55,7 +55,9 @@ class Inputter(object):
         elif (hour == 12) and (minute > 56): session = 'A'
         i2 = I2(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
-        if panda: return Pen(code=contract).fdc(option='I').to_html()
+        if panda:
+            if len(i2.trade_day) > i2._I2__period: return Pen(code=contract).fdc(option='I').to_html()
+            return Pen(code=contract).fdc().to_html()
         return summary(code=contract, format='html')
 
 class Estimator(object):
