@@ -30,7 +30,10 @@ class Analysor(object):
 
     @cherrypy.expose
     def proceed(self, contract):
-        if panda: return Pen(code=contract).fdc(option='I').to_html()
+        if panda:
+            opt_value = 'B'
+            if len(i2.trade_day) > i2._I2__period: opt_value = 'I'
+            return Pen(code=contract).fdc(option=opt_value).to_html()
         return summary(code=contract, format='html')
 
 class Inputter(object):
@@ -56,8 +59,9 @@ class Inputter(object):
         i2 = I2(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
         if panda:
-            if len(i2.trade_day) > i2._I2__period: return Pen(code=contract).fdc(option='I').to_html()
-            return Pen(code=contract).fdc().to_html()
+            opt_value = 'B'
+            if len(i2.trade_day) > i2._I2__period: opt_value = 'I'
+            return Pen(code=contract).fdc(option=opt_value).to_html()
         return summary(code=contract, format='html')
 
 class Estimator(object):
