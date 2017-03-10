@@ -17,7 +17,7 @@ class Pen:
             data, hdr = [], {}
             for i in mf.trade_day:
                 hdr = mf._I2__rangefinder(field='date', value=i)['D']
-                hdr['date'] = i
+                hdr['date'] = pd.Timestamp(i)
                 data.append(hdr)
             for dk in ('date', 'open', 'high', 'low', 'close', 'range', 'volume'): dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
         elif option == 'I':
@@ -30,7 +30,7 @@ class Pen:
             dd['RSI'] = [mf.RSI(date=i) for i in r_date]
         return pd.DataFrame(dd)
 
-    def board(self, **args):
+    def plot(self, **args):
         import matplotlib.pyplot as plt
         ti, tb = self.fdc(option='I'), self.fdc()
         plt.subplot(211)
@@ -41,10 +41,11 @@ class Pen:
         plt.plot(ti.Date, ti.KAMA, label='KAMA')
         plt.legend(loc='upper left', frameon=False)
         plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
-        plt.xticks([tb.Date[i] for i in range(0, len(tb.Date), 7)], [r'$%s$' % tb.Date[i] for i in range(0, len(tb.Date), 7)])
+        plt.xticks([tb.Date[i] for i in range(0, len(tb.Date), 7)], [r'$%s$' % tb.Date[i].strftime('%Y-%m-%d') for i in range(0, len(tb.Date), 7)])
         plt.grid(True)
         plt.subplot(212)
         plt.plot(ti.Date, ti.RSI, label='RSI')
         plt.xticks([ti.Date[i] for i in range(0, len(ti.Date), 4)], [r'$%s$' % ti.Date[i].strftime('%Y-%m-%d') for i in range(0, len(ti.Date), 4)])
         plt.legend(loc='lower left', frameon=False)
         plt.grid(True)
+        plt.show()
