@@ -3,11 +3,17 @@ import pandas as pd
 
 class Pen:
     def __init__(self, **args):
+        self.plt = None
+        try:
+            import matplotlib.pyplot as plt
+            self.plt = plt
+        except:pass
         if 'code' in args.keys(): self.code = args['code']
 
     def __del__(self):
-        self.code = None
+        self.code = self.plt = None
         del(self.code)
+        del(self.plt)
 
     def fdc(self, **args):
         mf, option, dd = I2(code=self.code), 'B', {}
@@ -31,21 +37,23 @@ class Pen:
         return pd.DataFrame(dd)
 
     def plot(self, **args):
-        import matplotlib.pyplot as plt
-        ti, tb = self.fdc(option='I'), self.fdc()
-        plt.subplot(211)
-        plt.title('%s : with various MA indicators and daily close' % self.code.upper())
-        plt.plot(ti.Date, ti.SMA, label='SMA')
-        plt.plot(ti.Date, ti.WMA, label='WMA')
-        plt.plot(ti.Date, ti.EMA, label='EMA')
-        plt.plot(ti.Date, ti.KAMA, label='KAMA')
-        plt.legend(loc='upper left', frameon=False)
-        plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
-        plt.xticks([tb.Date[i] for i in range(0, len(tb.Date), 7)], [r'$%s$' % tb.Date[i].strftime('%Y-%m-%d') for i in range(0, len(tb.Date), 7)])
-        plt.grid(True)
-        plt.subplot(212)
-        plt.plot(ti.Date, ti.RSI, label='RSI')
-        plt.xticks([ti.Date[i] for i in range(0, len(ti.Date), 4)], [r'$%s$' % ti.Date[i].strftime('%Y-%m-%d') for i in range(0, len(ti.Date), 4)])
-        plt.legend(loc='lower left', frameon=False)
-        plt.grid(True)
-        plt.show()
+        if self.plt:
+            ti, tb = self.fdc(option='I'), self.fdc()
+            self.plt.clf()
+            self.plt.subplot(211)
+            self.plt.title('%s : with various MA indicators and daily close' % self.code.upper())
+            self.plt.plot(ti.Date, ti.SMA, label='SMA')
+            self.plt.plot(ti.Date, ti.WMA, label='WMA')
+            self.plt.plot(ti.Date, ti.EMA, label='EMA')
+            self.plt.plot(ti.Date, ti.KAMA, label='KAMA')
+            self.plt.legend(loc='upper left', frameon=False)
+            self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
+            self.plt.xticks([tb.Date[i] for i in range(0, len(tb.Date), 7)], [r'$%s$' % tb.Date[i].strftime('%Y-%m-%d') for i in range(0, len(tb.Date), 7)])
+            self.plt.grid(True)
+            self.plt.subplot(212)
+            self.plt.plot(ti.Date, ti.RSI, label='RSI')
+            self.plt.xticks([ti.Date[i] for i in range(0, len(ti.Date), 4)], [r'$%s$' % ti.Date[i].strftime('%Y-%m-%d') for i in range(0, len(ti.Date), 4)])
+            self.plt.legend(loc='lower left', frameon=False)
+            self.plt.grid(True)
+            self.plt.tight_layout()
+            self.plt.show()
