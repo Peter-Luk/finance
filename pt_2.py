@@ -1,6 +1,11 @@
 from trial01 import I2
-# from mpl_finance import candlestick_ohlc
 import pandas as pd
+
+candle = False
+try:
+    from mpl_finance import candlestick_ohlc
+    candle = True
+except:pass
 
 class Pen:
     def __init__(self, **args):
@@ -48,15 +53,16 @@ class Pen:
             self.plt.plot(ti.Date, ti.EMA, label='EMA')
             self.plt.plot(ti.Date, ti.KAMA, label='KAMA')
             self.plt.legend(loc='upper left', frameon=False)
-#             c_axis = self.plt.gca()
-#             x, ohlc = 0, []
-#             while x < len(tb):
-#                 append_me = tb.Date.values[x], tb.Open.values[x], tb.High.values[x], tb.Low.values[x], tb.Close.values[x], tb.Volume.values[x]
-#                 ohlc.append(append_me)
-#                 x += 1
-#             candlestick_ohlc(c_axis, ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
-
-            self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
+            if candle:
+                c_axis = self.plt.gca()
+                x, ohlc = 0, []
+                while x < len(tb):
+                    append_me = tb.Date[x].toordinal(), tb.Open[x], tb.High[x], tb.Low[x], tb.Close[x], tb.Volume[x]
+                    ohlc.append(append_me)
+                    x += 1
+                candlestick_ohlc(c_axis, ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
+            else:
+                self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
             self.plt.xticks([tb.Date[i] for i in range(0, len(tb.Date), 7)], [r'$%s$' % tb.Date[i].strftime('%Y-%m-%d') for i in range(0, len(tb.Date), 7)])
             self.plt.grid(True)
             self.plt.subplot(212)
