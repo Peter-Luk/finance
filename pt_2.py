@@ -12,14 +12,18 @@ class Pen:
         self.plt = None
         try:
             import matplotlib.pyplot as plt
-            self.plt = plt
+            import matplotlib.dates as mdates
+            import matplotlib.ticker as mticker
+            self.plt, self.mdates, self.mticker = plt, mdates, mticker
         except:pass
         if 'code' in args.keys(): self.code = args['code']
 
     def __del__(self):
-        self.code = self.plt = None
+        self.code = self.plt = self.mdates = self.mticker = None
         del(self.code)
         del(self.plt)
+        del(self.mdates)
+        del(self.mticker)
 
     def fdc(self, **args):
         mf, option, dd = I2(code=self.code), 'B', {}
@@ -61,14 +65,21 @@ class Pen:
                     ohlc.append(append_me)
                     x += 1
                 candlestick_ohlc(ax1, ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
+                for label in ax1.xaxis.get_ticklabels(): label.set_rotation(45)
+                ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
+                ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(10))
             else:
                 self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
-            self.plt.xticks([tb.Date[i] for i in range(0, len(tb.Date), 7)], [r'$%s$' % tb.Date[i].strftime('%Y-%m-%d') for i in range(0, len(tb.Date), 7)])
+                self.plt.xticks([tb.Date[i] for i in range(0, len(tb.Date), 7)], [r'$%s$' % tb.Date[i].strftime('%Y-%m-%d') for i in range(0, len(tb.Date), 7)])
             self.plt.grid(True)
             self.plt.subplot(212)
+            ax1 = self.plt.gca()
             self.plt.plot(ti.Date, ti.RSI, label='RSI')
             self.plt.xticks([ti.Date[i] for i in range(0, len(ti.Date), 4)], [r'$%s$' % ti.Date[i].strftime('%Y-%m-%d') for i in range(0, len(ti.Date), 4)])
             self.plt.legend(loc='lower left', frameon=False)
+            for label in ax1.xaxis.get_ticklabels(): label.set_rotation(45)
+            ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
+            ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(10))
             self.plt.grid(True)
             self.plt.tight_layout()
             self.plt.show()
