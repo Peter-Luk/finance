@@ -75,7 +75,6 @@ class Pen:
             self.plt.subplot(212)
             ax1 = self.plt.gca()
             self.plt.plot(ti.Date, ti.RSI, label='RSI')
-#            self.plt.xticks([ti.Date[i] for i in range(0, len(ti.Date), 4)], [r'$%s$' % ti.Date[i].strftime('%Y-%m-%d') for i in range(0, len(ti.Date), 4)])
             self.plt.legend(loc='lower left', frameon=False)
             for label in ax1.xaxis.get_ticklabels(): label.set_rotation(45)
             ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
