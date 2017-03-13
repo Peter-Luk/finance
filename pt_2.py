@@ -46,6 +46,15 @@ class Pen:
             dd['RSI'] = [mf.RSI(date=i) for i in r_date]
         return pd.DataFrame(dd)
 
+    def axis_decorator(self, **args):
+        angle, labels = 45, 8
+        if 'axis' in args.keys(): ax1 = args['axis']
+        if 'angle' in args.keys(): angle = args['angle']
+        if 'labels' in args.keys(): labels = args['labels']
+        for label in ax1.xaxis.get_ticklabels(): label.set_rotation(angle)
+        ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
+        ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(labels))
+
     def plot(self, **args):
         if self.plt:
             r_index, ti, tb = 'close', self.fdc(option='I'), self.fdc()
@@ -56,27 +65,21 @@ class Pen:
             self.plt.plot(ti.Date, ti.EMA, label='EMA')
             self.plt.plot(ti.Date, ti.KAMA, label='KAMA')
             self.plt.legend(loc='upper left', frameon=False)
-            ax1 = self.plt.gca()
             if candle:
                 x, ohlc, r_index = 0, [], 'candlestick'
                 while x < len(tb):
                     append_me = tb.Date[x].toordinal(), tb.Open[x], tb.High[x], tb.Low[x], tb.Close[x], tb.Volume[x]
                     ohlc.append(append_me)
                     x += 1
-                candlestick_ohlc(ax1, ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
+                candlestick_ohlc(self.plt.gca(), ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
             else: self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
             self.plt.title('%s : with various MA indicators and daily %s' % (self.code.upper(), r_index))
-            for label in ax1.xaxis.get_ticklabels(): label.set_rotation(45)
-            ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
-            ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(10))
+            self.axis_decorator(axis=self.plt.gca(), labels=10)
             self.plt.grid(True)
             self.plt.subplot(212)
-            ax1 = self.plt.gca()
             self.plt.plot(ti.Date, ti.RSI, label='RSI')
             self.plt.legend(loc='lower left', frameon=False)
-            for label in ax1.xaxis.get_ticklabels(): label.set_rotation(45)
-            ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
-            ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(10))
+            self.axis_decorator(axis=self.plt.gca(), labels=8)
             self.plt.grid(True)
             self.plt.tight_layout()
             self.plt.show()
