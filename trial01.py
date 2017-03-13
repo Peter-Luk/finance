@@ -57,13 +57,13 @@ class I2:
                     do, sh, sl, sv = i['open'], i['high'], i['low'], i['volume']
                     sr = sh - sl
             dr = dh - dl
-            res['A'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
+            res['A'] = {'delta':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
         else:
             so, sc, sh, sl, sv = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'], hdr[0]['low'], hdr[0]['volume']
             do, dc, sr, dv = so, sc, sh -sl, sv
             dr, dh, dl = sr, sh, sl
-            res['M'] = {'range':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
-        res['D'] = {'range':dr, 'open':do, 'close':dc, 'volume':dv, 'high':dh, 'low':dl}
+            res['M'] = {'delta':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
+        res['D'] = {'delta':dr, 'open':do, 'close':dc, 'volume':dv, 'high':dh, 'low':dl}
         return res
 
     def append(self, **args):
@@ -217,7 +217,7 @@ class I2:
 
         for d in r_date:
             tmp = self.__rangefinder(field='date', value=d)['D']
-            hdr[d] = tmp['range']
+            hdr[d] = tmp['delta']
 
         for i in range(len(r_date) - period):
             res[r_date[period + i]] = 2 * 2 * stdev([hdr[r_date[x]] for x in range(i, period + i)]) / gr
@@ -356,13 +356,13 @@ class I2:
         if 'concise'in args.keys(): concise = args['concise']
 
         hdr = self.__rangefinder(field='date', value=t_date)
-        dr, gap = hdr['D']['range'], abs(pivot_point - hdr['D']['close'])
-        if 'A' in hdr.keys(): sr = hdr['A']['range']
+        dr, gap = hdr['D']['delta'], abs(pivot_point - hdr['D']['close'])
+        if 'A' in hdr.keys(): sr = hdr['A']['delta']
         elif 'M' in hdr.keys():
-            sr = hdr['M']['range']
+            sr = hdr['M']['delta']
             i_date = self.trade_day[self.trade_day.index(t_date) - 1]
             hdr2 = self.__rangefinder(field='date', value=i_date)
-            dr = hdr2['D']['range']
+            dr = hdr2['D']['delta']
 
         ogr = 1. / gr
         sru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-ogr)*sr, ogr*sr]])

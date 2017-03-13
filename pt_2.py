@@ -35,7 +35,7 @@ class Pen:
                 hdr = mf._I2__rangefinder(field='date', value=i)['D']
                 hdr['date'] = pd.Timestamp(i)
                 data.append(hdr)
-            for dk in ('date', 'open', 'high', 'low', 'close', 'range', 'volume'): dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
+            for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'): dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
         elif option == 'I':
             r_date = mf.trade_day[mf._I2__period + 1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
