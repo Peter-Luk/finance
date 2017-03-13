@@ -48,7 +48,7 @@ class Pen:
 
     def plot(self, **args):
         if self.plt:
-            ti, tb = self.fdc(option='I'), self.fdc()
+            r_index, ti, tb = 'close', self.fdc(option='I'), self.fdc()
             self.plt.clf()
             self.plt.subplot(211)
             self.plt.title('%s : with various MA indicators and daily close' % self.code.upper())
@@ -59,7 +59,7 @@ class Pen:
             self.plt.legend(loc='upper left', frameon=False)
             ax1 = self.plt.gca()
             if candle:
-                x, ohlc = 0, []
+                x, ohlc, r_index = 0, [], 'candlestick'
                 while x < len(tb):
                     append_me = tb.Date[x].toordinal(), tb.Open[x], tb.High[x], tb.Low[x], tb.Close[x], tb.Volume[x]
                     ohlc.append(append_me)
@@ -67,6 +67,7 @@ class Pen:
                 candlestick_ohlc(ax1, ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
             else:
                 self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
+            self.plt.title('%s : with various MA indicators and daily %s' % (self.code.upper(), r_index))
             for label in ax1.xaxis.get_ticklabels(): label.set_rotation(45)
             ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
             ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(10))
