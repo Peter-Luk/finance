@@ -5,7 +5,7 @@ candle = False
 try:
     from mpl_finance import candlestick_ohlc
     candle = True
-except:pass
+except: pass
 
 class Pen:
     def __init__(self, **args):
@@ -15,7 +15,7 @@ class Pen:
             import matplotlib.dates as mdates
             import matplotlib.ticker as mticker
             self.plt, self.mdates, self.mticker = plt, mdates, mticker
-        except:pass
+        except: pass
         if 'code' in args.keys(): self.code = args['code']
 
     def __del__(self):
@@ -27,7 +27,7 @@ class Pen:
 
     def fdc(self, **args):
         mf, option, dd = I2(code=self.code), 'B', {}
-        if 'option' in args.keys():option = args['option']
+        if 'option' in args.keys(): option = args['option']
 
         if option == 'B':
             data, hdr = [], {}
@@ -51,7 +51,6 @@ class Pen:
             r_index, ti, tb = 'close', self.fdc(option='I'), self.fdc()
             self.plt.clf()
             self.plt.subplot(211)
-            self.plt.title('%s : with various MA indicators and daily close' % self.code.upper())
             self.plt.plot(ti.Date, ti.SMA, label='SMA')
             self.plt.plot(ti.Date, ti.WMA, label='WMA')
             self.plt.plot(ti.Date, ti.EMA, label='EMA')
@@ -65,8 +64,7 @@ class Pen:
                     ohlc.append(append_me)
                     x += 1
                 candlestick_ohlc(ax1, ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
-            else:
-                self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
+            else: self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
             self.plt.title('%s : with various MA indicators and daily %s' % (self.code.upper(), r_index))
             for label in ax1.xaxis.get_ticklabels(): label.set_rotation(45)
             ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
