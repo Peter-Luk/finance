@@ -1,5 +1,5 @@
 import sqlite3 as lite
-from utilities import gr, rnd, filepath, sep, linesep
+from utilities import gr, rnd, filepath, sep, linesep, get_month
 from datetime import datetime
 from statistics import mean, stdev
 

@@ -1,6 +1,5 @@
-from trial01 import I2
+from trial01 import I2, get_month
 import pandas as pd
-from utilities import get_month
 
 candle = False
 try:
