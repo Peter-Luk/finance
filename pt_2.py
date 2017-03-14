@@ -1,5 +1,6 @@
 from trial01 import I2
 import pandas as pd
+from utilities import get_month
 
 candle = False
 try:
@@ -73,13 +74,13 @@ class Pen:
                     x += 1
                 candlestick_ohlc(self.plt.gca(), ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
             else: self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
-            self.plt.title('%s : with various MA indicators and daily %s' % (self.code.upper(), r_index))
+            self.plt.title('%s (%s): with various MA indicators and daily %s' % (self.code[:-2].upper(), ' '.join((get_month(self.code[-2]), '201' + self.code[-1])), r_index))
             self.axis_decorator(axis=self.plt.gca(), labels=10)
             self.plt.grid(True)
             self.plt.subplot(212)
             self.plt.plot(ti.Date, ti.RSI, label='RSI')
             self.plt.legend(loc='lower left', frameon=False)
-            self.axis_decorator(axis=self.plt.gca(), labels=8)
+            self.axis_decorator(axis=self.plt.gca(), labels=7)
             self.plt.grid(True)
             self.plt.tight_layout()
             self.plt.show()

@@ -31,6 +31,11 @@ def ltd(year=year, month=month, excluded={}):
 futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'March':'H', 'April':'J', 'May':'K', 'June':'M', 'July':'N', 'August':'Q', 'September':'U', 'October':'V', 'November':'X', 'December':'Z'}
 avail_indicators, cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)
 
+def get_month(index):
+    if index.upper() in month_initial.values():
+        for i in list(month_initial.items()):
+            if i[-1] == index.upper(): return i[0]
+
 def dex(n=0):
     if n in range(12):
         n_month, n_year = month + n, today.year
