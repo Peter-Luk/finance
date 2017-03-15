@@ -82,4 +82,4 @@ class Pen:
             self.axis_decorator(axis=self.plt.gca(), labels=7)
             self.plt.grid(True)
             self.plt.tight_layout()
-            self.plt.show()
+#            self.plt.show()
