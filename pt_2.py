@@ -44,7 +44,7 @@ class Pen:
             dd['EMA'] = [mf.EMA(date=i) for i in r_date]
             dd['KAMA'] = [mf.KAMA(date=i) for i in r_date]
             dd['RSI'] = [mf.RSI(date=i) for i in r_date]
-        elif option == 'A':
+        elif option == 'O':
             r_date = mf.trade_day[mf._I2__period + 1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
             dd['APZ'] = [mf.APZ(date=i) for i in r_date]
@@ -63,13 +63,19 @@ class Pen:
 
     def plot(self, **args):
         if self.plt:
-            r_index, ti, tb = 'close', self.fdc(option='I'), self.fdc()
+            r_index, ta, ti, tb = 'close', self.fdc(option='O'), self.fdc(option='I'), self.fdc()
             self.plt.clf()
             self.plt.subplot(211)
             self.plt.plot(ti.Date, ti.SMA, label='SMA')
             self.plt.plot(ti.Date, ti.WMA, label='WMA')
             self.plt.plot(ti.Date, ti.EMA, label='EMA')
             self.plt.plot(ti.Date, ti.KAMA, label='KAMA')
+            self.plt.plot(ta.Date, [x[0] for x in ta.KC.values], color='c', linestyle=':')
+            self.plt.plot(ta.Date, [x[-1] for x in ta.KC.values], color='c', linestyle=':')
+#             self.plt.plot(ta.Date, [x[0] for x in ta.BB.values], color='b', linestyle='-')
+#             self.plt.plot(ta.Date, [x[-1] for x in ta.BB.values], color='b', linestyle='-')
+            self.plt.plot(ta.Date, [x[0] for x in ta.APZ.values], color='c', linestyle='--')
+            self.plt.plot(ta.Date, [x[-1] for x in ta.APZ.values], color='c', linestyle='--')
             self.plt.legend(loc='upper left', frameon=False)
             if candle:
                 x, ohlc, r_index = 0, [], 'candlestick'
