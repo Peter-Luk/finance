@@ -44,6 +44,12 @@ class Pen:
             dd['EMA'] = [mf.EMA(date=i) for i in r_date]
             dd['KAMA'] = [mf.KAMA(date=i) for i in r_date]
             dd['RSI'] = [mf.RSI(date=i) for i in r_date]
+        elif option == 'A':
+            r_date = mf.trade_day[mf._I2__period + 1:]
+            dd['Date'] = [pd.Timestamp(d) for d in r_date]
+            dd['APZ'] = [mf.APZ(date=i) for i in r_date]
+            dd['BB'] = [mf.BB(date=i) for i in r_date]
+            dd['KC'] = [mf.KC(date=i) for i in r_date]
         return pd.DataFrame(dd)
 
     def axis_decorator(self, **args):
