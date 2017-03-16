@@ -1,5 +1,6 @@
 from trial01 import I2, get_month
 import pandas as pd
+import numpy as np
 
 candle = False
 try:
@@ -35,7 +36,11 @@ class Pen:
                 hdr = mf._I2__rangefinder(field='date', value=i)['D']
                 hdr['date'] = pd.Timestamp(i)
                 data.append(hdr)
-            for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'): dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
+            for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'):
+                hdr = [np.NaN for i in mf.trade_day[:mf._I2__period]]
+                hdr.extend([mf.ATR(date=d) for d in mf.trade_day[mf._I2__period:]])
+                dd['ATR'] = hdr
+                dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
         elif option == 'I':
             r_date = mf.trade_day[mf._I2__period + 1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
