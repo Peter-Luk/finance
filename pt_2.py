@@ -75,12 +75,12 @@ class Pen:
             self.plt.plot(ti.Date, ti.WMA, label='WMA')
             self.plt.plot(ti.Date, ti.EMA, label='EMA')
             self.plt.plot(ti.Date, ti.KAMA, label='KAMA')
-            self.plt.plot(ta.Date, [x[0] for x in ta.KC.values], color='c', linestyle=':')
-            self.plt.plot(ta.Date, [x[-1] for x in ta.KC.values], color='c', linestyle=':')
+            self.plt.plot(ta.Date, [x[0] for x in ta.KC.values], color='r', linestyle=':')
+            self.plt.plot(ta.Date, [x[-1] for x in ta.KC.values], color='r', linestyle=':')
             self.plt.plot(ta.Date, [x[0] for x in ta.BB.values], color='c', linestyle='-.')
             self.plt.plot(ta.Date, [x[-1] for x in ta.BB.values], color='c', linestyle='-.')
-            self.plt.plot(ta.Date, [x[0] for x in ta.APZ.values], color='c', linestyle='--')
-            self.plt.plot(ta.Date, [x[-1] for x in ta.APZ.values], color='c', linestyle='--')
+            self.plt.plot(ta.Date, [x[0] for x in ta.APZ.values], color='m', linestyle='--')
+            self.plt.plot(ta.Date, [x[-1] for x in ta.APZ.values], color='m', linestyle='--')
             self.plt.legend(loc='upper left', frameon=False)
             if candle:
                 x, ohlc, r_index = 0, [], 'candlestick'
