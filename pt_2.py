@@ -101,13 +101,13 @@ class Pen:
             self.plt.tight_layout()
 #            self.plt.show()
 
-    def rsit(self, *args):
+    def snl_rsi(self, *args):
         ratio = gr
         if args: ratio = args[0]
         ti = self.fdc(option='I')
         return [ti.RSI.mean() + ratio * i for i in [ti.RSI.std(), -ti.RSI.std()]]
 
-    def atrst(self, *args):
+    def snl_atr(self, *args):
         ratio = gr
         if args: ratio = args[0]
         tb = self.fdc()
