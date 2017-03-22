@@ -1,4 +1,4 @@
-from trial01 import I2, get_month
+from trial01 import I2, get_month, gr
 import pandas as pd
 import numpy as np
 
@@ -66,7 +66,7 @@ class Pen:
         ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
         ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(labels))
 
-    def plot(self, **args):
+    def draw(self, **args):
         if self.plt:
             r_index, ta, ti, tb = 'close', self.fdc(option='O'), self.fdc(option='I'), self.fdc()
             self.plt.clf()
@@ -100,3 +100,15 @@ class Pen:
             self.plt.grid(True)
             self.plt.tight_layout()
 #            self.plt.show()
+
+    def rsit(self, *args):
+        ratio = gr
+        if args: ratio = args[0]
+        ti = self.fdc(option='I')
+        return [ti.RSI.mean() + ratio * i for i in [ti.RSI.std(), -ti.RSI.std()]]
+
+    def atrst(self, *args):
+        ratio = gr
+        if args: ratio = args[0]
+        tb = self.fdc()
+        return [tb.ATR.mean() + ratio * i for i in [tb.ATR.std(), -tb.ATR.std()]]
