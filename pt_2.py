@@ -9,6 +9,9 @@ try:
 except: pass
 
 class Pen:
+    """
+Pandas DataFrame object for local Futures. Require parameter: 'code'
+    """
     def __init__(self, **kwargs):
         self.plt = None
         try:
@@ -27,6 +30,9 @@ class Pen:
         del(self.mticker)
 
     def fdc(self, **kwargs):
+        """
+Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
+         """
         mf, option, dd = I2(code=self.code), 'B', {}
         if 'option' in kwargs.keys(): option = kwargs['option']
 
@@ -67,6 +73,9 @@ class Pen:
         ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(labels))
 
     def draw(self, **kwargs):
+        """
+Generate basic matplotlib graph object.
+        """
         if self.plt:
             r_index, ta, ti, tb = 'close', self.fdc(option='O'), self.fdc(option='I'), self.fdc()
             self.plt.clf()
@@ -101,14 +110,20 @@ class Pen:
             self.plt.tight_layout()
 #            self.plt.show()
 
-    def snl_rsi(self, *kwargs):
+    def snl_rsi(self, *args):
+        """
+Statistics normal range for 'R'elative 'S'trength 'I'ndex with default 'golden ratio'.
+        """
         ratio = gr
-        if kwargs: ratio = kwargs[0]
+        if args: ratio = args[0]
         ti = self.fdc(option='I')
         return [ti.RSI.mean() + ratio * i for i in [ti.RSI.std(), -ti.RSI.std()]]
 
-    def snl_atr(self, *kwargs):
+    def snl_atr(self, *args):
+        """
+Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio'.
+        """
         ratio = gr
-        if kwargs: ratio = kwargs[0]
+        if args: ratio = args[0]
         tb = self.fdc()
         return [tb.ATR.mean() + ratio * i for i in [tb.ATR.std(), -tb.ATR.std()]]
