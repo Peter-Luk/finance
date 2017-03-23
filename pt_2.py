@@ -9,7 +9,7 @@ try:
 except: pass
 
 class Pen:
-    def __init__(self, **args):
+    def __init__(self, **kwargs):
         self.plt = None
         try:
             import matplotlib.pyplot as plt
@@ -17,7 +17,7 @@ class Pen:
             import matplotlib.ticker as mticker
             self.plt, self.mdates, self.mticker = plt, mdates, mticker
         except: pass
-        if 'code' in args.keys(): self.code = args['code']
+        if 'code' in kwargs.keys(): self.code = kwargs['code']
 
     def __del__(self):
         self.code = self.plt = self.mdates = self.mticker = None
@@ -26,9 +26,9 @@ class Pen:
         del(self.mdates)
         del(self.mticker)
 
-    def fdc(self, **args):
+    def fdc(self, **kwargs):
         mf, option, dd = I2(code=self.code), 'B', {}
-        if 'option' in args.keys(): option = args['option']
+        if 'option' in kwargs.keys(): option = kwargs['option']
 
         if option == 'B':
             data, hdr = [], {}
@@ -57,16 +57,16 @@ class Pen:
             dd['KC'] = [mf.KC(date=i) for i in r_date]
         return pd.DataFrame(dd)
 
-    def axis_decorator(self, **args):
+    def axis_decorator(self, **kwargs):
         angle, labels = 45, 8
-        if 'axis' in args.keys(): ax1 = args['axis']
-        if 'angle' in args.keys(): angle = args['angle']
-        if 'labels' in args.keys(): labels = args['labels']
+        if 'axis' in kwargs.keys(): ax1 = kwargs['axis']
+        if 'angle' in kwargs.keys(): angle = kwargs['angle']
+        if 'labels' in kwargs.keys(): labels = kwargs['labels']
         for label in ax1.xaxis.get_ticklabels(): label.set_rotation(angle)
         ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
         ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(labels))
 
-    def draw(self, **args):
+    def draw(self, **kwargs):
         if self.plt:
             r_index, ta, ti, tb = 'close', self.fdc(option='O'), self.fdc(option='I'), self.fdc()
             self.plt.clf()
@@ -101,14 +101,14 @@ class Pen:
             self.plt.tight_layout()
 #            self.plt.show()
 
-    def snl_rsi(self, *args):
+    def snl_rsi(self, *kwargs):
         ratio = gr
-        if args: ratio = args[0]
+        if kwargs: ratio = kwargs[0]
         ti = self.fdc(option='I')
         return [ti.RSI.mean() + ratio * i for i in [ti.RSI.std(), -ti.RSI.std()]]
 
-    def snl_atr(self, *args):
+    def snl_atr(self, *kwargs):
         ratio = gr
-        if args: ratio = args[0]
+        if kwargs: ratio = kwargs[0]
         tb = self.fdc()
         return [tb.ATR.mean() + ratio * i for i in [tb.ATR.std(), -tb.ATR.std()]]

@@ -6,13 +6,13 @@ from statistics import mean, stdev
 db_name, db_table = 'Futures', 'records'
 
 class I2:
-    def __init__(self, **args):
+    def __init__(self, **kwargs):
         self.trade_day = []
         self.__period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
-        if 'code' in args.keys(): self.__code = args['code']
-        if 'period' in args.keys(): self.__period = args['period']
-        if 'db_name' in args.keys(): self.__db = args['db_name']
-        if 'db_table' in args.keys(): self.__table = args['db_table']
+        if 'code' in kwargs.keys(): self.__code = kwargs['code']
+        if 'period' in kwargs.keys(): self.__period = kwargs['period']
+        if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
+        if 'db_table' in kwargs.keys(): self.__table = kwargs['db_table']
 
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
@@ -38,9 +38,9 @@ class I2:
         if x < 0:return True
         return False
 
-    def __rangefinder(self, **args):
-        if 'field' in args.keys(): field = args['field']
-        if 'value' in args.keys(): value = args['value']
+    def __rangefinder(self, **kwargs):
+        if 'field' in kwargs.keys(): field = kwargs['field']
+        if 'value' in kwargs.keys(): value = kwargs['value']
         res, hdr ={}, []
         for i in self.__data:
             if value == i[field]: hdr.append(i)
@@ -66,16 +66,16 @@ class I2:
         res['D'] = {'delta':dr, 'open':do, 'close':dc, 'volume':dv, 'high':dh, 'low':dl}
         return res
 
-    def append(self, **args):
+    def append(self, **kwargs):
         date = datetime.today().strftime('%Y-%m-%d')
-        if 'date' not in args.keys(): args['date'] = date
-        if 'volume' in args.keys(): volume = int(args['volume'])
-        kt, vt = ('date', 'session', 'code'), (args['date'], args['session'], self.__code.upper())
-        for k, v in args.items():
+        if 'date' not in kwargs.keys(): kwargs['date'] = date
+        if 'volume' in kwargs.keys(): volume = int(kwargs['volume'])
+        kt, vt = ('date', 'session', 'code'), (kwargs['date'], kwargs['session'], self.__code.upper())
+        for k, v in kwargs.items():
             if k not in ['date', 'session', 'code', 'volume']:
                 kt += (k,)
                 vt += (int(v),)
-        if args['session'] == 'A':
+        if kwargs['session'] == 'A':
             hdr = self.__rangefinder(field='date', value=date)
             if 'M' in hdr.keys(): volume -= hdr['M']['volume']
         sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % ((self.__table,) + kt + ('volume',) + vt + (volume,))
@@ -84,10 +84,10 @@ class I2:
             self.__conn.commit()
         except: self.__conn.rollback()
 
-    def ATR(self, **args):
+    def ATR(self, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
         res, r_date, tr, i, hdr = {}, self.trade_day, [], 0, {}
 
         tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
@@ -114,12 +114,12 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def EMA(self, **args):
+    def EMA(self, **kwargs):
         data, date, period, option = self.__data, datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'data' in args.keys(): data = args['data']
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
-        if 'option' in args.keys(): option = args['option']
+        if 'data' in kwargs.keys(): data = kwargs['data']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
+        if 'option' in kwargs.keys(): option = kwargs['option']
         if type(data[0]) in (int, float):
             res, kratio = [], 2. / (1 + period)
             for i in range(len(data)):
@@ -145,13 +145,13 @@ class I2:
             if date in rkeys: return res[date]
             return res[rkeys[-1]]
 
-    def KAMA(self, **args):
+    def KAMA(self, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         fast, slow = rnd(period / gr ** 2), period
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
-        if 'slow' in args.keys(): slow = args['slow']
-        if 'fast' in args.keys(): fast = args['fast']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
+        if 'slow' in kwargs.keys(): slow = kwargs['slow']
+        if 'fast' in kwargs.keys(): fast = kwargs['fast']
         res, trade_day, tr, hdr, er, sc = {}, self.trade_day, {}, {}, {}, {}
 
         for d in trade_day:
@@ -175,10 +175,10 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def RSI(self, **args):
+    def RSI(self, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
         res, trade_day, tr, hdr, i = {}, self.trade_day, {}, {}, 1
 
         for d in trade_day:
@@ -209,10 +209,10 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def BBW(self, **args):
+    def BBW(self, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
         res, r_date, hdr = {}, self.trade_day, {}
 
         for d in r_date:
@@ -227,11 +227,11 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 #
-    def SAR(self, **args):
+    def SAR(self, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        if 'option' in args.keys():option = args['option']
+        if 'date' in kwargs.keys():date = kwargs['date']
+        if 'period' in kwargs.keys():period = kwargs['period']
+        if 'option' in kwargs.keys():option = kwargs['option']
         res, r_date, i, hdr = {}, [], 0, {}
         sp = {}
         while i < len(self.__data):
@@ -256,11 +256,11 @@ class I2:
 #        if date in rkeys:return res[date]
 #        return res[rkeys[-1]]
 #
-    def SMA(self, **args):
+    def SMA(self, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
-        if 'option' in args.keys(): option = args['option']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
+        if 'option' in kwargs.keys(): option = kwargs['option']
         res, r_date, hdr = {}, self.trade_day, {}
 
         for d in r_date:
@@ -277,10 +277,10 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def APZ(self, **args):
+    def APZ(self, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
         res, r_date= {}, self.trade_day
 
         for i in range(period, len(r_date)):
@@ -296,11 +296,11 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def BB(self, **args):
+    def BB(self, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
-        if 'option' in args.keys(): option = args['option']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
+        if 'option' in kwargs.keys(): option = kwargs['option']
         res, r_date = {}, self.trade_day
 
         for i in range(len(r_date) - period):
@@ -311,11 +311,11 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def WMA(self, **args):
+    def WMA(self, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys(): date = args['date']
-        if 'period' in args.keys(): period = args['period']
-        if 'option' in args.keys(): option = args['option']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
+        if 'option' in kwargs.keys(): option = kwargs['option']
         res, r_date, hdr = {}, self.trade_day, {}
 
         for d in r_date:
@@ -332,29 +332,29 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def KC(self, **args):
+    def KC(self, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
-        if 'option' in args.keys():option = args['option']
+        if 'date' in kwargs.keys():date = kwargs['date']
+        if 'period' in kwargs.keys():period = kwargs['period']
+        if 'option' in kwargs.keys():option = kwargs['option']
         width, base = self.ATR(date=date, period=period), self.EMA(date=date, period=period, option=option)
         return (rnd(base - width * gr), rnd(base + width * gr))
 
-    def daatr(self, **args):
+    def daatr(self, **kwargs):
         date, period = None, 5
-        if 'date' in args.keys():date = args['date']
-        if 'period' in args.keys():period = args['period']
+        if 'date' in kwargs.keys():date = kwargs['date']
+        if 'period' in kwargs.keys():period = kwargs['period']
         if date:return self.ATR(date=date, period=period) - self.ATR(date=date)
         else: return self.ATR(period=period) - self.ATR()
 
-    def estimate(self, **args):
-        if 'pivot_point' in args.keys(): pivot_point = int(args['pivot_point'])
+    def estimate(self, **kwargs):
+        if 'pivot_point' in kwargs.keys(): pivot_point = int(kwargs['pivot_point'])
         else: return "Essential value ('pivot _point') is obmitted"
         t_date, programmatic, o_format, concise = self.trade_day[-1], False, 'raw', False
-        if 'date' in args.keys(): t_date = args['date']
-        if 'programmatic'in args.keys(): programmatic = args['programmatic']
-        if 'format'in args.keys(): o_format = args['format'].lower()
-        if 'concise'in args.keys(): concise = args['concise']
+        if 'date' in kwargs.keys(): t_date = kwargs['date']
+        if 'programmatic'in kwargs.keys(): programmatic = kwargs['programmatic']
+        if 'format'in kwargs.keys(): o_format = kwargs['format'].lower()
+        if 'concise'in kwargs.keys(): concise = kwargs['concise']
 
         hdr = self.__rangefinder(field='date', value=t_date)
         dr, gap = hdr['D']['delta'], abs(pivot_point - hdr['D']['close'])
@@ -391,19 +391,19 @@ class I2:
         if programmatic: return rdata
         return linesep.join(rstr)
 
-def summary(**args):
+def summary(**kwargs):
     o_format = 'raw'
-    if 'format' in args.keys():
-        o_format = args['format'].lower()
+    if 'format' in kwargs.keys():
+        o_format = kwargs['format'].lower()
         from tags import HTML, TITLE, TABLE, TH, TR, TD
-    if 'code' in args.keys():
-        f_code = args['code'].upper()
+    if 'code' in kwargs.keys():
+        f_code = kwargs['code'].upper()
         if o_format == 'html': hdr = TITLE("`%s` analyse" % f_code)
         mf = I2(code=f_code)
         period, tday = mf._I2__period, mf.trade_day
         ltd = len(tday)
-        if 'date' in args.keys():
-            if args['date'] in tday: ltd = tday.index(args['date']) + 1
+        if 'date' in kwargs.keys():
+            if kwargs['date'] in tday: ltd = tday.index(kwargs['date']) + 1
             elif o_format == 'html': return str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
             else: return 'Sorry, date entry invalid!'
         if ltd > period:
