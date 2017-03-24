@@ -115,3 +115,9 @@ class IP():
         self.address = self.mode = None
         del(self.mode)
         del(self.address)
+
+def dvs(d):
+    res, values = [], list(d.values())
+    values.sort()
+    for v in values: res.extend([i[0] for i in list(d.keys()) if d[i] == v])
+    return ''.join(res)
