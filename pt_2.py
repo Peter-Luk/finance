@@ -128,3 +128,10 @@ Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio
         if args: ratio = args[0]
         tb = self.fdc()
         return [tb.ATR.mean() + ratio * i for i in [tb.ATR.std(), -tb.ATR.std()]]
+
+    def maorder(self, date=pd.datetime.today().strftime('%Y-%m-%d')):
+        hdr, ti = {}, self.fdc(option='I')
+        res = ti[ti.Date == pd.Timestamp(date)]
+        for i in ['EMA', 'WMA', 'SMA', 'KAMA']: hdr[i] = eval("res.%s.values[0]" % i)
+        return dvs(hdr)
+
