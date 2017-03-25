@@ -44,10 +44,13 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
                 hdr['date'] = pd.Timestamp(i)
                 data.append(hdr)
             for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'):
-                hdr = [np.NaN for i in mf.trade_day[:mf._I2__period]]
-                hdr.extend([mf.ATR(date=d) for d in mf.trade_day[mf._I2__period:]])
-                dd['ATR'] = hdr
                 dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
+            hdr = [np.NaN for i in mf.trade_day[:mf._I2__period]]
+            hdr.extend([mf.ATR(date=d) for d in mf.trade_day[mf._I2__period:]])
+            dd['ATR'] = hdr
+            hdr = [np.NaN for i in mf.trade_day[:mf._I2__period+1]]
+            hdr.extend([self.maorder(date=d) for d in mf.trade_day[mf._I2__period+1:]])
+            dd['MAO'] = hdr
         elif option == 'I':
             r_date = mf.trade_day[mf._I2__period + 1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
