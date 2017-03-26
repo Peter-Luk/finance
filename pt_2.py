@@ -9,11 +9,11 @@ try:
     candle = True
 except: pass
 
-class Pen:
+class Pen():
     """
 Pandas DataFrame object for local Futures. Require parameter: 'code'
     """
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.plt = None
         try:
             import matplotlib.pyplot as plt
@@ -21,50 +21,56 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
             import matplotlib.ticker as mticker
             self.plt, self.mdates, self.mticker = plt, mdates, mticker
         except: pass
-        if 'code' in kwargs.keys(): self.code = kwargs['code']
+        self.__code = args[0]
+        self.mf = I2(code=self.__code)
+        if 'period' in kwargs.keys(): self.mf = I2(code=self.__code, period=kwargs['period'])
+        else: self.mf = I2(code=self.__code)
+        self.period = self.mf._I2__period
 
     def __del__(self):
-        self.code = self.plt = self.mdates = self.mticker = None
-        del(self.code)
+        self.period = self.mf = self.plt = self.mdates = self.mticker = self.__code = None
+        del(self.period)
+        del(self.mf)
         del(self.plt)
         del(self.mdates)
         del(self.mticker)
+        del(self.__code)
 
     def fdc(self, **kwargs):
         """
 Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
          """
-        mf, option, dd = I2(code=self.code), 'B', {}
+        option, dd = 'B', {}
         if 'option' in kwargs.keys(): option = kwargs['option']
 
         if option == 'B':
             data, hdr = [], {}
-            for i in mf.trade_day:
-                hdr = mf._I2__rangefinder(field='date', value=i)['D']
+            for i in self.mf.trade_day:
+                hdr = self.mf._I2__rangefinder(field='date', value=i)['D']
                 hdr['date'] = pd.Timestamp(i)
                 data.append(hdr)
             for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'):
                 dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
-            hdr = [np.NaN for i in mf.trade_day[:mf._I2__period]]
-            hdr.extend([mf.ATR(date=d) for d in mf.trade_day[mf._I2__period:]])
+            hdr = [np.NaN for i in self.mf.trade_day[:self.period]]
+            hdr.extend([self.mf.ATR(date=d) for d in self.mf.trade_day[self.period:]])
             dd['ATR'] = hdr
-            hdr = [np.NaN for i in mf.trade_day[:mf._I2__period+1]]
-            hdr.extend([self.maorder(date=d) for d in mf.trade_day[mf._I2__period+1:]])
+            hdr = [np.NaN for i in self.mf.trade_day[:self.period+1]]
+            hdr.extend([self.maorder(date=d) for d in self.mf.trade_day[self.period+1:]])
             dd['MAO'] = hdr
         elif option == 'I':
-            r_date = mf.trade_day[mf._I2__period + 1:]
+            r_date = self.mf.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
-            dd['SMA'] = [mf.SMA(date=i) for i in r_date]
-            dd['WMA'] = [mf.WMA(date=i) for i in r_date]
-            dd['EMA'] = [mf.EMA(date=i) for i in r_date]
-            dd['KAMA'] = [mf.KAMA(date=i) for i in r_date]
-            dd['RSI'] = [mf.RSI(date=i) for i in r_date]
+            dd['SMA'] = [self.mf.SMA(date=i) for i in r_date]
+            dd['WMA'] = [self.mf.WMA(date=i) for i in r_date]
+            dd['EMA'] = [self.mf.EMA(date=i) for i in r_date]
+            dd['KAMA'] = [self.mf.KAMA(date=i) for i in r_date]
+            dd['RSI'] = [self.mf.RSI(date=i) for i in r_date]
         elif option == 'O':
-            r_date = mf.trade_day[mf._I2__period + 1:]
+            r_date = self.mf.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
-            dd['APZ'] = [mf.APZ(date=i) for i in r_date]
-            dd['BB'] = [mf.BB(date=i) for i in r_date]
-            dd['KC'] = [mf.KC(date=i) for i in r_date]
+            dd['APZ'] = [self.mf.APZ(date=i) for i in r_date]
+            dd['BB'] = [self.mf.BB(date=i) for i in r_date]
+            dd['KC'] = [self.mf.KC(date=i) for i in r_date]
         return pd.DataFrame(dd)
 
     def axis_decorator(self, **kwargs):
@@ -103,7 +109,7 @@ Generate basic matplotlib graph object.
                     x += 1
                 candlestick_ohlc(self.plt.gca(), ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
             else: self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
-            self.plt.title('%s (%s): with various MA indicators and daily %s' % (self.code[:-2].upper(), ' '.join((get_month(self.code[-2]), '201' + self.code[-1])), r_index))
+            self.plt.title('%s (%s): with various MA indicators and daily %s' % (self.__code[:-2].upper(), ' '.join((get_month(self.__code[-2]), '201' + self.__code[-1])), r_index))
             self.axis_decorator(axis=self.plt.gca(), labels=10)
             self.plt.grid(True)
             self.plt.subplot(212)
@@ -121,7 +127,7 @@ Statistics normal range for 'R'elative 'S'trength 'I'ndex with default 'golden r
         ratio = gr
         if args: ratio = args[0]
         ti = self.fdc(option='I')
-        return [ti.RSI.mean() + ratio * i for i in [ti.RSI.std(), -ti.RSI.std()]]
+        return [ti.RSI.mean() + ratio * i for i in [-ti.RSI.std(), ti.RSI.std()]]
 
     def snl_atr(self, *args):
         """
@@ -130,11 +136,10 @@ Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio
         ratio = gr
         if args: ratio = args[0]
         tb = self.fdc()
-        return [tb.ATR.mean() + ratio * i for i in [tb.ATR.std(), -tb.ATR.std()]]
+        return [tb.ATR.mean() + ratio * i for i in [-tb.ATR.std(), tb.ATR.std()]]
 
     def maorder(self, date=pd.datetime.today().strftime('%Y-%m-%d')):
         hdr, ti = {}, self.fdc(option='I')
         res = ti[ti.Date == pd.Timestamp(date)]
         for i in ['EMA', 'WMA', 'SMA', 'KAMA']: hdr[i] = eval("res.%s.values[0]" % i)
         return dvs(hdr)
-
