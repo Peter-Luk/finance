@@ -54,7 +54,7 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
             hdr.extend([self.mf.ATR(date=d) for d in self.mf.trade_day[self.period:]])
             dd['ATR'] = hdr
             hdr = [np.NaN for i in self.mf.trade_day[:self.period+1]]
-            hdr.extend([self.maorder(date=d) for d in self.mf.trade_day[self.period+1:]])
+            hdr.extend([self.ma_order(date=d) for d in self.mf.trade_day[self.period+1:]])
             dd['MAO'] = hdr
         elif option == 'I':
             r_date = self.mf.trade_day[self.period+1:]
@@ -137,7 +137,7 @@ Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio
         tb = self.fdc()
         return [tb.ATR.mean() + ratio * i for i in [-tb.ATR.std(), tb.ATR.std()]]
 
-    def maorder(self, date=pd.datetime.today().strftime('%Y-%m-%d')):
+    def ma_order(self, date=pd.datetime.today().strftime('%Y-%m-%d')):
         hdr, ti = {}, self.fdc(option='I')
         res = ti[ti.Date == pd.Timestamp(date)]
         for i in ['EMA', 'WMA', 'SMA', 'KAMA']: hdr[i] = eval("res.%s.values[0]" % i)
