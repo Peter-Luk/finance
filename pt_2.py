@@ -36,12 +36,13 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
         del(self.mticker)
         del(self.__code)
 
-    def fdc(self, **kwargs):
+    def fdc(self, *args, **kwargs):
         """
 Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
          """
         option, dd = 'B', {}
-        if 'option' in kwargs.keys(): option = kwargs['option']
+        if args: option = args[0]
+        elif 'option' in kwargs.keys(): option = kwargs['option']
 
         if option == 'B':
             data, hdr = [], {}
