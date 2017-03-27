@@ -21,7 +21,8 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
             import matplotlib.ticker as mticker
             self.plt, self.mdates, self.mticker = plt, mdates, mticker
         except: pass
-        self.__code = args[0]
+        if args: self.__code = args[0]
+        elif 'code' in kwargs.keys(): self.__code = kwargs['code']
         self.mf = I2(code=self.__code)
         if 'period' in kwargs.keys(): self.mf = I2(code=self.__code, period=kwargs['period'])
         self.period = self.mf._I2__period
