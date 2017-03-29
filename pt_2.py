@@ -144,3 +144,24 @@ Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio
         res = ti[ti.Date == pd.Timestamp(date)]
         for i in ['EMA', 'WMA', 'SMA', 'KAMA']: hdr[i] = eval("res.%s.values[0]" % i)
         return dvs(hdr)
+
+    def xmaker(self, *args, **kwargs):
+        result, option = [], 'A'
+        if args: option = args[0]
+        elif 'option' in kwargs.keys(): option = kwargs['option']
+        if option in ['A', 'D', 'a', 'd']:
+            tb = self.fdc()
+            rtb = tb[self.period+1:]
+            amtr, bmtr = rtb[rtb.Delta > self.snl_atr()[-1]], rtb[rtb.Delta < self.snl_atr()[0]]
+            xmtr = pd.concat([amtr, bmtr])
+            xmtrs = xmtr.sort_values('Date')
+            bsxmtr = xmtrs.loc[:,['Date','Open','High','Low','Close','Volume','MAO','Delta','ATR']]
+            result.append(bsxmtr)
+        if option in ['A', 'R', 'a', 'r']:
+            ti = self.fdc('I')
+            amrs, bmrs = ti[ti.RSI > self.snl_rsi()[-1]], ti[ti.RSI < self.snl_rsi()[0]]
+            xmrs = pd.concat([amrs, bmrs])
+            xmrss = xmrs.sort_values('Date')
+            bsxmrs = xmrss.loc[:,['Date','SMA','WMA','RSI','EMA','KAMA']]
+            result.append(bsxmrs)
+        return result
