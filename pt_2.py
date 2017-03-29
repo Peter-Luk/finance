@@ -164,4 +164,5 @@ Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio
             xmrss = xmrs.sort_values('Date')
             bsxmrs = xmrss.loc[:,['Date','SMA','WMA','RSI','EMA','KAMA']]
             result.append(bsxmrs)
+        if len(result) == 1: return result[0]
         return result
