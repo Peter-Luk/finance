@@ -122,27 +122,18 @@ Generate basic matplotlib graph object.
 #            self.plt.show()
 
     def snl_rsi(self, *args):
-        """
-Statistics normal range for 'R'elative 'S'trength 'I'ndex with default 'golden ratio'.
-        """
         ratio = gr
         if args: ratio = args[0]
         ti = self.fdc(option='I')
         return [ti.RSI.mean() + ratio * i for i in [-ti.RSI.std(), ti.RSI.std()]]
 
     def snl_atr(self, *args):
-        """
-Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio'.
-        """
         ratio = gr
         if args: ratio = args[0]
         tb = self.fdc()
         return [tb.ATR.mean() + ratio * i for i in [-tb.ATR.std(), tb.ATR.std()]]
 
     def snl_delta(self, *args):
-        """
-Statistics normal range for 'D'elta with default 'golden ratio'.
-        """
         ratio = gr
         if args: ratio = args[0]
         tb = self.fdc()
@@ -158,10 +149,20 @@ Statistics normal range for 'D'elta with default 'golden ratio'.
         result, option = [], 'F'
         if args: option = args[0]
         elif 'option' in kwargs.keys(): option = kwargs['option']
+
+        def snl(*args):
+            idx, ratio = args[0], gr
+            if args: ratio = args[1]
+            if idx in ['rsi', 'RSI']: t, tr = self.fdc(option='I'), [idx.upper(), idx.upper(), idx.upper()]
+            elif idx in ['Delta', 'delta']: t, tr = self.fdc(option='B'), [idx.capitalize(), idx.capitalize(), idx.capitalize()]
+            elif idx in ['ATR', 'atr']:
+                t = self.fdc("B")
+                t = t[self.period:]
+                tr = [idx.upper(), idx.upper(), idx.upper()]
+            return eval("[t.%s.mean() + ratio * i for i in [-t.%s.std(), t.%s.std()]]" % tr)
+
         if option in ['F', 'D', 'f', 'd']:
             tb = self.fdc()
-#            rtb = tb[self.period+1:]
-#            amtr, bmtr = rtb[rtb.Delta > self.snl_atr()[-1]], rtb[rtb.Delta < self.snl_atr()[0]]
             amd, bmd = tb[tb.Delta > self.snl_delta()[-1]], tb[tb.Delta < self.snl_delta()[0]]
             xmd = pd.concat([amd, bmd])
             xmds = xmd.sort_values('Date')
