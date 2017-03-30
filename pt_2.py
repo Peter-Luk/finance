@@ -50,7 +50,7 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
         if args: option = args[0]
         elif 'option' in kwargs.keys(): option = kwargs['option']
 
-        if option == 'B':
+        if option in ['B', 'b']:
             data, hdr = [], {}
             for i in self.mf.trade_day:
                 hdr = self.mf._I2__rangefinder(field='date', value=i)['D']
@@ -64,7 +64,7 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
             hdr = [np.NaN for i in self.mf.trade_day[:self.period+1]]
             hdr.extend([ma_order(date=d) for d in self.mf.trade_day[self.period+1:]])
             dd['MAO'] = hdr
-        elif option == 'I':
+        elif option in ['I', 'i']:
             r_date = self.mf.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
             dd['SMA'] = [self.mf.SMA(date=i) for i in r_date]
@@ -72,7 +72,7 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
             dd['EMA'] = [self.mf.EMA(date=i) for i in r_date]
             dd['KAMA'] = [self.mf.KAMA(date=i) for i in r_date]
             dd['RSI'] = [self.mf.RSI(date=i) for i in r_date]
-        elif option == 'O':
+        elif option in ['O', 'o']:
             r_date = self.mf.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
             dd['APZ'] = [self.mf.APZ(date=i) for i in r_date]
@@ -128,6 +128,7 @@ Generate basic matplotlib graph object.
 #            self.plt.show()
 
     def xmaker(self, *args, **kwargs):
+        import pandas as pd
         result, option = [], 'F'
         if args: option = args[0]
         elif 'option' in kwargs.keys(): option = kwargs['option']
