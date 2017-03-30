@@ -135,13 +135,17 @@ Generate basic matplotlib graph object.
         def snl(*args):
             idx, ratio = args[0], gr
             if len(args) > 1: ratio = args[1]
-            if idx in ['rsi', 'RSI']: t, tr = self.fdc(option='I'), (idx.upper(), idx.upper(), idx.upper())
-            elif idx in ['Delta', 'delta']: t, tr = self.fdc(option='B'), (idx.capitalize(), idx.capitalize(), idx.capitalize())
+            if idx in ['rsi', 'RSI']:
+                t = self.fdc(option='I')
+                result = [t.RSI.mean() + ratio * i for i in [-t.RSI.std(), t.RSI.std()]]
+            elif idx in ['Delta', 'delta']:
+                t = self.fdc(option='B')
+                result = [t.Delta.mean() + ratio * i for i in [-t.Delta.std(), t.Delta.std()]]
             elif idx in ['ATR', 'atr']:
-                t = self.fdc("B")
-                t = t[self.period:]
-                tr = (idx.upper(), idx.upper(), idx.upper())
-            return eval("[t.%s.mean() + ratio * i for i in [-t.%s.std(), t.%s.std()]]" % tr)
+                tt = self.fdc("B")
+                t = tt[self.period:]
+                result = [t.ATR.mean() + ratio * i for i in [-t.ATR.std(), t.ATR.std()]]
+            return result
 
         if option in ['F', 'D', 'f', 'd']:
             tb = self.fdc()
