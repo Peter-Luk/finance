@@ -121,24 +121,6 @@ Generate basic matplotlib graph object.
             self.plt.tight_layout()
 #            self.plt.show()
 
-    def snl_rsi(self, *args):
-        ratio = gr
-        if args: ratio = args[0]
-        ti = self.fdc(option='I')
-        return [ti.RSI.mean() + ratio * i for i in [-ti.RSI.std(), ti.RSI.std()]]
-
-    def snl_atr(self, *args):
-        ratio = gr
-        if args: ratio = args[0]
-        tb = self.fdc()
-        return [tb.ATR.mean() + ratio * i for i in [-tb.ATR.std(), tb.ATR.std()]]
-
-    def snl_delta(self, *args):
-        ratio = gr
-        if args: ratio = args[0]
-        tb = self.fdc()
-        return [tb.Delta.mean() + ratio * i for i in [-tb.Delta.std(), tb.Delta.std()]]
-
     def ma_order(self, date=pd.datetime.today().strftime('%Y-%m-%d')):
         hdr, ti = {}, self.fdc(option='I')
         res = ti[ti.Date == pd.Timestamp(date)]
@@ -152,18 +134,18 @@ Generate basic matplotlib graph object.
 
         def snl(*args):
             idx, ratio = args[0], gr
-            if args: ratio = args[1]
-            if idx in ['rsi', 'RSI']: t, tr = self.fdc(option='I'), [idx.upper(), idx.upper(), idx.upper()]
-            elif idx in ['Delta', 'delta']: t, tr = self.fdc(option='B'), [idx.capitalize(), idx.capitalize(), idx.capitalize()]
+            if len(args) > 1: ratio = args[1]
+            if idx in ['rsi', 'RSI']: t, tr = self.fdc(option='I'), (idx.upper(), idx.upper(), idx.upper())
+            elif idx in ['Delta', 'delta']: t, tr = self.fdc(option='B'), (idx.capitalize(), idx.capitalize(), idx.capitalize())
             elif idx in ['ATR', 'atr']:
                 t = self.fdc("B")
                 t = t[self.period:]
-                tr = [idx.upper(), idx.upper(), idx.upper()]
+                tr = (idx.upper(), idx.upper(), idx.upper())
             return eval("[t.%s.mean() + ratio * i for i in [-t.%s.std(), t.%s.std()]]" % tr)
 
         if option in ['F', 'D', 'f', 'd']:
             tb = self.fdc()
-            amd, bmd = tb[tb.Delta > self.snl_delta()[-1]], tb[tb.Delta < self.snl_delta()[0]]
+            amd, bmd = tb[tb.Delta > snl('Delta')[-1]], tb[tb.Delta < snl('Delta')[0]]
             xmd = pd.concat([amd, bmd])
             xmds = xmd.sort_values('Date')
             bsxmd = xmds.loc[:, ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'MAO', 'Delta', 'ATR']]
@@ -171,14 +153,14 @@ Generate basic matplotlib graph object.
         if option in ['F', 'A', 'f', 'a']:
             tb = self.fdc()
             rtb = tb[self.period+1:]
-            amtr, bmtr = rtb[rtb.ATR > self.snl_atr()[-1]], rtb[rtb.ATR < self.snl_atr()[0]]
+            amtr, bmtr = rtb[rtb.ATR > snl('ATR')[-1]], rtb[rtb.ATR < snl('ATR')[0]]
             xmtr = pd.concat([amtr, bmtr])
             xmtrs = xmtr.sort_values('Date')
             bsxmtr = xmtrs.loc[:, ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'MAO', 'Delta', 'ATR']]
             result.append(bsxmtr)
         if option in ['F', 'R', 'f', 'r']:
             ti = self.fdc('I')
-            amrs, bmrs = ti[ti.RSI > self.snl_rsi()[-1]], ti[ti.RSI < self.snl_rsi()[0]]
+            amrs, bmrs = ti[ti.RSI > snl('RSI')[-1]], ti[ti.RSI < snl('RSI')[0]]
             xmrs = pd.concat([amrs, bmrs])
             xmrss = xmrs.sort_values('Date')
             bsxmrs = xmrss.loc[:, ['Date', 'SMA', 'WMA', 'RSI', 'EMA', 'KAMA']]
