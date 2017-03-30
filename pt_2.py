@@ -1,7 +1,5 @@
 from trial01 import I2, get_month
 from utilities import dvs, gr
-import pandas as pd
-import numpy as np
 
 candle = False
 try:
@@ -40,6 +38,8 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
         """
 Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
          """
+        import pandas as pd
+        import numpy as np
         def ma_order(date=self.mf.trade_day[-1]):
             hdr, ti = {}, self.fdc(option='I')
             res = ti[ti.Date == pd.Timestamp(date)]
