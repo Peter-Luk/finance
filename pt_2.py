@@ -40,6 +40,12 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
         """
 Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
          """
+        def ma_order(date=self.mf.trade_day[-1]):
+            hdr, ti = {}, self.fdc(option='I')
+            res = ti[ti.Date == pd.Timestamp(date)]
+            for i in ['EMA', 'WMA', 'SMA', 'KAMA']: hdr[i] = eval("res.%s.values[0]" % i)
+            return dvs(hdr)
+
         option, dd = 'B', {}
         if args: option = args[0]
         elif 'option' in kwargs.keys(): option = kwargs['option']
@@ -56,7 +62,7 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
             hdr.extend([self.mf.ATR(date=d) for d in self.mf.trade_day[self.period:]])
             dd['ATR'] = hdr
             hdr = [np.NaN for i in self.mf.trade_day[:self.period+1]]
-            hdr.extend([self.ma_order(date=d) for d in self.mf.trade_day[self.period+1:]])
+            hdr.extend([ma_order(date=d) for d in self.mf.trade_day[self.period+1:]])
             dd['MAO'] = hdr
         elif option == 'I':
             r_date = self.mf.trade_day[self.period+1:]
@@ -74,19 +80,19 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
             dd['KC'] = [self.mf.KC(date=i) for i in r_date]
         return pd.DataFrame(dd)
 
-    def axis_decorator(self, **kwargs):
-        angle, labels = 45, 8
-        if 'axis' in kwargs.keys(): ax1 = kwargs['axis']
-        if 'angle' in kwargs.keys(): angle = kwargs['angle']
-        if 'labels' in kwargs.keys(): labels = kwargs['labels']
-        for label in ax1.xaxis.get_ticklabels(): label.set_rotation(angle)
-        ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
-        ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(labels))
-
     def draw(self, **kwargs):
         """
 Generate basic matplotlib graph object.
         """
+        def axis_decorator(**kwargs):
+            angle, labels = 45, 8
+            if 'axis' in kwargs.keys(): ax1 = kwargs['axis']
+            if 'angle' in kwargs.keys(): angle = kwargs['angle']
+            if 'labels' in kwargs.keys(): labels = kwargs['labels']
+            for label in ax1.xaxis.get_ticklabels(): label.set_rotation(angle)
+            ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
+            ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(labels))
+
         if self.plt:
             r_index, ta, ti, tb = 'close', self.fdc(option='O'), self.fdc(option='I'), self.fdc()
             self.plt.clf()
@@ -111,21 +117,15 @@ Generate basic matplotlib graph object.
                 candlestick_ohlc(self.plt.gca(), ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
             else: self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
             self.plt.title('%s (%s): with various MA indicators and daily %s' % (self.__code[:-2].upper(), ' '.join((get_month(self.__code[-2]), '201' + self.__code[-1])), r_index))
-            self.axis_decorator(axis=self.plt.gca(), labels=10)
+            axis_decorator(axis=self.plt.gca(), labels=10)
             self.plt.grid(True)
             self.plt.subplot(212)
             self.plt.plot(ti.Date, ti.RSI, label='RSI')
             self.plt.legend(loc='lower left', frameon=False)
-            self.axis_decorator(axis=self.plt.gca(), labels=7)
+            axis_decorator(axis=self.plt.gca(), labels=7)
             self.plt.grid(True)
             self.plt.tight_layout()
 #            self.plt.show()
-
-    def ma_order(self, date=pd.datetime.today().strftime('%Y-%m-%d')):
-        hdr, ti = {}, self.fdc(option='I')
-        res = ti[ti.Date == pd.Timestamp(date)]
-        for i in ['EMA', 'WMA', 'SMA', 'KAMA']: hdr[i] = eval("res.%s.values[0]" % i)
-        return dvs(hdr)
 
     def xmaker(self, *args, **kwargs):
         result, option = [], 'F'
