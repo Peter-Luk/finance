@@ -6,13 +6,17 @@ from statistics import mean, stdev
 db_name, db_table = 'Futures', 'records'
 
 class I2:
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.trade_day = []
         self.__period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
-        if 'code' in kwargs.keys(): self.__code = kwargs['code']
-        if 'period' in kwargs.keys(): self.__period = kwargs['period']
-        if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
-        if 'db_table' in kwargs.keys(): self.__table = kwargs['db_table']
+        if args:
+            self.__code = args[0]
+            if len(args) < 3: self.__period = args[1]
+        else:
+            if 'code' in kwargs.keys(): self.__code = kwargs['code']
+            if 'period' in kwargs.keys(): self.__period = kwargs['period']
+            if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
+            if 'db_table' in kwargs.keys(): self.__table = kwargs['db_table']
 
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
