@@ -139,6 +139,15 @@ Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio
         tb = self.fdc()
         return [tb.ATR.mean() + ratio * i for i in [-tb.ATR.std(), tb.ATR.std()]]
 
+    def snl_delta(self, *args):
+        """
+Statistics normal range for 'D'elta with default 'golden ratio'.
+        """
+        ratio = gr
+        if args: ratio = args[0]
+        tb = self.fdc()
+        return [tb.Delta.mean() + ratio * i for i in [-tb.Delta.std(), tb.Delta.std()]]
+
     def ma_order(self, date=pd.datetime.today().strftime('%Y-%m-%d')):
         hdr, ti = {}, self.fdc(option='I')
         res = ti[ti.Date == pd.Timestamp(date)]
@@ -146,23 +155,32 @@ Statistics normal range for 'A'daptive 'T'rue 'R'ange with default 'golden ratio
         return dvs(hdr)
 
     def xmaker(self, *args, **kwargs):
-        result, option = [], 'A'
+        result, option = [], 'F'
         if args: option = args[0]
         elif 'option' in kwargs.keys(): option = kwargs['option']
-        if option in ['A', 'D', 'a', 'd']:
+        if option in ['F', 'D', 'f', 'd']:
+            tb = self.fdc()
+#            rtb = tb[self.period+1:]
+#            amtr, bmtr = rtb[rtb.Delta > self.snl_atr()[-1]], rtb[rtb.Delta < self.snl_atr()[0]]
+            amd, bmd = tb[tb.Delta > self.snl_delta()[-1]], tb[tb.Delta < self.snl_delta()[0]]
+            xmd = pd.concat([amd, bmd])
+            xmds = xmd.sort_values('Date')
+            bsxmd = xmds.loc[:, ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'MAO', 'Delta', 'ATR']]
+            result.append(bsxmd)
+        if option in ['F', 'A', 'f', 'a']:
             tb = self.fdc()
             rtb = tb[self.period+1:]
-            amtr, bmtr = rtb[rtb.Delta > self.snl_atr()[-1]], rtb[rtb.Delta < self.snl_atr()[0]]
+            amtr, bmtr = rtb[rtb.ATR > self.snl_atr()[-1]], rtb[rtb.ATR < self.snl_atr()[0]]
             xmtr = pd.concat([amtr, bmtr])
             xmtrs = xmtr.sort_values('Date')
-            bsxmtr = xmtrs.loc[:,['Date','Open','High','Low','Close','Volume','MAO','Delta','ATR']]
+            bsxmtr = xmtrs.loc[:, ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'MAO', 'Delta', 'ATR']]
             result.append(bsxmtr)
-        if option in ['A', 'R', 'a', 'r']:
+        if option in ['F', 'R', 'f', 'r']:
             ti = self.fdc('I')
             amrs, bmrs = ti[ti.RSI > self.snl_rsi()[-1]], ti[ti.RSI < self.snl_rsi()[0]]
             xmrs = pd.concat([amrs, bmrs])
             xmrss = xmrs.sort_values('Date')
-            bsxmrs = xmrss.loc[:,['Date','SMA','WMA','RSI','EMA','KAMA']]
+            bsxmrs = xmrss.loc[:, ['Date', 'SMA', 'WMA', 'RSI', 'EMA', 'KAMA']]
             result.append(bsxmrs)
         if len(result) == 1: return result[0]
         return result
