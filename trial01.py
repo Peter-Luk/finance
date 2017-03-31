@@ -12,11 +12,10 @@ class I2:
         if args:
             self.__code = args[0]
             if len(args) < 3: self.__period = args[1]
-        else:
-            if 'code' in kwargs.keys(): self.__code = kwargs['code']
-            if 'period' in kwargs.keys(): self.__period = kwargs['period']
-            if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
-            if 'db_table' in kwargs.keys(): self.__table = kwargs['db_table']
+        if 'code' in kwargs.keys(): self.__code = kwargs['code']
+        if 'period' in kwargs.keys(): self.__period = kwargs['period']
+        if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
+        if 'db_table' in kwargs.keys(): self.__table = kwargs['db_table']
 
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
@@ -34,15 +33,11 @@ class I2:
         del(self.__table)
         del(self.trade_day)
 
-    def __gt0(self, x):
-        if x > 0:return True
-        return False
-
-    def __lt0(self, x):
-        if x < 0:return True
-        return False
-
-    def __rangefinder(self, **kwargs):
+    def __rangefinder(self, *args, **kwargs):
+        """
+Accept 'two' and 'only two' variables (i.e. field and value)
+        """
+        if args: field, value = args[0], args[1]
         if 'field' in kwargs.keys(): field = kwargs['field']
         if 'value' in kwargs.keys(): value = kwargs['value']
         res, hdr ={}, []
@@ -53,7 +48,6 @@ class I2:
                 if i['session'] == 'A':
                     dc, so, sc, sr = i['close'], i['open'], i['close'], i['high'] - i['low']
                     if sh:
-
                         dh, dl, dv = sh, sl, sv + i['volume']
                         if i['high'] > dh:dh = i['high']
                         if i['low'] < dl:dl = i['low']
@@ -88,8 +82,11 @@ class I2:
             self.__conn.commit()
         except: self.__conn.rollback()
 
-    def ATR(self, **kwargs):
+    def ATR(self, *args, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
+        if args:
+            date = args[0]
+            if len(args) < 3: period = args[1]
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
         res, r_date, tr, i, hdr = {}, self.trade_day, [], 0, {}
@@ -179,12 +176,23 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def RSI(self, **kwargs):
+    def RSI(self, *args, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
+        if args:
+            date = args[0]
+            if len(args) < 3: period = args[1]
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
-        res, trade_day, tr, hdr, i = {}, self.trade_day, {}, {}, 1
 
+        def __gt0(x):
+            if x > 0:return True
+            return False
+
+        def __lt0(x):
+            if x < 0:return True
+            return False
+
+        res, trade_day, tr, hdr, i = {}, self.trade_day, {}, {}, 1
         for d in trade_day:
             tmp = self.__rangefinder(field='date', value=d)['D']
             tr[d] = tmp['close']
@@ -198,7 +206,7 @@ class I2:
         trade_day.sort()
         for i in range(period, len(trade_day)):
             if i == period:
-                ag[trade_day[i]], al[trade_day[i]] = sum(list(filter(self.__gt0, [hdr[trade_day[j]] for j in range(i - period, i)]))) / float(period), abs(sum(list(filter(self.__lt0, [hdr[trade_day[j]] for j in range(i - period, i)])))) / float(period)
+                ag[trade_day[i]], al[trade_day[i]] = sum(list(filter(__gt0, [hdr[trade_day[j]] for j in range(i - period, i)]))) / float(period), abs(sum(list(filter(__lt0, [hdr[trade_day[j]] for j in range(i - period, i)])))) / float(period)
             else:
                 if hdr[trade_day[i]] > 0:
                     ag[trade_day[i]] = (ag[trade_day[i - 1]] * (period - 1) + hdr[trade_day[i]]) / period
@@ -213,8 +221,11 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def BBW(self, **kwargs):
+    def BBW(self, *args, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
+        if args:
+            date = args[0]
+            if len(args) < 3: period = args[1]
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
         res, r_date, hdr = {}, self.trade_day, {}
@@ -281,8 +292,11 @@ class I2:
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def APZ(self, **kwargs):
+    def APZ(self, *args, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
+        if args:
+            date = args[0]
+            if len(args) < 3: period = args[1]
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
         res, r_date= {}, self.trade_day
