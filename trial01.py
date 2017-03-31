@@ -115,8 +115,13 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def EMA(self, **kwargs):
+    def EMA(self, *args, **kwargs):
         data, date, period, option = self.__data, datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if args:
+            date = args[0]
+            if len(args) == 2: period = args[1]
+            if len(args) == 3: period, data = args[1:3]
+            if len(args) == 4: period, data, option = args[1:]
         if 'data' in kwargs.keys(): data = kwargs['data']
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
@@ -146,9 +151,13 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             if date in rkeys: return res[date]
             return res[rkeys[-1]]
 
-    def KAMA(self, **kwargs):
+    def KAMA(self, *args, **kwargs):
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         fast, slow = rnd(period / gr ** 2), period
+        if args:
+            date = args[0]
+            if len(args) == 2: period = args[1]
+            if len(args) == 4: period, fast, slow = args[1:]
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
         if 'slow' in kwargs.keys(): slow = kwargs['slow']
@@ -271,8 +280,12 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 #        if date in rkeys:return res[date]
 #        return res[rkeys[-1]]
 #
-    def SMA(self, **kwargs):
+    def SMA(self, *args, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if args:
+            date = args[0]
+            if len(args) == 2: period = args[1]
+            if len(args) == 3: period, option = args[1:]
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
         if 'option' in kwargs.keys(): option = kwargs['option']
@@ -314,8 +327,12 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def BB(self, **kwargs):
+    def BB(self, *args, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if args:
+            date = args[0]
+            if len(args) == 2: period = args[1]
+            if len(args) == 3: period, option = args[1:]
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
         if 'option' in kwargs.keys(): option = kwargs['option']
@@ -329,8 +346,12 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def WMA(self, **kwargs):
+    def WMA(self, *args, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if args:
+            date = args[0]
+            if len(args) == 2: period = args[1]
+            if len(args) == 3: period, option = args[1:]
         if 'date' in kwargs.keys(): date = kwargs['date']
         if 'period' in kwargs.keys(): period = kwargs['period']
         if 'option' in kwargs.keys(): option = kwargs['option']
@@ -350,8 +371,12 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
-    def KC(self, **kwargs):
+    def KC(self, *args, **kwargs):
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        if args:
+            date = args[0]
+            if len(args) == 2: period = args[1]
+            if len(args) == 3: period, option = args[1:]
         if 'date' in kwargs.keys():date = kwargs['date']
         if 'period' in kwargs.keys():period = kwargs['period']
         if 'option' in kwargs.keys():option = kwargs['option']
@@ -409,14 +434,18 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if programmatic: return rdata
         return linesep.join(rstr)
 
-def summary(**kwargs):
+def summary(*args, **kwargs):
     o_format = 'raw'
-    if 'format' in kwargs.keys():
-        o_format = kwargs['format'].lower()
-        from tags import HTML, TITLE, TABLE, TH, TR, TD
-    if 'code' in kwargs.keys():
-        f_code = kwargs['code'].upper()
-        if o_format == 'html': hdr = TITLE("`%s` analyse" % f_code)
+    if args:
+        f_code = args[0].upper()
+        if len(args) == 2: date = args[1]
+        if len(args) == 3: date, o_format = args[1], args[2].lower()
+    if 'format' in kwargs.keys(): o_format = kwargs['format'].lower()
+    if 'code' in kwargs.keys(): f_code = kwargs['code'].upper()
+    if f_code:
+        if o_format == 'html':
+            from tags import HTML, TITLE, TABLE, TH, TR, TD
+            hdr = TITLE("`%s` analyse" % f_code)
         mf = I2(code=f_code)
         period, tday = mf._I2__period, mf.trade_day
         ltd = len(tday)
@@ -428,7 +457,7 @@ def summary(**kwargs):
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI'), []
             if o_format == 'html': th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
             else: hdr = '\t\t'.join(i_fields)
-            for i in range(period, ltd):
+            for i in range(period + 1, ltd):
                 i_values = []
                 for x in i_fields[1:]: i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
                 if o_format == 'html': trs.append(TR(linesep.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
