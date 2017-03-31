@@ -127,7 +127,7 @@ Generate basic matplotlib graph object.
             self.plt.tight_layout()
 #            self.plt.show()
 
-    def xmaker(self, *args, **kwargs):
+    def xfinder(self, *args, **kwargs):
         import pandas as pd
         result, option = [], 'F'
         if args: option = args[0]
