@@ -1,24 +1,11 @@
 from trial01 import I2, get_month
 from utilities import dvs, gr
 
-candle = False
-try:
-    from mpl_finance import candlestick_ohlc
-    candle = True
-except: pass
-
 class Pen():
     """
 Pandas DataFrame object for local Futures. Require parameter: 'code'
     """
     def __init__(self, *args, **kwargs):
-        self.plt = None
-        try:
-            import matplotlib.pyplot as plt
-            import matplotlib.dates as mdates
-            import matplotlib.ticker as mticker
-            self.plt, self.mdates, self.mticker = plt, mdates, mticker
-        except: pass
         if args: self.__code = args[0]
         elif 'code' in kwargs.keys(): self.__code = kwargs['code']
         self.mf = I2(code=self.__code)
@@ -26,12 +13,9 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
         self.period = self.mf._I2__period
 
     def __del__(self):
-        self.period = self.mf = self.plt = self.mdates = self.mticker = self.__code = None
+        self.period = self.mf = self.__code = None
         del(self.period)
         del(self.mf)
-        del(self.plt)
-        del(self.mdates)
-        del(self.mticker)
         del(self.__code)
 
     def fdc(self, *args, **kwargs):
@@ -40,7 +24,9 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
          """
         import pandas as pd
         import numpy as np
-        def ma_order(date=self.mf.trade_day[-1]):
+        def ma_order(*args, **kwargs):
+            if args: date = args[0]
+            if 'date' in kwargs.keys(): date = kwargs['date']
             hdr, ti = {}, self.fdc(option='I')
             res = ti[ti.Date == pd.Timestamp(date)]
             for i in ['EMA', 'WMA', 'SMA', 'KAMA']: hdr[i] = eval("res.%s.values[0]" % i)
@@ -85,6 +71,18 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
         """
 Generate basic matplotlib graph object.
         """
+        plt, candle = None, False
+        try:
+            import matplotlib.pyplot as plt
+            import matplotlib.dates as mdates
+            import matplotlib.ticker as mticker
+        except: pass
+
+        try:
+            from mpl_finance import candlestick_ohlc
+            candle = True
+        except: pass
+
         def axis_decorator(*args, **kwargs):
             angle, labels = 45, 8
             if args: ax1 = args[0]
@@ -92,41 +90,41 @@ Generate basic matplotlib graph object.
             if 'angle' in kwargs.keys(): angle = kwargs['angle']
             if 'labels' in kwargs.keys(): labels = kwargs['labels']
             for label in ax1.xaxis.get_ticklabels(): label.set_rotation(angle)
-            ax1.xaxis.set_major_formatter(self.mdates.DateFormatter('%Y-%m-%d'))
-            ax1.xaxis.set_major_locator(self.mticker.MaxNLocator(labels))
+            ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+            ax1.xaxis.set_major_locator(mticker.MaxNLocator(labels))
 
-        if self.plt:
+        if plt:
             r_index, ta, ti, tb = 'close', self.fdc(option='O'), self.fdc(option='I'), self.fdc()
-            self.plt.clf()
-            self.plt.subplot(211)
-            self.plt.plot(ti.Date, ti.SMA, label='SMA')
-            self.plt.plot(ti.Date, ti.WMA, label='WMA')
-            self.plt.plot(ti.Date, ti.EMA, label='EMA')
-            self.plt.plot(ti.Date, ti.KAMA, label='KAMA')
-            self.plt.plot(ta.Date, [x[0] for x in ta.KC.values], color='r', linestyle=':')
-            self.plt.plot(ta.Date, [x[-1] for x in ta.KC.values], color='r', linestyle=':')
-            self.plt.plot(ta.Date, [x[0] for x in ta.BB.values], color='c', linestyle='-.')
-            self.plt.plot(ta.Date, [x[-1] for x in ta.BB.values], color='c', linestyle='-.')
-            self.plt.plot(ta.Date, [x[0] for x in ta.APZ.values], color='m', linestyle='--')
-            self.plt.plot(ta.Date, [x[-1] for x in ta.APZ.values], color='m', linestyle='--')
-            self.plt.legend(loc='upper left', frameon=False)
+            plt.clf()
+            plt.subplot(211)
+            plt.plot(ti.Date, ti.SMA, label='SMA')
+            plt.plot(ti.Date, ti.WMA, label='WMA')
+            plt.plot(ti.Date, ti.EMA, label='EMA')
+            plt.plot(ti.Date, ti.KAMA, label='KAMA')
+            plt.plot(ta.Date, [x[0] for x in ta.KC.values], color='r', linestyle=':')
+            plt.plot(ta.Date, [x[-1] for x in ta.KC.values], color='r', linestyle=':')
+            plt.plot(ta.Date, [x[0] for x in ta.BB.values], color='c', linestyle='-.')
+            plt.plot(ta.Date, [x[-1] for x in ta.BB.values], color='c', linestyle='-.')
+            plt.plot(ta.Date, [x[0] for x in ta.APZ.values], color='m', linestyle='--')
+            plt.plot(ta.Date, [x[-1] for x in ta.APZ.values], color='m', linestyle='--')
+            plt.legend(loc='upper left', frameon=False)
             if candle:
                 x, ohlc, r_index = 0, [], 'candlestick'
                 while x < len(tb):
                     append_me = tb.Date[x].toordinal(), tb.Open[x], tb.High[x], tb.Low[x], tb.Close[x], tb.Volume[x]
                     ohlc.append(append_me)
                     x += 1
-                candlestick_ohlc(self.plt.gca(), ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
-            else: self.plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
-            self.plt.title('%s (%s): with various MA indicators and daily %s' % (self.__code[:-2].upper(), ' '.join((get_month(self.__code[-2]), '201' + self.__code[-1])), r_index))
-            axis_decorator(axis=self.plt.gca(), labels=10)
-            self.plt.grid(True)
-            self.plt.subplot(212)
-            self.plt.plot(ti.Date, ti.RSI, label='RSI')
-            self.plt.legend(loc='lower left', frameon=False)
-            axis_decorator(axis=self.plt.gca(), labels=7)
-            self.plt.grid(True)
-            self.plt.tight_layout()
+                candlestick_ohlc(plt.gca(), ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
+            else: plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
+            plt.title('%s (%s): with various MA indicators and daily %s' % (self.__code[:-2].upper(), ' '.join((get_month(self.__code[-2]), '201' + self.__code[-1])), r_index))
+            axis_decorator(axis=plt.gca(), labels=10)
+            plt.grid(True)
+            plt.subplot(212)
+            plt.plot(ti.Date, ti.RSI, label='RSI')
+            plt.legend(loc='lower left', frameon=False)
+            axis_decorator(axis=plt.gca(), labels=7)
+            plt.grid(True)
+            plt.tight_layout()
 
     def xfinder(self, *args, **kwargs):
         import pandas as pd
