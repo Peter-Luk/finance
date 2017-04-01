@@ -52,18 +52,16 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
 
         if option in ['B', 'b']:
             data, hdr = [], {}
-            for i in self.mf.trade_day:
+            for i in self.mf.trade_day[self.period+1:]:
                 hdr = self.mf._I2__rangefinder(field='date', value=i)['D']
                 hdr['date'] = pd.Timestamp(i)
                 data.append(hdr)
             for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'):
                 dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
-            hdr = [np.NaN for i in self.mf.trade_day[:self.period]]
-            hdr.extend([self.mf.ATR(date=d) for d in self.mf.trade_day[self.period:]])
-            dd['ATR'] = hdr
-            hdr = [np.NaN for i in self.mf.trade_day[:self.period+1]]
-            hdr.extend([ma_order(date=d) for d in self.mf.trade_day[self.period+1:]])
-            dd['MAO'] = hdr
+            dd['ATR'] = [self.mf.ATR(date=d) for d in self.mf.trade_day[self.period+1:]]
+            dd['MAO'] = [ma_order(date=d) for d in self.mf.trade_day[self.period+1:]]
+            t = pd.DataFrame(dd)
+            return t.loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
         elif option in ['I', 'i']:
             r_date = self.mf.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
@@ -72,20 +70,24 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
             dd['EMA'] = [self.mf.EMA(date=i) for i in r_date]
             dd['KAMA'] = [self.mf.KAMA(date=i) for i in r_date]
             dd['RSI'] = [self.mf.RSI(date=i) for i in r_date]
+            t = pd.DataFrame(dd)
+            return t.loc[:, ['Date', 'WMA', 'SMA', 'EMA', 'KAMA', 'RSI']]
         elif option in ['O', 'o']:
             r_date = self.mf.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
             dd['APZ'] = [self.mf.APZ(date=i) for i in r_date]
             dd['BB'] = [self.mf.BB(date=i) for i in r_date]
             dd['KC'] = [self.mf.KC(date=i) for i in r_date]
-        return pd.DataFrame(dd)
+            t = pd.DataFrame(dd)
+            return t.loc[:, ['Date', 'APZ', 'BB', 'KC']]
 
-    def draw(self, **kwargs):
+    def plot(self, **kwargs):
         """
 Generate basic matplotlib graph object.
         """
-        def axis_decorator(**kwargs):
+        def axis_decorator(*args, **kwargs):
             angle, labels = 45, 8
+            if args: ax1 = args[0]
             if 'axis' in kwargs.keys(): ax1 = kwargs['axis']
             if 'angle' in kwargs.keys(): angle = kwargs['angle']
             if 'labels' in kwargs.keys(): labels = kwargs['labels']
@@ -125,7 +127,6 @@ Generate basic matplotlib graph object.
             axis_decorator(axis=self.plt.gca(), labels=7)
             self.plt.grid(True)
             self.plt.tight_layout()
-#            self.plt.show()
 
     def xfinder(self, *args, **kwargs):
         import pandas as pd
@@ -153,7 +154,7 @@ Generate basic matplotlib graph object.
             amd, bmd = tb[tb.Delta > snl('Delta')[-1]], tb[tb.Delta < snl('Delta')[0]]
             xmd = pd.concat([amd, bmd])
             xmds = xmd.sort_values('Date')
-            bsxmd = xmds.loc[:, ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'MAO', 'Delta', 'ATR']]
+            bsxmd = xmds.loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
             result.append(bsxmd)
         if option in ['F', 'A', 'f', 'a']:
             tb = self.fdc()
@@ -161,14 +162,14 @@ Generate basic matplotlib graph object.
             amtr, bmtr = rtb[rtb.ATR > snl('ATR')[-1]], rtb[rtb.ATR < snl('ATR')[0]]
             xmtr = pd.concat([amtr, bmtr])
             xmtrs = xmtr.sort_values('Date')
-            bsxmtr = xmtrs.loc[:, ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'MAO', 'Delta', 'ATR']]
+            bsxmtr = xmtrs.loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
             result.append(bsxmtr)
         if option in ['F', 'R', 'f', 'r']:
             ti = self.fdc('I')
             amrs, bmrs = ti[ti.RSI > snl('RSI')[-1]], ti[ti.RSI < snl('RSI')[0]]
             xmrs = pd.concat([amrs, bmrs])
             xmrss = xmrs.sort_values('Date')
-            bsxmrs = xmrss.loc[:, ['Date', 'SMA', 'WMA', 'RSI', 'EMA', 'KAMA']]
+            bsxmrs = xmrss.loc[:, ['Date', 'WMA', 'SMA', 'EMA', 'KAMA', 'RSI']]
             result.append(bsxmrs)
         if len(result) == 1: return result[0]
         return result
