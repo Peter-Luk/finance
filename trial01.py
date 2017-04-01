@@ -320,7 +320,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             vv = self.EMA(data=[eh[j] for j in range(len(eh))], period=len(eh)) - self.EMA(data=[el[j] for j in range(len(el))], period=len(el))
             ema = self.EMA(date=r_date[i], option='HL', period=period)
 #            res[r_date[i]] = rnd(ema - (vv / 2)), rnd(ema + (vv / 2))
-            res[r_date[i]] = rnd(ema - vv * gr), rnd(ema + vv * gr)
+            res[r_date[i]] = rnd(ema - vv * gr / 2), rnd(ema + vv * gr / 2)
 
         rkeys = list(res.keys())
         rkeys.sort()
@@ -339,7 +339,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         res, r_date = {}, self.trade_day
 
         for i in range(len(r_date) - period):
-            res[r_date[period + i]] = tuple([rnd(self.SMA(date=r_date[period + i], period=period, option=option) + x) for x in [self.BBW(date=r_date[period + i], period=period), -self.BBW(date=r_date[period + i], period=period)]])
+            res[r_date[period + i]] = tuple([rnd(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr / 2) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
 
         rkeys = list(res.keys())
         rkeys.sort()
@@ -380,8 +380,9 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if 'date' in kwargs.keys():date = kwargs['date']
         if 'period' in kwargs.keys():period = kwargs['period']
         if 'option' in kwargs.keys():option = kwargs['option']
-        width, base = self.ATR(date=date, period=period), self.EMA(date=date, period=period, option=option)
-        return (rnd(base - width * gr), rnd(base + width * gr))
+        width, base = self.ATR(date=date, period=period), self.KAMA(date=date, period=period, option=option)
+#        return (rnd(base - width * gr), rnd(base + width * gr))
+        return (rnd(base - width * gr / 2), rnd(base + width * gr / 2))
 
     def daatr(self, **kwargs):
         date, period = None, 5
