@@ -1,7 +1,6 @@
 import sqlite3 as lite
 from utilities import gr, rnd, filepath, sep, linesep, get_month
 from datetime import datetime
-from statistics import mean, stdev
 
 db_name, db_table = 'Futures', 'records'
 
@@ -11,7 +10,9 @@ class I2:
         self.__period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
         if args:
             self.__code = args[0]
-            if len(args) < 3: self.__period = args[1]
+            if len(args) >= 4: self.__table = args[3]
+            if len(args) >= 3: self.__db = args[2]
+            if len(args) >= 2: self.__period = args[1]
         if 'code' in kwargs.keys(): self.__code = kwargs['code']
         if 'period' in kwargs.keys(): self.__period = kwargs['period']
         if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
@@ -64,8 +65,11 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         res['D'] = {'delta':dr, 'open':do, 'close':dc, 'volume':dv, 'high':dh, 'low':dl}
         return res
 
-    def append(self, **kwargs):
+    def append(self, *args, **kwargs):
         date = datetime.today().strftime('%Y-%m-%d')
+        if args:
+            date = args[0]
+            if len(args) == 2: volume = int(args[1])
         if 'date' not in kwargs.keys(): kwargs['date'] = date
         if 'volume' in kwargs.keys(): volume = int(kwargs['volume'])
         kt, vt = ('date', 'session', 'code'), (kwargs['date'], kwargs['session'], self.__code.upper())
@@ -83,6 +87,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         except: self.__conn.rollback()
 
     def ATR(self, *args, **kwargs):
+        from statistics import mean
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if args:
             date = args[0]
@@ -116,6 +121,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def EMA(self, *args, **kwargs):
+        from statistics import mean
         data, date, period, option = self.__data, datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if args:
             date = args[0]
@@ -231,6 +237,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def BBW(self, *args, **kwargs):
+        from statistics import stdev
         date, period = datetime.today().strftime('%Y-%m-%d'), self.__period
         if args:
             date = args[0]
@@ -252,6 +259,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 #
     def SAR(self, **kwargs):
+        from statistics import mean
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if 'date' in kwargs.keys():date = kwargs['date']
         if 'period' in kwargs.keys():period = kwargs['period']
@@ -281,6 +289,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 #        return res[rkeys[-1]]
 #
     def SMA(self, *args, **kwargs):
+        from statistics import mean
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if args:
             date = args[0]
@@ -319,7 +328,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             el = [self.EMA(date=r_date[i - j], period=period, option='L') for j in range(period)]
             vv = self.EMA(data=[eh[j] for j in range(len(eh))], period=len(eh)) - self.EMA(data=[el[j] for j in range(len(el))], period=len(el))
             ema = self.EMA(date=r_date[i], option='HL', period=period)
-#            res[r_date[i]] = rnd(ema - (vv / 2)), rnd(ema + (vv / 2))
             res[r_date[i]] = rnd(ema - vv * gr / 2), rnd(ema + vv * gr / 2)
 
         rkeys = list(res.keys())
@@ -347,6 +355,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def WMA(self, *args, **kwargs):
+        from statistics import mean
         date, period, option = datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
         if args:
             date = args[0]
@@ -381,11 +390,13 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if 'period' in kwargs.keys():period = kwargs['period']
         if 'option' in kwargs.keys():option = kwargs['option']
         width, base = self.ATR(date=date, period=period), self.KAMA(date=date, period=period, option=option)
-#        return (rnd(base - width * gr), rnd(base + width * gr))
         return (rnd(base - width * gr / 2), rnd(base + width * gr / 2))
 
-    def daatr(self, **kwargs):
+    def daatr(self, *args, **kwargs):
         date, period = None, 5
+        if args:
+            date = args[0]
+            if len(args) >= 2: period = args[1]
         if 'date' in kwargs.keys():date = kwargs['date']
         if 'period' in kwargs.keys():period = kwargs['period']
         if date:return self.ATR(date=date, period=period) - self.ATR(date=date)
