@@ -1,13 +1,14 @@
 from trial01 import I2
 
-class Pen(I2):
+class PI(I2):
     """
 Pandas DataFrame object for local Futures. Require parameter: 'code'
     """
     def __init__(self, *args, **kwargs):
+        self.I2 = I2
         if args: self.__code = args[0]
         elif 'code' in kwargs.keys(): self.__code = kwargs['code']
-        self.mf = I2(code=self.__code)
+        self.mf = self.I2(code=self.__code)
         if 'period' in kwargs.keys(): self.mf = I2(code=self.__code, period=kwargs['period'])
         self.period = self.mf._I2__period
 
