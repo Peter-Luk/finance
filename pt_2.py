@@ -9,19 +9,23 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
         if args: self.__code = args[0]
         elif 'code' in kwargs.keys(): self.__code = kwargs['code']
         self.mf = self.I2(code=self.__code)
-        if 'period' in kwargs.keys(): self.mf = I2(code=self.__code, period=kwargs['period'])
-        self.period = self.mf._I2__period
+        self.datetime, self.period, self.trade_day = self.mf.datetime, self.mf.period, self.mf.trade_day
+        if 'period' in kwargs.keys():
+            self.period = kwargs['period']
+            self.mf = I2(code=self.__code, period=self.period)
 
     def __del__(self):
-        self.period = self.mf = self.__code = None
+        self.trade_day = self.period = self.datetime = self.mf = self.__code = None
+        del self.trade_day
         del self.period
+        del self.datetime
         del self.mf
         del self.__code
 
     def fdc(self, *args, **kwargs):
         """
 Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
-         """
+        """
         from utilities import dvs
         import pandas as pd
         import numpy as np
@@ -39,18 +43,18 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
 
         if option in ['B', 'b']:
             data, hdr = [], {}
-            for i in self.mf.trade_day[self.period+1:]:
+            for i in self.trade_day[self.period+1:]:
                 hdr = self.mf._I2__rangefinder(field='date', value=i)['D']
                 hdr['date'] = pd.Timestamp(i)
                 data.append(hdr)
             for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'):
                 dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
-            dd['ATR'] = [self.mf.ATR(date=d) for d in self.mf.trade_day[self.period+1:]]
-            dd['MAO'] = [ma_order(date=d) for d in self.mf.trade_day[self.period+1:]]
+            dd['ATR'] = [self.mf.ATR(date=d) for d in self.trade_day[self.period+1:]]
+            dd['MAO'] = [ma_order(date=d) for d in self.trade_day[self.period+1:]]
             t = pd.DataFrame(dd)
             return t.loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
         elif option in ['I', 'i']:
-            r_date = self.mf.trade_day[self.period+1:]
+            r_date = self.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
             dd['SMA'] = [self.mf.SMA(date=i) for i in r_date]
             dd['WMA'] = [self.mf.WMA(date=i) for i in r_date]
@@ -60,7 +64,7 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
             t = pd.DataFrame(dd)
             return t.loc[:, ['Date', 'WMA', 'SMA', 'EMA', 'KAMA', 'RSI']]
         elif option in ['O', 'o']:
-            r_date = self.mf.trade_day[self.period+1:]
+            r_date = self.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
             dd['APZ'] = [self.mf.APZ(date=i) for i in r_date]
             dd['BB'] = [self.mf.BB(date=i) for i in r_date]

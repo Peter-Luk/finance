@@ -12,14 +12,14 @@ Base class to provide techinal analysis for financial derivatives. Required 'pro
         from utilities import filepath, gr, rnd
         from datetime import datetime
         self.datetime, self.trade_day = datetime, []
-        self.__period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
+        self.period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
         if args:
             self.__code = args[0]
             if len(args) >= 4: self.__table = args[3]
             if len(args) >= 3: self.__db = args[2]
-            if len(args) >= 2: self.__period = args[1]
+            if len(args) >= 2: self.period = args[1]
         if 'code' in kwargs.keys(): self.__code = kwargs['code']
-        if 'period' in kwargs.keys(): self.__period = kwargs['period']
+        if 'period' in kwargs.keys(): self.period = kwargs['period']
         if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
         if 'db_table' in kwargs.keys(): self.__table = kwargs['db_table']
 
@@ -30,11 +30,11 @@ Base class to provide techinal analysis for financial derivatives. Required 'pro
             if self.__data[i]['date'] not in self.trade_day: self.trade_day.append(self.__data[i]['date'])
 
     def __del__(self):
-        self.__data = self.__conn = self.__code = self.__period = self.__db = self.__table = self.datetime = self.trade_day = None
+        self.__data = self.__conn = self.__code = self.period = self.__db = self.__table = self.datetime = self.trade_day = None
         del self.__data
         del self.__conn
         del self.__code
-        del self.__period
+        del self.period
         del self.__db
         del self.__table
         del self.datetime
@@ -94,7 +94,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
     def ATR(self, *args, **kwargs):
         from statistics import mean
-        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.__period
+        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
             if len(args) < 3: period = args[1]
@@ -128,7 +128,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
     def EMA(self, *args, **kwargs):
         from statistics import mean
-        data, date, period, option = self.__data, self.datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        data, date, period, option = self.__data, self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
             if len(args) == 2: period = args[1]
@@ -165,7 +165,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
     def KAMA(self, *args, **kwargs):
         from utilities import gr, rnd
-        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.__period
+        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         fast, slow = rnd(period / gr ** 2), period
         if args:
             date = args[0]
@@ -182,7 +182,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             tr[d] = tmp['close']
 
         for i in range(period, len(trade_day)):
-            ch, vo = abs(tr[trade_day[i]] - tr[trade_day[i-period]]), sum([abs(tr[trade_day[x]] - tr[trade_day[x - 1]]) for x in range(i-period, i)])
+            ch, vo = abs(tr[trade_day[i]] - tr[trade_day[i - period]]), sum([abs(tr[trade_day[x]] - tr[trade_day[x - 1]]) for x in range(i - period, i)])
             er[trade_day[i]] = ch / float(vo)
 
         for i in range(slow, len(trade_day)):
@@ -199,7 +199,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def RSI(self, *args, **kwargs):
-        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.__period
+        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
             if len(args) < 3: period = args[1]
@@ -246,7 +246,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
     def BBW(self, *args, **kwargs):
         from statistics import stdev
         from utilities import gr
-        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.__period
+        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
             if len(args) < 3: period = args[1]
@@ -268,7 +268,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 #
     def SAR(self, **kwargs):
         from statistics import mean
-        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if 'date' in kwargs.keys():date = kwargs['date']
         if 'period' in kwargs.keys():period = kwargs['period']
         if 'option' in kwargs.keys():option = kwargs['option']
@@ -298,7 +298,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 #
     def SMA(self, *args, **kwargs):
         from statistics import mean
-        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
             if len(args) == 2: period = args[1]
@@ -324,7 +324,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
     def APZ(self, *args, **kwargs):
         from utilities import gr, rnd
-        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.__period
+        date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
             if len(args) < 3: period = args[1]
@@ -346,7 +346,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
     def BB(self, *args, **kwargs):
         from utilities import gr, rnd
-        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
             if len(args) == 2: period = args[1]
@@ -366,7 +366,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
     def WMA(self, *args, **kwargs):
         from statistics import mean
-        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
             if len(args) == 2: period = args[1]
@@ -392,14 +392,14 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
     def KC(self, *args, **kwargs):
         from utilities import gr, rnd
-        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.__period, 'C'
+        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
             if len(args) == 2: period = args[1]
             if len(args) == 3: period, option = args[1:]
-        if 'date' in kwargs.keys():date = kwargs['date']
-        if 'period' in kwargs.keys():period = kwargs['period']
-        if 'option' in kwargs.keys():option = kwargs['option']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
+        if 'option' in kwargs.keys(): option = kwargs['option']
         width, base = self.ATR(date=date, period=period), self.KAMA(date=date, period=period, option=option)
         return (rnd(base - width * gr / 2), rnd(base + width * gr / 2))
 
@@ -408,9 +408,9 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if args:
             date = args[0]
             if len(args) >= 2: period = args[1]
-        if 'date' in kwargs.keys():date = kwargs['date']
-        if 'period' in kwargs.keys():period = kwargs['period']
-        if date:return self.ATR(date=date, period=period) - self.ATR(date=date)
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
+        if date: return self.ATR(date=date, period=period) - self.ATR(date=date)
         else: return self.ATR(period=period) - self.ATR()
 
     def estimate(self, *args, **kwargs):
