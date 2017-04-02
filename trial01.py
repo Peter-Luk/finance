@@ -1,9 +1,9 @@
 """
 Powerhouse for techinal analysis between frontend like pandas, matplotlib and backend namely, sqlite3.
-    """
+"""
 db_name, db_table = 'Futures', 'records'
 
-class I2:
+class I2(object):
     """
 Base class to provide techinal analysis for financial derivatives. Required 'product code'.
     """

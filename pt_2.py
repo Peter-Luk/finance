@@ -1,6 +1,6 @@
 from trial01 import I2
 
-class Pen():
+class Pen(I2):
     """
 Pandas DataFrame object for local Futures. Require parameter: 'code'
     """
