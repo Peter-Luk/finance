@@ -1,6 +1,12 @@
+"""
+Powerhouse for techinal analysis between frontend like pandas, matplotlib and backend namely, sqlite3.
+    """
 db_name, db_table = 'Futures', 'records'
 
 class I2:
+    """
+Base class to provide techinal analysis for financial derivatives. Required 'product code'.
+    """
     def __init__(self, *args, **kwargs):
         import sqlite3 as lite
         from utilities import filepath, gr, rnd
