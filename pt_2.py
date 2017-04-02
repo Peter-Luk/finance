@@ -1,5 +1,4 @@
-from trial01 import I2, get_month
-from utilities import dvs, gr
+from trial01 import I2
 
 class Pen():
     """
@@ -14,14 +13,15 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
 
     def __del__(self):
         self.period = self.mf = self.__code = None
-        del(self.period)
-        del(self.mf)
-        del(self.__code)
+        del self.period
+        del self.mf
+        del self.__code
 
     def fdc(self, *args, **kwargs):
         """
 Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
          """
+        from utilities import dvs
         import pandas as pd
         import numpy as np
         def ma_order(*args, **kwargs):
@@ -71,6 +71,7 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
         """
 Generate basic matplotlib graph object.
         """
+        from utilities import get_month
         plt, candle = None, False
         try:
             import matplotlib.pyplot as plt
@@ -127,6 +128,7 @@ Generate basic matplotlib graph object.
             plt.tight_layout()
 
     def xfinder(self, *args, **kwargs):
+        from utilities import gr
         import pandas as pd
         result, option = [], 'F'
         if args: option = args[0]
