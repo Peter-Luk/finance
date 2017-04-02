@@ -423,7 +423,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             if len(args) >= 3: programmatic = args[2]
             if len(args) >= 2: t_date = args[1]
         if 'pivot_point' in kwargs.keys(): pivot_point = int(kwargs['pivot_point'])
-        else: return "Essential value ('pivot _point') is obmitted"
+        if not pivot_point: return "Essential value 'pivot _point' is obmitted"
         t_date, programmatic, o_format, concise = self.trade_day[-1], False, 'raw', False
         if 'date' in kwargs.keys(): t_date = kwargs['date']
         if 'programmatic'in kwargs.keys(): programmatic = kwargs['programmatic']
