@@ -391,7 +391,13 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if date:return self.ATR(date=date, period=period) - self.ATR(date=date)
         else: return self.ATR(period=period) - self.ATR()
 
-    def estimate(self, **kwargs):
+    def estimate(self, *args, **kwargs):
+        if args:
+            pivot_point = args[0]
+            if len(args) >= 5: concise = args[4]
+            if len(args) >= 4: o_format = args[3]
+            if len(args) >= 3: programmatic = args[2]
+            if len(args) >= 2: t_date = args[1]
         if 'pivot_point' in kwargs.keys(): pivot_point = int(kwargs['pivot_point'])
         else: return "Essential value ('pivot _point') is obmitted"
         t_date, programmatic, o_format, concise = self.trade_day[-1], False, 'raw', False
@@ -439,8 +445,8 @@ def summary(*args, **kwargs):
     o_format = 'raw'
     if args:
         f_code = args[0].upper()
-        if len(args) == 2: date = args[1]
-        if len(args) == 3: date, o_format = args[1], args[2].lower()
+        if len(args) >= 3: o_format = args[2].lower()
+        if len(args) >= 2: date = args[1]
     if 'format' in kwargs.keys(): o_format = kwargs['format'].lower()
     if 'code' in kwargs.keys(): f_code = kwargs['code'].upper()
     if f_code:
