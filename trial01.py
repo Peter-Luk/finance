@@ -480,7 +480,7 @@ def summary(*args, **kwargs):
             from tags import HTML, TITLE, TABLE, TH, TR, TD
             hdr = TITLE("`%s` analyse" % f_code)
         mf = I2(code=f_code)
-        period, tday = mf._I2__period, mf.trade_day
+        period, tday = mf.period, mf.trade_day
         ltd = len(tday)
         if 'date' in kwargs.keys():
             if kwargs['date'] in tday: ltd = tday.index(kwargs['date']) + 1
