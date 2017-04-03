@@ -14,26 +14,26 @@ Base class to provide techinal analysis for financial derivatives. Required 'pro
         self.datetime, self.trade_day = datetime, []
         self.period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
         if args:
-            self.__code = args[0]
+            self.code = args[0]
             if len(args) >= 4: self.__table = args[3]
             if len(args) >= 3: self.__db = args[2]
             if len(args) >= 2: self.period = args[1]
-        if 'code' in kwargs.keys(): self.__code = kwargs['code']
+        if 'code' in kwargs.keys(): self.code = kwargs['code']
         if 'period' in kwargs.keys(): self.period = kwargs['period']
         if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
         if 'db_table' in kwargs.keys(): self.__table = kwargs['db_table']
 
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
-        self.__data = self.__conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (self.__table, self.__code.upper())).fetchall()
+        self.__data = self.__conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (self.__table, self.code.upper())).fetchall()
         for i in range(len(self.__data)):
             if self.__data[i]['date'] not in self.trade_day: self.trade_day.append(self.__data[i]['date'])
 
     def __del__(self):
-        self.__data = self.__conn = self.__code = self.period = self.__db = self.__table = self.datetime = self.trade_day = None
+        self.__data = self.__conn = self.code = self.period = self.__db = self.__table = self.datetime = self.trade_day = None
         del self.__data
         del self.__conn
-        del self.__code
+        del self.code
         del self.period
         del self.__db
         del self.__table
@@ -78,7 +78,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             if len(args) == 2: volume = int(args[1])
         if 'date' not in kwargs.keys(): kwargs['date'] = date
         if 'volume' in kwargs.keys(): volume = int(kwargs['volume'])
-        kt, vt = ('date', 'session', 'code'), (kwargs['date'], kwargs['session'], self.__code.upper())
+        kt, vt = ('date', 'session', 'code'), (kwargs['date'], kwargs['session'], self.code.upper())
         for k, v in kwargs.items():
             if k not in ['date', 'session', 'code', 'volume']:
                 kt += (k,)
@@ -455,7 +455,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
         if o_format == 'html':
             from tags import HTML, TITLE, TABLE, TH, TR, TD
-            title = TITLE("Estimate of %s with reference on '%s' base on Pivot Point: %i" % (self.__code.upper(), t_date, pivot_point))
+            title = TITLE("Estimate of %s with reference on '%s' base on Pivot Point: %i" % (self.code.upper(), t_date, pivot_point))
             if concise: trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
             else:
                 trs = [TR(linesep.join([str(TD(x)) for x in [TD('Session delta (est.):'), TD(sru[0]), TD('to'), TD(sru[-1]), TD(sep), TD(srl[0]), TD('to'), TD(srl[-1])]]))]

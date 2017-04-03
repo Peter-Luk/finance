@@ -9,22 +9,23 @@ Base class to create Pandas DataFrame object for analyse local Futures data.
 Require parameter: 'code'
     """
     def __init__(self, *args, **kwargs):
-        self.I2 = I2
-        if args: self.__code = args[0]
-        elif 'code' in kwargs.keys(): self.__code = kwargs['code']
-        self.mf = self.I2(code=self.__code)
+        if args: self.code = args[0]
+        elif 'code' in kwargs.keys(): self.code = kwargs['code']
+        code = self.code
+        super(PI, self).__init__(code)
+        self.mf = I2(code=self.code)
         self.datetime, self.period, self.trade_day = self.mf.datetime, self.mf.period, self.mf.trade_day
         if 'period' in kwargs.keys():
             self.period = kwargs['period']
-            self.mf = I2(code=self.__code, period=self.period)
+            self.mf = I2(code=self.code, period=self.period)
 
     def __del__(self):
-        self.trade_day = self.period = self.datetime = self.mf = self.__code = None
+        self.trade_day = self.period = self.datetime = self.mf = self.code = None
         del self.trade_day
         del self.period
         del self.datetime
         del self.mf
-        del self.__code
+        del self.code
 
     def fdc(self, *args, **kwargs):
         """
@@ -133,7 +134,7 @@ Both others 'labels' and 'angle' variables are optional. Default 8 and 45 respec
                     x += 1
                 candlestick_ohlc(plt.gca(), ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
             else: plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
-            plt.title('%s (%s): with various MA indicators and daily %s' % (self.__code[:-2].upper(), ' '.join((get_month(self.__code[-2]), '201' + self.__code[-1])), r_index))
+            plt.title('%s (%s): with various MA indicators and daily %s' % (self.code[:-2].upper(), ' '.join((get_month(self.code[-2]), '201' + self.code[-1])), r_index))
             axis_decorator(plt.gca(), 9, 30)
             plt.grid(True)
             plt.subplot(212)
