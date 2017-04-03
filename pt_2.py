@@ -14,8 +14,9 @@ Require parameter: 'code'
             if len(args) >= 2: period = args[1]
         if 'code' in kwargs.keys(): code = kwargs['code']
         if 'period' in kwargs.keys(): period = kwargs['period']
-        if len(args) == 1: super(PI, self).__init__(code)
-        elif len(args) > 1: super(PI, self).__init__(code, period)
+        if code:
+            if period: super(PI, self).__init__(code, period)
+            else: super(PI, self).__init__(code)
 
     def fdc(self, *args, **kwargs):
         """
