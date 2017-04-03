@@ -1,8 +1,12 @@
+"""
+Local Futures (sqlite) analysis using pandas, matplotlib (visualize) via pyplot.
+"""
 from trial01 import I2
 
 class PI(I2):
     """
-Pandas DataFrame object for local Futures. Require parameter: 'code'
+Base class to create Pandas DataFrame object for analyse local Futures data.
+Require parameter: 'code'
     """
     def __init__(self, *args, **kwargs):
         self.I2 = I2
@@ -24,11 +28,11 @@ Pandas DataFrame object for local Futures. Require parameter: 'code'
 
     def fdc(self, *args, **kwargs):
         """
-Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
+Create Pandas DataFrame object required parameter: 'option'.
+Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
         """
         from utilities import dvs
         import pandas as pd
-        import numpy as np
         def ma_order(*args, **kwargs):
             if args: date = args[0]
             if 'date' in kwargs.keys(): date = kwargs['date']
@@ -74,7 +78,7 @@ Generate Pandas DataFrame object. Parameter: 'option', valid choice: 'B'asic (de
 
     def plot(self, **kwargs):
         """
-Generate basic matplotlib graph object.
+Create basic matplotlib graph object (develpoing...)
         """
         from utilities import get_month
         plt, candle = None, False
@@ -90,8 +94,15 @@ Generate basic matplotlib graph object.
         except: pass
 
         def axis_decorator(*args, **kwargs):
+            """
+Internal decorative function required parameter: 'ax1'.
+Both others 'labels' and 'angle' variables are optional. Default 8 and 45 respectively.
+            """
             angle, labels = 45, 8
-            if args: ax1 = args[0]
+            if args:
+                ax1 = args[0]
+                if len(args) >= 3: angle = args[2]
+                if len(args) >= 2: labels = args[1]
             if 'axis' in kwargs.keys(): ax1 = kwargs['axis']
             if 'angle' in kwargs.keys(): angle = kwargs['angle']
             if 'labels' in kwargs.keys(): labels = kwargs['labels']
@@ -123,16 +134,19 @@ Generate basic matplotlib graph object.
                 candlestick_ohlc(plt.gca(), ohlc, width=0.4, colorup='#77d879', colordown='#db3f3f')
             else: plt.plot(tb.Date, tb.Close, color='b', marker='x', linestyle='', label='Close')
             plt.title('%s (%s): with various MA indicators and daily %s' % (self.__code[:-2].upper(), ' '.join((get_month(self.__code[-2]), '201' + self.__code[-1])), r_index))
-            axis_decorator(axis=plt.gca(), labels=10)
+            axis_decorator(plt.gca(), 9, 30)
             plt.grid(True)
             plt.subplot(212)
             plt.plot(ti.Date, ti.RSI, label='RSI')
             plt.legend(loc='lower left', frameon=False)
-            axis_decorator(axis=plt.gca(), labels=7)
+            axis_decorator(plt.gca(), 9, 30)
             plt.grid(True)
             plt.tight_layout()
 
     def xfinder(self, *args, **kwargs):
+        """
+Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)TR, (D)elta, (F)ull (default) or (R)SI.
+        """
         from utilities import gr
         import pandas as pd
         result, option = [], 'F'
