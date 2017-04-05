@@ -1,6 +1,6 @@
 from os import linesep
 from sys import argv, platform
-from derivatives import Analyser, Futures, connect, fullpath, today, waf, estimate
+from derivatives import Analyser, Futures, today, waf, estimate
 from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
 from utilities import ltd, IP
 
