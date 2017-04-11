@@ -114,8 +114,8 @@ Both others 'labels' and 'angle' variables are optional. Default 8 and 45 respec
             plt.plot(ta.Date, [x[-1] for x in ta.KC.values], color='r', linestyle=':')
             plt.plot(ta.Date, [x[0] for x in ta.BB.values], color='c', linestyle='-.')
             plt.plot(ta.Date, [x[-1] for x in ta.BB.values], color='c', linestyle='-.')
-            plt.plot(ta.Date, [x[0] for x in ta.APZ.values], color='m', linestyle='--')
-            plt.plot(ta.Date, [x[-1] for x in ta.APZ.values], color='m', linestyle='--')
+            plt.plot(ta.Date, [x[0] for x in ta.APZ.values], color='g', linestyle='--')
+            plt.plot(ta.Date, [x[-1] for x in ta.APZ.values], color='g', linestyle='--')
             plt.legend(loc='upper left', frameon=False)
             if candle:
                 x, ohlc, r_index = 0, [], 'candlestick'
