@@ -4,10 +4,10 @@ from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OP
 from utilities import ltd, today, waf, IP
 panda = False
 try:
-    from pt_2 import I2, Pen
+    from pt_2 import PI
     panda = True
 except:
-    from trial01 import I2, summary
+    from trial01 import summary
 
 import cherrypy
 
@@ -30,10 +30,11 @@ class Analysor(object):
 
     @cherrypy.expose
     def proceed(self, contract):
+        i2 = PI(code=contract)
         if panda:
             opt_value = 'B'
-            if len(i2.trade_day) > i2._I2__period: opt_value = 'I'
-            return Pen(code=contract).fdc(option=opt_value).to_html()
+            if len(i2.trade_day) > i2.period: opt_value = 'I'
+            return PI(code=contract).fdc(option=opt_value).to_html()
         return summary(code=contract, format='html')
 
 class Inputter(object):
@@ -56,12 +57,12 @@ class Inputter(object):
         date, hour, minute = today.date().strftime('%Y-%m-%d'), today.hour, today.minute
         if hour > 12: session = 'A'
         elif (hour == 12) and (minute > 56): session = 'A'
-        i2 = I2(code=contract)
+        i2 = PI(code=contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
         if panda:
             opt_value = 'B'
-            if len(i2.trade_day) > i2._I2__period: opt_value = 'I'
-            return Pen(code=contract).fdc(option=opt_value).to_html()
+            if len(i2.trade_day) > i2.period: opt_value = 'I'
+            return PI(code=contract).fdc(option=opt_value).to_html()
         return summary(code=contract, format='html')
 
 class Estimator(object):
@@ -79,7 +80,7 @@ class Estimator(object):
 
     @cherrypy.expose
     def proceed(self, contract, pp):
-        i2 = I2(code=contract)
+        i2 = PI(code=contract)
         return i2.estimate(pivot_point=pp, format='html', concise=True)
 
 if __name__ == '__main__':
