@@ -4,7 +4,7 @@ from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OP
 from utilities import ltd, today, waf, IP
 panda = False
 try:
-    from pt_2 import I2, Pen
+    from pt_2 import I2, PI
     panda = True
 except:
     from trial01 import I2, summary
@@ -33,7 +33,7 @@ class Analysor(object):
         if panda:
             opt_value = 'B'
             if len(i2.trade_day) > i2._I2__period: opt_value = 'I'
-            return Pen(code=contract).fdc(option=opt_value).to_html()
+            return PI(code=contract).fdc(option=opt_value).to_html()
         return summary(code=contract, format='html')
 
 class Inputter(object):
@@ -61,7 +61,7 @@ class Inputter(object):
         if panda:
             opt_value = 'B'
             if len(i2.trade_day) > i2._I2__period: opt_value = 'I'
-            return Pen(code=contract).fdc(option=opt_value).to_html()
+            return PI(code=contract).fdc(option=opt_value).to_html()
         return summary(code=contract, format='html')
 
 class Estimator(object):
