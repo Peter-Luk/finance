@@ -75,10 +75,17 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
 
         if option in ['M', 'm', 'A', 'a']:
             itemp = self.fdc('i')
-            result.extend([int(round(eval('itemp.%s.values[%i]' % (k.upper(), -1)), 0)) for k in ['kama', 'ema', 'sma', 'wma']])
+            result.append(int(round(itemp.KAMA.values[-1])))
+            result.append(int(round(itemp.EMA.values[-1])))
+            result.append(int(round(itemp.SMA.values[-1])))
+            result.append(int(round(itemp.WMA.values[-1])))
+#            result.extend([int(round(eval('itemp.%s.values[%i]' % (k.upper(), -1)), 0)) for k in ['kama', 'ema', 'sma', 'wma']])
         if option in ['O', 'o', 'A', 'a']:
             otemp = self.fdc('o')
-            [result.extend(list(eval('otemp.%s.values[%i]' % (k.upper(), -1)))) for k in ['kc', 'apz', 'bb']]
+            result.extend(list(otemp.KC.values[-1]))
+            result.extend(list(otemp.APZ.values[-1]))
+            result.extend(list(otemp.BB.values[-1]))
+#            [result.extend(list(eval('otemp.%s.values[%i]' % (k.upper(), -1)))) for k in ['kc', 'apz', 'bb']]
         result.sort()
         return result
 
