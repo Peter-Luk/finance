@@ -9,10 +9,10 @@ Base class to provide techinal analysis for financial derivatives. Required 'pro
     """
     def __init__(self, *args, **kwargs):
         import sqlite3 as lite
-        from utilities import filepath, gr, rnd
+        from utilities import filepath, gr
         from datetime import datetime
         self.datetime, self.trade_day = datetime, []
-        self.period, self.__db, self.__table = rnd(20 / gr), db_name, db_table
+        self.period, self.__db, self.__table = int(round(20 / gr, 0)), db_name, db_table
         if args:
             self.code = args[0]
             if len(args) >= 4: self.__table = args[3]
@@ -164,9 +164,9 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             return res[rkeys[-1]]
 
     def KAMA(self, *args, **kwargs):
-        from utilities import gr, rnd
+        from utilities import gr
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
-        fast, slow = rnd(period / gr ** 2), period
+        fast, slow = int(round(period / gr ** 2, 0)), period
         if args:
             date = args[0]
             if len(args) == 2: period = args[1]
@@ -323,7 +323,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def APZ(self, *args, **kwargs):
-        from utilities import gr, rnd
+        from utilities import gr
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
@@ -337,7 +337,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             el = [self.EMA(date=r_date[i - j], period=period, option='L') for j in range(period)]
             vv = self.EMA(data=[eh[j] for j in range(len(eh))], period=len(eh)) - self.EMA(data=[el[j] for j in range(len(el))], period=len(el))
             ema = self.EMA(date=r_date[i], option='HL', period=period)
-            res[r_date[i]] = rnd(ema - vv * gr / 2), rnd(ema + vv * gr / 2)
+            res[r_date[i]] = int(round(ema - vv * gr / 2, 0)), int(round(ema + vv * gr / 2, 0))
 
         rkeys = list(res.keys())
         rkeys.sort()
@@ -345,7 +345,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def BB(self, *args, **kwargs):
-        from utilities import gr, rnd
+        from utilities import gr
         date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
@@ -357,7 +357,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         res, r_date = {}, self.trade_day
 
         for i in range(len(r_date) - period):
-            res[r_date[period + i]] = tuple([rnd(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr / 2) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
+            res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr / 2, 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
 
         rkeys = list(res.keys())
         rkeys.sort()
@@ -391,7 +391,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def KC(self, *args, **kwargs):
-        from utilities import gr, rnd
+        from utilities import gr
         date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
@@ -401,7 +401,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if 'period' in kwargs.keys(): period = kwargs['period']
         if 'option' in kwargs.keys(): option = kwargs['option']
         width, base = self.ATR(date=date, period=period), self.KAMA(date=date, period=period, option=option)
-        return (rnd(base - width * gr / 2), rnd(base + width * gr / 2))
+        return (int(round(base - width * gr / 2, 0)), int(round(base + width * gr / 2, 0)))
 
     def daatr(self, *args, **kwargs):
         date, period = None, 5
