@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
 from bokeh.io import output_notebook, show
 from bokeh.layouts import gridplot
 from bokeh.palettes import Viridis3
@@ -12,7 +7,7 @@ from bokeh.plotting import figure
 
 # class DateGapTickFormatter(TickFormatter):
 #     date_labels = List(String)
-    
+
 #     __implementation__ = """
 #         _ = require "underscore"
 #         Model = require "model"
@@ -20,7 +15,7 @@ from bokeh.plotting import figure
 
 #         class DateGapTickFormatter extends Model
 #             type: 'DateGapTickFormatter'
-  
+
 #             doFormat: (ticks) ->
 #                 date_labels = @get("date_labels")
 #                 return (date_labels[tick] ? "" for tick in ticks)
@@ -39,9 +34,6 @@ omatch = {'KC':'red', 'APZ':Viridis3[1], 'BB':Viridis3[2]}
 mp = getattr(__import__('pt_2'),'PI')(code)
 imp, omp, bmp = mp.fdc('i'), mp.fdc('o'), mp.fdc('b')
 # date_labels = [date.strftime('%b %d') for date in pd.to_datetime(imp['Date'])]
-
-
-# In[2]:
 
 q = figure(title='%s RSI' % code.upper(), x_axis_label='Date', background_fill_color='#DFDFE5', plot_height=250, x_axis_type='datetime')
 # q.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
@@ -85,4 +77,3 @@ r.legend.location = 'top_left'
 grid = gridplot([r, q], ncols=1, plot_width=800)
 output_notebook()
 show(grid)
-
