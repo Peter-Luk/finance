@@ -1,4 +1,4 @@
-from bokeh.io import output_notebook, show
+from bokeh.io import output_notebook, output_file, show, save
 from bokeh.layouts import gridplot
 from bokeh.palettes import Viridis3
 from bokeh.plotting import figure
@@ -28,8 +28,11 @@ class DateGapTickFormatter(TickFormatter):
             Model: DateGapTickFormatter
 """
 
-def plot(*args, **kwargs):
-    code = 'hsik7'
+def genplot(*args, **kwargs):
+    code = args[0]
+    if len(args) <= 2: webpage = args[1]
+    if 'code' in kwargs.keys(): code = kwargs['code']
+    if 'webpage' in kwargs.keys(): webpage = kwargs['webpage']
     cmatch = {'EMA':Viridis3[1], 'WMA':Viridis3[0], 'SMA':Viridis3[2], 'KAMA':'red'}
     omatch = {'KC':'red', 'APZ':Viridis3[1], 'BB':Viridis3[2]}
     mp = getattr(__import__('pt_2'),'PI')(code)
@@ -76,5 +79,9 @@ def plot(*args, **kwargs):
     [r.circle(imp['Date'], imp[k], legend=k, color=v, size=5) for k, v in cmatch.items()]
     r.legend.location = 'top_left'
     grid = gridplot([r, q], ncols=1, plot_width=800)
-    output_notebook()
-    show(grid)
+    if webpage:
+        output_file(webpage)
+        save(grid)
+    else:
+        output_notebook()
+        show(grid)
