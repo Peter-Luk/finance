@@ -233,7 +233,8 @@ Accept 'two' and 'only two' variables (i.e. field and value)
                 if hdr[trade_day[i]] > 0:
                     ag[trade_day[i]] = (ag[trade_day[i - 1]] * (period - 1) + hdr[trade_day[i]]) / period
                     al[trade_day[i]] = al[trade_day[i - 1]] * (period - 1) / period
-                if hdr[trade_day[i]] < 0:
+                else:
+#                if hdr[trade_day[i]] < 0:
                     ag[trade_day[i]] = ag[trade_day[i - 1]] * (period - 1) / period
                     al[trade_day[i]] = (al[trade_day[i - 1]] * (period - 1) + abs(hdr[trade_day[i]])) / period
             res[trade_day[i]] = 100 - 100 / ( 1 + float(ag[trade_day[i]]) / al[trade_day[i]])
