@@ -166,7 +166,8 @@ Accept 'two' and 'only two' variables (i.e. field and value)
     def KAMA(self, *args, **kwargs):
         from utilities import gr
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
-        fast, slow = int(round(period / gr ** 2, 0)), period
+#        fast, slow = int(round(period / gr ** 2, 0)), period
+        fast, slow = 2, period
         if args:
             date = args[0]
             if len(args) == 2: period = args[1]
