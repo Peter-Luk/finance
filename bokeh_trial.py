@@ -5,28 +5,28 @@ from bokeh.plotting import figure
 from bokeh.models.formatters import TickFormatter, String, List
 import pandas as pd
 
-class DateGapTickFormatter(TickFormatter):
-    date_labels = List(String)
-
-    __implementation__ = """
-        _ = require "underscore"
-        Model = require "model"
-        p = require "core/properties"
-
-        class DateGapTickFormatter extends Model
-            type: 'DateGapTickFormatter'
-
-            doFormat: (ticks) ->
-                date_labels = @get("date_labels")
-                return (date_labels[tick] ? "" for tick in ticks)
-
-            @define {
-                date_labels: [ p.Any ]
-            }
-
-        module.exports =
-            Model: DateGapTickFormatter
-"""
+# class DateGapTickFormatter(TickFormatter):
+#     date_labels = List(String)
+# 
+#     __implementation__ = """
+#         _ = require "underscore"
+#         Model = require "model"
+#         p = require "core/properties"
+# 
+#         class DateGapTickFormatter extends Model
+#             type: 'DateGapTickFormatter'
+# 
+#             doFormat: (ticks) ->
+#                 date_labels = @get("date_labels")
+#                 return (date_labels[tick] ? "" for tick in ticks)
+# 
+#             @define {
+#                 date_labels: [ p.Any ]
+#             }
+# 
+#         module.exports =
+#             Model: DateGapTickFormatter
+# """
 
 def genplot(*args, **kwargs):
     code = args[0]
@@ -40,7 +40,7 @@ def genplot(*args, **kwargs):
     date_labels = [date.strftime('%b %d') for date in pd.to_datetime(imp['Date'])]
 
     q = figure(title='%s RSI' % code.upper(), x_axis_label='Date', background_fill_color='#DFDFE5', plot_height=250, x_axis_type='datetime')
-    q.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
+#    q.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
     q.xgrid.grid_line_color = 'white'
     q.ygrid.grid_line_color = 'white'
     q.line(imp['Date'], imp['RSI'], legend='RSI', color='navy', line_width=3, alpha=0.5)
@@ -51,14 +51,14 @@ def genplot(*args, **kwargs):
     w = 12 * 60 * 60 * 1000
     TOOLS = 'pan,wheel_zoom,box_zoom,reset,save'
     r = figure(x_axis_type='datetime', tools=TOOLS, title='%s daily with Candlestick' % code.upper(), background_fill_color='#DFDFE5', x_range=q.x_range)
-    r.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
+#..    r.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
     r.xgrid.grid_line_color = 'white'
     r.xgrid.grid_line_width = 3
     r.ygrid.grid_line_color = 'white'
     r.ygrid.grid_line_width = 3
     r.grid.grid_line_alpha = 0.3
     r.segment(bmp.Date, bmp.High, bmp.Date, bmp.Low, color='black')
-    r.vbar(bmp.Date[inc], w, bmp.Open[inc], bmp.Close[inc], fill_color='blue', line_color='black')
+    r.vbar(bmp.Date[inc], w, bmp.Open[inc], bmp.Close[inc], fill_color='green', line_color='black')
     r.vbar(bmp.Date[dec], w, bmp.Open[dec], bmp.Close[dec], fill_color='red', line_color='black')
     for k, v in omatch.items():
         l, h = [], []
