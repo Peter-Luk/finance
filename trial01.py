@@ -338,8 +338,10 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             eh = [self.EMA(date=r_date[i - j], period=period, option='H') for j in range(period)]
             el = [self.EMA(date=r_date[i - j], period=period, option='L') for j in range(period)]
             vv = self.EMA(data=[eh[j] for j in range(len(eh))], period=len(eh)) - self.EMA(data=[el[j] for j in range(len(el))], period=len(el))
-            ema = self.EMA(date=r_date[i], option='HL', period=period)
-            res[r_date[i]] = int(round(ema - vv * gr / 2, 0)), int(round(ema + vv * gr / 2, 0))
+#            ema = self.EMA(date=r_date[i], option='HL', period=period)
+#            res[r_date[i]] = int(round(ema - vv * gr / 2, 0)), int(round(ema + vv * gr / 2, 0))
+            kama = self.KAMA(date=r_date[i], option='HL', period=period)
+            res[r_date[i]] = int(round(kama - vv * gr, 0)), int(round(kama + vv * gr, 0))
 
         rkeys = list(res.keys())
         rkeys.sort()
@@ -359,7 +361,8 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         res, r_date = {}, self.trade_day
 
         for i in range(len(r_date) - period):
-            res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr / 2, 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
+            #res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr / 2, 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
+            res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr, 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
 
         rkeys = list(res.keys())
         rkeys.sort()
@@ -403,7 +406,8 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if 'period' in kwargs.keys(): period = kwargs['period']
         if 'option' in kwargs.keys(): option = kwargs['option']
         width, base = self.ATR(date=date, period=period), self.KAMA(date=date, period=period, option=option)
-        return (int(round(base - width * gr / 2, 0)), int(round(base + width * gr / 2, 0)))
+#        return (int(round(base - width * gr / 2, 0)), int(round(base + width * gr / 2, 0)))
+        return (int(round(base - width * gr, 0)), int(round(base + width * gr, 0)))
 
     def daatr(self, *args, **kwargs):
         date, period = None, 5
