@@ -2,8 +2,8 @@ from bokeh.io import output_notebook, output_file, show, save
 from bokeh.layouts import gridplot
 from bokeh.palettes import Viridis3
 from bokeh.plotting import figure
-from bokeh.models.formatters import TickFormatter, String, List
-import pandas as pd
+# from bokeh.models.formatters import TickFormatter, String, List
+# import pandas as pd
 
 # class DateGapTickFormatter(TickFormatter):
 #     date_labels = List(String)
@@ -30,8 +30,9 @@ import pandas as pd
 
 def genplot(*args, **kwargs):
     embed = False
-    if args: code = args[0]
-    if len(args) == 2: webpage = args[1]
+    if len(args) >= 1:
+        code = args[0]
+        if len(args) == 2: webpage = args[1]
     if 'code' in kwargs.keys(): code = kwargs['code']
     if 'embed' in kwargs.keys(): embed = kwargs['embed']
     if 'webpage' in kwargs.keys(): webpage = kwargs['webpage']
@@ -42,10 +43,10 @@ def genplot(*args, **kwargs):
     omatch = {'KC':'red', 'APZ':Viridis3[1], 'BB':Viridis3[2]}
     mp = getattr(__import__('pt_2'),'PI')(code)
     imp, omp, bmp = mp.fdc('i'), mp.fdc('o'), mp.fdc('b')
-    date_labels = [date.strftime('%b %d') for date in pd.to_datetime(imp['Date'])]
+#    date_labels = [date.strftime('%b %d') for date in pd.to_datetime(imp['Date'])]
 
     q = figure(title='%s RSI' % code.upper(), x_axis_label='Date', background_fill_color='#DFDFE5', plot_height=250, x_axis_type='datetime')
-#    q.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
+#     q.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
     q.xgrid.grid_line_color = 'white'
     q.ygrid.grid_line_color = 'white'
     q.line(imp['Date'], imp['RSI'], legend='RSI', color='navy', line_width=3, alpha=0.5)
@@ -56,7 +57,7 @@ def genplot(*args, **kwargs):
     w = 12 * 60 * 60 * 1000
     TOOLS = 'pan,wheel_zoom,box_zoom,reset,save'
     r = figure(x_axis_type='datetime', tools=TOOLS, title='%s daily with Candlestick' % code.upper(), background_fill_color='#DFDFE5', x_range=q.x_range)
-#..    r.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
+#     r.xaxis[0].formatter = DateGapTickFormatter(date_labels = date_labels)
     r.xgrid.grid_line_color = 'white'
     r.xgrid.grid_line_width = 3
     r.ygrid.grid_line_color = 'white'
