@@ -1,6 +1,6 @@
 from os import linesep
 from sys import argv, platform
-from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT
+from tags import HTML, HEAD, TITLE, LINK, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT
 from utilities import ltd, today, waf, IP
 panda = False
 try:
@@ -30,11 +30,17 @@ class Analysor(object):
 
     @cherrypy.expose
     def proceed(self, contract):
-        i2 = PI(code=contract)
         if panda:
-            opt_value = 'B'
-            if len(i2.trade_day) > i2.period: opt_value = 'I'
-            return PI(code=contract).fdc(option=opt_value).to_html()
+            gp = getattr(__import__('bokeh_trial'),'genplot')
+            s, d = gp(code=contract, embed=True)
+            hd = HEAD(TITLE(contract), str(LINK({'href':"http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.css", 'rel':"stylesheet", 'type':"text/css"})), s)
+            bd = BODY(d)
+            return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
+#        i2 = PI(code=contract)
+#        if panda:
+#            opt_value = 'B'
+#            if len(i2.trade_day) > i2.period: opt_value = 'I'
+#            return PI(code=contract).fdc(option=opt_value).to_html()
         return summary(code=contract, format='html')
 
 class Inputter(object):
@@ -54,7 +60,7 @@ class Inputter(object):
     def append(self, contract, open, high, low, close, volume):
         from datetime import datetime
         today, session = datetime.today(), 'M'
-        date, hour, minute = today.date().strftime('%Y-%m-%d'), today.hour, today.minute
+        hour, minute = today.hour, today.minute
         if hour > 12: session = 'A'
         elif (hour == 12) and (minute > 56): session = 'A'
         i2 = PI(code=contract)
