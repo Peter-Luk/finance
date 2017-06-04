@@ -36,8 +36,10 @@ class Analysor(object):
         gp = getattr(__import__('bokeh_trial'),'genplot')
         s, d = gp(code=contract, embed=True)
         bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
-        bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
-        blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, s))
+#         bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
+#         blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, s))
+        bscript = '<script type="text/javascript" scr="%s">%s' % ('.'.join((bbase, 'js')), '\n'.join(s.split('\n')[2:]))
+        blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript))
         hd = HEAD(linesep.join(['<meta charset="utf-8">', str(TITLE(contract)), blink]))
 # #            hd = HEAD(TITLE(contract), str(LINK({'href':"http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.css", 'rel':"stylesheet", 'type':"text/css"})), s)
         bd = BODY(d)
