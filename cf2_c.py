@@ -37,7 +37,7 @@ class Analysor(object):
 #             s, d = gp(code=contract.upper(), embed=True)
 #             bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
 #             bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
-#             blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript))
+#             blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>'))
 #             hd = HEAD(linesep.join(['<meta charset="utf-8">', str(TITLE(contract)), blink]))
 #             bd = BODY('\n'.join([str(x) for x in [d, s]]))
 #             return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
