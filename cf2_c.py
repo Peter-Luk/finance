@@ -30,18 +30,25 @@ class Analysor(object):
 
     @cherrypy.expose
     def proceed(self, contract):
-        if panda:
-            gp = getattr(__import__('bokeh_trial'),'genplot')
-            s, d = gp(code=contract, embed=True)
-            hd = HEAD(TITLE(contract), str(LINK({'href':"http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.css", 'rel':"stylesheet", 'type':"text/css"})), s)
-            bd = BODY(d)
-            return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
-#        i2 = PI(code=contract)
-#        if panda:
-#            opt_value = 'B'
-#            if len(i2.trade_day) > i2.period: opt_value = 'I'
-#            return PI(code=contract).fdc(option=opt_value).to_html()
-        return summary(code=contract, format='html')
+#         if panda:
+#         try:
+        bv = getattr(__import__('bokeh'), '__version__')
+        gp = getattr(__import__('bokeh_trial'),'genplot')
+        s, d = gp(code=contract, embed=True)
+        bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
+        bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
+        blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, s))
+        hd = HEAD(linesep.join(['<meta charset="utf-8">', str(TITLE(contract)), blink]))
+# #            hd = HEAD(TITLE(contract), str(LINK({'href':"http://cdn.pydata.org/bokeh/release/bokeh-0.12.5.min.css", 'rel':"stylesheet", 'type':"text/css"})), s)
+        bd = BODY(d)
+        return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
+#         except:
+#             i2 = PI(code=contract)
+#             if panda:
+#                 opt_value = 'B'
+#                 if len(i2.trade_day) > i2.period: opt_value = 'I'
+#                 return PI(code=contract).fdc(option=opt_value).to_html()
+#             return summary(code=contract, format='html')
 
 class Inputter(object):
     @cherrypy.expose
