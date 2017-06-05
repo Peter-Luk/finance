@@ -349,7 +349,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def BB(self, *args, **kwargs):
-        from utilities import gr
+#         from utilities import gr
         date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
@@ -361,8 +361,9 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         res, r_date = {}, self.trade_day
 
         for i in range(len(r_date) - period):
-            #res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr / 2, 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
-            res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr, 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
+#             res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr / 2, 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
+#             res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * gr, 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
+            res[r_date[period + i]] = tuple([int(round(self.SMA(date=r_date[period + i], period=period, option=option) + x * 2., 0)) for x in [-self.BBW(date=r_date[period + i], period=period), self.BBW(date=r_date[period + i], period=period)]])
 
         rkeys = list(res.keys())
         rkeys.sort()
@@ -460,7 +461,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         rdata['Gap'] = {'upper':gru, 'lower':grl}
 
         if o_format == 'html':
-            from tags import HTML, TITLE, TABLE, TH, TR, TD
+            from tags import HTML, TITLE, TABLE, TR, TD
             title = TITLE("Estimate of %s with reference on '%s' base on Pivot Point: %i" % (self.code.upper(), t_date, pivot_point))
             if concise: trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
             else:
