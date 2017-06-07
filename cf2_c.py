@@ -31,23 +31,23 @@ class Analysor(object):
     @cherrypy.expose
     def proceed(self, contract):
 #         if panda:
-#         try:
-#             bv = getattr(__import__('bokeh'), '__version__')
-#             gp = getattr(__import__('bokeh_trial'),'genplot')
-#             s, d = gp(code=contract.upper(), embed=True)
-#             bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
-#             bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
-#             blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>'))
-#             hd = HEAD(linesep.join(['<meta charset="utf-8">', str(TITLE(contract)), blink]))
-#             bd = BODY('\n'.join([str(x) for x in [d, s]]))
-#             return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
-#         except:
-        if panda:
-            i2 = PI(code=contract)
-            opt_value = 'B'
-            if len(i2.trade_day) > i2.period: opt_value = 'I'
-            return PI(code=contract).fdc(option=opt_value).to_html()
-        return summary(code=contract, format='html')
+        try:
+            bv = getattr(__import__('bokeh'), '__version__')
+            gp = getattr(__import__('bokeh_trial'),'genplot')
+            s, d = gp(code=contract.upper(), embed=True)
+            bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
+            bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
+            blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>', s))
+            hd = HEAD(linesep.join(['<meta charset="utf-8">', str(TITLE(contract)), blink]))
+            bd = BODY(d)
+            return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
+        except:
+            if panda:
+                i2 = PI(code=contract)
+                opt_value = 'B'
+                if len(i2.trade_day) > i2.period: opt_value = 'I'
+                return PI(code=contract).fdc(option=opt_value).to_html()
+            return summary(code=contract, format='html')
 
 class Inputter(object):
     @cherrypy.expose
