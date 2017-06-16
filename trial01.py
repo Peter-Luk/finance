@@ -338,10 +338,10 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             eh = [self.EMA(date=r_date[i - j], period=period, option='H') for j in range(period)]
             el = [self.EMA(date=r_date[i - j], period=period, option='L') for j in range(period)]
             vv = self.EMA(data=[eh[j] for j in range(len(eh))], period=len(eh)) - self.EMA(data=[el[j] for j in range(len(el))], period=len(el))
-#            ema = self.EMA(date=r_date[i], option='HL', period=period)
-#            res[r_date[i]] = int(round(ema - vv * gr / 2, 0)), int(round(ema + vv * gr / 2, 0))
-            kama = self.KAMA(date=r_date[i], option='HL', period=period)
-            res[r_date[i]] = int(round(kama - vv * gr, 0)), int(round(kama + vv * gr, 0))
+            ema = self.EMA(date=r_date[i], option='HL', period=period)
+            res[r_date[i]] = int(round(ema - vv * gr, 0)), int(round(ema + vv * gr, 0))
+#            kama = self.KAMA(date=r_date[i], option='HL', period=period)
+#            res[r_date[i]] = int(round(kama - vv * gr, 0)), int(round(kama + vv * gr, 0))
 
         rkeys = list(res.keys())
         rkeys.sort()
