@@ -4,6 +4,7 @@ def encoder(*args, **kwargs):
         if args:mfp = args[0]
         if 'mfp' in list(kwargs.keys()): mfp = kwargs['mfp']
         if 'case' in list(kwargs.keys()): case = kwargs['case']
+        if 'alias' in list(kwargs.keys()): alias = kwargs['alias']
         for k, v in list(mfp.items()):
             if v:
                 for i in v:
