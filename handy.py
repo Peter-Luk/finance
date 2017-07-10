@@ -11,11 +11,16 @@ def encoder(*args, **kwargs):
                     _i = i
                     if case == 'lower': _i = i.lower()
                     if case == 'upper': _i = i.upper()
-                    if case == 'capitalize': _i = i.capitalize()
+                    if case == 'capitalize': _i = i.capitalize(i)
+                    try: _i = alias[i]
+                    except: pass
                     exec("%s=getattr(__import__('%s'),'%s')" % (_i, k, i))
                     res[_i] = eval('%s'%_i)
             else:
-                exec("%s=__import__('%s')" % (k, k))
-                res[k] = eval('%s'%k)
+                _k = k
+                exec("%s=__import__('%s')" % (_k, _k))
+                try: _k = alias
+                except: pass
+                res[_k] = eval('%s'%k)
     except: pass
     return res
