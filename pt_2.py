@@ -1,7 +1,12 @@
 """
 Local Futures (sqlite) analysis using pandas, matplotlib (visualize) via pyplot.
 """
-from trial01 import I2
+e = getattr(__import__('handy'),'encoder')
+rim = {'trial01':('I2',)}
+__ = e(rim, case='upper')
+for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
+# I2 = getattr(__import__('trial01'),'I2')
+# from trial01 import I2
 
 class PI(I2):
     """

@@ -1,7 +1,9 @@
-from sys import platform, version_info
-from os import linesep, sep, environ
-from datetime import datetime
-import socket
+e = getattr(__import__('handy'),'encoder')
+rim = {'socket':(), 'datetime':('datetime',)}
+rim['sys'] = ('platform', 'version_info')
+rim['os'] = ('linesep', 'sep', 'environ')
+__ = e(rim)
+for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 gr = 1.61803399
 
 today = datetime.today()
