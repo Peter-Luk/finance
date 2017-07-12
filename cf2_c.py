@@ -1,7 +1,17 @@
-from os import linesep
-from sys import argv, platform
-from tags import HTML, HEAD, TITLE, LINK, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT
-from utilities import ltd, today, waf, IP
+e = getattr(__import__('handy'),'encoder')
+rim = {'os':('linesep',)}
+rim['sys'] = ('argv','platform')
+rim['utilities'] = ('ltd', 'waf', 'today')
+__ = e(rim)
+for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
+rim = {'utilities':('IP',)}
+rim['tags'] = ('HTML', 'HEAD', 'TITLE', 'LINK', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT')
+__ = e(rim, case='upper')
+for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
+# from os import linesep
+# from sys import argv, platform
+# from tags import HTML, HEAD, TITLE, LINK, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT
+# from utilities import ltd, today, waf, IP
 panda = False
 try:
     from pt_2 import PI
