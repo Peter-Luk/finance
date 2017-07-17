@@ -11,7 +11,7 @@ def encoder(*args, **kwargs):
                     _i = i
                     if case == 'lower': _i = i.lower()
                     if case == 'upper': _i = i.upper()
-                    if case == 'capitalize': _i = i.capitalize(i)
+                    if case == 'capitalize': _i = i.capitalize()
                     try: _i = alias[i]
                     except: pass
                     exec("%s=getattr(__import__('%s'),'%s')" % (_i, k, i))

@@ -1,10 +1,20 @@
-from os import linesep
-from sys import argv, platform
-from derivatives import Analyser, Futures, today, waf, estimate
-from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
-from utilities import ltd, IP
+e = getattr(__import__('handy'),'encoder')
+rim = {'cherrypy':(),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd',),'derivatives':('today','waf','estimate')}
+__ = e(rim)
+for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
+rim = {'derivatives':('Analyser','Futures')}
+__ = e(rim, case='capitalize')
+for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
+rim = {'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT', 'B')}
+__ = e(rim, case='upper')
+for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
+# from os import linesep
+# from sys import argv, platform
+# from derivatives import Analyser, Futures, today, waf, estimate
+# from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT, B
+# from utilities import ltd, IP
 
-import cherrypy
+# import cherrypy
 
 server_host, server_port = IP('public').address, 2028
 if len(argv) > 1:server_host = argv[1]
