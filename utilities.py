@@ -51,22 +51,22 @@ def waf(delta=0):
     return tuple(futures)
 
 def filepath(*args, **kwargs):
-    name, file_type, data_format = args[0], 'data', 'sqlite3'
+    name, file_type, data_path = args[0], 'data', 'sqlite3'
     if 'type' in list(kwargs.keys()): file_type = kwargs['type']
-    if 'format' in list(kwargs.keys()): data_format = kwargs['format']
+    if 'subpath' in list(kwargs.keys()): data_path = kwargs['subpath']
     if platform == 'win32':
         file_drive, file_path = environ['HOMEDRIVE'], environ['HOMEPATH']
 #         reqval = ('drive', 'path')
 #         for i in reqval:
 #             if i in args.keys():exec("file_%s = '%s'" % (i, args[i]))
-        file_path = sep.join((file_drive, file_path, file_type, data_format))
-    if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_format))
+        file_path = sep.join((file_drive, file_path, file_type, data_path))
+    if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
     if platform in ('linux', 'linux2'):
         place = 'shared'
-        if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((environ['HOME'], file_type, data_format))
+        if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((environ['HOME'], file_type, data_path))
         elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
             place = 'external-1'
-            file_path = sep.join((environ['HOME'], 'storage', place, file_type, data_format))
+            file_path = sep.join((environ['HOME'], 'storage', place, file_type, data_path))
     return sep.join((file_path, name))
 
 def rnd(n, decimal_place=0):
