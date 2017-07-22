@@ -8,9 +8,10 @@ for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 #     if today.hour < 13:dstr='m'
 fi = []
 for _ in range(int(len(waf())/2)):
-    cfv = lf(waf()[_]).fp.fdc('b')['Volume'].values[-1]
+#     cfv = lf(waf()[_]).fp.fdc('b')['Volume'].values[-1]
     try:
         nfv = lf(waf()[_+2]).fp.fdc('b')['Volume'].values[-1]
+        cfv = lf(waf()[_]).fp.fdc('b')['Volume'].values[-1]
         if cfv > nfv:fi.append(waf()[_])
         else:fi.append(waf()[_+2])
     except:fi.append(waf()[_])
