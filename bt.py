@@ -1,7 +1,13 @@
-from bokeh.io import output_notebook, output_file, show, save
-from bokeh.layouts import gridplot
-from bokeh.palettes import Viridis3
-from bokeh.plotting import figure
+e = getattr(__import__('handy'),'encoder')
+__ = e({'bokeh.io':('output_notebook', 'output_file', 'show', 'save'),'bokeh.layouts':('gridplot',),'bokeh.plotting':('figure',)})
+for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
+# from bokeh.io import output_notebook, output_file, show, save
+# from bokeh.layouts import gridplot
+__ = e({'bokeh.palettes':('Viridis3',)}, case='capitalize')
+
+for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
+# from bokeh.palettes import Viridis3
+# from bokeh.plotting import figure
 
 class LF(object):
     def __init__(self, *args, **kwargs):

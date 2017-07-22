@@ -6,6 +6,8 @@ def encoder(*args, **kwargs):
         if 'case' in list(kwargs.keys()): case = kwargs['case']
         if 'alias' in list(kwargs.keys()): alias = kwargs['alias']
         for k, v in list(mfp.items()):
+            ks, es = k.split('.'), "getattr(__import__('%s'),"%k
+            if len(ks) > 1:es = "getattr(" + es + "'%s'),"%ks[1]
             if v:
                 for i in v:
                     _i = i
@@ -14,7 +16,8 @@ def encoder(*args, **kwargs):
                     if case == 'capitalize': _i = i.capitalize()
                     try: _i = alias[i]
                     except: pass
-                    exec("%s=getattr(__import__('%s'),'%s')" % (_i, k, i))
+#                     exec("%s=getattr(__import__('%s'),'%s')" % (_i, k, i))
+                    exec("%s=%s'%s')" % (_i, es, i))
                     res[_i] = eval('%s'%_i)
             else:
                 _k = k
