@@ -7,7 +7,7 @@ def encoder(*args, **kwargs):
         if 'alias' in list(kwargs.keys()): alias = kwargs['alias']
         for k, v in list(mfp.items()):
             ks, es = k.split('.'), "getattr(__import__('%s'),"%k
-            if len(ks) > 1:es = "getattr(" + es + "'%s'),"%ks[1]
+            if len(ks) > 1:es = "getattr(" + es + "'%s'),"%ks[-1]
             if v:
                 for i in v:
                     _i = i
