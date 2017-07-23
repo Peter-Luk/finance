@@ -1,12 +1,9 @@
 e = getattr(__import__('handy'),'encoder')
-rim = {'cherrypy':(),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd',),'derivatives':('today','waf','estimate')}
-__ = e(rim)
+__ = e({'cherrypy':(),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd',),'derivatives':('today','waf','estimate')})
 for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
-rim = {'derivatives':('Analyser','Futures')}
-__ = e(rim, case='capitalize')
+__ = e({'derivatives':('Analyser','Futures')},case='capitalize')
 for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
-rim = {'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT', 'B')}
-__ = e(rim, case='upper')
+__ = e({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT', 'B')},case='upper')
 for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
 # from os import linesep
 # from sys import argv, platform
