@@ -2,14 +2,19 @@
 Powerhouse for techinal analysis between frontend like pandas, matplotlib and backend namely, sqlite3.
 """
 db_name, db_table = 'Futures', 'records'
+e = getattr(__import__('handy'),'encoder')
+__ = e({'utilities':('gr','filepath'),'datetime':('datetime',)})
+for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
+__ = e({'sqlite3':()},alias='lite')
+for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 class I2(object):
     """
 Base class to provide techinal analysis for financial derivatives. Required 'product code'.
     """
     def __init__(self, *args, **kwargs):
-        import sqlite3 as lite
-        from utilities import filepath, gr
-        from datetime import datetime
+#         import sqlite3 as lite
+#         from utilities import filepath, gr
+#         from datetime import datetime
         self.datetime, self.trade_day = datetime, []
         self.period, self.__db, self.__table = int(round(20 / gr, 0)), db_name, db_table
         if args:
