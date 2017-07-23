@@ -1,10 +1,11 @@
-from utilities import rnd, gr, average
-from statistics import stdev
+e = getattr(__import__('handy'),'encoder')
+__ = e({'utilities':('rnd', 'gr', 'average'),'statistics':('stdev',)})
+for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
 class Methods():
     def __init__(self, ratio=None):
         self.ratio = ratio
-        if not(ratio):self.ratio = gr
+        if not ratio:self.ratio = gr
         self.__sf, self.__period = 2 / self.ratio, rnd(20 / self.ratio)
 
     def __del__(self):
