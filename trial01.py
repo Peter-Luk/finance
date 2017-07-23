@@ -4,8 +4,8 @@ Powerhouse for techinal analysis between frontend like pandas, matplotlib and ba
 db_name, db_table = 'Futures', 'records'
 e = getattr(__import__('handy'),'encoder')
 __ = e({'utilities':('gr','filepath'),'datetime':('datetime',)})
-for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
-__ = e({'sqlite3':()},alias='lite')
+_ = e({'sqlite3':()},alias='lite')
+for x in list(_.keys()):exec("__['%s']=_['%s']"%(x,x))
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 class I2(object):
     """
