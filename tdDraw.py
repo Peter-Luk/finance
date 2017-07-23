@@ -9,7 +9,6 @@ for _ in range(int(len(waf())/2)):
         if cfv > nfv:fi.append(waf()[_])
         else:fi.append(waf()[_+2])
     except:fi.append(waf()[_])
-# for _ in waf()[:2]:
 for _ in fi:
     trday, dstr = lf(_).fp.trade_day, ''
     pdate = datetime.strptime(trday[-1], '%Y-%m-%d').date()
