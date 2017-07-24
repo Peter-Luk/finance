@@ -1,7 +1,10 @@
 e = getattr(__import__('handy'),'encoder')
-__ = e({'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd','waf','today')})
-for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
-__ = e({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'LINK', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT')}, case='upper')
+__ = e({'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd','waf','today'),'cherrypy':()})
+# for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
+_ = e({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'LINK', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT')}, case='upper')
+for x in list(_.keys()):
+    if x in list(__.keys()):__[x] += _[x]
+    else: __[x] = _[x]
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 # from os import linesep
 # from sys import argv, platform
@@ -9,12 +12,14 @@ for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 # from utilities import ltd, today, waf, IP
 panda = False
 try:
-    from pt_2 import PI
+    PI = getattr(__import__('pt_2'),'PI')
+#     from pt_2 import PI
     panda = True
 except:
-    from trial01 import summary
+    summary = grtattr(__import__(trial01),'summary')
+#     from trial01 import summary
 
-import cherrypy
+# import cherrypy
 
 server_host, server_port = IP('public').address, 80
 if len(argv) > 1: server_host = argv[1]
