@@ -12,9 +12,6 @@ class I2(object):
 Base class to provide techinal analysis for financial derivatives. Required 'product code'.
     """
     def __init__(self, *args, **kwargs):
-#         import sqlite3 as lite
-#         from utilities import filepath, gr
-#         from datetime import datetime
         self.datetime, self.trade_day = datetime, []
         self.period, self.__db, self.__table = int(round(20 / gr, 0)), db_name, db_table
         if args:
