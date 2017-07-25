@@ -1,6 +1,5 @@
 e = getattr(__import__('handy'),'encoder')
 __ = e({'socket':(), 'datetime':('datetime',),'sys':('platform', 'version_info'),'os':('linesep', 'sep', 'environ')})
-# __ = e(rim)
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 gr = 1.61803399
 
