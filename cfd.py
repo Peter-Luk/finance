@@ -1,9 +1,15 @@
 e = getattr(__import__('handy'),'encoder')
 __ = e({'cherrypy':(),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd',),'derivatives':('today','waf','estimate')})
-for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
-__ = e({'derivatives':('Analyser','Futures')},case='capitalize')
-for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
-__ = e({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT', 'B')},case='upper')
+# for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
+_ = e({'derivatives':('Analyser','Futures')},case='capitalize')
+for x in list(_.keys()):
+    if x in list(__.keys()): __[x] += _[x]
+    else: __[x] = _[x]
+# for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
+_ = e({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT', 'B')},case='upper')
+for x in list(_.keys()):
+    if x in list(__.keys()): __[x] += _[x]
+    else: __[x] = _[x]
 for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
 # from os import linesep
 # from sys import argv, platform
