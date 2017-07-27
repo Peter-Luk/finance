@@ -1,6 +1,10 @@
-from utilities import rnd, gratio
-from derivatives import Analyser
-from daa import Methods
+e = getattr(__import__('handy'),'encoder')
+__ = e({'utilities':('rnd', 'gratio')})
+_ = e({'derivatives':('Analyser',),'daa':('Methods',)},case='capitalize')
+for x in list(_.keys()):
+    if x in list(__.keys()):__[x] += _[x]
+    else:__[x] = _[x]
+for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
 class Indicators(Analyser):
     def __init__(self, code):
