@@ -1,9 +1,3 @@
-# from os import linesep, environ
-# from sys import argv, version_info
-# from sqlite3 import connect
-# from datetime import datetime
-# from SQLiteHelper import Query
-# from utilities import futures_type, month_initial, avail_indicators, cal_month, filepath, gr
 e = getattr(__import__('handy'),'encoder')
 __ = e({'SQLiteHelper':('Query',)}, case='capitalize')
 for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
