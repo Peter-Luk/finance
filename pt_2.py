@@ -4,8 +4,6 @@ Local Futures (sqlite) analysis using pandas, matplotlib (visualize) via pyplot.
 e = getattr(__import__('handy'),'encoder')
 __ = e({'trial01':('I2',)},case='capitalize')
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
-# I2 = getattr(__import__('trial01'),'I2')
-# from trial01 import I2
 
 class PI(I2):
     """
