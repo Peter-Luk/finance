@@ -1,5 +1,5 @@
 e = getattr(__import__('handy'),'encoder')
-__ = e({'socket':(), 'datetime':('datetime',),'sys':('platform', 'version_info'),'os':('linesep', 'sep', 'environ')})
+__ = e({'socket':(), 'datetime':('datetime',),'sys':('platform', 'version_info'),'os':('linesep', 'sep', 'environ'),'bt':('LF',)})
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 gr = 1.61803399
 
@@ -47,7 +47,16 @@ def waf(delta=0):
     futures += [''.join((f,dex(delta+1))) for f in futures_type[:-2]]
     return tuple(futures)
 
-def filepath(*args, **kwargs):
+def mtf():
+    fi = []
+    for _ in range(int(len(waf())/2)):
+        nfv = lf(waf()[_+2]).fp.fdc('b')['Volume'].values[-1]
+        cfv = lf(waf()[_]).fp.fdc('b')['Volume'].values[-1]
+        if cfv > nfv:fi.append(waf()[_])
+        else:fi.append(waf()[_+2])
+    return fi
+
+def filepath (*args, **kwargs):
     name, file_type, data_path = args[0], 'data', 'sqlite3'
     if 'type' in list(kwargs.keys()): file_type = kwargs['type']
     if 'subpath' in list(kwargs.keys()): data_path = kwargs['subpath']
