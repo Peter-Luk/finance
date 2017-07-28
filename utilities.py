@@ -50,10 +50,13 @@ def waf(delta=0):
 def mtf():
     fi = []
     for _ in range(int(len(waf())/2)):
-        nfv = lf(waf()[_+2]).fp.fdc('b')['Volume'].values[-1]
-        cfv = lf(waf()[_]).fp.fdc('b')['Volume'].values[-1]
-        if cfv > nfv:fi.append(waf()[_])
-        else:fi.append(waf()[_+2])
+        try:
+            np, cp = lf(waf()[_+2]).fp, lf(waf()[_]).fp
+            nfv = np.fdc('b')['Volume'].values[-1]
+            cfv = cp.fdc('b')['Volume'].values[-1]
+            if cfv > nfv:fi.append(waf()[_])
+            else:fi.append(waf()[_+2])
+        except:fi.append(waf()[_])
     return fi
 
 def filepath (*args, **kwargs):
