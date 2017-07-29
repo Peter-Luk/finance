@@ -3,8 +3,10 @@ Powerhouse for techinal analysis between frontend like pandas, matplotlib and ba
 """
 db_name, db_table = 'Futures', 'records'
 e = getattr(__import__('handy'),'encoder')
-__ = e({'utilities':('gr','filepath'),'datetime':('datetime',)})
+__ = e({'utilities':('gr','filepath'),'datetime':('datetime',),'statistics':('mean','stdev'),'os':('sep','linesep')})
 _ = e({'sqlite3':()},alias='lite')
+for x in list(_.keys()):exec("__['%s']=_['%s']"%(x,x))
+_ = e({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, case='capitalize')
 for x in list(_.keys()):exec("__['%s']=_['%s']"%(x,x))
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 class I2(object):
@@ -94,7 +96,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         except: self.__conn.rollback()
 
     def ATR(self, *args, **kwargs):
-        from statistics import mean
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
@@ -128,7 +129,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def EMA(self, *args, **kwargs):
-        from statistics import mean
         data, date, period, option = self.__data, self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
@@ -165,7 +165,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             return res[rkeys[-1]]
 
     def KAMA(self, *args, **kwargs):
-        from utilities import gr
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
 #        fast, slow = int(round(period / gr ** 2, 0)), period
         fast, slow = 2, period
@@ -247,8 +246,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def BBW(self, *args, **kwargs):
-        from statistics import stdev
-        from utilities import gr
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
@@ -270,7 +267,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 #
     def SAR(self, **kwargs):
-        from statistics import mean
         date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if 'date' in kwargs.keys():date = kwargs['date']
         if 'period' in kwargs.keys():period = kwargs['period']
@@ -300,7 +296,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 #        return res[rkeys[-1]]
 #
     def SMA(self, *args, **kwargs):
-        from statistics import mean
         date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
@@ -326,7 +321,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def APZ(self, *args, **kwargs):
-        from utilities import gr
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
@@ -350,7 +344,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def BB(self, *args, **kwargs):
-#         from utilities import gr
         date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
@@ -372,7 +365,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def WMA(self, *args, **kwargs):
-        from statistics import mean
         date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
@@ -398,7 +390,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def KC(self, *args, **kwargs):
-        from utilities import gr
         date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
@@ -422,8 +413,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         else: return self.ATR(period=period) - self.ATR()
 
     def estimate(self, *args, **kwargs):
-        from os import sep, linesep
-        from utilities import gr
         if args:
             pivot_point = args[0]
             if len(args) >= 5: concise = args[4]
@@ -474,7 +463,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return linesep.join(rstr)
 
 def summary(*args, **kwargs):
-    from os import linesep
     o_format = 'raw'
     if args:
         f_code = args[0].upper()
@@ -485,7 +473,6 @@ def summary(*args, **kwargs):
     if 'code' in kwargs.keys(): f_code = kwargs['code'].upper()
     if f_code:
         if o_format == 'html':
-            from tags import HTML, TITLE, TABLE, TH, TR, TD
             hdr = TITLE("`%s` analyse" % f_code)
         mf = I2(code=f_code)
         period, tday = mf.period, mf.trade_day
