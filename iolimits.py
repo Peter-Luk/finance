@@ -1,7 +1,8 @@
 e = getattr(__import__('handy'),'encoder')
 __ = e({'utilities':('mtf',),'bt':('LF',)})
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
-pf = mtf()
+fit = 'mhi'
+pf = mtf(fit)
 mpd = getattr(lf(pf[-1]),'fp')
 print('%s: (latest @ %s)'%(pf[-1],mpd.trade_day[-1]))
 print(getattr(mpd,'xfinder')('d'))
