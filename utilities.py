@@ -1,6 +1,10 @@
-e = getattr(__import__('handy'),'encoder')
-__ = e({'socket':(), 'datetime':('datetime',),'sys':('platform', 'version_info'),'os':('linesep', 'sep', 'environ'),'bt':('LF',)})
-for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
+e = getattr(__import__('handy'), 'encoder')
+__ = e({'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ')})
+_ = e({'sqlite3':()}, alias='lite')
+for x in list(_.keys()):
+    if x in list(__.keys()): __[x] += _[x]
+    else: __[x] = _[x]
+for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 gr = 1.61803399
 
 today = datetime.today()
@@ -47,18 +51,6 @@ def waf(delta=0):
     futures += [''.join((f,dex(delta+1))) for f in futures_type[:-2]]
     return tuple(futures)
 
-def mtf():
-    fi = []
-    for _ in range(int(len(waf())/2)):
-        try:
-            np, cp = lf(waf()[_+2]).fp, lf(waf()[_]).fp
-            nfv = np.fdc('b')['Volume'].values[-1]
-            cfv = cp.fdc('b')['Volume'].values[-1]
-            if cfv > nfv:fi.append(waf()[_])
-            else:fi.append(waf()[_+2])
-        except:fi.append(waf()[_])
-    return fi
-
 def filepath (*args, **kwargs):
     name, file_type, data_path = args[0], 'data', 'sqlite3'
     if 'type' in list(kwargs.keys()): file_type = kwargs['type']
@@ -77,6 +69,18 @@ def filepath (*args, **kwargs):
             place = 'external-1'
             file_path = sep.join((environ['HOME'], 'storage', place, file_type, data_path))
     return sep.join((file_path, name))
+def mtf():
+    fi, conn = [], lite.connect(filepath('Futures'))
+    conn.row_factory = lite.Row
+    qstr = "SELECT volume FROM records WHERE code='%s' ORDER BY date DESC"
+    for _ in range(int(len(waf())/2)):
+        try:
+            nfv = conn.cursor().execute(qstr%waf()[_+2]).fetchall()[0][0]
+            cfv = conn.cursor().execute(qstr%waf()[_]).fetchall()[0][0]
+            if cfv > nfv:fi.append(waf()[_])
+            else:fi.append(waf()[_+2])
+        except:fi.append(waf()[_])
+    return fi
 
 def rnd(n, decimal_place=0):
     try:
