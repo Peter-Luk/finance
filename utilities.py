@@ -69,17 +69,29 @@ def filepath (*args, **kwargs):
             place = 'external-1'
             file_path = sep.join((environ['HOME'], 'storage', place, file_type, data_path))
     return sep.join((file_path, name))
-def mtf():
+
+def mtf(*args, **kwargs):
+    ftype = futures_type[:2]
+    if args:
+        if isinstance(args[0], str): ftype = [args[0]]
+        else: ftype = list(args[0])
+    if 'type' in list(kwargs.keys()):
+        if isinstance(kwargs['type'], str): ftype = [kwargs['type']]
+        else: ftype = list(kwargs['type'])
     fi, conn = [], lite.connect(filepath('Futures'))
     conn.row_factory = lite.Row
     qstr = "SELECT volume FROM records WHERE code='%s' ORDER BY date DESC"
-    for _ in range(int(len(waf())/2)):
+    for _ in ftype:
+        aft = []
+        for __ in waf():
+            if _ in __: aft.append(__)
+#     for _ in aft:
         try:
-            nfv = conn.cursor().execute(qstr%waf()[_+2]).fetchall()[0][0]
-            cfv = conn.cursor().execute(qstr%waf()[_]).fetchall()[0][0]
-            if cfv > nfv:fi.append(waf()[_])
-            else:fi.append(waf()[_+2])
-        except:fi.append(waf()[_])
+            nfv = conn.cursor().execute(qstr%aft[1]).fetchall()[0][0]
+            cfv = conn.cursor().execute(qstr%aft[0]).fetchall()[0][0]
+            if cfv > nfv: fi.append(aft[0])
+            else:fi.append(aft[1])
+        except:fi.append(aft[0])
     return fi
 
 def rnd(n, decimal_place=0):
