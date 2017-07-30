@@ -36,7 +36,7 @@ class Analysor(object):
 #         if panda:
         try:
             bv = getattr(__import__('bokeh'), '__version__')
-#             lf = getattr(__import__('bt'),'LF')
+#             lf = getattr(__import__('bt'), 'LF')
             s, d = lf(contract.upper()).plot(embed=True)
             bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
             bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
