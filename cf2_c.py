@@ -1,10 +1,14 @@
 e = getattr(__import__('handy'),'encoder')
-__ = e({'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd','waf','today'),'cherrypy':()})
+__ = e({'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd','waf','today'),'cherrypy':(),'bt':('LF',)})
 _ = e({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'LINK', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT')}, case='upper')
 for x in list(_.keys()):
-    if x in list(__.keys()):__[x] += _[x]
+    if x in list(__.keys()): __[x] += _[x]
     else: __[x] = _[x]
-for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
+# _ = e({'bokeh':('__version__',)}, alias='bv')
+# for x in list(_.keys()):
+#     if x in list(__.keys()): __[x] += _[x]
+#     else: __[x] = _[x]
+for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 
 panda = False
 try:
@@ -35,12 +39,9 @@ class Analysor(object):
     def proceed(self, contract):
 #         if panda:
         try:
-            bv = getattr(__import__('bokeh'), '__version__')
-#             lf = getattr(__import__('bt'), 'LF')
             s, d = lf(contract.upper()).plot(embed=True)
             bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
             bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
-            # blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>', s))
             blink = '<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase
             blink += bscript + '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>%s' % s
             hd = HEAD(linesep.join(['<meta charset="utf-8">', str(TITLE(contract)), blink]))
