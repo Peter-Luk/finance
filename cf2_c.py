@@ -35,12 +35,14 @@ class Analysor(object):
     def proceed(self, contract):
 #         if panda:
         try:
-#             bv = getattr(__import__('bokeh'), '__version__')
-            lf = getattr(__import__('bt'),'LF')
+            bv = getattr(__import__('bokeh'), '__version__')
+#             lf = getattr(__import__('bt'),'LF')
             s, d = lf(contract.upper()).plot(embed=True)
             bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
             bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
-            blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>', s))
+            # blink = linesep.join(('<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase, bscript, '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>', s))
+            blink = '<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase
+            blink += bscript + '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>%s' % s
             hd = HEAD(linesep.join(['<meta charset="utf-8">', str(TITLE(contract)), blink]))
             bd = BODY(d)
             return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
