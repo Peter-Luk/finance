@@ -21,7 +21,6 @@ def encoder(*args, **kwargs):
                     if case == 'capitalize': _i = i.capitalize()
                     try: _i = alias[i]
                     except: pass
-#                     exec("%s=getattr(__import__('%s'),'%s')" % (_i, k, i))
                     exec("%s=%s'%s')" % (_i, es, i))
                     try:
                         _a = la.pop()

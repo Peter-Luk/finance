@@ -85,7 +85,6 @@ def mtf(*args, **kwargs):
         aft = []
         for __ in waf():
             if _.upper() in __: aft.append(__)
-#     for _ in aft:
         try:
             nfv = conn.cursor().execute(qstr%aft[1]).fetchall()[0][0]
             cfv = conn.cursor().execute(qstr%aft[0]).fetchall()[0][0]
