@@ -34,3 +34,17 @@ def encoder(*args, **kwargs):
                 res[_k] = eval('%s'%k)
     except: pass
     return res
+
+def him(*args):
+    if args: __, iml = {}, args[0]
+    if isinstance(iml, dict):
+        _ = eval("encoder(%s)"%iml)
+        for k, v in list(_.items()):
+            if k not in list(__.keys()): __[k] = v
+    elif isinstance(iml, list):
+        for i in iml:
+            if len(i) == 1: _ = eval("encoder(%s)"%i)
+            if len(i) == 2: _ = eval("encoder(%s,%s)"%i)
+            for k, v in list(_.items()):
+                if k not in list(__.keys()): __[k] = v
+    return __
