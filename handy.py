@@ -45,6 +45,7 @@ def him(*args):
         for i in iml:
             if len(i) == 1: _ = eval("encoder(%s)"%i)
             if len(i) == 2: _ = eval("encoder(%s,%s)"%i)
+            if isinstance(i, dict): _ = eval("encoder(%s)"%i)
             for k, v in list(_.items()):
                 if k not in list(__.keys()): __[k] = v
     return __
