@@ -1,9 +1,6 @@
-e = getattr(__import__('handy'), 'encoder')
-__ = e({'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ')})
-_ = e({'sqlite3':()}, alias='lite')
-for x in list(_.keys()):
-    if x in list(__.keys()): __[x] += _[x]
-    else: __[x] = _[x]
+him = getattr(__import__('handy'), 'him')
+iml = [{'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ')},({'sqlite3':()}, "alias='lite'")]
+__ = him(iml)
 for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 gr = 1.61803399
 
