@@ -1,7 +1,10 @@
-e = getattr(__import__('handy'),'encoder')
-__ = e({'SQLiteHelper':('Query',)}, case='capitalize')
-for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
-__ = e({'sqlite3':('connect',),'sys':('argv','version_info'),'os':('linesep','environ'),'utilities':('futures_type','month_initial','avail_indicators','cal_month','filepath','gr'),'datetime':('datetime',)})
+him = getattr(__import__('handy'),'him')
+iml = [({'SQLiteHelper':('Query',)}, "case='capitalize'"),{'sqlite3':('connect',),'sys':('argv','version_info'),'os':('linesep','environ'),'utilities':('futures_type','month_initial','avail_indicators','cal_month','filepath','gr'),'datetime':('datetime',)}]
+__ = him(iml)
+# e = getattr(__import__('handy'),'encoder')
+# __ = e({'SQLiteHelper':('Query',)}, case='capitalize')
+# for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
+# __ = e({'sqlite3':('connect',),'sys':('argv','version_info'),'os':('linesep','environ'),'utilities':('futures_type','month_initial','avail_indicators','cal_month','filepath','gr'),'datetime':('datetime',)})
 for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
 
 fullpath, today = filepath('Futures'), datetime.today()
