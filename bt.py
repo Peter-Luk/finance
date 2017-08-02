@@ -1,6 +1,5 @@
 him = getattr(__import__('handy'),'him')
-iml = [{'bokeh.io':('output_notebook', 'output_file', 'show', 'save'),'bokeh.layouts':('gridplot',),'bokeh.plotting':('figure',)},
-({'bokeh.palettes':('Viridis3',)}, "case='capitalize'")]
+iml = [{'bokeh.io':('output_notebook', 'output_file', 'show', 'save'),'bokeh.layouts':('gridplot',),'bokeh.plotting':('figure',)},({'bokeh.palettes':('Viridis3',)}, "case='capitalize'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
