@@ -1,13 +1,6 @@
-e = getattr(__import__('handy'),'encoder')
-__ = e({'cherrypy':(),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd',),'derivatives':('today','waf','estimate')})
-_ = e({'derivatives':('Analyser','Futures')},case='capitalize')
-for x in list(_.keys()):
-    if x in list(__.keys()): __[x] += _[x]
-    else: __[x] = _[x]
-_ = e({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT', 'B')},case='upper')
-for x in list(_.keys()):
-    if x in list(__.keys()): __[x] += _[x]
-    else: __[x] = _[x]
+him = getattr(__import__('handy'),'him')
+iml = [{'cherrypy':(),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd',),'derivatives':('today','waf','estimate')},({'derivatives':('Analyser','Futures')},"case='capitalize'"),({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT', 'B')},"case='upper'")]
+__ = him(iml)
 for _ in list(__.keys()): exec("%s=__['%s']"%(_,_))
 
 server_host, server_port = IP('public').address, 2028
