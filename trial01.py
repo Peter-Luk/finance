@@ -5,12 +5,6 @@ db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'),'him')
 iml = [{'utilities':('gr','filepath'),'datetime':('datetime',),'statistics':('mean','stdev'),'os':('sep','linesep')},({'sqlite3':()},"alias='lite'"),({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='capitalize'")]
 __ = him(iml)
-# e = getattr(__import__('handy'),'encoder')
-# __ = e({'utilities':('gr','filepath'),'datetime':('datetime',),'statistics':('mean','stdev'),'os':('sep','linesep')})
-# _ = e({'sqlite3':()},alias='lite')
-# for x in list(_.keys()):exec("__['%s']=_['%s']"%(x,x))
-# _ = e({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, case='capitalize')
-# for x in list(_.keys()):exec("__['%s']=_['%s']"%(x,x))
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 class I2(object):
     """

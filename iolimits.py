@@ -12,4 +12,3 @@ lc, cs = ar['Close'].values[-1], ar['Close'].std()
 il = list(filter(lambda _:(_>lc-cs) and (_<lc+cs),mos))
 ol = list(filter(lambda _:(_<lc-cs) or (_>lc+cs),mos))
 print(il,lc,ol)
-
