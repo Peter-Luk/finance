@@ -1,5 +1,3 @@
-# e = getattr(__import__('handy'), 'encoder')
-# __ = e({'datetime':('datetime',),'utilities':('today', 'filepath', 'mtf'), 'os':('sep',), 'bt':('LF',)})
 him = getattr(__import__('handy'), 'him')
 __ = him({'datetime':('datetime',),'utilities':('today', 'filepath', 'mtf'), 'os':('sep',), 'bt':('LF',)})
 for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
