@@ -1,19 +1,11 @@
-e = getattr(__import__('handy'),'encoder')
-__ = e({'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd','waf','today'),'cherrypy':(),'bt':('LF',)})
-_ = e({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'LINK', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT')}, case='upper')
-for x in list(_.keys()):
-    if x in list(__.keys()): __[x] += _[x]
-    else: __[x] = _[x]
-# _ = e({'bokeh':('__version__',)}, alias='bv')
-# for x in list(_.keys()):
-#     if x in list(__.keys()): __[x] += _[x]
-#     else: __[x] = _[x]
+him = getattr(__import__('handy'),'him')
+iml =[{'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd','waf','today'),'cherrypy':(),'bt':('LF',)},({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'LINK', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT')}, "case='upper'")]
+__ = him(iml)
 for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 
 panda = False
 try:
     PI = getattr(__import__('pt_2'),'PI')
-#     from pt_2 import PI
     panda = True
 except:
     summary = grtattr(__import__(trial01),'summary')
@@ -37,7 +29,6 @@ class Analysor(object):
 
     @cherrypy.expose
     def proceed(self, contract):
-#         if panda:
         try:
             s, d = lf(contract.upper()).plot(embed=True)
             bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
