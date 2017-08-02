@@ -1,5 +1,5 @@
-e = getattr(__import__('handy'),'encoder')
-__ = e({'utilities':('mtf',),'bt':('LF',)})
+him = getattr(__import__('handy'),'him')
+__ = him({'utilities':('mtf',),'bt':('LF',)})
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 fit = 'mhi'
 pf = mtf(fit)

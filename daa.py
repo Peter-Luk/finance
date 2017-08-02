@@ -1,5 +1,5 @@
-e = getattr(__import__('handy'),'encoder')
-__ = e({'utilities':('rnd', 'gr', 'average'),'statistics':('stdev',)})
+him = getattr(__import__('handy'),'him')
+__ = him({'utilities':('rnd', 'gr', 'average'),'statistics':('stdev',)})
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
 class Methods():

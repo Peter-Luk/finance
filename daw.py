@@ -1,9 +1,6 @@
-e = getattr(__import__('handy'),'encoder')
-__ = e({'utilities':('rnd', 'gratio')})
-_ = e({'derivatives':('Analyser',),'daa':('Methods',)},case='capitalize')
-for x in list(_.keys()):
-    if x in list(__.keys()):__[x] += _[x]
-    else:__[x] = _[x]
+him = getattr(__import__('handy'),'him')
+iml = [{'utilities':('rnd', 'gratio')},({'derivatives':('Analyser',),'daa':('Methods',)},"case='capitalize'")]
+__ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
 class Indicators(Analyser):
