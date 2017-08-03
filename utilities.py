@@ -88,6 +88,7 @@ def mtf(*args, **kwargs):
             if cfv > nfv: fi.append(aft[0])
             else:fi.append(aft[1])
         except:fi.append(aft[0])
+    if len(fi) == 1: return fi.pop()
     return fi
 
 def rnd(n, decimal_place=0):
