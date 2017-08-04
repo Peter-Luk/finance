@@ -5,7 +5,10 @@ def encoder(*args, **kwargs):
         if 'mfp' in list(kwargs.keys()): mfp = kwargs['mfp']
         if 'case' in list(kwargs.keys()): case = kwargs['case']
         if 'alias' in list(kwargs.keys()):
-            if not isinstance(kwargs['alias'],dict): la = kwargs['alias']
+            la = kwargs['alias']
+#             if isinstance(kwargs['alias'],dict):
+#                 pass
+#             else: la = kwargs['alias']
             if isinstance(kwargs['alias'], str):
                 la = []
                 la.append(kwargs['alias'])
@@ -19,7 +22,7 @@ def encoder(*args, **kwargs):
                     if case == 'lower': _i = i.lower()
                     if case == 'upper': _i = i.upper()
                     if case == 'capitalize': _i = i.capitalize()
-                    try: _i = alias[i]
+                    try: _i = la[i]
                     except: pass
                     exec("%s=%s'%s')" % (_i, es, i))
                     try:
@@ -29,7 +32,9 @@ def encoder(*args, **kwargs):
             else:
                 _k = k
                 exec("%s=__import__('%s')" % (_k, _k))
-                try: _k = la.pop()
+                try:
+                    if isinstance(la, dict): _k = la[_k]
+                    else: _k = la.pop()
                 except: pass
                 res[_k] = eval('%s'%k)
     except: pass
