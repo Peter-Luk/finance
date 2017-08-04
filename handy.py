@@ -11,8 +11,8 @@ def encoder(*args, **kwargs):
                 la.append(kwargs['alias'])
             elif isinstance(kwargs['alias'], tuple): la = list(kwargs['alias'])
         for k, v in list(mfp.items()):
-            ks, es = k.split('.'), "getattr(__import__('%s'),"%k
-            if len(ks) > 1:es = "getattr(" + es + "'%s'),"%ks[-1]
+            ks, es = k.split('.'), "getattr(__import__('%s')," % k
+            for i in ks[1:]:es = "getattr(" + es + "'%s')," % i
             if v:
                 for i in v:
                     _i = i
