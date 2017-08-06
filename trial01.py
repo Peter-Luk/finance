@@ -3,7 +3,7 @@ Powerhouse for techinal analysis between frontend like pandas, matplotlib and ba
 """
 db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'),'him')
-iml = [{'utilities':('gr','filepath'),'datetime':('datetime',),'statistics':('mean','stdev'),'os':('sep','linesep')},({'sqlite3':()},"alias='lite'"),({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='capitalize'")]
+iml = [{'utilities':('gr','filepath'),'datetime':('datetime',),'statistics':('mean','stdev'),'os':('sep','linesep')},({'sqlite3':()},"alias='lite'"),({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='upper'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 class I2(object):
@@ -448,7 +448,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         rdata['Gap'] = {'upper':gru, 'lower':grl}
 
         if o_format == 'html':
-            from tags import HTML, TITLE, TABLE, TR, TD
+#             from tags import HTML, TITLE, TABLE, TR, TD
             title = TITLE("Estimate of %s with reference on '%s' base on Pivot Point: %i" % (self.code.upper(), t_date, pivot_point))
             if concise: trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
             else:
