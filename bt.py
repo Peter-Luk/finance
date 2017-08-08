@@ -23,7 +23,6 @@ class LF(object):
         if 'embed' in kwargs.keys(): embed = kwargs['embed']
         if 'webpage' in kwargs.keys(): webpage = kwargs['webpage']
         if embed:
-#             from bokeh.embed import components
             webpage = None
         cmatch = {'EMA':Viridis3[1], 'WMA':Viridis3[0], 'SMA':Viridis3[2], 'KAMA':'red'}
         omatch = {'KC':'red', 'APZ':Viridis3[1], 'BB':Viridis3[2]}
