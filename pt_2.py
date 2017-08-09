@@ -1,9 +1,9 @@
 """
 Local Futures (sqlite) analysis using pandas, matplotlib (visualize) via pyplot.
 """
-him = getattr(__import__('handy'),'him')
-__ = him([{'utilities':('dvs',)}, ({'trial01':('I2',), 'pandas':()}, "alias={'I2':'I2', 'pandas':'pd'}")])
-for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
+him = getattr(__import__('handy'), 'him')
+__ = him([{'utilities':('dvs', 'gr', 'get_month')}, ({'trial01':('I2',), 'pandas':()}, "alias={'I2':'I2', 'pandas':'pd'}")])
+for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 
 class PI(I2):
     """
@@ -95,7 +95,7 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
         """
 Create basic matplotlib graph object (develpoing...)
         """
-        from utilities import get_month
+        # from utilities import get_month
         plt, candle = None, False
         try:
             import matplotlib.pyplot as plt
@@ -162,8 +162,8 @@ Both others 'labels' and 'angle' variables are optional. Default 8 and 45 respec
         """
 Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)TR, (D)elta, (F)ull (default) or (R)SI.
         """
-        from utilities import gr
-        import pandas as pd
+        # from utilities import gr
+        # import pandas as pd
         result, option = [], 'F'
         if args: option = args[0]
         elif 'option' in kwargs.keys(): option = kwargs['option']
