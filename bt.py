@@ -66,10 +66,13 @@ class LF(object):
         [r.circle(imp['Date'], imp[k], legend=k, color=v, size=5) for k, v in cmatch.items()]
         r.legend.location = 'top_left'
         grid = gridplot([r, q], ncols=1, plot_width=800)
-        if webpage:
+#         if webpage:
+        try:
+            if embed: return components(grid)
             output_file(webpage)
             save(grid)
-        elif embed: return components(grid)
-        else:
+#         elif embed: return components(grid)
+#         else:
+        except:
             output_notebook()
             show(grid)
