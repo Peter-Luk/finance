@@ -1,8 +1,8 @@
 """
 Local Futures (sqlite) analysis using pandas, matplotlib (visualize) via pyplot.
 """
-e = getattr(__import__('handy'),'encoder')
-__ = e({'trial01':('I2',)},case='capitalize')
+him = getattr(__import__('handy'),'him')
+__ = him([{'utilities':('dvs',)}, ({'trial01':('I2',), 'pandas':()}, "alias={'I2':'I2', 'pandas':'pd'}")])
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 
 class PI(I2):
@@ -25,8 +25,8 @@ Require parameter: 'code'
 Create Pandas DataFrame object required parameter: 'option'.
 Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
         """
-        from utilities import dvs
-        import pandas as pd
+        # from utilities import dvs
+        # import pandas as pd
         def ma_order(*args, **kwargs):
             if args: date = args[0]
             if 'date' in kwargs.keys(): date = kwargs['date']
