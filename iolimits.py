@@ -11,12 +11,12 @@ try:
     dtxd = xd.transpose().to_dict()
     for _ in list(dtxd.keys()):
         print("%s: delta @ %i" % (dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta']))
-except pass
+except:pass
 try:
     dtxr = xr.transpose().to_dict()
     for _ in list(dtxr.keys()):
         print("%s: RSI @ %i" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI']))
-except pass
+except:pass
 ar, mos = getattr(mpd,'fdc')('b'), getattr(mpd,'ltdmos')('a')
 lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
 print("%sVolume over mean: %.2f%%" % (linesep, lv / vm* 100.))
