@@ -7,7 +7,7 @@ mpd = getattr(lf(pf), 'fp')
 print('%s: (latest @ %s)' % (pf, mpd.trade_day[-1]))
 xd = getattr(mpd, 'xfinder')('d')
 xr = getattr(mpd, 'xfinder')('r')
-ai, ar, mos = getattr(mpd, 'fdc')('b'), getattr(mpd, 'fdc')('i'), getattr(mpd, 'ltdmos')('a')
+ai, ar, mos = getattr(mpd, 'fdc')('i'), getattr(mpd, 'fdc')('b'), getattr(mpd, 'ltdmos')('a')
 try:
     dtxd = xd.transpose().to_dict()
     for _ in list(dtxd.keys()):
