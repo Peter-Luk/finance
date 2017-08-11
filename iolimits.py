@@ -5,8 +5,18 @@ fit = 'mhi'
 pf = mtf(fit)
 mpd = getattr(lf(pf),'fp')
 print('%s: (latest @ %s)'%(pf,mpd.trade_day[-1]))
-print(getattr(mpd,'xfinder')('d'))
-print(getattr(mpd,'xfinder')('r'))
+xd = getattr(mpd,'xfinder')('d')
+xr = getattr(mpd,'xfinder')('r')
+try:
+    dtxd = xd.transpose().to_dict()
+    for _ in list(dtxd.keys()):
+        print("%s: delta @ %i" % (dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta']))
+except pass
+try:
+    dtxr = xr.transpose().to_dict()
+    for _ in list(dtxr.keys()):
+        print("%s: RSI @ %i" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI']))
+except pass
 ar, mos = getattr(mpd,'fdc')('b'), getattr(mpd,'ltdmos')('a')
 lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
 print("%sVolume over mean: %.2f%%" % (linesep, lv / vm* 100.))
