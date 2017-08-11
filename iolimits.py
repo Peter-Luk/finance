@@ -15,7 +15,7 @@ except:pass
 try:
     dtxr = xr.transpose().to_dict()
     for _ in list(dtxr.keys()):
-        print("%s: RSI @ %i" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI']))
+        print("%s: RSI @ %.3f" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI']))
 except:pass
 ar, mos = getattr(mpd,'fdc')('b'), getattr(mpd,'ltdmos')('a')
 lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
