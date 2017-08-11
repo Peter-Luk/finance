@@ -4,10 +4,10 @@ for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 fit = 'mhi'
 pf = mtf(fit)
 mpd = getattr(lf(pf), 'fp')
+ai, ar, mos = getattr(mpd, 'fdc')('i'), getattr(mpd, 'fdc')('b'), getattr(mpd, 'ltdmos')('a')
 print('%s: (latest @ %s)' % (pf, mpd.trade_day[-1]))
 xd = getattr(mpd, 'xfinder')('d')
 xr = getattr(mpd, 'xfinder')('r')
-ai, ar, mos = getattr(mpd, 'fdc')('i'), getattr(mpd, 'fdc')('b'), getattr(mpd, 'ltdmos')('a')
 try:
     dtxd = xd.transpose().to_dict()
     for _ in list(dtxd.keys()):
@@ -18,7 +18,6 @@ try:
     for _ in list(dtxr.keys()):
         print("%s: RSI @ %.3f (mean %.3f)" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI'], ai['RSI'].mean()))
 except:pass
-ar, mos = getattr(mpd, 'fdc')('b'), getattr(mpd, 'ltdmos')('a')
 lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
 print("%sVolume over mean: %.2f%%" % (linesep, lv / vm* 100.))
 print("Volume over (mean + std): %.2f%%" % (lv / (vm +vs) * 100.))
