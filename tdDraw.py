@@ -6,6 +6,8 @@ for _ in mtf():
     pdate = datetime.strptime(trday[-1], '%Y-%m-%d').date()
     if (today.date() in [datetime.strptime(__, '%Y-%m-%d').date() for __ in trday]):
         pdate = today.date()
-        if today.hour < 13:dstr='m'
-    eval("getattr(lf('%s'),'plot')(filepath('%sbt%02i%s.html', type=sep.join(('data','plot')), subpath=sep.join(('%i','%s'))))" % (_, _[0].lower(), pdate.day, dstr, pdate.year, pdate.strftime('%B')))
-    print("%s (%s) plotted." % (_, pdate.strftime('%d-%m-%Y')))
+        if today.hour < 13: dstr = 'm'
+    eval("getattr(lf('%s'), 'plot')(filepath('%sbt%02i%s.html', type=sep.join(('data', 'plot')), subpath=sep.join(('%i','%s'))))" % (_, _[0].lower(), pdate.day, dstr, pdate.year, pdate.strftime('%B')))
+    st = 'full'
+    if dstr == 'm': st = 'morning'
+    print("%s (%s %s session) plotted." % (_, pdate.strftime('%d-%m-%Y'), st))
