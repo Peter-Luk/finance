@@ -1,5 +1,5 @@
-him = getattr(__import__('handy'),'him')
-iml = [{'bokeh.embed':('components',),'bokeh.io':('output_notebook', 'output_file', 'show', 'save'),'bokeh.layouts':('gridplot',),'bokeh.plotting':('figure',)},({'bokeh.palettes':('Viridis3',)}, "case='capitalize'")]
+him = getattr(__import__('handy'), 'him')
+iml = [{'bokeh.embed':('components',), 'bokeh.io':('output_notebook', 'output_file', 'show', 'save'), 'bokeh.layouts':('gridplot',), 'bokeh.plotting':('figure',), 'os':('linesep',)}, ({'bokeh.palettes':('Viridis3',)}, "case='capitalize'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
@@ -9,7 +9,7 @@ class LF(object):
         if 'code' in kwargs.keys(): self.code = kwargs['code']
         try:
             self.fp = getattr(__import__('pt_2'),'PI')(self.code)
-        except:pass
+        except: pass
 
     def __del__(self):
         self.fp = self.code = None
@@ -98,3 +98,39 @@ class LF(object):
         except:
             output_notebook()
             show(grid)
+
+    def ds(self, *args, **kwargs):
+        print('%s: (latest @ %s)' % (self.code.upper(), self.fp.trade_day[-1]))
+        try:
+            mos = getattr(self.fp, 'ltdmos')('a')
+            ar = getattr(self.fp, 'fdc')('b')
+            dm, ds = ar['Delta'].mean(), ar['Delta'].std()
+            lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
+            lc, cs = ar['Close'].values[-1], ar['Close'].std()
+            print('Close: %i' % lc)
+            print("%sVolume over mean: %.2f%%" % (linesep, lv / vm* 100.))
+            print("Volume over (mean + std): %.2f%%" % (lv / (vm +vs) * 100.))
+            il = list(filter(lambda _:(_ > lc - cs) and (_ < lc + cs), mos))
+            ol = list(filter(lambda _:(_ < lc - cs) or (_ > lc + cs), mos))
+            print('%sWithin statistical range:' % linesep, il)
+            ml = list(filter(lambda _:_ > lc, ol))
+            csl = list(filter(lambda _:_ not in ml, ol))
+            if ml: print('%sMoon shot:' % linesep, ml)
+            if csl: print('China syndrome:', csl)
+            xd = getattr(self.fp, 'xfinder')('d')
+            dtxd = xd.transpose().to_dict()
+            if len(dtxd.keys()):
+                print('%sDelta extreme case:' % linesep)
+                for _ in list(dtxd.keys()):
+                    print("%s: %i (%i - %i)" % (dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta'], dm - ds, dm + ds))
+        except:pass
+        try:
+            ai = getattr(self.fp, 'fdc')('i')
+            xr = getattr(self.fp, 'xfinder')('r')
+            rm, rs = ai['RSI'].mean(), ai['RSI'].std()
+            dtxr = xr.transpose().to_dict()
+            if len(dtxr.keys()):
+                print('RSI extreme case:')
+                for _ in list(dtxr.keys()):
+                    print("%s: %.3f (%.3f - %.3f)" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI'], rm - rs, rm + rs))
+        except:pass
