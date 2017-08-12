@@ -2,7 +2,7 @@
 Local Futures (sqlite) analysis using pandas, matplotlib (visualize) via pyplot.
 """
 him = getattr(__import__('handy'), 'him')
-__ = him([{'utilities':('dvs', 'gr', 'get_month')}, ({'trial01':('I2',), 'pandas':()}, "alias={'I2':'I2', 'pandas':'pd'}")])
+__ = him([{'utilities':('dvs', 'gr', 'get_month')}, ({'trial01':('I2',), 'pandas':(), 'os':('linesep',)}, "alias={'I2':'I2', 'pandas':'pd'}")])
 for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 
 class PI(I2):
@@ -12,13 +12,18 @@ Require parameter: 'code'
     """
     def __init__(self, *args, **kwargs):
         if args:
-            code = args[0]
-            if len(args) >= 2: period = args[1]
-        if 'code' in kwargs.keys(): code = kwargs['code']
-        if 'period' in kwargs.keys(): period = kwargs['period']
+            self.code = args[0]
+            if len(args) >= 2: self.period = args[1]
+        if 'code' in kwargs.keys(): self.code = kwargs['code']
+        if 'period' in kwargs.keys(): self.period = kwargs['period']
         if (len(args) <= 2) or ('code' in kwargs.keys()):
-            if (len(args) == 2) or ('period' in kwargs.keys()): super(PI, self).__init__(code, period)
-            else: super(PI, self).__init__(code)
+            if (len(args) == 2) or ('period' in kwargs.keys()): super(PI, self).__init__(self.code, self.period)
+            else: super(PI, self).__init__(self.code)
+
+    def __del__(self):
+        self.code = self.period = None
+        del(self.period)
+        del(self.code)
 
     def fdc(self, *args, **kwargs):
         """
@@ -207,3 +212,39 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
             result.append(bsxmrs)
         if len(result) == 1: return result[0]
         return result
+
+    def ds(self, *args, **kwargs):
+        print('%s: (latest @ %s)' % (self.code.upper(), self.trade_day[-1]))
+        try:
+            mos = self.ltdmos('a')
+            ar = self.fdc('b')
+            dm, ds = ar['Delta'].mean(), ar['Delta'].std()
+            lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
+            lc, cs = ar['Close'].values[-1], ar['Close'].std()
+            print('Close: %i' % lc)
+            print("%sVolume over mean: %.2f%%" % (linesep, lv / vm* 100.))
+            print("Volume over (mean + std): %.2f%%" % (lv / (vm +vs) * 100.))
+            il = list(filter(lambda _:(_ > lc - cs) and (_ < lc + cs), mos))
+            ol = list(filter(lambda _:(_ < lc - cs) or (_ > lc + cs), mos))
+            print('%sWithin statistical range:' % linesep, il)
+            ml = list(filter(lambda _:_ > lc, ol))
+            csl = list(filter(lambda _:_ not in ml, ol))
+            if ml: print('%sMoon shot:' % linesep, ml)
+            if csl: print('China syndrome:', csl)
+            xd = self.xfinder('d')
+            dtxd = xd.transpose().to_dict()
+            if len(dtxd.keys()):
+                print('%sDelta extreme case:' % linesep)
+                for _ in list(dtxd.keys()):
+                    print("%s: %i (%i - %i)" % (dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta'], dm - ds, dm + ds))
+        except:pass
+        try:
+            ai = self.fdc('i')
+            xr = self.xfinder('r')
+            rm, rs = ai['RSI'].mean(), ai['RSI'].std()
+            dtxr = xr.transpose().to_dict()
+            if len(dtxr.keys()):
+                print('RSI extreme case:')
+                for _ in list(dtxr.keys()):
+                    print("%s: %.3f (%.3f - %.3f)" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI'], rm - rs, rm + rs))
+        except:pass
