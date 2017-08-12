@@ -1,5 +1,5 @@
 him = getattr(__import__('handy'), 'him')
-__ = him({'utilities':('mtf','waf'), 'bt':('LF',), 'os':('linesep',)})
+__ = him({'utilities':('mtf','waf'), 'bt':('LF',), 'os':('linesep',), 'sys':('version_info',)})
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 def an(*args, **kwargs):
     if args: pf = mtf(args[0])
@@ -37,4 +37,20 @@ def an(*args, **kwargs):
         if ml: print('%sMoon shot:' % linesep, ml)
         if csl: print('China syndrome:', csl)
     except:pass
-an('mhi')
+
+if __name__ == "__main__":
+    confirm = 'Y'
+    while confirm.upper() != 'N':
+        if version_info.major == 2: ct = raw_input("Futures (C)ode/(T)ype: ")
+        if version_info.major == 3: ct = input("Futures (C)ode/(T)ype: ")
+        if ct.upper() == 'C':
+            if version_info.major == 2: contract = raw_input('Contract: ')
+            if version_info.major == 3: contract = input('Contract: ')
+            if contract.upper() in waf(): an(code=contract.upper())
+        elif ct.upper() == 'T':
+            if version_info.major == 2: tp = raw_input('Type (H)SI/(M)HI: ')
+            if version_info.major == 3: tp = input('Type (H)SI/(M)HI: ')
+            if tp.upper() == 'H': an('hsi')
+            elif tp.upper() == 'M': an('mhi')
+        if version_info.major == 2: confirm = raw_input("Proceed (Y)es/(N)o: ")
+        if version_info.major == 3: confirm = input("Proceed (Y)es/(N)o: ")
