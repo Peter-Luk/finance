@@ -13,8 +13,9 @@ def an(*args, **kwargs):
         xr = getattr(mpd, 'xfinder')('r')
         rm, rs = ai['RSI'].mean(), ai['RSI'].std()
         dtxr = xr.transpose().to_dict()
-        for _ in list(dtxr.keys()):
-            print("%s: RSI @ %.3f (%.3f - %.3f)" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI'], rm - rs, rm + rs))
+        if len(dtxr.keys()):
+            for _ in list(dtxr.keys()):
+                print("%s: RSI @ %.3f (%.3f - %.3f)" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI'], rm - rs, rm + rs))
     except:pass
     try:
         mos = getattr(mpd, 'ltdmos')('a')
@@ -22,8 +23,9 @@ def an(*args, **kwargs):
         xd = getattr(mpd, 'xfinder')('d')
         dm, ds = ar['Delta'].mean(), ar['Delta'].std()
         dtxd = xd.transpose().to_dict()
-        for _ in list(dtxd.keys()):
-            print("%s: delta @ %i (%i - %i)" % (dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta'], dm - ds, dm + ds))
+        if len(dtxd.keys()):
+            for _ in list(dtxd.keys()):
+                print("%s: delta @ %i (%i - %i)" % (dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta'], dm - ds, dm + ds))
         lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
         lc, cs = ar['Close'].values[-1], ar['Close'].std()
         print('%sLatest Close: %i' % (linesep, lc))
