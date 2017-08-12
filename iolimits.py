@@ -6,11 +6,7 @@ def an(*args, **kwargs):
     if 'futures_type' in list(kwargs.keys()): fit = kwargs['futures_type']
     pf = mtf(fit)
     mpd = getattr(lf(pf), 'fp')
-#    ai, ar, mos = getattr(mpd, 'fdc')('i'), getattr(mpd, 'fdc')('b'), getattr(mpd, 'ltdmos')('a')
-#    ai = getattr(mpd, 'fdc')('i')
     print('%s: (latest @ %s)' % (pf, mpd.trade_day[-1]))
-#    xd = getattr(mpd, 'xfinder')('d')
-#    xr = getattr(mpd, 'xfinder')('r')
     try:
         mos = getattr(mpd, 'ltdmos')('a')
         ar = getattr(mpd, 'fdc')('b')
