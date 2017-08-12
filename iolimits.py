@@ -1,10 +1,11 @@
 him = getattr(__import__('handy'), 'him')
-__ = him({'utilities':('mtf',), 'bt':('LF',), 'os':('linesep',)})
+__ = him({'utilities':('mtf','waf'), 'bt':('LF',), 'os':('linesep',)})
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 def an(*args, **kwargs):
-    if args: fit = args[0]
-    if 'futures_type' in list(kwargs.keys()): fit = kwargs['futures_type']
-    pf = mtf(fit)
+    if args: pf = mtf(args[0])
+    if 'futures_type' in list(kwargs.keys()): pf = mtf(kwargs['futures_type'])
+    if 'code' in list(kwargs.keys()):
+        if kwargs['code'] in waf(): pf = kwargs['code']
     mpd = getattr(lf(pf), 'fp')
     print('%s: (latest @ %s)' % (pf, mpd.trade_day[-1]))
     try:
