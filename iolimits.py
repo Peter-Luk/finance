@@ -7,7 +7,7 @@ def an(*args, **kwargs):
     if 'code' in list(kwargs.keys()):
         if kwargs['code'] in waf(): pf = kwargs['code']
     mpd = getattr(lf(pf), 'fp')
-    print('%s: (latest @ %s)' % (pf, mpd.trade_day[-1]))
+    print('%s: (latest @ %s)%sExtreme case:' % (pf, mpd.trade_day[-1], linesep))
     try:
         ai = getattr(mpd, 'fdc')('i')
         xr = getattr(mpd, 'xfinder')('r')
@@ -25,12 +25,14 @@ def an(*args, **kwargs):
         for _ in list(dtxd.keys()):
             print("%s: delta @ %i (%i - %i)" % (dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta'], dm - ds, dm + ds))
         lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
+        lc, cs = ar['Close'].values[-1], ar['Close'].std()
+        print('%sLatest Close: %i' % (linesep, lc))
         print("%sVolume over mean: %.2f%%" % (linesep, lv / vm* 100.))
         print("Volume over (mean + std): %.2f%%" % (lv / (vm +vs) * 100.))
-        lc, cs = ar['Close'].values[-1], ar['Close'].std()
+        # lc, cs = ar['Close'].values[-1], ar['Close'].std()
         il = list(filter(lambda _:(_ > lc - cs) and (_ < lc + cs), mos))
         ol = list(filter(lambda _:(_ < lc - cs) or (_ > lc + cs), mos))
-        print('%sLast Close: %i' % (linesep, lc))
+        # print('%sLast Close: %i' % (linesep, lc))
         print('%sWithin statistical range:' % linesep, il)
         ml = list(filter(lambda _:_ > lc, ol))
         csl = list(filter(lambda _:_ not in ml, ol))
