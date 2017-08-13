@@ -214,6 +214,8 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
         return result
 
     def ds(self, *args, **kwargs):
+        programmatic = False
+        if 'programmatic' in list(kwargs.keys()): programmatic = kwargs['programmatic']
         res = {'Code': self.code.upper(), 'Latest': self.trade_day[-1]}
         rest = '%s: (latest @ %s)' % (self.code.upper(), self.trade_day[-1])
         try:
@@ -262,4 +264,5 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
                     rest += '%s%s: %.3f' % (linesep, dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI'])
                 res['RSI']['extreme'] = tl
         except:pass
+        if programmatic == True: return res
         print(rest)
