@@ -215,7 +215,7 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
 
     def ds(self, *args, **kwargs):
         res = {'Code': self.code.upper(), 'Latest': self.trade_day[-1]}
-        print('%s: (latest @ %s)' % (self.code.upper(), self.trade_day[-1]))
+        rest = '%s: (latest @ %s)' % (self.code.upper(), self.trade_day[-1])
         try:
             mos = self.ltdmos('a')
             ar = self.fdc('b')
@@ -225,23 +225,28 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
             res['Delta'] = {'mean': dm, 'std': ds}
             res['Volume'] = {'last': lv, 'mean': vm, 'std': vs}
             res['Close'] = {'last': lc, 'std': cs}
-            print('Close: %i' % lc)
-            print("%sVolume over mean: %.2f%%" % (linesep, lv / vm* 100.))
-            print("Volume over (mean + std): %.2f%%" % (lv / (vm +vs) * 100.))
+            rest += '%sClose: %i%s%sVolume over mean: %.2f %%%sVolume over (mean + std): %.2f %%' % (linesep, lc, linesep, linesep, lv / vm * 100., linesep, lv / (vm + vs) * 100.)
             il = list(filter(lambda _:(_ > lc - cs) and (_ < lc + cs), mos))
             ol = list(filter(lambda _:(_ < lc - cs) or (_ > lc + cs), mos))
             res['Range'] = {'inner': il, 'outer': ol}
-            print('%sWithin statistical range:' % linesep, il)
+            rest += '%s%sWithin statistical range: %s' % (linesep, linesep, il)
             ml = list(filter(lambda _:_ > lc, ol))
             csl = list(filter(lambda _:_ not in ml, ol))
-            if ml: print('%sMoon shot:' % linesep, ml)
-            if csl: print('China syndrome:', csl)
+            if ml:
+                res['Moon'] = ml
+                rest += '%s%sMoon shot: %s' % (linesep, linesep, ml)
+            if csl:
+                res['China'] = csl
+                rest += '%sChina syndrome: %s' % (linesep, csl)
             xd = self.xfinder('d')
             dtxd = xd.transpose().to_dict()
             if len(dtxd.keys()):
-                print('%sDelta extreme case:' % linesep)
+                tl = []
+                rest += '%s%sDelta extreme case (< %i or > %i)' % (linesep, linesep, dm - ds, dm + ds)
                 for _ in list(dtxd.keys()):
-                    print("%s: %i (%i - %i)" % (dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta'], dm - ds, dm + ds))
+                    tl.append({dtxd[_]['Date'].strftime('%d-%m-%Y'): dtxd[_]['Delta']})
+                    rest += '%s%s: %i' % (linesep, dtxd[_]['Date'].strftime('%d-%m-%Y'), dtxd[_]['Delta'])
+                res['Delta']['extreme'] = tl
         except:pass
         try:
             ai = self.fdc('i')
@@ -250,7 +255,11 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
             dtxr = xr.transpose().to_dict()
             res['RSI'] = {'mean': rm, 'std': rs}
             if len(dtxr.keys()):
-                print('RSI extreme case:')
+                tl = []
+                rest += '%sRSI extreme case (< %.3f or > %.3f)' % (linesep, rm - rs, rm + rs)
                 for _ in list(dtxr.keys()):
-                    print("%s: %.3f (%.3f - %.3f)" % (dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI'], rm - rs, rm + rs))
+                    tl.append({dtxr[_]['Date'].strftime('%d-%m-%Y'):dtxr[_]['RSI']})
+                    rest += '%s%s: %.3f' % (linesep, dtxr[_]['Date'].strftime('%d-%m-%Y'), dtxr[_]['RSI'])
+                res['RSI']['extreme'] = tl
         except:pass
+        print(rest)
