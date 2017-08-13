@@ -214,6 +214,7 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
         return result
 
     def ds(self, *args, **kwargs):
+        res = {'Code': self.code.upper(), 'Latest': self.trade_day[-1]}
         print('%s: (latest @ %s)' % (self.code.upper(), self.trade_day[-1]))
         try:
             mos = self.ltdmos('a')
@@ -221,11 +222,15 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
             dm, ds = ar['Delta'].mean(), ar['Delta'].std()
             lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
             lc, cs = ar['Close'].values[-1], ar['Close'].std()
+            res['Delta'] = {'mean': dm, 'std': ds}
+            res['Volume'] = {'last': lv, 'mean': vm, 'std': vs}
+            res['Close'] = {'last': lc, 'std': cs}
             print('Close: %i' % lc)
             print("%sVolume over mean: %.2f%%" % (linesep, lv / vm* 100.))
             print("Volume over (mean + std): %.2f%%" % (lv / (vm +vs) * 100.))
             il = list(filter(lambda _:(_ > lc - cs) and (_ < lc + cs), mos))
             ol = list(filter(lambda _:(_ < lc - cs) or (_ > lc + cs), mos))
+            res['Range'] = {'inner': il, 'outer': ol}
             print('%sWithin statistical range:' % linesep, il)
             ml = list(filter(lambda _:_ > lc, ol))
             csl = list(filter(lambda _:_ not in ml, ol))
@@ -243,6 +248,7 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
             xr = self.xfinder('r')
             rm, rs = ai['RSI'].mean(), ai['RSI'].std()
             dtxr = xr.transpose().to_dict()
+            res['RSI'] = {'mean': rm, 'std': rs}
             if len(dtxr.keys()):
                 print('RSI extreme case:')
                 for _ in list(dtxr.keys()):
