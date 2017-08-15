@@ -230,7 +230,6 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
             rest += '%sClose: %i%s%sVolume over (mean = %.2f): %.2f %%%sVolume over (mean + std = %.2f): %.2f %%' % (linesep, lc, linesep, linesep, vm, lv / vm * 100., linesep, vm + vs, lv / (vm + vs) * 100.)
             il = list(filter(lambda _:(_ > lc - cs) and (_ < lc + cs), mos))
             ol = list(filter(lambda _:(_ < lc - cs) or (_ > lc + cs), mos))
-            # res['Range'] = {'inner': il, 'outer': ol}
             res['Range'] = il
             rest += '%s%sWithin statistical range: %s' % (linesep, linesep, il)
             ml = list(filter(lambda _:_ > lc, ol))
