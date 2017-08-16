@@ -17,7 +17,7 @@ if __name__ == "__main__":
             if version_info.major == 3: tp = input('Type (H)SI/(M)HI: ')
             if tp.upper() == 'H': code = mtf('hsi')
             elif tp.upper() == 'M': code = mtf('mhi')
-        try: pi(code).ds(programmatic=False)
+        try: print(pi(code).ds(programmatic=False))
         except: print("Only for local futures (current or next calender) month")
         if version_info.major == 2: confirm = raw_input("Proceed (Y)es/(N)o: ")
         if version_info.major == 3: confirm = input("Proceed (Y)es/(N)o: ")

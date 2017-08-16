@@ -265,4 +265,4 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
                 res['RSI']['extreme'] = tl
         except:pass
         if programmatic == True: return res
-        print(rest)
+        return rest
