@@ -1,5 +1,5 @@
 him = getattr(__import__('handy'), 'him')
-__ = him({'utilities':('mtf','waf'), 'pt_2':('PI',), 'sys':('version_info',)})
+__ = him([{'utilities':('mtf','waf'), 'pt_2':('PI',), 'sys':('version_info',)},({'multiprocessing':()}, "alias='mp'")])
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 
 if __name__ == "__main__":
