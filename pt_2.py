@@ -214,6 +214,10 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
         return result
 
     def ds(self, *args, **kwargs):
+        """
+        Accept sole boolean argument `programmatic` only,
+        If True return result in dict type,others in plain text.
+        """
         programmatic = True
         if 'programmatic' in list(kwargs.keys()): programmatic = kwargs['programmatic']
         res = {'Code': self.code.upper(), 'Latest': self.trade_day[-1]}
