@@ -22,11 +22,13 @@ Require parameter: 'code'
         if (len(args) <= 2) or ('code' in kwargs.keys()):
             if (len(args) == 2) or ('period' in kwargs.keys()): super(PI, self).__init__(self.code, self.period)
             else: super(PI, self).__init__(self.code)
+        self.__queue = Queue()
 
     def __del__(self):
-        self.code = self.period = None
+        self.code = self.period = self.__queue = None
         del(self.period)
         del(self.code)
+        del(self.__queue)
 
     def fdc(self, *args, **kwargs):
         """
@@ -57,8 +59,9 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
                 dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
             dd['ATR'] = [self.ATR(date=d) for d in self.trade_day[self.period+1:]]
             dd['MAO'] = [ma_order(date=d) for d in self.trade_day[self.period+1:]]
-            t = pd.DataFrame(dd)
-            return t.loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
+            res = pd.DataFrame(dd).loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
+            self.__queue.put(res)
+            return res
         elif option in ['I', 'i']:
             r_date = self.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
@@ -67,16 +70,18 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
             dd['EMA'] = [self.EMA(date=i) for i in r_date]
             dd['KAMA'] = [self.KAMA(date=i) for i in r_date]
             dd['RSI'] = [self.RSI(date=i) for i in r_date]
-            t = pd.DataFrame(dd)
-            return t.loc[:, ['Date', 'WMA', 'SMA', 'EMA', 'KAMA', 'RSI']]
+            res = pd.DataFrame(dd).loc[:, ['Date', 'WMA', 'SMA', 'EMA', 'KAMA', 'RSI']]
+            self.__queue.put(res)
+            return res
         elif option in ['O', 'o']:
             r_date = self.trade_day[self.period+1:]
             dd['Date'] = [pd.Timestamp(d) for d in r_date]
             dd['APZ'] = [self.APZ(date=i) for i in r_date]
             dd['BB'] = [self.BB(date=i) for i in r_date]
             dd['KC'] = [self.KC(date=i) for i in r_date]
-            t = pd.DataFrame(dd)
-            return t.loc[:, ['Date', 'APZ', 'BB', 'KC']]
+            res = pd.DataFrame(dd).loc[:, ['Date', 'APZ', 'BB', 'KC']]
+            self.__queue.put(res)
+            return res
 
     def ltdmos(self, *args, **kwargs):
         option, result = 'A', []
