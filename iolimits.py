@@ -9,8 +9,11 @@ if platform in ['linux', 'linux2']:
     __ = him(rm)
 for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 
+q = Queue()
+
 def f(x):
-    q.put(pi(x).ds(programmatic=False))
+    if platform in ['linux', 'linux2']: q.put(pi(x).ds(programmatic=False))
+    return pi(x).ds(programmatic=False)
 
 if __name__ == "__main__":
     confirm = 'Y'
