@@ -19,7 +19,7 @@ def f(x):
 if __name__ == "__main__":
     confirm = 'Y'
     if platform in ['linux', 'linux2']:
-        dmp, q = {}, Queue()
+        dmp = {}
         for _ in waf():
             p = Thread(target=f, name=_, args=(_,))
             p.start()
