@@ -12,7 +12,7 @@ for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 q = Queue()
 
 def f(x):
-    res = pi(x).ds(programmatic=False) 
+    res = pi(x).ds(programmatic=False)
     if platform in ['linux', 'linux2']: q.put(res)
     return res
 
