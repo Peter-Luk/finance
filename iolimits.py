@@ -1,5 +1,5 @@
 him = getattr(__import__('handy'), 'him')
-__ = him([{'utilities':('mtf', 'waf'), 'pt_2':('PI',), 'sys':('version_info', 'platform')}, ({'threading':('Thread', 'Lock')}, "case='capitalize'")])
+__ = him([{'utilities':('mtf', 'waf'), 'pt_2':('PI',), 'sys':('version_info', 'platform')}])
 for _ in list(__.keys()): exec("%s=__['%s']" % (_,_))
 if platform == 'win32': __ = him([({'multiprocessing':('Pool', 'Queue')}, "case='capitalize'")])
 if platform in ['linux', 'linux2']:
@@ -42,7 +42,6 @@ if __name__ == "__main__":
             if version_info.major == 3: tp = input('Type (H)SI/(M)HI: ')
             if tp.upper() == 'H': code = mtf('hsi')
             elif tp.upper() == 'M': code = mtf('mhi')
-        # try: print(pi(code).ds(programmatic=False))
         try:
             if platform in ['linux', 'linux2']: print(dmp[code])
             if platform == 'win32': print(res[waf().index(code)])
