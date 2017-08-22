@@ -52,38 +52,50 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
         elif 'option' in kwargs.keys(): option = kwargs['option']
 
         if option in ['B', 'b']:
-            data, hdr = [], {}
-            for i in self.trade_day[self.period+1:]:
-                hdr = self._I2__rangefinder(field='date', value=i)['D']
-                hdr['date'] = pd.Timestamp(i)
-                data.append(hdr)
-            for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'):
-                dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
-            dd['ATR'] = [self.ATR(date=d) for d in self.trade_day[self.period+1:]]
-            dd['MAO'] = [ma_order(date=d) for d in self.trade_day[self.period+1:]]
-            res = pd.DataFrame(dd).loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
-            self.__queue.put(res)
-            return res
+            if 'b' in list(self.__fdc.keys()):
+                # self.__queue.put(self.__fdc['b'])
+                return self.__fdc['b']
+            else:
+                data, hdr = [], {}
+                for i in self.trade_day[self.period+1:]:
+                    hdr = self._I2__rangefinder(field='date', value=i)['D']
+                    hdr['date'] = pd.Timestamp(i)
+                    data.append(hdr)
+                for dk in ('date', 'open', 'high', 'low', 'close', 'delta', 'volume'):
+                    dd[dk.capitalize()] = [data[i][dk] for i in range(len(data))]
+                dd['ATR'] = [self.ATR(date=d) for d in self.trade_day[self.period+1:]]
+                dd['MAO'] = [ma_order(date=d) for d in self.trade_day[self.period+1:]]
+                res = pd.DataFrame(dd).loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
+                self.__queue.put(res)
+                return res
         elif option in ['I', 'i']:
-            r_date = self.trade_day[self.period+1:]
-            dd['Date'] = [pd.Timestamp(d) for d in r_date]
-            dd['SMA'] = [self.SMA(date=i) for i in r_date]
-            dd['WMA'] = [self.WMA(date=i) for i in r_date]
-            dd['EMA'] = [self.EMA(date=i) for i in r_date]
-            dd['KAMA'] = [self.KAMA(date=i) for i in r_date]
-            dd['RSI'] = [self.RSI(date=i) for i in r_date]
-            res = pd.DataFrame(dd).loc[:, ['Date', 'WMA', 'SMA', 'EMA', 'KAMA', 'RSI']]
-            self.__queue.put(res)
-            return res
+            if 'i' in list(self.__fdc.keys()):
+                # self.__queue.put(self.__fdc['i'])
+                return self.__fdc['i']
+            else:
+                r_date = self.trade_day[self.period+1:]
+                dd['Date'] = [pd.Timestamp(d) for d in r_date]
+                dd['SMA'] = [self.SMA(date=i) for i in r_date]
+                dd['WMA'] = [self.WMA(date=i) for i in r_date]
+                dd['EMA'] = [self.EMA(date=i) for i in r_date]
+                dd['KAMA'] = [self.KAMA(date=i) for i in r_date]
+                dd['RSI'] = [self.RSI(date=i) for i in r_date]
+                res = pd.DataFrame(dd).loc[:, ['Date', 'WMA', 'SMA', 'EMA', 'KAMA', 'RSI']]
+                self.__queue.put(res)
+                return res
         elif option in ['O', 'o']:
-            r_date = self.trade_day[self.period+1:]
-            dd['Date'] = [pd.Timestamp(d) for d in r_date]
-            dd['APZ'] = [self.APZ(date=i) for i in r_date]
-            dd['BB'] = [self.BB(date=i) for i in r_date]
-            dd['KC'] = [self.KC(date=i) for i in r_date]
-            res = pd.DataFrame(dd).loc[:, ['Date', 'APZ', 'BB', 'KC']]
-            self.__queue.put(res)
-            return res
+            if 'o' in list(self.__fdc.keys()):
+                # self.__queue.put(self.__fdc['o'])
+                return self.__fdc['o']
+            else:
+                r_date = self.trade_day[self.period+1:]
+                dd['Date'] = [pd.Timestamp(d) for d in r_date]
+                dd['APZ'] = [self.APZ(date=i) for i in r_date]
+                dd['BB'] = [self.BB(date=i) for i in r_date]
+                dd['KC'] = [self.KC(date=i) for i in r_date]
+                res = pd.DataFrame(dd).loc[:, ['Date', 'APZ', 'BB', 'KC']]
+                self.__queue.put(res)
+                return res
 
     def ltdmos(self, *args, **kwargs):
         option, result = 'A', []
