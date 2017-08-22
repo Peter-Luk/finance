@@ -123,7 +123,7 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
             result.extend(list(otemp.BB.values[-1]))
 #            [result.extend(list(eval('otemp.%s.values[%i]' % (k.upper(), -1)))) for k in ['kc', 'apz', 'bb']]
         result.sort()
-        self.__queue.put(result)
+        # self.__queue.put(result)
         return result
 
     def plot(self, **kwargs):
