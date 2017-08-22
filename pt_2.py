@@ -23,12 +23,14 @@ Require parameter: 'code'
             if (len(args) == 2) or ('period' in kwargs.keys()): super(PI, self).__init__(self.code, self.period)
             else: super(PI, self).__init__(self.code)
         self.__queue = Queue()
+        self.__fdc = {}
 
     def __del__(self):
-        self.code = self.period = self.__queue = None
+        self.code = self.period = self.__queue = self.__fdc = None
         del(self.period)
         del(self.code)
         del(self.__queue)
+        del(self.__fdc)
 
     def fdc(self, *args, **kwargs):
         """
@@ -87,16 +89,23 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
         option, result = 'A', []
         if args: option = args[0]
         elif 'option' in kwargs.keys(): option = kwargs['option']
+        reqo = ['i', 'o']
+        for _ in reqo:
+            if _ not in list(self.__fdc.keys()):
+                p = Thread(target=self.fdc, name=_, args=(_,))
+                p.start()
+                self.__fdc[_] = self.__queue.get()
+                p.join()
 
         if option in ['M', 'm', 'A', 'a']:
-            itemp = self.fdc('i')
+            itemp = self.__fdc['i']
             result.append(int(round(itemp.KAMA.values[-1])))
             result.append(int(round(itemp.EMA.values[-1])))
             result.append(int(round(itemp.SMA.values[-1])))
             result.append(int(round(itemp.WMA.values[-1])))
 #            result.extend([int(round(eval('itemp.%s.values[%i]' % (k.upper(), -1)), 0)) for k in ['kama', 'ema', 'sma', 'wma']])
         if option in ['O', 'o', 'A', 'a']:
-            otemp = self.fdc('o')
+            otemp = self.__fdc['o']
             result.extend(list(otemp.KC.values[-1]))
             result.extend(list(otemp.APZ.values[-1]))
             result.extend(list(otemp.BB.values[-1]))
@@ -182,30 +191,38 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
         if args: option = args[0]
         elif 'option' in kwargs.keys(): option = kwargs['option']
 
+        reqo = ['i', 'b']
+        for _ in reqo:
+            if _ not in list(self.__fdc.keys()):
+                p = Thread(target=self.fdc, name=_, args=(_,))
+                p.start()
+                self.__fdc[_] = self.__queue.get()
+                p.join()
+
         def snl(*args):
             idx, ratio = args[0], gr
             if len(args) > 1: ratio = args[1]
             if idx in ['rsi', 'RSI']:
-                t = self.fdc(option='I')
+                t = self.__fdc['i']
                 result = [t.RSI.mean() + ratio * i for i in [-t.RSI.std(), t.RSI.std()]]
             elif idx in ['Delta', 'delta']:
-                t = self.fdc(option='B')
+                t = self.__fdc['b']
                 result = [t.Delta.mean() + ratio * i for i in [-t.Delta.std(), t.Delta.std()]]
             elif idx in ['ATR', 'atr']:
-                tt = self.fdc("B")
-                t = tt[self.period:]
+                # tt = self.__fdc['b']
+                t = self.__fdc['b'][self.period:]
                 result = [t.ATR.mean() + ratio * i for i in [-t.ATR.std(), t.ATR.std()]]
             return result
 
         if option in ['F', 'D', 'f', 'd']:
-            tb = self.fdc()
+            tb = self.__fdc['b']
             amd, bmd = tb[tb.Delta > snl('Delta')[-1]], tb[tb.Delta < snl('Delta')[0]]
             xmd = pd.concat([amd, bmd])
             xmds = xmd.sort_values('Date')
             bsxmd = xmds.loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
             result.append(bsxmd)
         if option in ['F', 'A', 'f', 'a']:
-            tb = self.fdc()
+            tb = self.__fdc['b']
             rtb = tb[self.period+1:]
             amtr, bmtr = rtb[rtb.ATR > snl('ATR')[-1]], rtb[rtb.ATR < snl('ATR')[0]]
             xmtr = pd.concat([amtr, bmtr])
@@ -213,13 +230,14 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
             bsxmtr = xmtrs.loc[:, ['Date', 'Delta', 'ATR', 'MAO', 'Open', 'High', 'Low', 'Close', 'Volume']]
             result.append(bsxmtr)
         if option in ['F', 'R', 'f', 'r']:
-            ti = self.fdc('I')
+            ti = self.__fdc['i']
             amrs, bmrs = ti[ti.RSI > snl('RSI')[-1]], ti[ti.RSI < snl('RSI')[0]]
             xmrs = pd.concat([amrs, bmrs])
             xmrss = xmrs.sort_values('Date')
             bsxmrs = xmrss.loc[:, ['Date', 'WMA', 'SMA', 'EMA', 'KAMA', 'RSI']]
             result.append(bsxmrs)
         if len(result) == 1: return result[0]
+        self.__queue.put(result)
         return result
 
     def ds(self, *args, **kwargs):
