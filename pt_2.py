@@ -7,7 +7,7 @@ for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 if version_info.major == 2: __ = him([({'threading':('Thread',), 'Queue':('Queue',)}, "case='capitalize'")])
 if version_info.major == 3: __ = him([({'threading':('Thread',), 'queue':('Queue',)}, "case='capitalize'")])
 for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
-
+q = Queue()
 class PI(I2):
     """
 Base class to create Pandas DataFrame object for analyse local Futures data.
@@ -124,6 +124,7 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
 #            [result.extend(list(eval('otemp.%s.values[%i]' % (k.upper(), -1)))) for k in ['kc', 'apz', 'bb']]
         result.sort()
         # self.__queue.put(result)
+        q.put(result)
         return result
 
     def plot(self, **kwargs):
@@ -262,7 +263,12 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
         res = {'Code': self.code.upper(), 'Latest': self.trade_day[-1]}
         rest = '%s: (latest @ %s)' % (self.code.upper(), self.trade_day[-1])
         try:
-            mos = self.ltdmos('a')
+            # mos = self.ltdmos('a')
+            # ar = self.fdc('b')
+            p = Thread(target=self.ltdmos, name='mos', args=('a',))
+            p.start()
+            mos = q.get()
+            p.join()
             ar = self.fdc('b')
             dm, ds = ar['Delta'].mean(), ar['Delta'].std()
             lv, vm, vs = ar['Volume'].values[-1], ar['Volume'].mean(), ar['Volume'].std()
