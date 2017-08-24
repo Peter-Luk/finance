@@ -2,11 +2,13 @@ def lstl(*args):
     res, fl = [], args[0]
     if len(args) > 1: sl = args[1]
     if len(fl) == len(sl):
-        while fl:
-            tfl = fl.pop()
-            tsl = sl.pop()
+        i = 0
+        while i < len(fl):
+            tfl = fl[i]
+            tsl = sl[i]
             res.append((tfl, tsl))
-        res.reverse()
+            i += 1
+        # res.reverse()
         return res
 
 def ema(*args):
@@ -16,8 +18,8 @@ def ema(*args):
     count = len(values)
     if count >= steps:
         while count > steps:
-            lval = values.pop()
-            return (ema(values, steps) * (steps - 1) + lval) / steps
+            lval = values[-1]
+            return (ema(values[:-1], steps) * (steps - 1) + lval) / steps
         return sum(values) / steps
 
 def sma(*args):
