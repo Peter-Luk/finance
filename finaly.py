@@ -1,11 +1,11 @@
 def lstl(*args):
-    res, tl = [], [args[0]]
-    if len(args) > 1: tl.append(args[1])
-    if len(tl[0]) == len(tl[1]):
-        while tl[0]:
-            t0 = tl[0].pop()
-            t1 = tl[1].pop()
-            res.append((t0, t1))
+    res, fl = [], args[0]
+    if len(args) > 1: sl = args[1]
+    if len(fl) == len(sl):
+        while fl:
+            tfl = fl.pop()
+            tsl = sl.pop()
+            res.append((tfl, tsl))
         res.reverse()
         return res
 
