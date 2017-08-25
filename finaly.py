@@ -100,7 +100,7 @@ def kama(*args):
         fc = 2 / (steps + 1)
         sc = 2 / (2 + 1)
         while count > steps:
-            er = (values[-1] - values[-steps]) / absum(delta(values[-steps:-1]))
+            er = (values[-1] - values[-steps]) / absum(delta(values[-steps:]))
             alpha = (er + (fc - sc) + sc) ** 2
             pk = kama(values[:-1], steps)
             return alpha * (values[-1] - pk) + pk
