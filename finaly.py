@@ -20,6 +20,14 @@ def delta(*args):
         i += 1
     return res
 
+def absum(*args):
+    i, res, values = 0, 0, args[0]
+    while i < len(values):
+        if values[i] > 0: res += values[i]
+        if values[i] < 0: res += -values[i]
+        i += 1
+    return res
+
 def ema(*args):
     steps = 12
     values = args[0]
@@ -92,7 +100,7 @@ def kama(*args):
         fc = 2 / (steps + 1)
         sc = 2 / (2 + 1)
         while count > steps:
-            er = (values[-1] - values[-steps])
+            er = (values[-1] - values[-steps]) / absum(delta(values[-steps:-1]))
             alpha = (er + (fc - sc) + sc) ** 2
             pk = kama(values[:-1], steps)
             return alpha * (values[-1] - pk) + pk
