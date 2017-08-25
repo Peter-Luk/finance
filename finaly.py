@@ -1,3 +1,5 @@
+from statistics import stdev
+
 def lstl(*args):
     res, tl = [], [args[0]]
     if len(args) > 1: tl.append(args[1])
@@ -10,6 +12,13 @@ def lstl(*args):
             i += 1
         # res.reverse()
         return res
+
+def delta(*args):
+    i, res, values = 0, [], args[0]
+    while i < len(values) - 1:
+        res.append(values[i + 1] - values[i])
+        i += 1
+    return res
 
 def ema(*args):
     steps = 12
@@ -42,13 +51,16 @@ def wma(*args):
 def rsi(*args):
     values, steps  = args[0], 12
     if len(args) > 1: steps = args[1]
-    i, dl = 0, []
-    while i < len(values) - 1:
-        dl.append(values[i + 1] - values[i])
-        i += 1
+    dl = delta(values)
+    # i = 0
+    # while i < len(values) - 1:
+        # dl.append(values[i + 1] - values[i])
+        # i += 1
 
     def ag(*args):
-        gs, i, t, values, steps = 0, 0, 0, args[0], 12
+        gs = i = t = 0
+        values, steps = args[0], 12
+        if len(args) > 1: steps = args[1]
         while steps < len(values):
             if values[-1] > 0: t = values[-1]
             return (ag(values[:-1], steps) * (steps - 1) + t) / steps
@@ -58,7 +70,9 @@ def rsi(*args):
         return gs / steps
 
     def al(*args):
-        ls, i, t, values, steps = 0, 0, 0, args[0], 12
+        ls = i = t = 0
+        values, steps = args[0], 12
+        if len(args) > 1: steps = args[1]
         while steps < len(values):
             if values[-1] < 0: t = abs(values[-1])
             return (al(values[:-1], steps) * (steps - 1) + t) / steps
@@ -66,5 +80,6 @@ def rsi(*args):
             if values[i] < 0: ls += abs(values[i])
             i += 1
         return ls / steps
-    rs = ag(dl, 12) / al(dl, 12)
+
+    rs = ag(dl, steps) / al(dl, steps)
     return 100 - 100 / (1 + rs)
