@@ -83,3 +83,17 @@ def rsi(*args):
 
     rs = ag(dl, steps) / al(dl, steps)
     return 100 - 100 / (1 + rs)
+
+def kama(*args):
+    steps, values = 12, args[0]
+    if len(args) > 1: steps = args[1]
+    count = len(values)
+    if count >= steps:
+        fc = 2 / (steps + 1)
+        sc = 2 / (2 + 1)
+        while count > steps:
+            er = (values[-1] - values[-steps])
+            alpha = (er + (fc - sc) + sc) ** 2
+            pk = kama(values[:-1], steps)
+            return alpha * (values[-1] - pk) + pk
+        return sum(values) / steps
