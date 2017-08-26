@@ -54,14 +54,6 @@ class Futures(object):
         if programmatic: return hdr
         return list(hdr.values())
 
-    def absum(self, *args):
-        i, res, values = 0, 0, args[0]
-        while i < len(values):
-            if values[i] > 0: res += values[i]
-            if values[i] < 0: res += -values[i]
-            i += 1
-        return res
-
     def delta(self, *args):
         i, res, values = 0, [], args[0]
         while i < len(values) - 1:
@@ -82,16 +74,30 @@ class Futures(object):
             return sum(res[-steps:]) / sum(ys[-steps:])
     def kama(self, *args, **kwargs):
         steps, values = 12, self.extract()
+        fast, slow = steps, 2
         if args: values = args[0]
         if len(args) > 1: steps = args[1]
+        if len(args) > 2: fast = args[2]
+        if len(args) > 3: slow = args[3]
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        if 'fast' in list(kwargs.keys()): fast = kwargs['fast']
+        if 'slow' in list(kwargs.keys()): slow = kwargs['slow']
+
+        def absum(*args):
+            i, res, values = 0, 0, args[0]
+            while i < len(values):
+                if values[i] > 0: res += values[i]
+                if values[i] < 0: res += -values[i]
+                i += 1
+            return res
+
         count = len(values)
         if count >= steps:
-            fc = 2 / (steps + 1)
-            sc = 2 / (2 + 1)
+            fc = 2. / (fast + 1)
+            sc = 2. / (slow + 1)
             while count > steps:
-                er = (values[-1] - values[-steps]) / self.absum(self.delta(values[-steps:]))
-                alpha = (er + (fc - sc) + sc) ** 2
+                er = (values[-1] - values[-steps]) / absum(self.delta(values[-steps:]))
+                alpha = (er * (fc - sc) + sc) ** 2
                 pk = self.kama(values[:-1], steps)
                 return alpha * (values[-1] - pk) + pk
             return sum(values) / steps
@@ -137,9 +143,7 @@ class Futures(object):
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         count = len(values)
         if count >= steps:
-            while count > steps:
-                lval = values[-1]
-                return (self.ema(values[:-1], steps) * (steps - 1) + lval) / steps
+            while count > steps: return (self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps
             return sum(values) / steps
 
     def sma(self, *args, **kwargs):
