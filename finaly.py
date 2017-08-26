@@ -1,4 +1,49 @@
-from statistics import stdev
+db_name, db_table = 'Futures', 'records'
+him = getattr(__import__('handy'),'him')
+iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'datetime':('datetime',), 'statistics':('mean', 'stdev'), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
+# iml = [{'utilities':('gr','filepath'),'datetime':('datetime',),'statistics':('mean','stdev'),'os':('sep','linesep')},({'sqlite3':()},"alias='lite'"),({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='upper'")]
+__ = him(iml)
+for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
+
+conn = lite.connect(filepath(db_name))
+conn.row_factory = lite.Row
+
+class Futures(object):
+    def __init__(self, *args, **kwargs):
+        self.code = args[0]
+        if 'code' in list(kwargs.keys()): self.code = kwargs['code']
+        self.__data = conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (db_table, self.code)).fetchall()
+
+    def __del__(self):
+        self.code = self.__data = None
+        del(self.__data)
+        del(self.code)
+
+    def extract(self, *args, **kwargs):
+        hdr, field, programmatic, src = {}, 'close', False, self.__data
+        if args: args[0]
+        if len(args) > 1: field = args[1]
+        if 'field' in list(kwargs.keys()): field = kwargs['field']
+        if 'source' in list(kwargs.keys()): src = kwargs['source']
+        if 'programmatic' in list(kwargs.keys()): programmatic = kwargs['programmatic']
+        for i in src:
+            if field == 'open':
+                if i['date'] in list(hdr.keys()) and i['session'] == 'M': hdr[i['date']] = i['open']
+                hdr[i['date']] = i['open']
+            if field == 'high':
+                if i['date'] in list(hdr.keys()) and i['high'] > hdr[i['date']]: hdr[i['date']] = i['high']
+                hdr[i['date']] = i['high']
+            if field == 'low':
+                if i['date'] in list(hdr.keys()) and i['low'] < hdr[i['date']]: hdr[i['date']] = i['low']
+                hdr[i['date']] = i['low']
+            if field == 'close':
+                if i['date'] in list(hdr.keys()) and i['session'] == 'A': hdr[i['date']] = i['close']
+                hdr[i['date']] = i['close']
+            if field == 'volume':
+                if i['date'] in list(hdr.keys()) and i['session'] == 'A': hdr[i['date']] += i['volume']
+                hdr[i['date']] = i['volume']
+        if programmatic: return hdr
+        return list(hdr.values())
 
 def lstl(*args):
     res, tl = [], [args[0]]
