@@ -1,6 +1,6 @@
 db_name, db_table = 'Futures', 'records'
-him = getattr(__import__('handy'),'him')
-iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'datetime':('datetime',), 'statistics':('mean', 'stdev'), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
+him = getattr(__import__('handy'), 'him')
+iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'statistics':('mean', 'stdev'), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
