@@ -156,7 +156,7 @@ class Futures(object):
                 alpha = (er * (fc - sc) + sc) ** 2
                 pk = self.kama(values[:-1], steps)
                 return alpha * (values[-1] - pk) + pk
-            return sum(values) / steps
+            return mean(values)
 
     def rsi(self, *args, **kwargs):
         values, steps  = self.extract(), self.period
@@ -200,12 +200,11 @@ class Futures(object):
         count = len(values)
         if count >= steps:
             while count > steps: return (self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps
-            return sum(values) / steps
+            return mean(values)
 
     def sma(self, *args, **kwargs):
         steps, values = self.period, self.extract()
         if args: values = args[0]
         if len(args) > 1: steps = args[1]
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        # if len(values) >= steps: return sum(values[-steps:]) / steps
         if len(values) >= steps: return mean(values[-steps:])
