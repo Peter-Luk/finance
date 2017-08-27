@@ -69,26 +69,17 @@ class Futures(object):
                     while i < len(ac):
                         src.append(self.rsi(ac[:i+1], self.period))
                         i += 1
-                if field == 'ema':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.ema(ac[:i+1], self.period))
-                        i += 1
-                if field == 'sma':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.sma(ac[:i+1], self.period))
-                        i += 1
                 if field == 'wma':
                     av = self.extract(field='volume')
                     i -= 1
                     while i < len(ac):
                         src.append(self.wma(self.__bi_values(ac[:i+1], av[:i+1]), self.period))
                         i += 1
-                if field == 'kama':
+                if field in ['ema', 'sma', 'kama']:
                     i -= 1
                     while i < len(ac):
-                        src.append(self.kama(ac[:i+1], self.period))
+                        eval("src.append(self.%s(ac[:i+1], self.period))" % field)
+                        # src.append(self.ema(ac[:i+1], self.period))
                         i += 1
             else: src = self.extract(field=field)
         return stdev(src)
@@ -105,26 +96,16 @@ class Futures(object):
                     while i < len(ac):
                         src.append(self.rsi(ac[:i+1], self.period))
                         i += 1
-                if field == 'ema':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.ema(ac[:i+1], self.period))
-                        i += 1
-                if field == 'sma':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.sma(ac[:i+1], self.period))
-                        i += 1
                 if field == 'wma':
                     av = self.extract(field='volume')
                     i -= 1
                     while i < len(ac):
                         src.append(self.wma(self.__bi_values(ac[:i+1], av[:i+1]), self.period))
                         i += 1
-                if field == 'kama':
+                if field in ['ema', 'sma', 'kama']:
                     i -= 1
                     while i < len(ac):
-                        src.append(self.kama(ac[:i+1], self.period))
+                        eval("src.append(self.%s(ac[:i+1], self.period))" % field)
                         i += 1
             else: src = self.extract(field=field)
         return mean(src)
