@@ -1,6 +1,6 @@
 db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'statistics':('mean', 'stdev'), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
@@ -14,9 +14,15 @@ class Futures(object):
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'period' in list(kwargs.keys()): self.period = kwargs['period']
         self.__data = conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (db_table, self.code)).fetchall()
+        self.close = self.__data[-1]['close']
+        self.latest = self.__data[-1]['date']
+        self.trade_date = self.extract(field='date')
 
     def __del__(self):
-        self.code = self.__data = self.period= None
+        self.code = self.__data = self.period = self.close = self.trade_date = self.latest = None
+        del(self.latest)
+        del(self.trade_date)
+        del(self.close)
         del(self.period)
         del(self.__data)
         del(self.code)
@@ -32,11 +38,12 @@ class Futures(object):
             return res
 
     def extract(self, *args, **kwargs):
-        hdr, field, programmatic, src = {}, 'close', False, self.__data
-        if args: args[0]
+        hdr, field, programmatic, src, req_date = {}, 'close', False, self.__data, datetime.strptime(self.latest, '%Y-%m-%d')
+        if args: src = args[0]
         if len(args) > 1: field = args[1]
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if 'source' in list(kwargs.keys()): src = kwargs['source']
+        if 'date' in list(kwargs.keys()): req_date = datetime.strptime(kwargs['date'], '%Y-%m-%d')
         if 'programmatic' in list(kwargs.keys()): programmatic = kwargs['programmatic']
         for i in src:
             if field == 'open':
@@ -51,11 +58,17 @@ class Futures(object):
             if field == 'close':
                 if i['date'] in list(hdr.keys()) and i['session'] == 'A': hdr[i['date']] = i['close']
                 hdr[i['date']] = i['close']
-            if field == 'volume':
+            if field in ['date', 'volume']:
                 if i['date'] in list(hdr.keys()) and i['session'] == 'A': hdr[i['date']] += i['volume']
                 hdr[i['date']] = i['volume']
-        if programmatic: return hdr
-        return list(hdr.values())
+        _ = {}
+        for i in list(hdr.keys()):
+            if not (datetime.strptime(i, '%Y-%m-%d') > req_date): _[i] = hdr[i]
+        if programmatic:
+            if field == 'date': return list(_.keys())
+            return _
+        if field == 'date': return list(_.keys())
+        return list(_.values())
 
     def std(self, *args, **kwargs):
         field = 'close'
