@@ -71,19 +71,20 @@ class Futures(object):
         return list(_.values())
 
     def std(self, *args, **kwargs):
-        field = 'close'
+        field, date = 'close', self.latest
         if args: src = args[0]
         if len(args) > 1: field = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if not args or ('field' in list(kwargs.keys())):
             if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
-                src, i, ac = [], self.period, self.extract()
+                src, i, ac = [], self.period, self.extract(date=date)
                 if field == 'rsi':
                     while i < len(ac):
                         src.append(self.rsi(ac[:i+1], self.period))
                         i += 1
                 if field == 'wma':
-                    av = self.extract(field='volume')
+                    av = self.extract(field='volume', date=date)
                     i -= 1
                     while i < len(ac):
                         src.append(self.wma(self.__bi_values(ac[:i+1], av[:i+1]), self.period))
@@ -92,25 +93,25 @@ class Futures(object):
                     i -= 1
                     while i < len(ac):
                         eval("src.append(self.%s(ac[:i+1], self.period))" % field)
-                        # src.append(self.ema(ac[:i+1], self.period))
                         i += 1
-            else: src = self.extract(field=field)
+            else: src = self.extract(field=field, date=date)
         return stdev(src)
 
     def mean(self, *args, **kwargs):
-        field = 'close'
+        field, date = 'close', self.latest
         if args: src = args[0]
         if len(args) > 1: field = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if not args or ('field' in list(kwargs.keys())):
             if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
-                src, i, ac = [], self.period, self.extract()
+                src, i, ac = [], self.period, self.extract(date=date)
                 if field == 'rsi':
                     while i < len(ac):
                         src.append(self.rsi(ac[:i+1], self.period))
                         i += 1
                 if field == 'wma':
-                    av = self.extract(field='volume')
+                    av = self.extract(field='volume', date=date)
                     i -= 1
                     while i < len(ac):
                         src.append(self.wma(self.__bi_values(ac[:i+1], av[:i+1]), self.period))
@@ -120,7 +121,7 @@ class Futures(object):
                     while i < len(ac):
                         eval("src.append(self.%s(ac[:i+1], self.period))" % field)
                         i += 1
-            else: src = self.extract(field=field)
+            else: src = self.extract(field=field, date=date)
         return mean(src)
 
     def delta(self, *args):
@@ -134,6 +135,7 @@ class Futures(object):
         steps, values = self.period, self.__bi_values(self.extract(), self.extract(field='volume'))
         if args: values = args[0]
         if len(args) > 1: steps = args[1]
+        if 'date' in list(kwargs.keys()): values = self.__bi_values(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if len(values) >= steps:
             res, ys = [], []
@@ -148,6 +150,7 @@ class Futures(object):
         if len(args) > 1: steps = args[1]
         if len(args) > 2: fast = args[2]
         if len(args) > 3: slow = args[3]
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if 'fast' in list(kwargs.keys()): fast = kwargs['fast']
         if 'slow' in list(kwargs.keys()): slow = kwargs['slow']
@@ -175,6 +178,7 @@ class Futures(object):
         values, steps  = self.extract(), self.period
         if args: values = args[0]
         if len(args) > 1: steps = args[1]
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         dl = self.delta(values)
 
@@ -209,6 +213,7 @@ class Futures(object):
         steps, values = self.period, self.extract()
         if args: values = args[0]
         if len(args) > 1: steps = args[1]
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         count = len(values)
         if count >= steps:
@@ -219,5 +224,6 @@ class Futures(object):
         steps, values = self.period, self.extract()
         if args: values = args[0]
         if len(args) > 1: steps = args[1]
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if len(values) >= steps: return mean(values[-steps:])
