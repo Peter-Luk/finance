@@ -89,10 +89,20 @@ class Futures(object):
                     while i < len(ac):
                         src.append(self.wma(self.__bi_values(ac[:i+1], av[:i+1]), self.period))
                         i += 1
-                if field in ['ema', 'sma', 'kama']:
+                if field == 'ema':
                     i -= 1
                     while i < len(ac):
-                        eval("src.append(self.%s(ac[:i+1], self.period))" % field)
+                        src.append(self.ema(ac[:i+1], self.period))
+                        i += 1
+                if field == 'sma':
+                    i -= 1
+                    while i < len(ac):
+                        src.append(self.sma(ac[:i+1], self.period))
+                        i += 1
+                if field == 'kama':
+                    i -= 1
+                    while i < len(ac):
+                        src.append(self.kama(ac[:i+1], self.period))
                         i += 1
             else: src = self.extract(field=field, date=date)
         return stdev(src)
@@ -116,10 +126,20 @@ class Futures(object):
                     while i < len(ac):
                         src.append(self.wma(self.__bi_values(ac[:i+1], av[:i+1]), self.period))
                         i += 1
-                if field in ['ema', 'sma', 'kama']:
+                if field == 'ema':
                     i -= 1
                     while i < len(ac):
-                        eval("src.append(self.%s(ac[:i+1], self.period))" % field)
+                        src.append(self.ema(ac[:i+1], self.period))
+                        i += 1
+                if field == 'sma':
+                    i -= 1
+                    while i < len(ac):
+                        src.append(self.sma(ac[:i+1], self.period))
+                        i += 1
+                if field == 'kama':
+                    i -= 1
+                    while i < len(ac):
+                        src.append(self.kama(ac[:i+1], self.period))
                         i += 1
             else: src = self.extract(field=field, date=date)
         return mean(src)
