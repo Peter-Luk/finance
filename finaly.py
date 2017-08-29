@@ -229,6 +229,25 @@ class Futures(object):
         rs = ag(dl, steps) / al(dl, steps)
         return 100 - 100 / (1 + rs)
 
+    def apz(self, *args, **kwargs):
+        steps, cs, hs, ls = int(self.period / gr), self.extract(), self.extract(field='high'), self.extract(field='low')
+        if args: steps = args[0]
+        if 'date' in list(kwargs.keys()):
+            cs = self.extract(date=kwargs['date'])
+            hs = self.extract(field='high', date=kwargs['date'])
+            ls = self.extract(field='low', date=kwargs['date'])
+        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        hms = [_[0]-_[-1] for _ in self.__bi_values(hs, ls)]
+        esteps, i = [], steps
+        while i < len(hms):
+            esteps.append(self.ema(hms[:i], steps))
+            i += 1
+        vol = self.ema(esteps, steps)
+        ap = self.ema(cs, steps)
+        ubw = (gr + 1) * vol
+        lbw = (gr - 1) * vol
+        return ap + ubw, ap - lbw
+
     def ema(self, *args, **kwargs):
         steps, values = self.period, self.extract()
         if args: values = args[0]
