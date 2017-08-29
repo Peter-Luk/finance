@@ -243,7 +243,7 @@ class Futures(object):
             esteps.append(self.ema(hms[:i], steps))
             i += 1
         vol = self.ema(esteps, steps)
-        ap = self.ema(cs, steps)
+        ap = self.sma(cs, steps)
         ubw = (gr + 1) * vol
         lbw = (gr - 1) * vol
         return ap + ubw, ap - lbw
