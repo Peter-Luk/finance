@@ -262,9 +262,9 @@ class Futures(object):
     def kc(self, *args, **kwargs):
         steps = self.period
         if args: steps = args[0]
-        ml = self.kama(steps=steps)
+        ml = self.ema(steps=steps)
         if 'date' in list(kwargs.keys()):
-            ml = self.kama(steps=steps, date=kwargs['date'])
+            ml = self.ema(steps=steps, date=kwargs['date'])
             return ml + gr * self.atr(steps=int(steps/gr), date=kwargs['date']), ml - self.atr(steps=int(steps/gr), date=kwargs['date'])
         return ml + gr * self.atr(steps=int(steps/gr)), ml - gr * self.atr(steps=int(steps/gr))
 
