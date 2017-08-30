@@ -259,6 +259,15 @@ class Futures(object):
             while count > steps: return (self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps
             return mean(values)
 
+    def kc(self, *args, **kwargs):
+        steps = self.period
+        if args: steps = args[0]
+        ml = self.kama(steps=steps)
+        if 'date' in list(kwargs.keys()):
+            ml = self.kama(steps=steps, date=kwargs['date'])
+            return ml + gr * self.atr(steps=int(steps/gr), date=kwargs['date']), ml - self.atr(steps=int(steps/gr), date=kwargs['date'])
+        return ml + gr * self.atr(steps=int(steps/gr)), ml - gr * self.atr(steps=int(steps/gr))
+
     def ema(self, *args, **kwargs):
         steps, values = self.period, self.extract()
         if args: values = args[0]
