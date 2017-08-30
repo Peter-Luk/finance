@@ -237,16 +237,27 @@ class Futures(object):
             hs = self.extract(field='high', date=kwargs['date'])
             ls = self.extract(field='low', date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        hms = [_[0]-_[-1] for _ in self.__bi_values(hs, ls)]
+        dhl = [_[0]-_[-1] for _ in self.__bi_values(hs, ls)]
         esteps, i = [], steps
-        while i < len(hms):
-            esteps.append(self.ema(hms[:i], steps))
+        while i < len(dhl):
+            esteps.append(self.ema(dhl[:i], steps))
             i += 1
         vol = self.ema(esteps, steps)
         ap = self.sma(cs, steps)
         ubw = (gr + 1) * vol
         lbw = (gr - 1) * vol
         return ap + ubw, ap - lbw
+
+    def atr(self, *args, **kwargs):
+        steps, values = self.period, [_[0]-_[-1] for _ in self.__bi_values(self.extract(field='high'), self.extract(field='low'))]
+        if args: values = args[0]
+        if len(args) > 1: steps = args[1]
+        if 'date' in list(kwargs.keys()): values = [_[0]-_[-1] for _ in self.__bi_values(self.extract(field='high', date=kwargs['date']), self.extract(field='low', date=kwargs['date']))]
+        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        count = len(values)
+        if count >= steps:
+            while count > steps: return (self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps
+            return mean(values)
 
     def ema(self, *args, **kwargs):
         steps, values = self.period, self.extract()
