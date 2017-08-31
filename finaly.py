@@ -288,9 +288,9 @@ class Futures(object):
     def kc(self, *args, **kwargs):
         steps = self.period
         if args: steps = args[0]
-        ml = self.ema(steps=steps)
+        ml = self.kama(steps=steps)
         if 'date' in list(kwargs.keys()):
-            ml = self.ema(steps=steps, date=kwargs['date'])
+            ml = self.kama(steps=steps, date=kwargs['date'])
             return ml + gr * self.atr(steps=int(self.period/gr), date=kwargs['date']), ml - self.atr(steps=int(self.period/gr), date=kwargs['date'])
         return ml + gr * self.atr(steps=int(self.period/gr)), ml - gr * self.atr(steps=int(self.period/gr))
 
