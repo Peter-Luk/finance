@@ -286,24 +286,14 @@ class Futures(object):
             return mean(values)
 
     def kc(self, *args, **kwargs):
-        steps = self.period
-        if args: steps = args[0]
+        date, steps = self.latest, self.period
+        if args: date = args[0]
+        if len(args) > 1: steps = args[1]
         ml = self.kama(steps=steps)
         if 'date' in list(kwargs.keys()):
             ml = self.kama(steps=steps, date=kwargs['date'])
             return ml + gr * self.atr(steps=int(self.period/gr), date=kwargs['date']), ml - self.atr(steps=int(self.period/gr), date=kwargs['date'])
         return ml + gr * self.atr(steps=int(self.period/gr)), ml - gr * self.atr(steps=int(self.period/gr))
-
-    def ema(self, *args, **kwargs):
-        steps, values = self.period, self.extract()
-        if args: values = args[0]
-        if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        count = len(values)
-        if count >= steps:
-            while count > steps: return (self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps
-            return mean(values)
 
     def stosc(self, *args, **kwargs):
         """
