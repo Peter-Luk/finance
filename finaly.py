@@ -305,6 +305,27 @@ class Futures(object):
             while count > steps: return (self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps
             return mean(values)
 
+    def oc(self, *args, **kwargs):
+        date, steps = self.latest, self.period
+        if args: date = args[0]
+        if len(args) > 1: steps = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        def pk(*args, **kwargs):
+            date, steps = self.latest, self.period
+            if args: date = args[0]
+            if len(args) > 1: steps = args[1]
+            if 'date' in list(kwargs.keys()): date = kwargs['date']
+            if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+            hs = self.extract(field='high', date=date)
+            ls = self.extract(field='low', date=date)
+            lc = self.extract(date=date)[-1]
+            return (lc - min(ls[-steps:])) / (max(hs[-steps:]) - min(ls[-steps:])) * 100
+        ds = self.extract(field='date', date=date)
+        pks = [pk(_, steps) for _ in ds[-3:]]
+        pd = mean(pks)
+        if len(self.trade_date) >= steps: return pks[-1], pd
+
     def sma(self, *args, **kwargs):
         steps, values = self.period, self.extract()
         if args: values = args[0]
