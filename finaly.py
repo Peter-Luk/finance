@@ -306,13 +306,13 @@ class Futures(object):
             return mean(values)
 
     def stosc(self, *args, **kwargs):
-"""
+        """
 Stochastic Oscillator
 -- accept date and/or steps variables,
 date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> %k and %d as tuple in respective order.
-"""
+        """
         date, steps = self.latest, self.period
         if args: date = args[0]
         if len(args) > 1: steps = args[1]
