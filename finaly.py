@@ -152,19 +152,11 @@ class Futures(object):
         return res
 
     def wma(self, *args, **kwargs):
-        """
-Weighted Moving Average
--- accept date and/or steps variables,
-date (default: last trade date) on record -- optional
-steps (default: period) -- optional
---> float
-        """
-        steps, date = self.period, self.latest
-        if args: date = args[0]
+        steps, values = self.period, self.__bi_values(self.extract(), self.extract(field='volume'))
+        if args: values = args[0]
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'date' in list(kwargs.keys()): values = self.__bi_values(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        values = self.__bi_values(self.extract(date=date), self.extract(field='volume', date=date))
         if len(values) >= steps:
             res, ys = [], []
             for x, y in values:
@@ -173,24 +165,16 @@ steps (default: period) -- optional
             return sum(res[-steps:]) / sum(ys[-steps:])
 
     def kama(self, *args, **kwargs):
-        """
-Kaufman's Adaptive Moving Average
--- accept date and/or steps variables,
-date (default: last trade date) on record -- optional
-steps (default: period) -- optional
---> float
-        """
-        steps, date = self.period, self.latest
+        steps, values = self.period, self.extract()
         fast, slow = steps, 2
-        if args: date = args[0]
+        if args: values = args[0]
         if len(args) > 1: steps = args[1]
         if len(args) > 2: fast = args[2]
         if len(args) > 3: slow = args[3]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if 'fast' in list(kwargs.keys()): fast = kwargs['fast']
         if 'slow' in list(kwargs.keys()): slow = kwargs['slow']
-        values = self.extract(date=date)
 
         def absum(*args):
             i, res, values = 0, 0, args[0]
@@ -370,17 +354,9 @@ steps (default: period) -- optional
         if len(self.trade_date) >= steps: return pks[-1], pd
 
     def sma(self, *args, **kwargs):
-        """
-Simple Moving Average
--- accept date and/or steps variables,
-date (default: last trade date) on record -- optional
-steps (default: period) -- optional
---> float
-        """
-        steps, date = self.period, self.latest
-        if args: date = args[0]
+        steps, values = self.period, self.extract()
+        if args: values = args[0]
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        values = self.extract(date=date)
         if len(values) >= steps: return mean(values[-steps:])
