@@ -159,12 +159,15 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, date = self.period, self.latest
-        if args: date = args[0]
+        steps, values = self.period, self.__bi_values(self.extract(), self.extract(field='volume'))
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            if isinstance(args[0], str):
+                try: values = self.__bi_values(self.extract(date=args[0]), self.extract(field='volume', date=args[0]))
+                except: pass
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'date' in list(kwargs.keys()): values = self.__bi_values(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        values = self.__bi_values(self.extract(date=date), self.extract(field='volume', date=date))
         if len(values) >= steps:
             res, ys = [], []
             for x, y in values:
@@ -222,12 +225,15 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        date, steps  = self.latest, self.period
-        if args: date = args[0]
+        values, steps  = self.extract(), self.period
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            if isinstance(args[0], str):
+                try: values = self.extract(date=args[0])
+                except: pass
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        values = self.extract(date=date)
         dl = self.delta(values)
 
         def ag(*args):
@@ -394,10 +400,13 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, date = self.period, self.latest
-        if args: date = args[0]
+        steps, values = self.period, self.extract()
+        if args:
+            if isinstance(args[0], list): values= args[0]
+            if isinstance(args[0], str):
+                try: values = self.extract(date=args[0])
+                except: pass
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        values = self.extract(date=date)
         if len(values) >= steps: return mean(values[-steps:])
