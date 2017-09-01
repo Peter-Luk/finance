@@ -20,12 +20,12 @@ class Futures(object):
 
     def __del__(self):
         self.code = self.__data = self.period = self.close = self.trade_date = self.latest = None
-        del(self.latest)
-        del(self.trade_date)
-        del(self.close)
-        del(self.period)
-        del(self.__data)
-        del(self.code)
+        del self.latest
+        del self.trade_date
+        del self.close
+        del self.period
+        del self.__data
+        del self.code
 
     def __bi_values(self, *args):
         res, tl = [], [args[0]]
@@ -63,7 +63,7 @@ class Futures(object):
                 hdr[i['date']] = i['volume']
         _ = {}
         for i in list(hdr.keys()):
-            if not (datetime.strptime(i, '%Y-%m-%d') > req_date): _[i] = hdr[i]
+            if not datetime.strptime(i, '%Y-%m-%d') > req_date: _[i] = hdr[i]
         if programmatic:
             if field == 'date': return list(_.keys())
             return _
@@ -145,6 +145,9 @@ class Futures(object):
         return mean(src)
 
     def delta(self, *args):
+        """
+Helper function for difference of (integer/float) values in single dimension list.
+        """
         i, res, values = 0, [], args[0]
         while i < len(values) - 1:
             res.append(values[i + 1] - values[i])
