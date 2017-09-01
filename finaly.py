@@ -173,9 +173,20 @@ steps (default: period) -- optional
             return sum(res[-steps:]) / sum(ys[-steps:])
 
     def kama(self, *args, **kwargs):
+        """
+Kaufman's Adaptive Moving Average
+-- accept values(data series or date) as first positional variable and steps as second positional variable,
+values (default: all available) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
         steps, values = self.period, self.extract()
         fast, slow = steps, 2
-        if args: values = args[0]
+        if args:
+            if isinstance(values, list): values = args[0]
+            if isinstance(values, str):
+                try: values = self.extract(date=args[0])
+                except: pass
         if len(args) > 1: steps = args[1]
         if len(args) > 2: fast = args[2]
         if len(args) > 3: slow = args[3]
@@ -247,8 +258,19 @@ steps (default: period) -- optional
         return 100 - 100 / (1 + rs)
 
     def ema(self, *args, **kwargs):
+        """
+Exponential Moving Average
+-- accept values(data series or date) as first positional variable and steps as second positional variable,
+values (default: all available) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
         steps, values = self.period, self.extract()
-        if args: values = args[0]
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            if isinstance(args[0], str):
+                try: values = self.extract(date=args[0])
+                except: pass
         if len(args) > 1: steps = args[1]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
@@ -307,9 +329,13 @@ date (default: last trade date) on record -- optional
                     i += 1
             return res
         steps, values = self.period, [_[0]-_[-1] for _ in tr()]
-        if args: values = args[0]
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            if isinstance(args[0], str):
+                try: values = [x[0]-x[-1] for x in tr(args[0])]
+                except: pass
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): values = [_[0]-_[-1] for _ in tr(kwargs['date'])]
+        if 'date' in list(kwargs.keys()): values = [x[0]-x[-1] for x in tr(kwargs['date'])]
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         count = len(values)
         if count >= steps:
@@ -327,11 +353,10 @@ steps (default: period) -- optional
         date, steps = self.latest, self.period
         if args: date = args[0]
         if len(args) > 1: steps = args[1]
-        ml = self.kama(steps=steps)
-        if 'date' in list(kwargs.keys()):
-            ml = self.kama(steps=steps, date=kwargs['date'])
-            return ml + gr * self.atr(steps=int(self.period/gr), date=kwargs['date']), ml - self.atr(steps=int(self.period/gr), date=kwargs['date'])
-        return ml + gr * self.atr(steps=int(self.period/gr)), ml - gr * self.atr(steps=int(self.period/gr))
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        ml = self.kama(date, steps)
+        return ml + gr * self.atr(date, int(self.period/gr)), ml - gr * self.atr(date, int(self.period/gr))
 
     def stosc(self, *args, **kwargs):
         """
@@ -357,7 +382,7 @@ steps (default: period) -- optional
             lc = self.extract(date=date)[-1]
             return (lc - min(ls[-steps:])) / (max(hs[-steps:]) - min(ls[-steps:])) * 100
         ds = self.extract(field='date', date=date)
-        pks = [pk(_, steps) for _ in ds[-3:]]
+        pks = [pk(x, steps) for x in ds[-3:]]
         pd = mean(pks)
         if len(self.trade_date) >= steps: return pks[-1], pd
 
