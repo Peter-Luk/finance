@@ -269,10 +269,10 @@ steps (default: period) -- optional
         if args: date = args[0]
         if len(args) > 1: steps = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
-        cs = self.extract(date=kwargs['date'])
-        hs = self.extract(field='high', date=kwargs['date'])
-        ls = self.extract(field='low', date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        cs = self.extract(date=date)
+        hs = self.extract(field='high', date=date)
+        ls = self.extract(field='low', date=date)
         dhl = [_[0]-_[-1] for _ in self.__bi_values(hs, ls)]
         esteps, i = [], steps
         while i < len(dhl):
