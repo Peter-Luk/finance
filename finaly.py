@@ -152,11 +152,19 @@ class Futures(object):
         return res
 
     def wma(self, *args, **kwargs):
-        steps, values = self.period, self.__bi_values(self.extract(), self.extract(field='volume'))
-        if args: values = args[0]
+        """
+Weighted Moving Average
+-- accept date and/or steps variables,
+date (default: last trade date) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        steps, date = self.period, self.latest
+        if args: date = args[0]
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): values = self.__bi_values(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        values = self.__bi_values(self.extract(date=date), self.extract(field='volume', date=date))
         if len(values) >= steps:
             res, ys = [], []
             for x, y in values:
@@ -354,9 +362,17 @@ steps (default: period) -- optional
         if len(self.trade_date) >= steps: return pks[-1], pd
 
     def sma(self, *args, **kwargs):
-        steps, values = self.period, self.extract()
-        if args: values = args[0]
+        """
+Simple Moving Average
+-- accept date and/or steps variables,
+date (default: last trade date) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        steps, date = self.period, self.latest
+        if args: date = args[0]
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        values = self.extract(date=date)
         if len(values) >= steps: return mean(values[-steps:])
