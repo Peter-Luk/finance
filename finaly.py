@@ -310,7 +310,7 @@ steps (default: period) -- optional
         ap = self.ema(cs, self.period)
         ubw = (gr + 1) * vol
         lbw = (gr - 1) * vol
-        return ap + ubw, ap - lbw
+        return int(ap + ubw), int(ap - lbw)
 
     def atr(self, *args, **kwargs):
         """
@@ -362,7 +362,7 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         ml = self.kama(date, steps)
-        return ml + gr * self.atr(date, int(self.period/gr)), ml - gr * self.atr(date, int(self.period/gr))
+        return int(ml + gr * self.atr(date, int(self.period/gr))), int(ml - gr * self.atr(date, int(self.period/gr)))
 
     def stosc(self, *args, **kwargs):
         """
