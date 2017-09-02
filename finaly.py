@@ -1,6 +1,6 @@
 db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf', 'rnd'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
@@ -310,7 +310,7 @@ steps (default: period) -- optional
         ap = self.ema(cs, self.period)
         ubw = (gr + 1) * vol
         lbw = (gr - 1) * vol
-        return int(ap + ubw), int(ap - lbw)
+        return rnd(ap + ubw, 3), rnd(ap - lbw, 3)
 
     def atr(self, *args, **kwargs):
         """
@@ -362,7 +362,7 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         ml = self.kama(date, steps)
-        return int(ml + gr * self.atr(date, int(self.period/gr))), int(ml - gr * self.atr(date, int(self.period/gr)))
+        return rnd(ml + gr * self.atr(date, int(self.period/gr)), 3), rnd(ml - gr * self.atr(date, int(self.period/gr)), 3)
 
     def stosc(self, *args, **kwargs):
         """
