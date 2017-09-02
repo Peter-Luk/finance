@@ -20,22 +20,19 @@ class Futures(object):
 
     def __del__(self):
         self.code = self.__data = self.period = self.close = self.trade_date = self.latest = None
-        del self.latest
-        del self.trade_date
-        del self.close
-        del self.period
-        del self.__data
-        del self.code
+        del self.latest, self.code, self.trade_date, self.close, self.period, self.__data
 
-    def __bi_values(self, *args):
+    def __nvalues(self, *args):
         res, tl = [], [args[0]]
-        if len(args) > 1: tl.append(args[1])
-        if len(tl[0]) == len(tl[1]):
-            i = 0
-            while i < len(tl[0]):
-                res.append((tl[0][i], tl[1][i]))
-                i += 1
-            return res
+        i = 1
+        while i < len(args):
+            if len(args[i]) == len(args[i-1]): tl.append(args[i])
+            i += 1
+        i = 0
+        while i < len(tl[0]):
+            res.append(tuple([tl[_][i] for _ in range(len(args))]))
+            i += 1
+        return res
 
     def extract(self, *args, **kwargs):
         hdr, field, programmatic, src, req_date = {}, 'close', False, self.__data, datetime.strptime(self.latest, '%Y-%m-%d')
@@ -87,7 +84,7 @@ class Futures(object):
                     av = self.extract(field='volume', date=date)
                     i -= 1
                     while i < len(ac):
-                        src.append(self.wma(self.__bi_values(ac[:i+1], av[:i+1]), self.period))
+                        src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), self.period))
                         i += 1
                 if field == 'ema':
                     i -= 1
@@ -124,7 +121,7 @@ class Futures(object):
                     av = self.extract(field='volume', date=date)
                     i -= 1
                     while i < len(ac):
-                        src.append(self.wma(self.__bi_values(ac[:i+1], av[:i+1]), self.period))
+                        src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), self.period))
                         i += 1
                 if field == 'ema':
                     i -= 1
@@ -162,14 +159,14 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, values = self.period, self.__bi_values(self.extract(), self.extract(field='volume'))
+        steps, values = self.period, self.__nvalues(self.extract(), self.extract(field='volume'))
         if args:
             if isinstance(args[0], list): values = args[0]
             if isinstance(args[0], str):
-                try: values = self.__bi_values(self.extract(date=args[0]), self.extract(field='volume', date=args[0]))
+                try: values = self.__nvalues(self.extract(date=args[0]), self.extract(field='volume', date=args[0]))
                 except: pass
         if len(args) > 1: steps = args[1]
-        if 'date' in list(kwargs.keys()): values = self.__bi_values(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
+        if 'date' in list(kwargs.keys()): values = self.__nvalues(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if len(values) >= steps:
             res, ys = [], []
@@ -304,7 +301,7 @@ steps (default: period) -- optional
         cs = self.extract(date=date)
         hs = self.extract(field='high', date=date)
         ls = self.extract(field='low', date=date)
-        dhl = [_[0]-_[-1] for _ in self.__bi_values(hs, ls)]
+        dhl = [_[0]-_[-1] for _ in self.__nvalues(hs, ls)]
         esteps, i = [], steps
         while i < len(dhl):
             esteps.append(self.ema(dhl[:i], steps))
