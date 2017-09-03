@@ -1,6 +1,6 @@
 db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf', 'rnd'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
@@ -173,7 +173,7 @@ steps (default: period) -- optional
             for x, y in values:
                 res.append(x * y)
                 ys.append(y)
-            if self.digits: return rnd(sum(res[-steps:]) / sum(ys[-steps:]), self.digits)
+            if self.digits: return round(sum(res[-steps:]) / sum(ys[-steps:]), self.digits)
             return sum(res[-steps:]) / sum(ys[-steps:])
 
     def kama(self, *args, **kwargs):
@@ -215,9 +215,9 @@ steps (default: period) -- optional
                 er = (values[-1] - values[-steps]) / absum(self.delta(values[-steps:]))
                 alpha = (er * (fc - sc) + sc) ** 2
                 pk = self.kama(values[:-1], steps)
-                if self.digits: return rnd(alpha * (values[-1] - pk) + pk, self.digits)
+                if self.digits: return round(alpha * (values[-1] - pk) + pk, self.digits)
                 return alpha * (values[-1] - pk) + pk
-            if self.digits: return rnd(mean(values), self.digits)
+            if self.digits: return round(mean(values), self.digits)
             return mean(values)
 
     def rsi(self, *args, **kwargs):
@@ -264,7 +264,7 @@ steps (default: period) -- optional
             return ls / steps
 
         rs = ag(dl, steps) / al(dl, steps)
-        if self.digits: return rnd(100 - 100 / (1 + rs), self.digits)
+        if self.digits: return round(100 - 100 / (1 + rs), self.digits)
         return 100 - 100 / (1 + rs)
 
     def ema(self, *args, **kwargs):
@@ -287,9 +287,9 @@ steps (default: period) -- optional
         count = len(values)
         if count >= steps:
             while count > steps:
-                if self.digits: return rnd((self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
+                if self.digits: return round((self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
                 return (self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps
-            if self.digits: return rnd(mean(values), self.digits)
+            if self.digits: return round(mean(values), self.digits)
             return mean(values)
 
     def apz(self, *args, **kwargs):
@@ -317,7 +317,7 @@ steps (default: period) -- optional
         ap = self.ema(cs, self.period)
         ubw = (gr + 1) * vol
         lbw = (gr - 1) * vol
-        if self.digits: return rnd(ap + ubw, self.digits), rnd(ap - lbw, self.digits)
+        if self.digits: return round(ap + ubw, self.digits), round(ap - lbw, self.digits)
         return ap + ubw, ap - lbw
 
     def atr(self, *args, **kwargs):
@@ -354,9 +354,9 @@ date (default: last trade date) on record -- optional
         count = len(values)
         if count >= steps:
             while count > steps:
-                if self.digits: return rnd((self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
+                if self.digits: return round((self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
                 return (self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps
-            if self.digits: return rnd(mean(values), self.digits)
+            if self.digits: return round(mean(values), self.digits)
             return mean(values)
 
     def kc(self, *args, **kwargs):
@@ -373,10 +373,10 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         ml = self.kama(date, steps)
-        if self.digits: return rnd(ml + gr * self.atr(date, int(self.period/gr)), self.digits), rnd(ml - gr * self.atr(date, int(self.period/gr)), self.digits)
+        if self.digits: return round(ml + gr * self.atr(date, int(self.period/gr)), self.digits), round(ml - gr * self.atr(date, int(self.period/gr)), self.digits)
         return ml + gr * self.atr(date, int(self.period/gr)), ml - gr * self.atr(date, int(self.period/gr))
 
-    def stosc(self, *args, **kwargs):
+    def stos(self, *args, **kwargs):
         """
 Stochastic Oscillator
 -- accept date and/or steps variables,
@@ -403,7 +403,7 @@ steps (default: period) -- optional
         pks = [pk(x, steps) for x in ds[-3:]]
         pd = mean(pks)
         if len(self.trade_date) >= steps:
-            if self.digits: return rnd(pks[-1], self.digits), rnd(pd, self.digits)
+            if self.digits: return round(pks[-1], self.digits), round(pd, self.digits)
             return pks[-1], pd
 
     def sma(self, *args, **kwargs):
@@ -424,5 +424,5 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if len(values) >= steps:
-            if self.digits: return rnd(mean(values[-steps:]), self.digits)
+            if self.digits: return round(mean(values[-steps:]), self.digits)
             return mean(values[-steps:])
