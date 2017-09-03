@@ -9,7 +9,7 @@ conn.row_factory = lite.Row
 
 class Futures(object):
     def __init__(self, *args, **kwargs):
-        self.code, self.period, self.digits = args[0], 12, 3
+        self.code, self.period, self.digits = args[0], 12, None
         if len(args) > 1: self.period = args[1]
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'period' in list(kwargs.keys()): self.period = kwargs['period']
@@ -173,7 +173,8 @@ steps (default: period) -- optional
             for x, y in values:
                 res.append(x * y)
                 ys.append(y)
-            return rnd(sum(res[-steps:]) / sum(ys[-steps:]), self.digits)
+            if self.digits: return rnd(sum(res[-steps:]) / sum(ys[-steps:]), self.digits)
+            return sum(res[-steps:]) / sum(ys[-steps:])
 
     def kama(self, *args, **kwargs):
         """
@@ -214,8 +215,10 @@ steps (default: period) -- optional
                 er = (values[-1] - values[-steps]) / absum(self.delta(values[-steps:]))
                 alpha = (er * (fc - sc) + sc) ** 2
                 pk = self.kama(values[:-1], steps)
-                return rnd(alpha * (values[-1] - pk) + pk, self.digits)
-            return rnd(mean(values), self.digits)
+                if self.digits: return rnd(alpha * (values[-1] - pk) + pk, self.digits)
+                return alpha * (values[-1] - pk) + pk
+            if self.digits: return rnd(mean(values), self.digits)
+            return mean(values)
 
     def rsi(self, *args, **kwargs):
         """
@@ -261,7 +264,8 @@ steps (default: period) -- optional
             return ls / steps
 
         rs = ag(dl, steps) / al(dl, steps)
-        return rnd(100 - 100 / (1 + rs), self.digits)
+        if self.digits: return rnd(100 - 100 / (1 + rs), self.digits)
+        return 100 - 100 / (1 + rs)
 
     def ema(self, *args, **kwargs):
         """
@@ -282,8 +286,11 @@ steps (default: period) -- optional
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         count = len(values)
         if count >= steps:
-            while count > steps: return rnd((self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
-            return rnd(mean(values), self.digits)
+            while count > steps:
+                if self.digits: return rnd((self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
+                return (self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps
+            if self.digits: return rnd(mean(values), self.digits)
+            return mean(values)
 
     def apz(self, *args, **kwargs):
         """
@@ -310,7 +317,8 @@ steps (default: period) -- optional
         ap = self.ema(cs, self.period)
         ubw = (gr + 1) * vol
         lbw = (gr - 1) * vol
-        return rnd(ap + ubw, self.digits), rnd(ap - lbw, self.digits)
+        if self.digits: return rnd(ap + ubw, self.digits), rnd(ap - lbw, self.digits)
+        return ap + ubw, ap - lbw
 
     def atr(self, *args, **kwargs):
         """
@@ -345,8 +353,11 @@ date (default: last trade date) on record -- optional
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         count = len(values)
         if count >= steps:
-            while count > steps: return rnd((self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
-            return rnd(mean(values), self.digits)
+            while count > steps:
+                if self.digits: return rnd((self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
+                return (self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps
+            if self.digits: return rnd(mean(values), self.digits)
+            return mean(values)
 
     def kc(self, *args, **kwargs):
         """
@@ -362,7 +373,8 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         ml = self.kama(date, steps)
-        return rnd(ml + gr * self.atr(date, int(self.period/gr)), self.digits), rnd(ml - gr * self.atr(date, int(self.period/gr)), self.digits)
+        if self.digits: return rnd(ml + gr * self.atr(date, int(self.period/gr)), self.digits), rnd(ml - gr * self.atr(date, int(self.period/gr)), self.digits)
+        return ml + gr * self.atr(date, int(self.period/gr)), ml - gr * self.atr(date, int(self.period/gr))
 
     def stosc(self, *args, **kwargs):
         """
@@ -390,7 +402,9 @@ steps (default: period) -- optional
         ds = self.extract(field='date', date=date)
         pks = [pk(x, steps) for x in ds[-3:]]
         pd = mean(pks)
-        if len(self.trade_date) >= steps: return rnd(pks[-1], self.digits), rnd(pd, self.digits)
+        if len(self.trade_date) >= steps:
+            if self.digits: return rnd(pks[-1], self.digits), rnd(pd, self.digits)
+            return pks[-1], pd
 
     def sma(self, *args, **kwargs):
         """
@@ -409,4 +423,6 @@ steps (default: period) -- optional
         if len(args) > 1: steps = args[1]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        if len(values) >= steps: return rnd(mean(values[-steps:]), self.digits)
+        if len(values) >= steps:
+            if self.digits: return rnd(mean(values[-steps:]), self.digits)
+            return mean(values[-steps:])
