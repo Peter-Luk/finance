@@ -69,76 +69,78 @@ class Futures(object):
 
     def std(self, *args, **kwargs):
         field, date = 'close', self.latest
-        if args: src = args[0]
-        if len(args) > 1: field = args[1]
+        if args:
+            if isinstance(args[0], list): src = args[0]
+            if isinstance(args[0], str): field = args[0]
+        if len(args) > 1: date = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
-        if not args or ('field' in list(kwargs.keys())):
-            if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
-                src, i, ac = [], self.period, self.extract(date=date)
-                if field == 'rsi':
-                    while i < len(ac):
-                        src.append(self.rsi(ac[:i+1], self.period))
-                        i += 1
-                if field == 'wma':
-                    av = self.extract(field='volume', date=date)
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), self.period))
-                        i += 1
-                if field == 'ema':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.ema(ac[:i+1], self.period))
-                        i += 1
-                if field == 'sma':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.sma(ac[:i+1], self.period))
-                        i += 1
-                if field == 'kama':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.kama(ac[:i+1], self.period))
-                        i += 1
-            else: src = self.extract(field=field, date=date)
+        if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
+            src, i, ac = [], self.period, self.extract(date=date)
+            if field == 'rsi':
+                while i < len(ac):
+                    src.append(self.rsi(ac[:i+1], self.period))
+                    i += 1
+            if field == 'wma':
+                av = self.extract(field='volume', date=date)
+                i -= 1
+                while i < len(ac):
+                    src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), self.period))
+                    i += 1
+            if field == 'ema':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.ema(ac[:i+1], self.period))
+                    i += 1
+            if field == 'sma':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.sma(ac[:i+1], self.period))
+                    i += 1
+            if field == 'kama':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.kama(ac[:i+1], self.period))
+                    i += 1
+        else: src = self.extract(field=field, date=date)
         return stdev(src)
 
     def mean(self, *args, **kwargs):
         field, date = 'close', self.latest
-        if args: src = args[0]
-        if len(args) > 1: field = args[1]
+        if args:
+            if isinstance(args[0], list): src = args[0]
+            if isinstance(args[0], str): field = args[0]
+        if len(args) > 1: date = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
-        if not args or ('field' in list(kwargs.keys())):
-            if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
-                src, i, ac = [], self.period, self.extract(date=date)
-                if field == 'rsi':
-                    while i < len(ac):
-                        src.append(self.rsi(ac[:i+1], self.period))
-                        i += 1
-                if field == 'wma':
-                    av = self.extract(field='volume', date=date)
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), self.period))
-                        i += 1
-                if field == 'ema':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.ema(ac[:i+1], self.period))
-                        i += 1
-                if field == 'sma':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.sma(ac[:i+1], self.period))
-                        i += 1
-                if field == 'kama':
-                    i -= 1
-                    while i < len(ac):
-                        src.append(self.kama(ac[:i+1], self.period))
-                        i += 1
-            else: src = self.extract(field=field, date=date)
+        if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
+            src, i, ac = [], self.period, self.extract(date=date)
+            if field == 'rsi':
+                while i < len(ac):
+                    src.append(self.rsi(ac[:i+1], self.period))
+                    i += 1
+            if field == 'wma':
+                av = self.extract(field='volume', date=date)
+                i -= 1
+                while i < len(ac):
+                    src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), self.period))
+                    i += 1
+            if field == 'ema':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.ema(ac[:i+1], self.period))
+                    i += 1
+            if field == 'sma':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.sma(ac[:i+1], self.period))
+                    i += 1
+            if field == 'kama':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.kama(ac[:i+1], self.period))
+                    i += 1
+        else: src = self.extract(field=field, date=date)
         return mean(src)
 
     def delta(self, *args):
