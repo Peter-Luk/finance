@@ -68,77 +68,79 @@ class Futures(object):
         return list(_.values())
 
     def std(self, *args, **kwargs):
-        field, date = 'close', self.latest
+        field, date, period = 'close', self.latest, self.period
         if args:
             if isinstance(args[0], list): src = args[0]
             if isinstance(args[0], str): field = args[0]
         if len(args) > 1: date = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
-            src, i, ac = [], self.period, self.extract(date=date)
+            src, i, ac = [], period, self.extract(date=date)
             if field == 'rsi':
                 while i < len(ac):
-                    src.append(self.rsi(ac[:i+1], self.period))
+                    src.append(self.rsi(ac[:i+1], period))
                     i += 1
             if field == 'wma':
                 av = self.extract(field='volume', date=date)
                 i -= 1
                 while i < len(ac):
-                    src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), self.period))
+                    src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), period))
                     i += 1
             if field == 'ema':
                 i -= 1
                 while i < len(ac):
-                    src.append(self.ema(ac[:i+1], self.period))
+                    src.append(self.ema(ac[:i+1], period))
                     i += 1
             if field == 'sma':
                 i -= 1
                 while i < len(ac):
-                    src.append(self.sma(ac[:i+1], self.period))
+                    src.append(self.sma(ac[:i+1], period))
                     i += 1
             if field == 'kama':
                 i -= 1
                 while i < len(ac):
-                    src.append(self.kama(ac[:i+1], self.period))
+                    src.append(self.kama(ac[:i+1], period))
                     i += 1
         else: src = self.extract(field=field, date=date)
         return stdev(src)
 
     def mean(self, *args, **kwargs):
-        field, date = 'close', self.latest
+        field, date, period = 'close', self.latest, self.period
         if args:
             if isinstance(args[0], list): src = args[0]
             if isinstance(args[0], str): field = args[0]
         if len(args) > 1: date = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
         if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
-            src, i, ac = [], self.period, self.extract(date=date)
+            src, i, ac = [], period, self.extract(date=date)
             if field == 'rsi':
                 while i < len(ac):
-                    src.append(self.rsi(ac[:i+1], self.period))
+                    src.append(self.rsi(ac[:i+1], period))
                     i += 1
             if field == 'wma':
                 av = self.extract(field='volume', date=date)
                 i -= 1
                 while i < len(ac):
-                    src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), self.period))
+                    src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), period))
                     i += 1
             if field == 'ema':
                 i -= 1
                 while i < len(ac):
-                    src.append(self.ema(ac[:i+1], self.period))
+                    src.append(self.ema(ac[:i+1], period))
                     i += 1
             if field == 'sma':
                 i -= 1
                 while i < len(ac):
-                    src.append(self.sma(ac[:i+1], self.period))
+                    src.append(self.sma(ac[:i+1], period))
                     i += 1
             if field == 'kama':
                 i -= 1
                 while i < len(ac):
-                    src.append(self.kama(ac[:i+1], self.period))
+                    src.append(self.kama(ac[:i+1], period))
                     i += 1
         else: src = self.extract(field=field, date=date)
         return mean(src)
@@ -186,18 +188,18 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, values = self.period, self.extract()
-        fast, slow = steps, 2
+        period, values = self.period, self.extract()
+        fast, slow = period, 2
         if args:
             if isinstance(values, list): values = args[0]
             if isinstance(values, str):
                 try: values = self.extract(date=args[0])
                 except: pass
-        if len(args) > 1: steps = args[1]
+        if len(args) > 1: period = args[1]
         if len(args) > 2: fast = args[2]
         if len(args) > 3: slow = args[3]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
         if 'fast' in list(kwargs.keys()): fast = kwargs['fast']
         if 'slow' in list(kwargs.keys()): slow = kwargs['slow']
 
@@ -210,13 +212,13 @@ steps (default: period) -- optional
             return res
 
         count = len(values)
-        if count >= steps:
+        if count >= period:
             fc = 2. / (fast + 1)
             sc = 2. / (slow + 1)
-            while count > steps:
-                er = (values[-1] - values[-steps]) / absum(self.delta(values[-steps:]))
+            while count > period:
+                er = (values[-1] - values[-period]) / absum(self.delta(values[-period:]))
                 alpha = (er * (fc - sc) + sc) ** 2
-                pk = self.kama(values[:-1], steps)
+                pk = self.kama(values[:-1], period)
                 if self.digits: return round(alpha * (values[-1] - pk) + pk, self.digits)
                 return alpha * (values[-1] - pk) + pk
             if self.digits: return round(mean(values), self.digits)
@@ -230,42 +232,42 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        values, steps  = self.extract(), self.period
+        values, period  = self.extract(), self.period
         if args:
             if isinstance(args[0], list): values = args[0]
             if isinstance(args[0], str):
                 try: values = self.extract(date=args[0])
                 except: pass
-        if len(args) > 1: steps = args[1]
+        if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
         dl = self.delta(values)
 
         def ag(*args):
             gs = i = t = 0
-            values, steps = args[0], self.period
-            if len(args) > 1: steps = args[1]
-            while steps < len(values):
+            values, period = args[0], self.period
+            if len(args) > 1: period = args[1]
+            while period < len(values):
                 if values[-1] > 0: t = values[-1]
-                return (ag(values[:-1], steps) * (steps - 1) + t) / steps
-            while i < steps:
+                return (ag(values[:-1], period) * (period - 1) + t) / period
+            while i < period:
                 if values[i] > 0: gs += values[i]
                 i += 1
-            return gs / steps
+            return gs / period
 
         def al(*args):
             ls = i = t = 0
-            values, steps = args[0], self.period
-            if len(args) > 1: steps = args[1]
-            while steps < len(values):
+            values, period = args[0], self.period
+            if len(args) > 1: period = args[1]
+            while period < len(values):
                 if values[-1] < 0: t = abs(values[-1])
-                return (al(values[:-1], steps) * (steps - 1) + t) / steps
-            while i < steps:
+                return (al(values[:-1], period) * (period - 1) + t) / period
+            while i < period:
                 if values[i] < 0: ls += abs(values[i])
                 i += 1
-            return ls / steps
+            return ls / period
 
-        rs = ag(dl, steps) / al(dl, steps)
+        rs = ag(dl, period) / al(dl, period)
         if self.digits: return round(100 - 100 / (1 + rs), self.digits)
         return 100 - 100 / (1 + rs)
 
@@ -277,20 +279,20 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, values = self.period, self.extract()
+        period, values = self.period, self.extract()
         if args:
             if isinstance(args[0], list): values = args[0]
             if isinstance(args[0], str):
                 try: values = self.extract(date=args[0])
                 except: pass
-        if len(args) > 1: steps = args[1]
+        if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
         count = len(values)
-        if count >= steps:
-            while count > steps:
-                if self.digits: return round((self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
-                return (self.ema(values[:-1], steps) * (steps - 1) + values[-1]) / steps
+        if count >= period:
+            while count > period:
+                if self.digits: return round((self.ema(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                return (self.ema(values[:-1], period) * (period - 1) + values[-1]) / period
             if self.digits: return round(mean(values), self.digits)
             return mean(values)
 
@@ -302,20 +304,20 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> tuple
         """
-        steps, date = int(self.period / gr), self.latest
+        period, date = int(self.period / gr), self.latest
         if args: date = args[0]
-        if len(args) > 1: steps = args[1]
+        if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
         cs = self.extract(date=date)
         hs = self.extract(field='high', date=date)
         ls = self.extract(field='low', date=date)
         dhl = [_[0]-_[-1] for _ in self.__nvalues(hs, ls)]
-        esteps, i = [], steps
+        estep, i = [], period
         while i < len(dhl):
-            esteps.append(self.ema(dhl[:i], steps))
+            estep.append(self.ema(dhl[:i], period))
             i += 1
-        vol = self.ema(esteps, steps)
+        vol = self.ema(estep, period)
         ap = self.ema(cs, self.period)
         ubw = (gr + 1) * vol
         lbw = (gr - 1) * vol
@@ -344,20 +346,20 @@ date (default: last trade date) on record -- optional
                     res.append((h, l))
                     i += 1
             return res
-        steps, values = self.period, [_[0]-_[-1] for _ in tr()]
+        period, values = self.period, [_[0]-_[-1] for _ in tr()]
         if args:
             if isinstance(args[0], list): values = args[0]
             if isinstance(args[0], str):
                 try: values = [x[0]-x[-1] for x in tr(args[0])]
                 except: pass
-        if len(args) > 1: steps = args[1]
+        if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): values = [x[0]-x[-1] for x in tr(kwargs['date'])]
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
         count = len(values)
-        if count >= steps:
-            while count > steps:
-                if self.digits: return round((self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps, self.digits)
-                return (self.atr(values[:-1], steps) * (steps - 1) + values[-1]) / steps
+        if count >= period:
+            while count > period:
+                if self.digits: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                return (self.atr(values[:-1], period) * (period - 1) + values[-1]) / period
             if self.digits: return round(mean(values), self.digits)
             return mean(values)
 
@@ -369,12 +371,12 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> tuple
         """
-        date, steps = self.latest, self.period
+        date, period = self.latest, self.period
         if args: date = args[0]
-        if len(args) > 1: steps = args[1]
+        if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        ml = self.kama(date, steps)
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        ml = self.kama(date, period)
         if self.digits: return round(ml + gr * self.atr(date, int(self.period/gr)), self.digits), round(ml - gr * self.atr(date, int(self.period/gr)), self.digits)
         return ml + gr * self.atr(date, int(self.period/gr)), ml - gr * self.atr(date, int(self.period/gr))
 
@@ -386,25 +388,25 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> %k and %d as tuple in respective order.
         """
-        date, steps = self.latest, self.period
+        date, period = self.latest, self.period
         if args: date = args[0]
-        if len(args) > 1: steps = args[1]
+        if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
         def pk(*args, **kwargs):
-            date, steps = self.latest, self.period
+            date, period = self.latest, self.period
             if args: date = args[0]
-            if len(args) > 1: steps = args[1]
+            if len(args) > 1: period = args[1]
             if 'date' in list(kwargs.keys()): date = kwargs['date']
-            if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+            if 'period' in list(kwargs.keys()): period = kwargs['period']
             hs = self.extract(field='high', date=date)
             ls = self.extract(field='low', date=date)
             lc = self.extract(date=date)[-1]
-            return (lc - min(ls[-steps:])) / (max(hs[-steps:]) - min(ls[-steps:])) * 100
+            return (lc - min(ls[-period:])) / (max(hs[-period:]) - min(ls[-period:])) * 100
         ds = self.extract(field='date', date=date)
-        pks = [pk(x, steps) for x in ds[-3:]]
+        pks = [pk(x, period) for x in ds[-3:]]
         pd = mean(pks)
-        if len(self.trade_date) >= steps:
+        if len(self.trade_date) >= period:
             if self.digits: return round(pks[-1], self.digits), round(pd, self.digits)
             return pks[-1], pd
 
@@ -416,15 +418,15 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, values = self.period, self.extract()
+        period, values = self.period, self.extract()
         if args:
             if isinstance(args[0], list): values= args[0]
             if isinstance(args[0], str):
                 try: values = self.extract(date=args[0])
                 except: pass
-        if len(args) > 1: steps = args[1]
+        if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
-        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
-        if len(values) >= steps:
-            if self.digits: return round(mean(values[-steps:]), self.digits)
-            return mean(values[-steps:])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if len(values) >= period:
+            if self.digits: return round(mean(values[-period:]), self.digits)
+            return mean(values[-period:])
