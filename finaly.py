@@ -145,6 +145,21 @@ class Futures(object):
         else: src = self.extract(field=field, date=date)
         return mean(src)
 
+    def srange(self, *args, **kwargs):
+        field, date, period = 'close', self.latest, self.period
+        if args: field = args[0]
+        if len(args) > 1: date = args[1]
+        if len(args) > 2: period = args[2]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if 'field' in list(kwargs.keys()): field = kwargs['field']
+        afield = ['open', 'high', 'low', 'close', 'volume']
+        afield.extend(['rsi', 'ema', 'sma', 'wma', 'kama'])
+        if field in afield:
+            ub = eval("self.mean('%s', date='%s', period=%i) + self.std('%s', date='%s', period=%i)" % (field, date, period, field, date, period))
+            lb = eval("self.mean('%s', date='%s', period=%i) - self.std('%s', date='%s', period=%i)" % (field, date, period, field, date, period))
+            return ub, lb
+
     def delta(self, *args):
         """
 Helper function for difference of (integer/float) values in single dimension list.
