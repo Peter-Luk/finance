@@ -377,8 +377,8 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ml = self.kama(date, period)
-        if self.digits: return round(ml + gr * self.atr(date, int(self.period/gr)), self.digits), round(ml - gr * self.atr(date, int(self.period/gr)), self.digits)
-        return ml + gr * self.atr(date, int(self.period/gr)), ml - gr * self.atr(date, int(self.period/gr))
+        if self.digits: return round(ml + gr * self.atr(date, int(self.period/gr)) / 2, self.digits), round(ml - gr * self.atr(date, int(self.period/gr)) / 2, self.digits)
+        return ml + gr * self.atr(date, int(self.period/gr)) / 2, ml - gr * self.atr(date, int(self.period/gr)) / 2
 
     def stos(self, *args, **kwargs):
         """
