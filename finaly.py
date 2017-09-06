@@ -346,6 +346,23 @@ Average True Range
 date (default: last trade date) on record -- optional
 --> float
         """
+        def tr(*args, **kwargs):
+            res = []
+            # res, date = [], self.latest
+            if args: date = args[0]
+            if 'date' in list(kwargs.keys()): date = kwargs['date']
+            cs, hs, ls = self.extract(date=date), self.extract(field='high', date=date), self.extract(field='low', date=date)
+            if len(cs) == len(hs) == len(ls):
+                i = 1
+                res.append((hs[0], ls[0]))
+                while i < len(cs):
+                    h, l = hs[i], ls[i]
+                    if cs[i-1] > h: h = cs[i-1]
+                    if cs[i-1] < l: l = cs[i-1]
+                    res.append((h, l))
+                    i += 1
+            return res
+
         date, period = self.latest, self.period
         values = [x[0]-x[-1] for x in tr(date)]
         if args:
@@ -361,22 +378,23 @@ date (default: last trade date) on record -- optional
             values = [x[0]-x[-1] for x in tr(date)]
         if 'period' in list(kwargs.keys()): period = kwargs['period']
 
-        def tr(*args, **kwargs):
-            res, date = [], self.latest
-            if args: date = args[0]
-            if 'date' in list(kwargs.keys()): date = kwargs['date']
-            cs, hs, ls = self.extract(date=date), self.extract(field='high', date=date), self.extract(field='low', date=date)
-            if len(cs) == len(hs) == len(ls):
-                i = 1
-                res.append((hs[0], ls[0]))
-                while i < len(cs):
-                    h, l = hs[i], ls[i]
-                    if cs[i-1] > h: h = cs[i-1]
-                    if cs[i-1] < l: l = cs[i-1]
-                    res.append((h, l))
-                    i += 1
-            return res
-
+#         def tr(*args, **kwargs):
+#             res = []
+#             # res, date = [], self.latest
+#             if args: date = args[0]
+#             if 'date' in list(kwargs.keys()): date = kwargs['date']
+#             cs, hs, ls = self.extract(date=date), self.extract(field='high', date=date), self.extract(field='low', date=date)
+#             if len(cs) == len(hs) == len(ls):
+#                 i = 1
+#                 res.append((hs[0], ls[0]))
+#                 while i < len(cs):
+#                     h, l = hs[i], ls[i]
+#                     if cs[i-1] > h: h = cs[i-1]
+#                     if cs[i-1] < l: l = cs[i-1]
+#                     res.append((h, l))
+#                     i += 1
+#             return res
+# 
         # period, values = self.period, [_[0]-_[-1] for _ in tr()]
         # if args:
             # if isinstance(args[0], list): values = args[0]
