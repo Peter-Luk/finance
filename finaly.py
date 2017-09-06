@@ -76,7 +76,7 @@ class Futures(object):
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
-        if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
+        if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr']:
             src, i, ac = [], period, self.extract(date=date)
             if field == 'rsi':
                 while i < len(ac):
@@ -87,6 +87,11 @@ class Futures(object):
                 i -= 1
                 while i < len(ac):
                     src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), period))
+                    i += 1
+            if field == 'atr':
+                i -= 1
+                while datetime.strptime(self.trade_date[i], '%Y-%m-%d') < datetime.strptime(date, '%Y-%m-%d'):
+                    src.append(self.atr(self.trade_date[i], period))
                     i += 1
             if field == 'ema':
                 i -= 1
@@ -115,7 +120,7 @@ class Futures(object):
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
-        if field in ['rsi', 'ema', 'sma', 'wma', 'kama']:
+        if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr']:
             src, i, ac = [], period, self.extract(date=date)
             if field == 'rsi':
                 while i < len(ac):
@@ -126,6 +131,11 @@ class Futures(object):
                 i -= 1
                 while i < len(ac):
                     src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), period))
+                    i += 1
+            if field == 'atr':
+                i -= 1
+                while datetime.strptime(self.trade_date[i], '%Y-%m-%d') < datetime.strptime(date, '%Y-%m-%d'):
+                    src.append(self.atr(self.trade_date[i], period))
                     i += 1
             if field == 'ema':
                 i -= 1
@@ -154,7 +164,7 @@ class Futures(object):
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         afield = ['open', 'high', 'low', 'close', 'volume']
-        afield.extend(['rsi', 'ema', 'sma', 'wma', 'kama'])
+        afield.extend(['rsi', 'ema', 'sma', 'wma', 'kama', 'atr'])
         if field in afield:
             ub = eval("self.mean('%s', date='%s', period=%i) + self.std('%s', date='%s', period=%i)" % (field, date, period, field, date, period))
             lb = eval("self.mean('%s', date='%s', period=%i) - self.std('%s', date='%s', period=%i)" % (field, date, period, field, date, period))
