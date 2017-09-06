@@ -346,6 +346,21 @@ Average True Range
 date (default: last trade date) on record -- optional
 --> float
         """
+        date, period = self.latest, self.period
+        values = [x[0]-x[-1] for x in tr(date)]
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            if isinstance(args[0], str):
+                try:
+                    date = args[0]
+                    values = [x[0]-x[-1] for x in tr(date)]
+                except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()):
+            date = kwargs['date']
+            values = [x[0]-x[-1] for x in tr(date)]
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+
         def tr(*args, **kwargs):
             res, date = [], self.latest
             if args: date = args[0]
@@ -361,15 +376,16 @@ date (default: last trade date) on record -- optional
                     res.append((h, l))
                     i += 1
             return res
-        period, values = self.period, [_[0]-_[-1] for _ in tr()]
-        if args:
-            if isinstance(args[0], list): values = args[0]
-            if isinstance(args[0], str):
-                try: values = [x[0]-x[-1] for x in tr(args[0])]
-                except: pass
-        if len(args) > 1: period = args[1]
-        if 'date' in list(kwargs.keys()): values = [x[0]-x[-1] for x in tr(kwargs['date'])]
-        if 'period' in list(kwargs.keys()): period = kwargs['period']
+
+        # period, values = self.period, [_[0]-_[-1] for _ in tr()]
+        # if args:
+            # if isinstance(args[0], list): values = args[0]
+            # if isinstance(args[0], str):
+                # try: values = [x[0]-x[-1] for x in tr(args[0])]
+                # except: pass
+        # if len(args) > 1: period = args[1]
+        # if 'date' in list(kwargs.keys()): values = [x[0]-x[-1] for x in tr(kwargs['date'])]
+        # if 'period' in list(kwargs.keys()): period = kwargs['period']
         count = len(values)
         if count >= period:
             while count > period:
