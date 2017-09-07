@@ -411,7 +411,7 @@ steps (default: period) -- optional
         if self.digits: return round(ml + gr * self.atr(date, int(self.period/gr)) / 2, self.digits), round(ml - gr * self.atr(date, int(self.period/gr)) / 2, self.digits)
         return ml + gr * self.atr(date, int(self.period/gr)) / 2, ml - gr * self.atr(date, int(self.period/gr)) / 2
 
-    def stos(self, *args, **kwargs):
+    def stc(self, *args, **kwargs):
         """
 Stochastic Oscillator
 -- accept date and/or steps variables,
