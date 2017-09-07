@@ -134,7 +134,9 @@ class Futures(object):
                     i += 1
             if field == 'atr':
                 i -= 1
-                while datetime.strptime(self.trade_date[i], '%Y-%m-%d') < datetime.strptime(date, '%Y-%m-%d'):
+                di = self.trade_date.index(date)
+                while i < di:
+                # while datetime.strptime(self.trade_date[i], '%Y-%m-%d') < datetime.strptime(date, '%Y-%m-%d'):
                     src.append(self.atr(self.trade_date[i], period))
                     i += 1
             if field == 'ema':
