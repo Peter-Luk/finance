@@ -91,9 +91,7 @@ class Futures(object):
             if field == 'atr':
                 i -= 1
                 di = self.trade_date.index(date)
-                while i < di:
-                    src.append(self.atr(self.trade_date[i], period))
-                    i += 1
+                src.extend([self.atr(self.trade_date[_], period) for _ in range(i, di)])
             if field == 'ema':
                 i -= 1
                 while i < len(ac):
@@ -137,9 +135,6 @@ class Futures(object):
                 i -= 1
                 di = self.trade_date.index(date)
                 src.extend([self.atr(self.trade_date[_], period) for _ in range(i, di)])
-                  # while i < di:
-                    # src.append(self.atr(self.trade_date[i], period))
-                    # i += 1
             if field == 'ema':
                 i -= 1
                 while i < len(ac):
