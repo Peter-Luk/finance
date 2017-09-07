@@ -472,4 +472,4 @@ steps (default: period) -- optional
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
-        return self.sma(values, period) + 2 / gr * self.std(values, period=period), self.sma(values, period) - 2 /gr * self.std(values, period=period)
+        return self.sma(values, period) + self.std(values, period=period), self.sma(values, period) - 2 /gr * self.std(values, period=period)
