@@ -9,7 +9,7 @@ conn.row_factory = lite.Row
 
 class Futures(object):
     def __init__(self, *args, **kwargs):
-        self.code, self.period, self.digits = args[0], 12, None
+        self.code, self.period, self.digits = args[0], 12, -1
         if len(args) > 1: self.period = args[1]
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'period' in list(kwargs.keys()): self.period = kwargs['period']
@@ -200,7 +200,7 @@ steps (default: period) -- optional
             for x, y in values:
                 res.append(x * y)
                 ys.append(y)
-            if self.digits: return round(sum(res[-steps:]) / sum(ys[-steps:]), self.digits)
+            if not self.digits < 0: return round(sum(res[-steps:]) / sum(ys[-steps:]), self.digits)
             return sum(res[-steps:]) / sum(ys[-steps:])
 
     def kama(self, *args, **kwargs):
@@ -242,9 +242,9 @@ steps (default: period) -- optional
                 er = (values[-1] - values[-period]) / absum(self.delta(values[-period:]))
                 alpha = (er * (fc - sc) + sc) ** 2
                 pk = self.kama(values[:-1], period)
-                if self.digits: return round(alpha * (values[-1] - pk) + pk, self.digits)
+                if not self.digits < 0: return round(alpha * (values[-1] - pk) + pk, self.digits)
                 return alpha * (values[-1] - pk) + pk
-            if self.digits: return round(mean(values), self.digits)
+            if not self.digits < 0: return round(mean(values), self.digits)
             return mean(values)
 
     def rsi(self, *args, **kwargs):
@@ -291,7 +291,7 @@ steps (default: period) -- optional
             return ls / period
 
         rs = ag(dl, period) / al(dl, period)
-        if self.digits: return round(100 - 100 / (1 + rs), self.digits)
+        if not self.digits < 0: return round(100 - 100 / (1 + rs), self.digits)
         return 100 - 100 / (1 + rs)
 
     def ema(self, *args, **kwargs):
@@ -314,9 +314,9 @@ steps (default: period) -- optional
         count = len(values)
         if count >= period:
             while count > period:
-                if self.digits: return round((self.ema(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                if not self.digits < 0: return round((self.ema(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
                 return (self.ema(values[:-1], period) * (period - 1) + values[-1]) / period
-            if self.digits: return round(mean(values), self.digits)
+            if not self.digits < 0: return round(mean(values), self.digits)
             return mean(values)
 
     def apz(self, *args, **kwargs):
@@ -344,7 +344,7 @@ steps (default: period) -- optional
         ap = self.ema(cs, self.period)
         ubw = (gr + 1) * vol
         lbw = (gr - 1) * vol
-        if self.digits: return round(ap + ubw, self.digits), round(ap - lbw, self.digits)
+        if not self.digits < 0: return round(ap + ubw, self.digits), round(ap - lbw, self.digits)
         return ap + ubw, ap - lbw
 
     def atr(self, *args, **kwargs):
@@ -389,9 +389,9 @@ date (default: last trade date) on record -- optional
         count = len(values)
         if count >= period:
             while count > period:
-                if self.digits: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                if not self.digits < 0: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
                 return (self.atr(values[:-1], period) * (period - 1) + values[-1]) / period
-            if self.digits: return round(mean(values), self.digits)
+            if not self.digits < 0: return round(mean(values), self.digits)
             return mean(values)
 
     def kc(self, *args, **kwargs):
@@ -408,7 +408,7 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ml = self.kama(date, period)
-        if self.digits: return round(ml + gr * self.atr(date, int(self.period/gr)) / 2, self.digits), round(ml - gr * self.atr(date, int(self.period/gr)) / 2, self.digits)
+        if not self.digits < 0: return round(ml + gr * self.atr(date, int(self.period/gr)) / 2, self.digits), round(ml - gr * self.atr(date, int(self.period/gr)) / 2, self.digits)
         return ml + gr * self.atr(date, int(self.period/gr)) / 2, ml - gr * self.atr(date, int(self.period/gr)) / 2
 
     def stc(self, *args, **kwargs):
@@ -438,7 +438,7 @@ steps (default: period) -- optional
         pks = [pk(x, period) for x in ds[-3:]]
         pd = mean(pks)
         if len(self.trade_date) >= period:
-            if self.digits: return round(pks[-1], self.digits), round(pd, self.digits)
+            if not self.digits < 0: return round(pks[-1], self.digits), round(pd, self.digits)
             return pks[-1], pd
 
     def sma(self, *args, **kwargs):
@@ -459,7 +459,7 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if len(values) >= period:
-            if self.digits: return round(mean(values[-period:]), self.digits)
+            if not self.digits < 0: return round(mean(values[-period:]), self.digits)
             return mean(values[-period:])
 
     def bb(self, *args, **kwargs):
@@ -472,4 +472,5 @@ steps (default: period) -- optional
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if not self.digits < 0:return round(self.sma(values, period) + gr / 2 * self.std(values, period=period), self.digits), round(self.sma(values, period) - gr / 2 * self.std(values, period=period), self.digits)
         return self.sma(values, period) + gr / 2 * self.std(values, period=period), self.sma(values, period) - gr / 2 * self.std(values, period=period)
