@@ -461,3 +461,15 @@ steps (default: period) -- optional
         if len(values) >= period:
             if self.digits: return round(mean(values[-period:]), self.digits)
             return mean(values[-period:])
+
+    def bb(self, *args, **kwargs):
+        period, values = self.period, self.extract()
+        if args:
+            if isinstance(args[0], list): values= args[0]
+            if isinstance(args[0], str):
+                try: values = self.extract(date=args[0])
+                except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        return self.sma(values, period) + gr * self.std(values, period=period), self.sma(values, period) - gr * self.std(values, period=period)
