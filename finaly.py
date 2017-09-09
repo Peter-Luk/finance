@@ -471,7 +471,7 @@ steps (default: period) -- optional
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
-        if not self.digits < 0:return round(self.sma(values, period) + gr / 2 * self.std(values, period=period), self.digits), round(self.sma(values, period) - gr / 2 * self.std(values, period=period), self.digits)
+        if not self.digits < 0: return round(self.sma(values, period) + gr / 2 * self.std(values, period=period), self.digits), round(self.sma(values, period) - gr / 2 * self.std(values, period=period), self.digits)
         return self.sma(values, period) + gr / 2 * self.std(values, period=period), self.sma(values, period) - gr / 2 * self.std(values, period=period)
 
     def __dx(self, *args, **kwargs):
@@ -524,5 +524,8 @@ steps (default: period) -- optional
             try: src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
             except: pass
         count = len(src)
-        while count > period: return (self.adx(src[:-1], period) * (period - 1) + src[-1]) / period
+        while count > period:
+            if not self.digits < 0: return round((self.adx(src[:-1], period) * (period - 1) + src[-1]) / period, self.digits)
+            return (self.adx(src[:-1], period) * (period - 1) + src[-1]) / period
+        if not self.digits < 0: return round(mean(src), self.digits)
         return mean(src)
