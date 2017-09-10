@@ -76,7 +76,7 @@ class Futures(object):
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
-        if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr']:
+        if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx']:
             src, i, ac = [], period, self.extract(date=date)
             if field == 'rsi':
                 while i < len(ac):
@@ -92,6 +92,10 @@ class Futures(object):
                 i -= 1
                 di = self.trade_date.index(date)
                 src.extend([self.atr(self.trade_date[_], period) for _ in range(i, di)])
+            if field == 'adx':
+                i += 1
+                di = self.trade_date.index(date)
+                src.extend([self.adx(self.trade_date[_], period) for _ in range(i, di)])
             if field == 'ema':
                 i -= 1
                 while i < len(ac):
@@ -119,7 +123,7 @@ class Futures(object):
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
-        if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr']:
+        if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx']:
             src, i, ac = [], period, self.extract(date=date)
             if field == 'rsi':
                 while i < len(ac):
@@ -135,6 +139,10 @@ class Futures(object):
                 i -= 1
                 di = self.trade_date.index(date)
                 src.extend([self.atr(self.trade_date[_], period) for _ in range(i, di)])
+            if field == 'adx':
+                i += 1
+                di = self.trade_date.index(date)
+                src.extend([self.adx(self.trade_date[_], period) for _ in range(i, di)])
             if field == 'ema':
                 i -= 1
                 while i < len(ac):
@@ -162,7 +170,7 @@ class Futures(object):
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         afield = ['open', 'high', 'low', 'close', 'volume']
-        afield.extend(['rsi', 'ema', 'sma', 'wma', 'kama', 'atr'])
+        afield.extend(['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx'])
         if field in afield:
             ub = eval("self.mean('%s', date='%s', period=%i) + self.std('%s', date='%s', period=%i)" % (field, date, period, field, date, period))
             lb = eval("self.mean('%s', date='%s', period=%i) - self.std('%s', date='%s', period=%i)" % (field, date, period, field, date, period))
@@ -529,3 +537,12 @@ steps (default: period) -- optional
             return (self.adx(src[:-1], period) * (period - 1) + src[-1]) / period
         if not self.digits < 0: return round(mean(src), self.digits)
         return mean(src)
+
+    def sar(self, *args, **kwargs):
+        period, date = self.period, self.latest
+        if args:
+            if isinstance(args[0], list): src = args[0]
+            if isinstance(args[0], str): date = args[0]
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
