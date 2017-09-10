@@ -140,7 +140,7 @@ class Futures(object):
                 di = self.trade_date.index(date)
                 src.extend([self.atr(self.trade_date[_], period) for _ in range(i, di)])
             if field == 'adx':
-                i += 1
+                i + 1
                 di = self.trade_date.index(date)
                 src.extend([self.adx(self.trade_date[_], period) for _ in range(i, di)])
             if field == 'ema':
@@ -546,3 +546,7 @@ steps (default: period) -- optional
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
+        src = self.__nvalues(self.extract(field='high', date=date), self.ectract(field='low', date=date), self.extract(date=date))
+        fdiff = self.delta([_[-1] for _ in src])[0]
+        if fdiff > 0:
+            th, tl = src[0][:-1]
