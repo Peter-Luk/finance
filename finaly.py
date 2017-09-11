@@ -140,7 +140,7 @@ class Futures(object):
                 di = self.trade_date.index(date)
                 src.extend([self.atr(self.trade_date[_], period) for _ in range(i, di)])
             if field == 'adx':
-                i + 1
+                i += 1
                 di = self.trade_date.index(date)
                 src.extend([self.adx(self.trade_date[_], period) for _ in range(i, di)])
             if field == 'ema':
