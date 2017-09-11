@@ -549,4 +549,8 @@ steps (default: period) -- optional
         src = self.__nvalues(self.extract(field='high', date=date), self.ectract(field='low', date=date), self.extract(date=date))
         fdiff = self.delta([_[-1] for _ in src])[0]
         if fdiff > 0:
-            th, tl = src[0][:-1]
+            ep, af = src[0][0], .02
+            res = mean(src[:-1]) + af * (ep - mean(src[:-1]))
+        else:
+            ep, af = src[0][1], .02
+            res = mean(src[:-1]) - af * (mean(src[:-1]) - ep)
