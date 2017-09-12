@@ -546,11 +546,12 @@ steps (default: period) -- optional
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
-        src = self.__nvalues(self.extract(field='high', date=date), self.ectract(field='low', date=date), self.extract(date=date))
+        src = self.__nvalues(self.extract(field='high', date=date), self.extract(field='low', date=date), self.extract(date=date))
         fdiff = self.delta([_[-1] for _ in src])[0]
         if fdiff > 0:
             ep, af = src[0][0], .02
-            res = mean(src[:-1]) + af * (ep - mean(src[:-1]))
+            res = mean(src[0][:-1]) + af * (ep - mean(src[0][:-1]))
         else:
             ep, af = src[0][1], .02
-            res = mean(src[:-1]) - af * (mean(src[:-1]) - ep)
+            res = mean(src[0][:-1]) - af * (mean(src[0][:-1]) - ep)
+        retur res
