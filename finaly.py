@@ -554,4 +554,4 @@ steps (default: period) -- optional
         else:
             ep, af = src[0][1], .02
             res = mean(src[0][:-1]) - af * (mean(src[0][:-1]) - ep)
-        retur res
+        return res
