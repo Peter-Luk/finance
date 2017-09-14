@@ -547,8 +547,11 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         src = self.__nvalues(self.extract(field='high', date=date), self.extract(field='low', date=date), self.extract(date=date))
-        fdiff = self.delta([_[-1] for _ in src])[0]
-        if fdiff > 0:
+        fdiff, i = self.delta([_[-1] for _ in src]), 1
+        while i < self.trade_date.index(date):
+            # return self.sar(src[:-1],date=date)
+            i += 1
+        if fdiff[0] > 0:
             ep, af = src[0][0], .02
             res = mean(src[0][:-1]) + af * (ep - mean(src[0][:-1]))
         else:
