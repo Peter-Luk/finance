@@ -35,29 +35,53 @@ class Futures(object):
         return res
 
     def extract(self, *args, **kwargs):
-        hdr, field, programmatic, src, req_date = {}, 'close', False, self.__data, datetime.strptime(self.latest, '%Y-%m-%d')
+        hdr, field, programmatic, src, session, req_date = {}, 'close', False, self.__data, 'F', datetime.strptime(self.latest, '%Y-%m-%d')
         if args: src = args[0]
         if len(args) > 1: field = args[1]
+        if len(args) > 2: session = args[2].upper()
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if 'source' in list(kwargs.keys()): src = kwargs['source']
         if 'date' in list(kwargs.keys()): req_date = datetime.strptime(kwargs['date'], '%Y-%m-%d')
         if 'programmatic' in list(kwargs.keys()): programmatic = kwargs['programmatic']
+        if 'session' in list(kwargs.keys()): session = kwargs['session'].upper()
         for i in src:
-            if field == 'open':
-                if i['date'] in list(hdr.keys()) and i['session'] == 'M': hdr[i['date']] = i['open']
-                hdr[i['date']] = i['open']
-            if field == 'high':
-                if i['date'] in list(hdr.keys()) and i['high'] > hdr[i['date']]: hdr[i['date']] = i['high']
-                hdr[i['date']] = i['high']
-            if field == 'low':
-                if i['date'] in list(hdr.keys()) and i['low'] < hdr[i['date']]: hdr[i['date']] = i['low']
-                hdr[i['date']] = i['low']
-            if field == 'close':
-                if i['date'] in list(hdr.keys()) and i['session'] == 'A': hdr[i['date']] = i['close']
-                hdr[i['date']] = i['close']
-            if field in ['date', 'volume']:
-                if i['date'] in list(hdr.keys()) and i['session'] == 'A': hdr[i['date']] += i['volume']
-                hdr[i['date']] = i['volume']
+            if session == 'F':
+                if field == 'open':
+                    if i['date'] in list(hdr.keys()):
+                        if i['session'] == 'M': hdr[i['date']] = i['open']
+                    else: hdr[i['date']] = i['open']
+                if field == 'high':
+                    if i['date'] in list(hdr.keys()):
+                        if i['high'] > hdr[i['date']]: hdr[i['date']] = i['high']
+                    else: hdr[i['date']] = i['high']
+                if field == 'low':
+                    if i['date'] in list(hdr.keys()):
+                        if i['low'] < hdr[i['date']]: hdr[i['date']] = i['low']
+                    else: hdr[i['date']] = i['low']
+                if field == 'close':
+                    if i['date'] in list(hdr.keys()):
+                        if i['session'] == 'A': hdr[i['date']] = i['close']
+                    else: hdr[i['date']] = i['close']
+                if field in ['date', 'volume']:
+                    if i['date'] in list(hdr.keys()):
+                        if i['session'] == 'A': hdr[i['date']] += i['volume']
+                    else: hdr[i['date']] = i['volume']
+            if session in ['A', 'M']:
+                if field == 'open':
+                    if i['date'] in list(hdr.keys()):
+                        if i['session'] == session: hdr[i['date']] = i['open']
+                if field == 'high':
+                    if i['date'] in list(hdr.keys()):
+                        if i['session'] == session: hdr[i['date']] = i['high']
+                if field == 'low':
+                    if i['date'] in list(hdr.keys()):
+                        if i['session'] == session: hdr[i['date']] = i['low']
+                if field == 'close':
+                    if i['date'] in list(hdr.keys()):
+                        if i['session'] == session: hdr[i['date']] = i['close']
+                if field in ['date', 'volume']:
+                    if i['date'] in list(hdr.keys()):
+                        if i['session'] == session: hdr[i['date']] = i['volume']
         _ = {}
         for i in list(hdr.keys()):
             if not datetime.strptime(i, '%Y-%m-%d') > req_date: _[i] = hdr[i]
