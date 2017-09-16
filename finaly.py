@@ -9,18 +9,20 @@ conn.row_factory = lite.Row
 
 class Futures(object):
     def __init__(self, *args, **kwargs):
-        self.code, self.period, self.digits = args[0], 12, -1
+        self.code, self.period, self.digits, self.session = args[0], 12, -1, 'F'
         if len(args) > 1: self.period = args[1]
+        if len(args) > 2: self.session = args[2]
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'period' in list(kwargs.keys()): self.period = kwargs['period']
+        if 'session' in list(kwargs.keys()): self.session = kwargs['session']
         self.__data = conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (db_table, self.code)).fetchall()
         self.close = self.__data[-1]['close']
         self.latest = self.__data[-1]['date']
         self.trade_date = self.extract(field='date')
 
     def __del__(self):
-        self.code = self.__data = self.period = self.close = self.trade_date = self.latest = self.digits = None
-        del self.latest, self.code, self.trade_date, self.close, self.period, self.__data, self.digits
+        self.code = self.__data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = None
+        del self.latest, self.code, self.trade_date, self.close, self.period, self.__data, self.digits, self.session
 
     def __nvalues(self, *args):
         res, tl = [], [args[0]]
@@ -35,7 +37,16 @@ class Futures(object):
         return res
 
     def extract(self, *args, **kwargs):
-        hdr, field, programmatic, src, session, req_date = {}, 'close', False, self.__data, 'F', datetime.strptime(self.latest, '%Y-%m-%d')
+        """
+Main method to extract data from backend database.
+Usage:
+    First positional argument 'src' for raw data from database,
+    Second positional argument 'field' for intended field (column) name (default: 'close'), and
+    Third positional argument 'session' (default: '(F)ull'),
+All can be override with key-value pair. Acceptable keys are 'source' for 'src' type 'list', 'field' type 'string', 'session' type 'string' (one of 'A', 'F' or 'M'), and 'programmatic' type 'boolean'.
+Also in order to extract all available trade date from backend database, 'close' clause is pseudonymously used.
+        """
+        hdr, field, programmatic, src, session, req_date = {}, 'close', False, self.__data, self.session, datetime.strptime(self.latest, '%Y-%m-%d')
         if args: src = args[0]
         if len(args) > 1: field = args[1]
         if len(args) > 2: session = args[2].upper()
