@@ -58,11 +58,11 @@ class Futures(object):
                     if i['date'] in list(hdr.keys()):
                         if i['low'] < hdr[i['date']]: hdr[i['date']] = i['low']
                     else: hdr[i['date']] = i['low']
-                if field == 'close':
+                if field in ['date', 'close']:
                     if i['date'] in list(hdr.keys()):
                         if i['session'] == 'A': hdr[i['date']] = i['close']
                     else: hdr[i['date']] = i['close']
-                if field in ['date', 'volume']:
+                if field == 'volume':
                     if i['date'] in list(hdr.keys()):
                         if i['session'] == 'A': hdr[i['date']] += i['volume']
                     else: hdr[i['date']] = i['volume']
@@ -76,10 +76,10 @@ class Futures(object):
                 if field == 'low':
                     if i['date'] in list(hdr.keys()):
                         if i['session'] == session: hdr[i['date']] = i['low']
-                if field == 'close':
+                if field in ['date', 'close']:
                     if i['date'] in list(hdr.keys()):
                         if i['session'] == session: hdr[i['date']] = i['close']
-                if field in ['date', 'volume']:
+                if field == 'volume':
                     if i['date'] in list(hdr.keys()):
                         if i['session'] == session: hdr[i['date']] = i['volume']
         _ = {}
