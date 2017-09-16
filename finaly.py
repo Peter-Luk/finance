@@ -8,6 +8,12 @@ conn = lite.connect(filepath(db_name))
 conn.row_factory = lite.Row
 
 class Futures(object):
+    """
+Primary object for local futures ('HSI', 'MHI') of current and next calendar month.
+Included technical analysis (sma, ema, wma, kama, rsi, atr, adx, bb, apz, kc, stc and sar under construction).
+Addition statistical method (mean, standard derivation) is provided to (sma, ema, wma, kama, rsi, atr, and adx).
+Statistic range (srange) also provided for all 'addition statistical method' supported.
+    """
     def __init__(self, *args, **kwargs):
         self.code, self.period, self.digits, self.session = args[0], 12, -1, 'F'
         if len(args) > 1: self.period = args[1]
@@ -21,10 +27,17 @@ class Futures(object):
         self.trade_date = self.extract(field='date')
 
     def __del__(self):
+        """
+Standard cleanup (garbage collection) method.
+        """
         self.code = self.__data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = None
         del self.latest, self.code, self.trade_date, self.close, self.period, self.__data, self.digits, self.session
 
     def __nvalues(self, *args):
+        """
+Convert n mutable with m datas into mutable of m datas of n values.
+Key-value pair not supported.
+        """
         res, tl = [], [args[0]]
         i = 1
         while i < len(args):
@@ -44,7 +57,7 @@ Usage:
     Second positional argument 'field' for intended field (column) name (default: 'close'), and
     Third positional argument 'session' (default: '(F)ull'),
 All can be override with key-value pair. Acceptable keys are 'source' for 'src' type 'list', 'field' type 'string', 'session' type 'string' (one of 'A', 'F' or 'M'), and 'programmatic' type 'boolean'.
-Also in order to extract all available trade date from backend database, 'close' clause is pseudonymously used.
+Also in order to extract all available trade date from backend database, 'close' clause is pseudonymous used.
         """
         hdr, field, programmatic, src, session, req_date = {}, 'close', False, self.__data, self.session, datetime.strptime(self.latest, '%Y-%m-%d')
         if args: src = args[0]
