@@ -15,26 +15,26 @@ Addition statistical method (mean, standard derivation) is provided to (sma, ema
 Statistic range (srange) also provided for all 'addition statistical method' supported.
     """
     def __init__(self, *args, **kwargs):
-        self.code, self.period, self.digits, self.session, self.prefield = args[0], 12, -1, 'F', 'close'
+        self.code, self.period, self.digits, self.session, self.__field = args[0], 12, -1, 'F', 'close'
         if len(args) > 1: self.period = args[1]
-        if len(args) > 2: self.prefield = args[2]
+        if len(args) > 2: self.__field = args[2]
         if len(args) > 3: self.session = args[3]
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'period' in list(kwargs.keys()): self.period = kwargs['period']
         if 'session' in list(kwargs.keys()): self.session = kwargs['session']
-        if 'prefer_field' in list(kwargs.keys()): self.prefield = kwargs['prefer_field']
+        if 'prefer_field' in list(kwargs.keys()): self.__field = kwargs['prefer_field']
         self.__raw_data = conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (db_table, self.code)).fetchall()
         self.close = self.__raw_data[-1]['close']
         self.latest = self.__raw_data[-1]['date']
-        self.__data = self.extract(field=self.prefield)
+        self.__data = self.extract(field=self.__field)
         self.trade_date = self.extract(field='date')
 
     def __del__(self):
         """
 Standard cleanup (garbage collection) method.
         """
-        self.code = self.__raw_data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = self.prefield = self.__data = None
-        del self.latest, self.code, self.trade_date, self.close, self.period, self.__raw_data, self.digits, self.session, self.prefield, self.__data
+        self.code = self.__raw_data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = self.__field = self.__data = None
+        del self.latest, self.code, self.trade_date, self.close, self.period, self.__raw_data, self.digits, self.session, self.__field, self.__data
 
     def __nvalues(self, *args):
         """
