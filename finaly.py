@@ -15,23 +15,26 @@ Addition statistical method (mean, standard derivation) is provided to (sma, ema
 Statistic range (srange) also provided for all 'addition statistical method' supported.
     """
     def __init__(self, *args, **kwargs):
-        self.code, self.period, self.digits, self.session = args[0], 12, -1, 'F'
+        self.code, self.period, self.digits, self.session, self.prefield = args[0], 12, -1, 'F', 'close'
         if len(args) > 1: self.period = args[1]
-        if len(args) > 2: self.session = args[2]
+        if len(args) > 2: self.prefield = args[2]
+        if len(args) > 3: self.session = args[3]
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'period' in list(kwargs.keys()): self.period = kwargs['period']
         if 'session' in list(kwargs.keys()): self.session = kwargs['session']
-        self.__data = conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (db_table, self.code)).fetchall()
-        self.close = self.__data[-1]['close']
-        self.latest = self.__data[-1]['date']
+        if 'prefer_field' in list(kwargs.keys()): self.prefield = kwargs['prefer_field']
+        self.__raw_data = conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (db_table, self.code)).fetchall()
+        self.close = self.__raw_data[-1]['close']
+        self.latest = self.__raw_data[-1]['date']
+        self.__data = self.extract(field=self.prefield)
         self.trade_date = self.extract(field='date')
 
     def __del__(self):
         """
 Standard cleanup (garbage collection) method.
         """
-        self.code = self.__data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = None
-        del self.latest, self.code, self.trade_date, self.close, self.period, self.__data, self.digits, self.session
+        self.code = self.__raw_data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = self.prefield = self.__data = None
+        del self.latest, self.code, self.trade_date, self.close, self.period, self.__raw_data, self.digits, self.session, self.prefield, self.__data
 
     def __nvalues(self, *args):
         """
@@ -59,7 +62,7 @@ Usage:
 All can be override with key-value pair. Acceptable keys are 'source' for 'src' type 'list', 'field' type 'string', 'session' type 'string' (one of 'A', 'F' or 'M'), and 'programmatic' type 'boolean'.
 Also in order to extract all available trade date from backend database, 'close' clause is pseudonymous used.
         """
-        hdr, field, programmatic, src, session, req_date = {}, 'close', False, self.__data, self.session, datetime.strptime(self.latest, '%Y-%m-%d')
+        hdr, field, programmatic, src, session, req_date = {}, 'close', False, self.__raw_data, self.session, datetime.strptime(self.latest, '%Y-%m-%d')
         if args: src = args[0]
         if len(args) > 1: field = args[1]
         if len(args) > 2: session = args[2].upper()
@@ -242,7 +245,7 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, values = self.period, self.__nvalues(self.extract(), self.extract(field='volume'))
+        steps, values = self.period, self.__nvalues(self.__data, self.extract(field='volume'))
         if args:
             if isinstance(args[0], list): values = args[0]
             if isinstance(args[0], str):
@@ -267,7 +270,7 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, self.extract()
+        period, values = self.period, self.__data
         fast, slow = period, 2
         if args:
             if isinstance(values, list): values = args[0]
@@ -311,7 +314,7 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        values, period  = self.extract(), self.period
+        values, period  = self.__data, self.period
         if args:
             if isinstance(args[0], list): values = args[0]
             if isinstance(args[0], str):
@@ -358,7 +361,7 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, self.extract()
+        period, values = self.period, self.__data
         if args:
             if isinstance(args[0], list): values = args[0]
             if isinstance(args[0], str):
@@ -504,7 +507,7 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, self.extract()
+        period, values = self.period, self.__data
         if args:
             if isinstance(args[0], list): values= args[0]
             if isinstance(args[0], str):
@@ -518,7 +521,7 @@ steps (default: period) -- optional
             return mean(values[-period:])
 
     def bb(self, *args, **kwargs):
-        period, values = self.period, self.extract()
+        period, values = self.period, self.__data
         if args:
             if isinstance(args[0], list): values= args[0]
             if isinstance(args[0], str):
