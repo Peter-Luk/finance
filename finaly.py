@@ -611,9 +611,9 @@ Average Directional indeX
         if fdiff[0] > 0:
             ep, af = src[0][0], .02
             # res = mean(src[0][:-1]) + af * (ep - mean(src[0][:-1]))
-            res = mean(src[0]) + af * (ep - mean(src[0]))
+            res = src[0][-1] + af * (ep - src[0][-1])
         else:
             ep, af = src[0][1], .02
             # res = mean(src[0][:-1]) - af * (mean(src[0][:-1]) - ep)
-            res = mean(src[0]) - af * (mean(src[0]) - ep)
+            res = src[0][0] - af * (src[0][0] - ep)
         return res
