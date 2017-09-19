@@ -521,6 +521,9 @@ steps (default: period) -- optional
             return mean(values[-period:])
 
     def bb(self, *args, **kwargs):
+        """
+Bollinger Band
+        """
         period, values = self.period, self.__data
         if args:
             if isinstance(args[0], list): values= args[0]
@@ -568,6 +571,9 @@ steps (default: period) -- optional
         return abs(spd - smd) / (spd + smd) * 100
 
     def adx(self, *args, **kwargs):
+        """
+Average Directional indeX
+        """
         period, date = self.period, self.latest
         if args:
             if isinstance(args[0], list): src = args[0]
@@ -599,13 +605,15 @@ steps (default: period) -- optional
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         src = self.__nvalues(self.extract(field='high', date=date), self.extract(field='low', date=date), self.extract(date=date))
         fdiff, i = self.delta([_[-1] for _ in src]), 1
-        while i < self.trade_date.index(date):
+        # while i < self.trade_date.index(date):
             # return self.sar(src[:-1],date=date)
-            i += 1
+            # i += 1
         if fdiff[0] > 0:
             ep, af = src[0][0], .02
-            res = mean(src[0][:-1]) + af * (ep - mean(src[0][:-1]))
+            # res = mean(src[0][:-1]) + af * (ep - mean(src[0][:-1]))
+            res = mean(src[0]) + af * (ep - mean(src[0]))
         else:
             ep, af = src[0][1], .02
-            res = mean(src[0][:-1]) - af * (mean(src[0][:-1]) - ep)
+            # res = mean(src[0][:-1]) - af * (mean(src[0][:-1]) - ep)
+            res = mean(src[0]) - af * (mean(src[0]) - ep)
         return res
