@@ -609,11 +609,13 @@ Average Directional indeX
             # return self.sar(src[:-1],date=date)
             # i += 1
         if fdiff[0] > 0:
-            ep, af = src[0][0], .02
+            # ep, af = src[0][0], .02
             # res = mean(src[0][:-1]) + af * (ep - mean(src[0][:-1]))
             res = src[0][-1]
+            ep, af = src[0][0], .02
         else:
-            ep, af = src[0][-1], .02
+            # ep, af = src[0][-1], .02
             # res = mean(src[0][:-1]) - af * (mean(src[0][:-1]) - ep)
             res = src[0][0]
+            ep, af = src[0][-1], .02
         return res
