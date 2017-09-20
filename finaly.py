@@ -604,11 +604,11 @@ Average Directional indeX
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         src = self.__nvalues(self.extract(field='high', date=date), self.extract(field='low', date=date), self.extract(date=date))
-        fdiff, i = self.delta([_[-1] for _ in src]), 1
+        hdiff, ldiff, i = self.delta([_[0] for _ in src]), self.delta([_[-1] for _ in src]), 1
         # while i < self.trade_date.index(date):
             # return self.sar(src[:-1],date=date)
             # i += 1
-        if fdiff[0] > 0:
+        if ldiff[0] > 0:
             # ep, af = src[0][0], .02
             # res = mean(src[0][:-1]) + af * (ep - mean(src[0][:-1]))
             res = src[0][-1]
