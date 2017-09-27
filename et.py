@@ -1,10 +1,11 @@
 from utilities import filepath
 from datetime import datetime
 from sqlite3 import connect
+from statistics import mean
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
-        self.digits = 2
+        self.period, self.digits = 20, 2
         if args: self.code = args[0]
         if len(args) > 1: self.digits = int(args[1])
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
@@ -16,8 +17,8 @@ class Equities(object):
         self.close = [_ for _ in self.__data if _['Date'] == self.trade_date[-1]][0]['Close']
 
     def __del__(self):
-        self.code = self.digits = self.__data = self.trade_date = self.latest = self.close = None
-        del self.code, self.digits, self.__data, self.trade_date, self.latest, self.close
+        self.code = self.period = self.digits = self.__data = self.trade_date = self.latest = self.close = None
+        del self.code, self.period, self.digits, self.__data, self.trade_date, self.latest, self.close
 
     def get(self, *args, **kwargs):
         digits = 2
@@ -65,3 +66,24 @@ class Equities(object):
         while i < len(self.__data):
             sqstr = "INSERT INTO %s (%s) VALUES" % (table_name, ','.join(list(self.__data[i].keys())))
             i += 1
+
+    def sma(self, *args, **kwargs):
+        """
+Simple Moving Average
+-- accept date and/or steps variables,
+date (default: last trade date) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        period, values = self.period, [_['Close'] for _ in self.__data]
+        if args:
+            if isinstance(args[0], list): values= args[0]
+#            if isinstance(args[0], str):
+#                try: values = self.extract(date=args[0])
+#                except: pass
+        if len(args) > 1: period = args[1]
+        # if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if len(values) >= period:
+            if not self.digits < 0: return round(mean(values[-period:]), self.digits)
+            return mean(values[-period:])
