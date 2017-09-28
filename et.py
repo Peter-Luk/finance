@@ -78,11 +78,23 @@ steps (default: period) -- optional
         period, values = self.period, [_['Close'] for _ in self.__data]
         if args:
             if isinstance(args[0], list): values= args[0]
-#            if isinstance(args[0], str):
+            elif isinstance(args[0], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                except: pass
 #                try: values = self.extract(date=args[0])
 #                except: pass
         if len(args) > 1: period = args[1]
-        # if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                except: pass
+            # values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if len(values) >= period:
             if not self.digits < 0: return round(mean(values[-period:]), self.digits)
