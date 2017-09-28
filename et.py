@@ -124,13 +124,26 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, values = self.period, self.__nvalues([_['Close'] for _ in self.__data], [_['Volume'] for _ in self.__data])
+        steps, values = self.period, [(_['Close'], _['Volume']) for _ in self.__data]
         if args:
             if isinstance(args[0], list): values = args[0]
+            elif isinstance(args[0], str):
+                try: values = [(_['Close'], _['Volume']) for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [(_['Close'], _['Volume']) for _ in self.__data if not args[0] < _['Date']]
+                except: pass
 #            if isinstance(args[0], str):
 #                try: values = self.__nvalues(self.extract(date=args[0]), self.extract(field='volume', date=args[0]))
 #                except: pass
         if len(args) > 1: steps = args[1]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try: values = [(_['Close'], _['Volume']) for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [(_['Close'], _['Volume']) for _ in self.__data if not kwargs['date'] < _['Date']]
+                except: pass
 #        if 'date' in list(kwargs.keys()): values = self.__nvalues(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if len(values) >= steps:
