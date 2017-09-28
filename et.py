@@ -87,3 +87,44 @@ steps (default: period) -- optional
         if len(values) >= period:
             if not self.digits < 0: return round(mean(values[-period:]), self.digits)
             return mean(values[-period:])
+
+    def __nvalues(self, *args):
+        """
+Convert n mutable with m datas into mutable of m datas of n values.
+Key-value pair not supported.
+        """
+        res, tl = [], [args[0]]
+        i = 1
+        while i < len(args):
+            if len(args[i]) == len(args[i-1]): tl.append(args[i])
+            i += 1
+        i = 0
+        while i < len(tl[0]):
+            res.append(tuple([tl[_][i] for _ in range(len(args))]))
+            i += 1
+        return res
+
+    def wma(self, *args, **kwargs):
+        """
+Weighted Moving Average
+-- accept date and/or steps variables,
+date (default: last trade date) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        steps, values = self.period, self.__nvalues([_['Close'] for _ in self.__data], [_['Volume'] for _ in self.__data])
+        if args:
+            if isinstance(args[0], list): values = args[0]
+#            if isinstance(args[0], str):
+#                try: values = self.__nvalues(self.extract(date=args[0]), self.extract(field='volume', date=args[0]))
+#                except: pass
+        if len(args) > 1: steps = args[1]
+#        if 'date' in list(kwargs.keys()): values = self.__nvalues(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
+        if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
+        if len(values) >= steps:
+            res, ys = [], []
+            for x, y in values:
+                res.append(x * y)
+                ys.append(y)
+            if not self.digits < 0: return round(sum(res[-steps:]) / sum(ys[-steps:]), self.digits)
+            return sum(res[-steps:]) / sum(ys[-steps:])
