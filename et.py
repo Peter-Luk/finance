@@ -1,7 +1,7 @@
 from utilities import filepath
 from datetime import datetime
 from sqlite3 import connect
-from statistics import mean
+from statistics import mean, stdev
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
@@ -67,6 +67,22 @@ class Equities(object):
             sqstr = "INSERT INTO %s (%s) VALUES" % (table_name, ','.join(list(self.__data[i].keys())))
             i += 1
 
+    def __nvalues(self, *args):
+        """
+Convert n mutable with m datas into mutable of m datas of n values.
+Key-value pair not supported.
+        """
+        res, tl = [], [args[0]]
+        i = 1
+        while i < len(args):
+            if len(args[i]) == len(args[i-1]): tl.append(args[i])
+            i += 1
+        i = 0
+        while i < len(tl[0]):
+            res.append(tuple([tl[_][i] for _ in range(len(args))]))
+            i += 1
+        return res
+
     def delta(self, *args):
         """
 Helper function for difference of (integer/float) values in single dimension list.
@@ -76,6 +92,219 @@ Helper function for difference of (integer/float) values in single dimension lis
             res.append(values[i + 1] - values[i])
             i += 1
         return res
+
+    def std(self, *args, **kwargs):
+        field, date, period = 'Close', self.latest, self.period
+        if args:
+            if isinstance(args[0], list): src = args[0]
+            if isinstance(args[0], str): field = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], str):
+                try: date = datetime.strptime(args[1], '%Y-%m-%d').date()
+                except: pass
+            else: date = args[1]
+            # date = args[1]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try: date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
+                except: pass
+            else: date = kwargs['date']
+            # date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if 'field' in list(kwargs.keys()): field = kwargs['field']
+        if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx']:
+            # src, i, ac = [], period, self.extract(date=date)
+            src, i, ac = [], period, [_['Close'] for _ in self.__data]
+            if field == 'rsi':
+                while i < len(ac):
+                    src.append(self.rsi(ac[:i+1], period))
+                    i += 1
+            if field == 'wma':
+                # av = self.extract(field='volume', date=date)
+                av = [_['Volume'] for _ in self.__data if not _['Date'] > date]
+                i -= 1
+                while i < len(ac):
+                    src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), period))
+                    i += 1
+            if field == 'atr':
+                i -= 1
+                di = self.trade_date.index(date)
+                src.extend([self.atr(self.trade_date[_], period) for _ in range(i, di)])
+            if field == 'adx':
+                i += 1
+                di = self.trade_date.index(date)
+                src.extend([self.adx(self.trade_date[_], period) for _ in range(i, di)])
+            if field == 'ema':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.ema(ac[:i+1], period))
+                    i += 1
+            if field == 'sma':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.sma(ac[:i+1], period))
+                    i += 1
+            if field == 'kama':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.kama(ac[:i+1], period))
+                    i += 1
+        else: src = [_[field] for _ in self.__data if not _['Date'] > date]
+        # else: src = self.extract(field=field, date=date)
+        return stdev(src)
+
+    def mean(self, *args, **kwargs):
+        field, date, period = 'Close', self.latest, self.period
+        if args:
+            if isinstance(args[0], list): src = args[0]
+            if isinstance(args[0], str): field = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], str):
+                try: date = datetime.strptime(args[1], '%Y-%m-%d').date()
+                except: pass
+            else: date = args[1]
+            # date = args[1]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try: date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
+                except: pass
+            else: date = kwargs['date']
+            # date = kwargs['date']
+        if 'field' in list(kwargs.keys()): field = kwargs['field']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx']:
+            # src, i, ac = [], period, self.extract(date=date)
+            src, i, ac = [], period, [_['Close'] for _ in self.__data]
+            if field == 'rsi':
+                while i < len(ac):
+                    src.append(self.rsi(ac[:i+1], period))
+                    i += 1
+            if field == 'wma':
+                av = [_['Volume'] for _ in self.__data if not _['Date'] > date]
+                # av = self.extract(field='volume', date=date)
+                i -= 1
+                while i < len(ac):
+                    src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), period))
+                    i += 1
+            if field == 'atr':
+                i -= 1
+                di = self.trade_date.index(date)
+                src.extend([self.atr(self.trade_date[_], period) for _ in range(i, di)])
+            if field == 'adx':
+                i += 1
+                di = self.trade_date.index(date)
+                src.extend([self.adx(self.trade_date[_], period) for _ in range(i, di)])
+            if field == 'ema':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.ema(ac[:i+1], period))
+                    i += 1
+            if field == 'sma':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.sma(ac[:i+1], period))
+                    i += 1
+            if field == 'kama':
+                i -= 1
+                while i < len(ac):
+                    src.append(self.kama(ac[:i+1], period))
+                    i += 1
+        else: src = [_[field] for _ in self.__data if not _['Date'] > date]
+        # else: src = self.extract(field=field, date=date)
+        return mean(src)
+
+    def ema(self, *args, **kwargs):
+        """
+Exponential Moving Average
+-- accept values(data series or date) as first positional variable and steps as second positional variable,
+values (default: all available) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        period, values = self.period, self.__data
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            elif isinstance(args[0], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                except: pass
+                # try: values = self.extract(date=args[0])
+                # except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                except: pass
+            # values = self.extract(date=kwargs['date'])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        count = len(values)
+        if count >= period:
+            while count > period:
+                if not self.digits < 0: return round((self.ema(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                return (self.ema(values[:-1], period) * (period - 1) + values[-1]) / period
+            if not self.digits < 0: return round(mean(values), self.digits)
+            return mean(values)
+
+    def kama(self, *args, **kwargs):
+        """
+Kaufman's Adaptive Moving Average
+-- accept values(data series or date) as first positional variable and steps as second positional variable,
+values (default: all available) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        period, values = self.period, self.__data
+        fast, slow = period, 2
+        if args:
+            if isinstance(values, list): values = args[0]
+            elif isinstance(values, str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                except: pass
+                # try: values = self.extract(date=args[0])
+                # except: pass
+        if len(args) > 1: period = args[1]
+        if len(args) > 2: fast = args[2]
+        if len(args) > 3: slow = args[3]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                except: pass
+            # values = self.extract(date=kwargs['date'])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if 'fast' in list(kwargs.keys()): fast = kwargs['fast']
+        if 'slow' in list(kwargs.keys()): slow = kwargs['slow']
+
+        def absum(*args):
+            i, res, values = 0, 0, args[0]
+            while i < len(values):
+                if values[i] > 0: res += values[i]
+                if values[i] < 0: res += -values[i]
+                i += 1
+            return res
+
+        count = len(values)
+        if count >= period:
+            fc = 2. / (fast + 1)
+            sc = 2. / (slow + 1)
+            while count > period:
+                er = (values[-1] - values[-period]) / absum(self.delta(values[-period:]))
+                alpha = (er * (fc - sc) + sc) ** 2
+                pk = self.kama(values[:-1], period)
+                if not self.digits < 0: return round(alpha * (values[-1] - pk) + pk, self.digits)
+                return alpha * (values[-1] - pk) + pk
+            if not self.digits < 0: return round(mean(values), self.digits)
+            return mean(values)
 
     def rsi(self, *args, **kwargs):
         """
