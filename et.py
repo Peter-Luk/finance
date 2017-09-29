@@ -192,6 +192,43 @@ steps (default: period) -- optional
             if not self.digits < 0: return round(mean(values), self.digits)
             return mean(values)
 
+    def ema(self, *args, **kwargs):
+        """
+Exponential Moving Average
+-- accept values(data series or date) as first positional variable and steps as second positional variable,
+values (default: all available) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        period, values = self.period, self.__data
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            elif isinstance(args[0], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                except: pass
+                # try: values = self.extract(date=args[0])
+                # except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                except: pass
+            # values = self.extract(date=kwargs['date'])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        count = len(values)
+        if count >= period:
+            while count > period:
+                if not self.digits < 0: return round((self.ema(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                return (self.ema(values[:-1], period) * (period - 1) + values[-1]) / period
+            if not self.digits < 0: return round(mean(values), self.digits)
+            return mean(values)
+
     def sma(self, *args, **kwargs):
         """
 Simple Moving Average
