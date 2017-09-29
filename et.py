@@ -67,6 +67,75 @@ class Equities(object):
             sqstr = "INSERT INTO %s (%s) VALUES" % (table_name, ','.join(list(self.__data[i].keys())))
             i += 1
 
+    def delta(self, *args):
+        """
+Helper function for difference of (integer/float) values in single dimension list.
+        """
+        i, res, values = 0, [], args[0]
+        while i < len(values) - 1:
+            res.append(values[i + 1] - values[i])
+            i += 1
+        return res
+
+    def rsi(self, *args, **kwargs):
+        """
+Relative Strength Index
+-- accept date and/or steps variables,
+date (default: last trade date) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        values, period  = [_['Close'] for _ in self.__data], self.period
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            elif isinstance(args[0], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                except: pass
+                # try: values = self.extract(date=args[0])
+                # except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                except: pass
+            else:
+                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                except: pass
+            # values = self.extract(date=kwargs['date'])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        dl = self.delta(values)
+
+        def ag(*args):
+            gs = i = t = 0
+            values, period = args[0], self.period
+            if len(args) > 1: period = args[1]
+            while period < len(values):
+                if values[-1] > 0: t = values[-1]
+                return (ag(values[:-1], period) * (period - 1) + t) / period
+            while i < period:
+                if values[i] > 0: gs += values[i]
+                i += 1
+            return gs / period
+
+        def al(*args):
+            ls = i = t = 0
+            values, period = args[0], self.period
+            if len(args) > 1: period = args[1]
+            while period < len(values):
+                if values[-1] < 0: t = abs(values[-1])
+                return (al(values[:-1], period) * (period - 1) + t) / period
+            while i < period:
+                if values[i] < 0: ls += abs(values[i])
+                i += 1
+            return ls / period
+
+        rs = ag(dl, period) / al(dl, period)
+        if not self.digits < 0: return round(100 - 100 / (1 + rs), self.digits)
+        return 100 - 100 / (1 + rs)
+
     def sma(self, *args, **kwargs):
         """
 Simple Moving Average
