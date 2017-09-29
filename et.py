@@ -96,22 +96,6 @@ steps (default: period) -- optional
         if len(values) >= period:
             if not self.digits < 0: return round(mean(values[-period:]), self.digits)
             return mean(values[-period:])
-#
-#    def __nvalues(self, *args):
-#        """
-#Convert n mutable with m datas into mutable of m datas of n values.
-#Key-value pair not supported.
-#        """
-#        res, tl = [], [args[0]]
-#        i = 1
-#        while i < len(args):
-#            if len(args[i]) == len(args[i-1]): tl.append(args[i])
-#            i += 1
-#        i = 0
-#        while i < len(tl[0]):
-#            res.append(tuple([tl[_][i] for _ in range(len(args))]))
-#            i += 1
-#        return res
 
     def wma(self, *args, **kwargs):
         """
