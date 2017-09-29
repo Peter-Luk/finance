@@ -2,6 +2,8 @@ from utilities import filepath
 from datetime import datetime
 from sqlite3 import connect
 from statistics import mean, stdev
+import sys
+sys.setrecursionlimit(10000)
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
@@ -428,3 +430,80 @@ steps (default: period) -- optional
                 ys.append(y)
             if not self.digits < 0: return round(sum(res[-steps:]) / sum(ys[-steps:]), self.digits)
             return sum(res[-steps:]) / sum(ys[-steps:])
+
+    def tr(self, *args, **kwargs):
+        res = []
+        if args: date = args[0]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        cs, hs, ls = [_['Close'] for _ in self.__data if not _['Date'] > date], [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not]_['Date'] > date]
+        if len(cs) == len(hs) == len(ls):
+            i = 1
+            res.append((hs[0], ls[0]))
+            while i < len(cs):
+                h, l = hs[i], ls[i]
+                if cs[i-1] > h: h = cs[i-1]
+                if cs[i-1] < l: l = cs[i-1]
+                res.append((h, l))
+                i += 1
+        return res
+
+    def __dx(self, *args, **kwargs):
+        period, date = self.period, self.latest
+        if args:
+            if isinstance(args[0], str):
+                date = args[0]
+                # try: date = args[0]
+                # except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        ah, al = [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
+        # ah, al = self.extract(field='high', date=date), self.extract(field='low', date=date)
+        pdm, mdm, i, tr = [], [], 1, [_[0]-_[-1] for _ in self.tr(date, period)]
+        if len(ah) == len(al):
+            while i < len(ah):
+                th, tl = ah[i] - ah[i-1], al[i-1] - al[i]
+                if th > tl: pdm.append(th)
+                else: pdm.append(0)
+                if tl > th: mdm.append(tl)
+                else: mdm.append(0)
+                i += 1
+
+        def sdm(*args, **kwargs):
+            period = self.period
+            if args: src = args[0]
+            if len(args) > 1: period = args[1]
+            if 'source' in list(kwargs.keys()): src = kwargs['source']
+            if 'period' in list(kwargs.keys()): period = kwargs['period']
+            count = len(src)
+            while count > period:
+                return (sdm(src[:-1], period) * (period - 1) / 100 + (src[-1] / tr[-1])) / period * 100
+            return mean(src) / mean(tr) * 100
+
+        spd, smd = sdm(pdm, period), sdm(mdm, period)
+        return abs(spd - smd) / (spd + smd) * 100
+
+    def adx(self, *args, **kwargs):
+        """
+Average Directional indeX
+        """
+        period, date = self.period, self.latest
+        if args:
+            if isinstance(args[0], list): src = args[0]
+            if isinstance(args[0], str): date = args[0]
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if args:
+            if isinstance(args[0], str) or ('date' in list(kwargs.keys())):
+                try: src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
+                except: pass
+        else:
+            try: src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
+            except: pass
+        count = len(src)
+        while count > period:
+            if not self.digits < 0: return round((self.adx(src[:-1], period) * (period - 1) + src[-1]) / period, self.digits)
+            return (self.adx(src[:-1], period) * (period - 1) + src[-1]) / period
+        if not self.digits < 0: return round(mean(src), self.digits)
+        return mean(src)
