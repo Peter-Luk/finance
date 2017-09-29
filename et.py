@@ -84,8 +84,6 @@ steps (default: period) -- optional
             else:
                 try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
                 except: pass
-#                try: values = self.extract(date=args[0])
-#                except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
@@ -94,27 +92,26 @@ steps (default: period) -- optional
             else:
                 try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
                 except: pass
-            # values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if len(values) >= period:
             if not self.digits < 0: return round(mean(values[-period:]), self.digits)
             return mean(values[-period:])
-
-    def __nvalues(self, *args):
-        """
-Convert n mutable with m datas into mutable of m datas of n values.
-Key-value pair not supported.
-        """
-        res, tl = [], [args[0]]
-        i = 1
-        while i < len(args):
-            if len(args[i]) == len(args[i-1]): tl.append(args[i])
-            i += 1
-        i = 0
-        while i < len(tl[0]):
-            res.append(tuple([tl[_][i] for _ in range(len(args))]))
-            i += 1
-        return res
+#
+#    def __nvalues(self, *args):
+#        """
+#Convert n mutable with m datas into mutable of m datas of n values.
+#Key-value pair not supported.
+#        """
+#        res, tl = [], [args[0]]
+#        i = 1
+#        while i < len(args):
+#            if len(args[i]) == len(args[i-1]): tl.append(args[i])
+#            i += 1
+#        i = 0
+#        while i < len(tl[0]):
+#            res.append(tuple([tl[_][i] for _ in range(len(args))]))
+#            i += 1
+#        return res
 
     def wma(self, *args, **kwargs):
         """
@@ -133,9 +130,6 @@ steps (default: period) -- optional
             else:
                 try: values = [(_['Close'], _['Volume']) for _ in self.__data if not args[0] < _['Date']]
                 except: pass
-#            if isinstance(args[0], str):
-#                try: values = self.__nvalues(self.extract(date=args[0]), self.extract(field='volume', date=args[0]))
-#                except: pass
         if len(args) > 1: steps = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
@@ -144,7 +138,6 @@ steps (default: period) -- optional
             else:
                 try: values = [(_['Close'], _['Volume']) for _ in self.__data if not kwargs['date'] < _['Date']]
                 except: pass
-#        if 'date' in list(kwargs.keys()): values = self.__nvalues(self.extract(date=kwargs['date']), self.extract(field='volume', date=kwargs['date']))
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if len(values) >= steps:
             res, ys = [], []
