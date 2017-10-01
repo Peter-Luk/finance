@@ -433,8 +433,12 @@ steps (default: period) -- optional
 
     def tr(self, *args, **kwargs):
         res = []
-        if args: date = args[0]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if args:
+            if isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
+            else: date = args[0]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
+            else: date = kwargs['date']
         cs, hs, ls = [_['Close'] for _ in self.__data if not _['Date'] > date], [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
         if len(cs) == len(hs) == len(ls):
             i = 1
@@ -448,14 +452,16 @@ steps (default: period) -- optional
         return res
 
     def __dx(self, *args, **kwargs):
-        period, date = self.period, self.latest
+        period, date = self.period, self.trade_date[-1]
         if args:
-            if isinstance(args[0], str):
-                date = args[0]
+            if isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
+            else: date = args[0]
                 # try: date = args[0]
                 # except: pass
         if len(args) > 1: period = args[1]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
+            else:else: date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ah, al = [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
         # ah, al = self.extract(field='high', date=date), self.extract(field='low', date=date)
@@ -487,12 +493,15 @@ steps (default: period) -- optional
         """
 Average Directional indeX
         """
-        period, date = self.period, self.latest
+        period, date = self.period, self.trade_date[-1]
         if args:
             if isinstance(args[0], list): src = args[0]
-            if isinstance(args[0], str): date = args[0]
+            elif isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
+            else: date = args[0]
         if len(args) > 1: period = args[1]
-        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str): date = datetime(kwargs['date'], '%Y-%m-%d').date()
+            else: date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if args:
             if isinstance(args[0], str) or ('date' in list(kwargs.keys())):
