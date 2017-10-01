@@ -540,8 +540,9 @@ Bollinger Band
         period, date = self.period, self.latest
         if args:
             if isinstance(args[0], str):
-                try: date = args[0]
-                except: pass
+                date = args[0]
+                # try: date = args[0]
+                # except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
