@@ -223,7 +223,7 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, self.__data
+        period, values = self.period, [_['Close'] for _ in self.__data]
         if args:
             if isinstance(args[0], list): values = args[0]
             elif isinstance(args[0], str):
