@@ -435,7 +435,7 @@ steps (default: period) -- optional
         res = []
         if args: date = args[0]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
-        cs, hs, ls = [_['Close'] for _ in self.__data if not _['Date'] > date], [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not]_['Date'] > date]
+        cs, hs, ls = [_['Close'] for _ in self.__data if not _['Date'] > date], [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
         if len(cs) == len(hs) == len(ls):
             i = 1
             res.append((hs[0], ls[0]))
