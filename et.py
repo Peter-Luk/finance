@@ -7,7 +7,7 @@ sys.setrecursionlimit(10000)
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
-        self.period, self.digits = 20, 2
+        self.period, self.digits = 20, -1
         if args: self.code = args[0]
         if len(args) > 1: self.digits = int(args[1])
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
@@ -15,7 +15,7 @@ class Equities(object):
         self.__data = self.get(self.code, self.digits)
         self.trade_date = [_['Date'] for _ in self.__data]
         self.trade_date.sort()
-        self.latest = self.trade_date[-1].strftime('%d-%m-%Y')
+        self.latest = self.trade_date[-1].strftime('%Y-%m-%d')
         self.close = [_ for _ in self.__data if _['Date'] == self.trade_date[-1]][0]['Close']
 
     def __del__(self):
@@ -434,11 +434,13 @@ steps (default: period) -- optional
     def tr(self, *args, **kwargs):
         res = []
         if args:
-            if isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
+            if isinstance(args[0], str):
+                try: date = datetime.strptime(args[0], '%Y-%m-%d').date()
+                except: pass
             else: date = args[0]
         if 'date' in list(kwargs.keys()):
-            if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
-            else: date = kwargs['date']
+            try: date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
+            except: date = kwargs['date']
         cs, hs, ls = [_['Close'] for _ in self.__data if not _['Date'] > date], [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
         if len(cs) == len(hs) == len(ls):
             i = 1
@@ -454,14 +456,14 @@ steps (default: period) -- optional
     def __dx(self, *args, **kwargs):
         period, date = self.period, self.trade_date[-1]
         if args:
-            if isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
+            if isinstance(args[0], str):
+                try: date = datetime.strptime(args[0], '%Y-%m-%d').date()
+                except: pass
             else: date = args[0]
-                # try: date = args[0]
-                # except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
-            if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
-            else:else: date = kwargs['date']
+            try: date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
+            except: date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ah, al = [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
         # ah, al = self.extract(field='high', date=date), self.extract(field='low', date=date)
@@ -484,10 +486,45 @@ steps (default: period) -- optional
             count = len(src)
             while count > period:
                 return (sdm(src[:-1], period) * (period - 1) / 100 + (src[-1] / tr[-1])) / period * 100
+            if mean(tr) == 0: return 100
             return mean(src) / mean(tr) * 100
 
         spd, smd = sdm(pdm, period), sdm(mdm, period)
         return abs(spd - smd) / (spd + smd) * 100
+
+    def atr(self, *args, **kwargs):
+        """
+Average True Range
+-- accept date variables,
+date (default: last trade date) on record -- optional
+--> float
+        """
+        date, period = self.latest, self.period
+        values = [x[0]-x[-1] for x in self.tr(date)]
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            if isinstance(args[0], str):
+                try:
+                    date = args[0]
+                    values = [x[0]-x[-1] for x in self.tr(date)]
+                except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()):
+            if isinstance(kwargs['date'], str):
+                try:
+                    date = kwargs['date']
+                    values = [x[0]-x[-1] for x in self.tr(date)]
+                except: pass
+            # values = [x[0]-x[-1] for x in self.tr(date)]
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+
+        count = len(values)
+        if count >= period:
+            while count > period:
+                if not self.digits < 0: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                return (self.atr(values[:-1], period) * (period - 1) + values[-1]) / period
+            if not self.digits < 0: return round(mean(values), self.digits)
+            return mean(values)
 
     def adx(self, *args, **kwargs):
         """
@@ -496,20 +533,24 @@ Average Directional indeX
         period, date = self.period, self.trade_date[-1]
         if args:
             if isinstance(args[0], list): src = args[0]
-            elif isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
-            else: date = args[0]
+            else:
+                if isinstance(args[0], str):
+                    try: date = datetime.strptime(args[0], '%Y-%m-%d').date()
+                    except:pass
+                else: date = args[0]
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
-            if isinstance(kwargs['date'], str): date = datetime(kwargs['date'], '%Y-%m-%d').date()
-            else: date = kwargs['date']
+            try: date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
+            except: date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if args:
             if isinstance(args[0], str) or ('date' in list(kwargs.keys())):
                 try: src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
                 except: pass
         else:
-            try: src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
-            except: pass
+            src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
+            # try: src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
+            # except: pass
         count = len(src)
         while count > period:
             if not self.digits < 0: return round((self.adx(src[:-1], period) * (period - 1) + src[-1]) / period, self.digits)
