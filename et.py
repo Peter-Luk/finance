@@ -64,7 +64,7 @@ class Equities(object):
         if len(args) > 1: data_type = args[1]
         if 'name' in list(kwargs.keys()): table_name = kwargs['name']
         if 'type' in list(kwargs.keys()): data_type = kwargs['type']
-        i = 0
+        isql, i = 0
         while i < len(self.__data):
             k, v, s = [_.lower() for _ in list(self.__data[i].keys())], list(self.__data[i].values()), []
             for j in range(len(k)):
@@ -76,8 +76,9 @@ class Equities(object):
             k.append('eid')
             v.append(int(self.code.split('.')[0]))
             s.append('%i')
-            sqstr = "INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")" % tuple([table_name, ','.join(k)].extend(v))
+            isql.append("INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")" % tuple([table_name, ','.join(k)].extend(v)))
             i += 1
+        return isql
 
     def __nvalues(self, *args):
         """
