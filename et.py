@@ -7,7 +7,7 @@ sys.setrecursionlimit(10000)
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
-        self.period, self.digits = 20, 2
+        self.period, self.digits = 20, 4
         if args: self.code = args[0]
         if len(args) > 1: self.digits = int(args[1])
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
@@ -66,7 +66,17 @@ class Equities(object):
         if 'type' in list(kwargs.keys()): data_type = kwargs['type']
         i = 0
         while i < len(self.__data):
-            sqstr = "INSERT INTO %s (%s) VALUES" % (table_name, ','.join(list(self.__data[i].keys())))
+            k, v, s = [_.lower() for _ in list(self.__data[i].keys())], list(self.__data[i].values()), []
+            for j in range(len(k)):
+                if k[j] == 'date':
+                    v[j] = v[j].strftime('%Y-%m-%d')
+                    s.append("'%s'")
+                elif k[j] == 'volume': s.append('%i')
+                else: s.append('%f')
+            k.append('eid')
+            v.append(int(self.code.split('.')[0]))
+            s.append('%i')
+            sqstr = "INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")" % tuple([table_name, ','.join(k)].extend(v))
             i += 1
 
     def __nvalues(self, *args):
@@ -461,7 +471,7 @@ steps (default: period) -- optional
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
-            else:else: date = kwargs['date']
+            else: date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ah, al = [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
         # ah, al = self.extract(field='high', date=date), self.extract(field='low', date=date)
