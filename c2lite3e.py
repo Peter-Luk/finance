@@ -56,13 +56,18 @@ class Equities(object):
             i += 1
         return tmp
 
-    def put(self, *args, **kwargs):
+    def store(self, *args, **kwargs):
         table_name = db_table
         if args: table_name = args[0]
         if 'name' in list(kwargs.keys()): table_name = kwargs['name']
-        isql, i = [], 0
+        isql, i, sd, nd = [], 0, [_['date'] for _ in self.__stored_data], []
         while i < len(self.__data):
-            k, v, s = [_.lower() for _ in list(self.__data[i].keys())], list(self.__data[i].values()), []
+            _ = self.__data[i]
+            if _['Date'] not in sd: nd.append(_)
+            i += 1
+        i = 0
+        while i < len(nd):
+            k, v, s = [_.lower() for _ in list(nd[i].keys())], list(nd[i].values()), []
             for j in range(len(k)):
                 if k[j] == 'date':
                     v[j] = v[j].strftime('%Y-%m-%d')
@@ -77,4 +82,7 @@ class Equities(object):
             tl.extend(v)
             isql.append(sqlstr % tuple(tl))
             i += 1
-        return isql
+        try:
+            conn.cursors.executemany(isql)
+            return len(isql)
+        except: return False
