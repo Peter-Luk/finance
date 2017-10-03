@@ -14,7 +14,7 @@ class Equities(object):
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'digits' in list(kwargs.keys()): self.digits = int(kwargs['digits'])
         self.__data = self.get(self.code, self.digits)
-        self.__stored_data = conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC, session DESC" % (db_table, int(self.code.split('.')[0]))).fetchall()
+        self.__stored_data = conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, int(self.code.split('.')[0]))).fetchall()
 
     def __del__(self):
         self.code = self.digits = self.__data = self.__stored_data = None
@@ -57,11 +57,9 @@ class Equities(object):
         return tmp
 
     def put(self, *args, **kwargs):
-        data_type = 'sql'
+        table_name = db_table
         if args: table_name = args[0]
-        if len(args) > 1: data_type = args[1]
         if 'name' in list(kwargs.keys()): table_name = kwargs['name']
-        if 'type' in list(kwargs.keys()): data_type = kwargs['type']
         isql, i = [], 0
         while i < len(self.__data):
             k, v, s = [_.lower() for _ in list(self.__data[i].keys())], list(self.__data[i].values()), []
@@ -74,6 +72,7 @@ class Equities(object):
             k.append('eid')
             v.append(int(self.code.split('.')[0]))
             s.append('%i')
-            isql.append("INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")" % tuple([table_name, ','.join(k)].extend(v)))
+            sqlstr = "INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")"
+            isql.append(sqlstr % tuple([table_name, ','.join(k)].extend(v)))
             i += 1
         return isql
