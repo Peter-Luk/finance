@@ -72,7 +72,8 @@ class Equities(object):
             k.append('eid')
             v.append(int(self.code.split('.')[0]))
             s.append('%i')
-            sqlstr = "INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")"
-            isql.append(sqlstr % tuple([table_name, ','.join(k)].extend(v)))
+            tl = [table_name, ','.join(k)]
+            tl.extend(v)
+            isql.append("INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")" % tuple(tl))
             i += 1
         return isql
