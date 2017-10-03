@@ -1,6 +1,5 @@
 from utilities import filepath
 from datetime import datetime
-from sqlite3 import connect
 from statistics import mean, stdev
 import sys
 sys.setrecursionlimit(10000)
