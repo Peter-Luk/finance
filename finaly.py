@@ -4,9 +4,6 @@ iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'statistics':('mean', 'std
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
-conn = lite.connect(filepath(db_name))
-conn.row_factory = lite.Row
-
 class Futures(object):
     """
 Primary object for local futures ('HSI', 'MHI') of current and next calendar month.
@@ -23,7 +20,9 @@ Statistic range (srange) also provided for all 'addition statistical method' sup
         if 'period' in list(kwargs.keys()): self.period = kwargs['period']
         if 'session' in list(kwargs.keys()): self.session = kwargs['session']
         if 'prefer_field' in list(kwargs.keys()): self.__field = kwargs['prefer_field']
-        self.__raw_data = conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (db_table, self.code)).fetchall()
+        self.conn = lite.connect(filepath(db_name))
+        self.conn.row_factory = lite.Row
+        self.__raw_data = self.conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (db_table, self.code)).fetchall()
         self.close = self.__raw_data[-1]['close']
         self.latest = self.__raw_data[-1]['date']
         self.__data = self.extract(field=self.__field)
@@ -33,8 +32,9 @@ Statistic range (srange) also provided for all 'addition statistical method' sup
         """
 Standard cleanup (garbage collection) method.
         """
-        self.code = self.__raw_data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = self.__field = self.__data = None
-        del self.latest, self.code, self.trade_date, self.close, self.period, self.__raw_data, self.digits, self.session, self.__field, self.__data
+        seld.conn.close()
+        self.conn = self.code = self.__raw_data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = self.__field = self.__data = None
+        del self.conn, self.latest, self.code, self.trade_date, self.close, self.period, self.__raw_data, self.digits, self.session, self.__field, self.__data
 
     def __nvalues(self, *args):
         """
@@ -541,8 +541,6 @@ Bollinger Band
         if args:
             if isinstance(args[0], str):
                 date = args[0]
-                # try: date = args[0]
-                # except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
