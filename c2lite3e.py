@@ -80,10 +80,10 @@ class Equities(object):
             sqlstr = "INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")"
             tl = [table_name, ','.join(k)]
             tl.extend(v)
-            isql.append(sqlstr % tuple(tl))
-            # conn.cursor().execute(sqlstr % tuple(tl))
+            # isql.append(sqlstr % tuple(tl))
+            conn.cursor().execute(sqlstr % tuple(tl))
             i += 1
-        # conn.commit()
-        # conn.close()
-        return isql
-        # return i
+        conn.commit()
+        conn.close()
+        # return isql
+        return i
