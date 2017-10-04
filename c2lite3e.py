@@ -17,6 +17,7 @@ class Equities(object):
         self.__stored_data = conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, int(self.code.split('.')[0]))).fetchall()
 
     def __del__(self):
+        self.conn.close()
         self.conn = self.code = self.digits = self.__data = self.__stored_data = None
         del self.conn, self.code, self.digits, self.__data, self.__stored_data
 
