@@ -14,7 +14,7 @@ class Equities(object):
         self.conn = lite.connect(filepath(db_name))
         self.conn.row_factory = lite.Row
         self.__data = self.get(self.code, self.digits)
-        self.__stored_data = conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, int(self.code.split('.')[0]))).fetchall()
+        self.__stored_data = self.conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, int(self.code.split('.')[0]))).fetchall()
 
     def __del__(self):
         self.conn.close()
