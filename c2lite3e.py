@@ -61,7 +61,7 @@ class Equities(object):
         table_name = db_table
         if args: table_name = args[0]
         if 'name' in list(kwargs.keys()): table_name = kwargs['name']
-        isql, i, sd, nd = [], 0, [datetime.strptime(_['date'], '%Y-%m-%d').date() for _ in self.__stored_data], []
+        i, sd, nd = 0, [datetime.strptime(_['date'], '%Y-%m-%d').date() for _ in self.__stored_data], []
         while i < len(self.__data):
             _ = self.__data[i]
             if _['Date'] not in sd: nd.append(_)
@@ -81,10 +81,7 @@ class Equities(object):
             sqlstr = "INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")"
             tl = [table_name, ','.join(k)]
             tl.extend(v)
-            # isql.append(sqlstr % tuple(tl))
             conn.cursor().execute(sqlstr % tuple(tl))
             i += 1
         conn.commit()
-        # conn.close()
-        # return isql
         return i
