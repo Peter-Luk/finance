@@ -32,7 +32,7 @@ Statistic range (srange) also provided for all 'addition statistical method' sup
         """
 Standard cleanup (garbage collection) method.
         """
-        seld.conn.close()
+        self.conn.close()
         self.conn = self.code = self.__raw_data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = self.__field = self.__data = None
         del self.conn, self.latest, self.code, self.trade_date, self.close, self.period, self.__raw_data, self.digits, self.session, self.__field, self.__data
 
