@@ -15,7 +15,7 @@ class Equities(object):
         if args:
             try:
                 if isinstance(args[0], str): self.code = int(args[0])
-                if isinstance(kargs[0], int): self.code = args[0]
+                if isinstance(args[0], int): self.code = args[0]
             except: pass
         if len(args) > 1: self.digits = int(args[1])
         if 'code' in list(kwargs.keys()):
