@@ -3,8 +3,6 @@ from datetime import datetime
 import sqlite3 as lite
 
 db_name, db_table = 'Securities', 'records'
-conn = lite.connect(filepath(db_name))
-conn.row_factory = lite.Row
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
@@ -13,12 +11,14 @@ class Equities(object):
         if len(args) > 1: self.digits = int(args[1])
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'digits' in list(kwargs.keys()): self.digits = int(kwargs['digits'])
+        self.conn = lite.connect(filepath(db_name))
+        self.conn.row_factory = lite.Row
         self.__data = self.get(self.code, self.digits)
         self.__stored_data = conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, int(self.code.split('.')[0]))).fetchall()
 
     def __del__(self):
-        self.code = self.digits = self.__data = self.__stored_data = None
-        del self.code, self.digits, self.__data, self.__stored_data
+        self.conn = self.code = self.digits = self.__data = self.__stored_data = None
+        del self.conn, self.code, self.digits, self.__data, self.__stored_data
 
     def get(self, *args, **kwargs):
         digits = 2
@@ -80,7 +80,7 @@ class Equities(object):
             sqlstr = "INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")"
             tl = [table_name, ','.join(k)]
             tl.extend(v)
-            conn.cursor().execute(sqlstr % tuple(tl))
+            self.conn.cursor().execute(sqlstr % tuple(tl))
             i += 1
-        conn.commit()
+        self.conn.commit()
         return i
