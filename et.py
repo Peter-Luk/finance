@@ -1,8 +1,13 @@
 from utilities import filepath
 from datetime import datetime
 from statistics import mean, stdev
+import sqlite3 as lite
 import sys
 sys.setrecursionlimit(10000)
+
+db_name, db_table = 'Securities', 'records'
+conn = lite.connect(filepath(db_name))
+conn.row_factory = lite.Row
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
@@ -11,73 +16,16 @@ class Equities(object):
         if len(args) > 1: self.digits = int(args[1])
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if 'digits' in list(kwargs.keys()): self.digits = int(kwargs['digits'])
-        self.__data = self.get(self.code, self.digits)
-        self.trade_date = [_['Date'] for _ in self.__data]
+        self.__data = conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, int(self.code))).fetchall()
+        # self.__data = self.get(self.code, self.digits)
+        self.trade_date = [_['date'] for _ in self.__data]
         self.trade_date.sort()
-        self.latest = self.trade_date[-1].strftime('%d-%m-%Y')
-        self.close = [_ for _ in self.__data if _['Date'] == self.trade_date[-1]][0]['Close']
+        self.latest = self.trade_date[-1]
+        self.close = [_ for _ in self.__data if _['date'] == self.trade_date[-1]][0]['close']
 
     def __del__(self):
         self.code = self.period = self.digits = self.__data = self.trade_date = self.latest = self.close = None
         del self.code, self.period, self.digits, self.__data, self.trade_date, self.latest, self.close
-
-    def get(self, *args, **kwargs):
-        digits = 2
-        if 'code' in list(kwargs.keys()): self.code = kwargs['code']
-        if args: code = args[0]
-        if len(args) > 1: digits = int(args[1])
-        if 'code' in list(kwargs.keys()): code = kwargs['code']
-        if 'digits' in list(kwargs.keys()): digits = int(kwargs['digits'])
-        tmp = open(filepath('.'.join((code, 'csv')), subpath='csv'))
-        data = [_[:-1] for _ in tmp.readlines()]
-        tmp.close()
-        fields = data[0].split(',')
-        i, values = 1, []
-        while i < len(data):
-            tmp = data[i].split(',')
-            try:
-                tmp[0] = datetime.strptime(tmp[0], '%Y-%m-%d').date()
-                tmp[-1] = int(tmp[-1])
-                j = 1
-                while j < len(tmp) - 1:
-                    tmp[j] = round(float(tmp[j]), digits)
-                    j += 1
-                values.append(tmp)
-            except: pass
-            i += 1
-        el  = ['Adj Close']
-        rfl = [_ for _ in fields if _ not in el]
-        i, tmp  = 0, []
-        while i < len(values):
-            hdr = {}
-            for _ in rfl:
-                j = fields.index(_)
-                hdr[fields[j]] = values[i][j]
-            tmp.append(hdr)
-            i += 1
-        return tmp
-
-    def put(self, *args, **kwargs):
-        data_type = 'sql'
-        if args: table_name = args[0]
-        if len(args) > 1: data_type = args[1]
-        if 'name' in list(kwargs.keys()): table_name = kwargs['name']
-        if 'type' in list(kwargs.keys()): data_type = kwargs['type']
-        isql, i = 0
-        while i < len(self.__data):
-            k, v, s = [_.lower() for _ in list(self.__data[i].keys())], list(self.__data[i].values()), []
-            for j in range(len(k)):
-                if k[j] == 'date':
-                    v[j] = v[j].strftime('%Y-%m-%d')
-                    s.append("'%s'")
-                elif k[j] == 'volume': s.append('%i')
-                else: s.append('%f')
-            k.append('eid')
-            v.append(int(self.code.split('.')[0]))
-            s.append('%i')
-            isql.append("INSERT INTO %s (%s) VALUES (" + ','.join(s) + ")" % tuple([table_name, ','.join(k)].extend(v)))
-            i += 1
-        return isql
 
     def __nvalues(self, *args):
         """
