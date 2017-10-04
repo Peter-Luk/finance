@@ -6,26 +6,33 @@ import sys
 sys.setrecursionlimit(10000)
 
 db_name, db_table = 'Securities', 'records'
-conn = lite.connect(filepath(db_name))
-conn.row_factory = lite.Row
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
         self.period, self.digits = 20, 4
-        if args: self.code = args[0]
+        self.conn = lite.connect(filepath(db_name))
+        self.conn.row_factory = lite.Row
+        if args:
+            try:
+                if isinstance(args[0], str): self.code = int(args[0])
+                if isinstance(kargs[0], int): self.code = args[0]
+            except: pass
         if len(args) > 1: self.digits = int(args[1])
-        if 'code' in list(kwargs.keys()): self.code = kwargs['code']
+        if 'code' in list(kwargs.keys()):
+            try:
+                if isinstance(kwargs['code'], int): self.code = kwargs['code']
+                if isinstance(kwargs['code'], str): self.code = int(kwargs['code'])
+            except: pass
         if 'digits' in list(kwargs.keys()): self.digits = int(kwargs['digits'])
-        self.__data = conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, int(self.code))).fetchall()
-        # self.__data = self.get(self.code, self.digits)
+        self.__data = self.conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, self.code)).fetchall()
         self.trade_date = [_['date'] for _ in self.__data]
         self.trade_date.sort()
         self.latest = self.trade_date[-1]
         self.close = [_ for _ in self.__data if _['date'] == self.trade_date[-1]][0]['close']
 
     def __del__(self):
-        self.code = self.period = self.digits = self.__data = self.trade_date = self.latest = self.close = None
-        del self.code, self.period, self.digits, self.__data, self.trade_date, self.latest, self.close
+        self.conn = self.code = self.period = self.digits = self.__data = self.trade_date = self.latest = self.close = None
+        del self.conn, self.code, self.period, self.digits, self.__data, self.trade_date, self.latest, self.close
 
     def __nvalues(self, *args):
         """
@@ -63,24 +70,20 @@ Helper function for difference of (integer/float) values in single dimension lis
                 try: date = datetime.strptime(args[1], '%Y-%m-%d').date()
                 except: pass
             else: date = args[1]
-            # date = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
                 try: date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
                 except: pass
             else: date = kwargs['date']
-            # date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx']:
-            # src, i, ac = [], period, self.extract(date=date)
             src, i, ac = [], period, [_['close'] for _ in self.__data]
             if field == 'rsi':
                 while i < len(ac):
                     src.append(self.rsi(ac[:i+1], period))
                     i += 1
             if field == 'wma':
-                # av = self.extract(field='volume', date=date)
                 av = [_['volume'] for _ in self.__data if not _['date'] > date]
                 i -= 1
                 while i < len(ac):
@@ -110,7 +113,6 @@ Helper function for difference of (integer/float) values in single dimension lis
                     src.append(self.kama(ac[:i+1], period))
                     i += 1
         else: src = [_[field] for _ in self.__data if not _['date'] > date]
-        # else: src = self.extract(field=field, date=date)
         return stdev(src)
 
     def mean(self, *args, **kwargs):
@@ -123,17 +125,14 @@ Helper function for difference of (integer/float) values in single dimension lis
                 try: date = datetime.strptime(args[1], '%Y-%m-%d').date()
                 except: pass
             else: date = args[1]
-            # date = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
                 try: date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
                 except: pass
             else: date = kwargs['date']
-            # date = kwargs['date']
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx']:
-            # src, i, ac = [], period, self.extract(date=date)
             src, i, ac = [], period, [_['close'] for _ in self.__data]
             if field == 'rsi':
                 while i < len(ac):
@@ -141,7 +140,6 @@ Helper function for difference of (integer/float) values in single dimension lis
                     i += 1
             if field == 'wma':
                 av = [_['volume'] for _ in self.__data if not _['date'] > date]
-                # av = self.extract(field='volume', date=date)
                 i -= 1
                 while i < len(ac):
                     src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), period))
@@ -170,7 +168,6 @@ Helper function for difference of (integer/float) values in single dimension lis
                     src.append(self.kama(ac[:i+1], period))
                     i += 1
         else: src = [_[field] for _ in self.__data if not _['date'] > date]
-        # else: src = self.extract(field=field, date=date)
         return mean(src)
 
     def ema(self, *args, **kwargs):
@@ -190,8 +187,6 @@ steps (default: period) -- optional
             else:
                 try: values = [_['close'] for _ in self.__data if not args[0] < _['date']]
                 except: pass
-                # try: values = self.extract(date=args[0])
-                # except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
@@ -200,7 +195,6 @@ steps (default: period) -- optional
             else:
                 try: values = [_['close'] for _ in self.__data if not kwargs['date'] < _['date']]
                 except: pass
-            # values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         count = len(values)
         if count >= period:
@@ -228,8 +222,6 @@ steps (default: period) -- optional
             else:
                 try: values = [_['close'] for _ in self.__data if not args[0] < _['date']]
                 except: pass
-                # try: values = self.extract(date=args[0])
-                # except: pass
         if len(args) > 1: period = args[1]
         if len(args) > 2: fast = args[2]
         if len(args) > 3: slow = args[3]
@@ -283,8 +275,6 @@ steps (default: period) -- optional
             else:
                 try: values = [_['close'] for _ in self.__data if not args[0] < _['date']]
                 except: pass
-                # try: values = self.extract(date=args[0])
-                # except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
@@ -414,15 +404,12 @@ steps (default: period) -- optional
         if args:
             if isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
             else: date = args[0]
-                # try: date = args[0]
-                # except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
             else: date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ah, al = [_['high'] for _ in self.__data if not _['date'] > date], [_['low'] for _ in self.__data if not _['date'] > date]
-        # ah, al = self.extract(field='high', date=date), self.extract(field='low', date=date)
         pdm, mdm, i, tr = [], [], 1, [_[0]-_[-1] for _ in self.tr(date, period)]
         if len(ah) == len(al):
             while i < len(ah):
