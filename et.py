@@ -31,6 +31,7 @@ class Equities(object):
         self.close = [_ for _ in self.__data if _['date'] == self.trade_date[-1]][0]['close']
 
     def __del__(self):
+        self.conn.close()
         self.conn = self.code = self.period = self.digits = self.__data = self.trade_date = self.latest = self.close = None
         del self.conn, self.code, self.period, self.digits, self.__data, self.trade_date, self.latest, self.close
 
