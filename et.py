@@ -54,7 +54,7 @@ Helper function for difference of (integer/float) values in single dimension lis
         return res
 
     def std(self, *args, **kwargs):
-        field, date, period = 'Close', self.latest, self.period
+        field, date, period = 'close', self.latest, self.period
         if args:
             if isinstance(args[0], list): src = args[0]
             if isinstance(args[0], str): field = args[0]
@@ -74,14 +74,14 @@ Helper function for difference of (integer/float) values in single dimension lis
         if 'field' in list(kwargs.keys()): field = kwargs['field']
         if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx']:
             # src, i, ac = [], period, self.extract(date=date)
-            src, i, ac = [], period, [_['Close'] for _ in self.__data]
+            src, i, ac = [], period, [_['close'] for _ in self.__data]
             if field == 'rsi':
                 while i < len(ac):
                     src.append(self.rsi(ac[:i+1], period))
                     i += 1
             if field == 'wma':
                 # av = self.extract(field='volume', date=date)
-                av = [_['Volume'] for _ in self.__data if not _['Date'] > date]
+                av = [_['volume'] for _ in self.__data if not _['date'] > date]
                 i -= 1
                 while i < len(ac):
                     src.append(self.wma(self.__nvalues(ac[:i+1], av[:i+1]), period))
@@ -109,12 +109,12 @@ Helper function for difference of (integer/float) values in single dimension lis
                 while i < len(ac):
                     src.append(self.kama(ac[:i+1], period))
                     i += 1
-        else: src = [_[field] for _ in self.__data if not _['Date'] > date]
+        else: src = [_[field] for _ in self.__data if not _['date'] > date]
         # else: src = self.extract(field=field, date=date)
         return stdev(src)
 
     def mean(self, *args, **kwargs):
-        field, date, period = 'Close', self.latest, self.period
+        field, date, period = 'close', self.latest, self.period
         if args:
             if isinstance(args[0], list): src = args[0]
             if isinstance(args[0], str): field = args[0]
@@ -134,13 +134,13 @@ Helper function for difference of (integer/float) values in single dimension lis
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if field in ['rsi', 'ema', 'sma', 'wma', 'kama', 'atr', 'adx']:
             # src, i, ac = [], period, self.extract(date=date)
-            src, i, ac = [], period, [_['Close'] for _ in self.__data]
+            src, i, ac = [], period, [_['close'] for _ in self.__data]
             if field == 'rsi':
                 while i < len(ac):
                     src.append(self.rsi(ac[:i+1], period))
                     i += 1
             if field == 'wma':
-                av = [_['Volume'] for _ in self.__data if not _['Date'] > date]
+                av = [_['volume'] for _ in self.__data if not _['date'] > date]
                 # av = self.extract(field='volume', date=date)
                 i -= 1
                 while i < len(ac):
@@ -169,7 +169,7 @@ Helper function for difference of (integer/float) values in single dimension lis
                 while i < len(ac):
                     src.append(self.kama(ac[:i+1], period))
                     i += 1
-        else: src = [_[field] for _ in self.__data if not _['Date'] > date]
+        else: src = [_[field] for _ in self.__data if not _['date'] > date]
         # else: src = self.extract(field=field, date=date)
         return mean(src)
 
@@ -181,24 +181,24 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, [_['Close'] for _ in self.__data]
+        period, values = self.period, [_['close'] for _ in self.__data]
         if args:
             if isinstance(args[0], list): values = args[0]
             elif isinstance(args[0], str):
-                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not args[0] < _['date']]
                 except: pass
                 # try: values = self.extract(date=args[0])
                 # except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
-                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not kwargs['date'] < _['date']]
                 except: pass
             # values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
@@ -218,15 +218,15 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, [_['Close'] for _ in self.__data]
+        period, values = self.period, [_['close'] for _ in self.__data]
         fast, slow = period, 2
         if args:
             if isinstance(values, list): values = args[0]
             elif isinstance(values, str):
-                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not args[0] < _['date']]
                 except: pass
                 # try: values = self.extract(date=args[0])
                 # except: pass
@@ -235,10 +235,10 @@ steps (default: period) -- optional
         if len(args) > 3: slow = args[3]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
-                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not kwargs['date'] < _['date']]
                 except: pass
             # values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
@@ -274,24 +274,24 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        values, period  = [_['Close'] for _ in self.__data], self.period
+        values, period  = [_['close'] for _ in self.__data], self.period
         if args:
             if isinstance(args[0], list): values = args[0]
             elif isinstance(args[0], str):
-                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not args[0] < _['date']]
                 except: pass
                 # try: values = self.extract(date=args[0])
                 # except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
-                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not kwargs['date'] < _['date']]
                 except: pass
             # values = self.extract(date=kwargs['date'])
         if 'period' in list(kwargs.keys()): period = kwargs['period']
@@ -333,22 +333,22 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, [_['Close'] for _ in self.__data]
+        period, values = self.period, [_['close'] for _ in self.__data]
         if args:
             if isinstance(args[0], list): values= args[0]
             elif isinstance(args[0], str):
-                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [_['Close'] for _ in self.__data if not args[0] < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not args[0] < _['date']]
                 except: pass
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
-                try: values = [_['Close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [_['Close'] for _ in self.__data if not kwargs['date'] < _['Date']]
+                try: values = [_['close'] for _ in self.__data if not kwargs['date'] < _['date']]
                 except: pass
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if len(values) >= period:
@@ -363,22 +363,22 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, values = self.period, [(_['Close'], _['Volume']) for _ in self.__data]
+        steps, values = self.period, [(_['close'], _['volume']) for _ in self.__data]
         if args:
             if isinstance(args[0], list): values = args[0]
             elif isinstance(args[0], str):
-                try: values = [(_['Close'], _['Volume']) for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['Date']]
+                try: values = [(_['close'], _['volume']) for _ in self.__data if not datetime.strptime(args[0], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [(_['Close'], _['Volume']) for _ in self.__data if not args[0] < _['Date']]
+                try: values = [(_['close'], _['volume']) for _ in self.__data if not args[0] < _['date']]
                 except: pass
         if len(args) > 1: steps = args[1]
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str):
-                try: values = [(_['Close'], _['Volume']) for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['Date']]
+                try: values = [(_['close'], _['volume']) for _ in self.__data if not datetime.strptime(kwargs['date'], '%Y-%m-%d').date() < _['date']]
                 except: pass
             else:
-                try: values = [(_['Close'], _['Volume']) for _ in self.__data if not kwargs['date'] < _['Date']]
+                try: values = [(_['close'], _['volume']) for _ in self.__data if not kwargs['date'] < _['date']]
                 except: pass
         if 'steps' in list(kwargs.keys()): steps = kwargs['steps']
         if len(values) >= steps:
@@ -397,7 +397,7 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()):
             if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
             else: date = kwargs['date']
-        cs, hs, ls = [_['Close'] for _ in self.__data if not _['Date'] > date], [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
+        cs, hs, ls = [_['close'] for _ in self.__data if not _['date'] > date], [_['high'] for _ in self.__data if not _['date'] > date], [_['low'] for _ in self.__data if not _['date'] > date]
         if len(cs) == len(hs) == len(ls):
             i = 1
             res.append((hs[0], ls[0]))
@@ -421,7 +421,7 @@ steps (default: period) -- optional
             if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
             else: date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
-        ah, al = [_['High'] for _ in self.__data if not _['Date'] > date], [_['Low'] for _ in self.__data if not _['Date'] > date]
+        ah, al = [_['high'] for _ in self.__data if not _['date'] > date], [_['low'] for _ in self.__data if not _['date'] > date]
         # ah, al = self.extract(field='high', date=date), self.extract(field='low', date=date)
         pdm, mdm, i, tr = [], [], 1, [_[0]-_[-1] for _ in self.tr(date, period)]
         if len(ah) == len(al):
