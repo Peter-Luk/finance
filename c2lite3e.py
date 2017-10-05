@@ -1,8 +1,8 @@
-from utilities import filepath
-from datetime import datetime
-import sqlite3 as lite
-
 db_name, db_table = 'Securities', 'records'
+him = getattr(__import__('handy'), 'him')
+iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, ({'sqlite3':()}, "alias='lite'")]
+__ = him(iml)
+for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
