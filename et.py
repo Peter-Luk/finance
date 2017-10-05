@@ -51,6 +51,15 @@ Key-value pair not supported.
             i += 1
         return res
 
+    def dataspan(self, *args, **kwargs):
+        unit, nY = 'Year', 2
+        if args:
+            if isinstance(args[0], str): nY = int(args[0])
+            if isinstance(args[0], int): nY = args[0]
+        if 'unit' in list(kwargs.keys()): unit = kwargs['unit']
+        cY = datetime.today().year
+        return [_ for _ in self.__data if datetime.strptime(_['Date'], '%Y-%m-%d').year > (cY - nY - 1)]
+
     def delta(self, *args):
         """
 Helper function for difference of (integer/float) values in single dimension list.
