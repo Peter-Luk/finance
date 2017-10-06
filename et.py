@@ -70,15 +70,21 @@ Also in order to extract all available trade date from backend database, 'close'
         if 'date' in list(kwargs.keys()): req_date = datetime.strptime(kwargs['date'], '%Y-%m-%d')
         if 'programmatic' in list(kwargs.keys()): programmatic = kwargs['programmatic']
         for i in src:
-            [hdr[i['date']] = i[_] for _ in ['open', 'high','low','close','volume']]
+            if field == 'open': hdr[i['date']] = i['open']
+            if field == 'high': hdr[i['date']] = i['high']
+            if field == 'low': hdr[i['date']] = i['low']
+            if field in ['date', 'close']: hdr[i['date']] = i['close']
+            if field == 'volume': hdr[i['date']] = i['volume']
         _ = {}
         for i in list(hdr.keys()):
-            if not datetime.strptime(i, '%Y-%m-%d') > req_date: _[i] = hdr[i]
+            if datetime.strptime(i, '%Y-%m-%d') <= req_date: _[i] = hdr[i]
+        okeys = list(_.keys())
+        okeys.sort()
         if programmatic:
-            if field == 'date': return list(_.keys())
+            if field == 'date': return okeys
             return _
-        if field == 'date': return list(_.keys())
-        return list(_.values())
+        if field == 'date': return okeys
+        return [_[i] for i in okeys]
 
     def dataspan(self, *args, **kwargs):
         unit, nY = 'Year', 3
