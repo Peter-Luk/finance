@@ -30,11 +30,12 @@ class Equities(object):
         self.trade_date.sort()
         self.latest = self.trade_date[-1]
         self.close = [_ for _ in self.span if _['date'] == self.trade_date[-1]][0]['close']
+        self.__all_close = [_['close'] for _ in self.span]
 
     def __del__(self):
         self.conn.close()
-        self.conn = self.span = self.code = self.period = self.digits = self.__data = self.trade_date = self.latest = self.close = None
-        del self.conn, self.span, self.code, self.period, self.digits, self.__data, self.trade_date, self.latest, self.close
+        self.conn = self.span = self.code = self.period = self.digits = self.__data = self.trade_date = self.latest = self.close = self.__all_close = None
+        del self.conn, self.span, self.code, self.period, self.digits, self.__data, self.trade_date, self.latest, self.close, self.__all_close
 
     def __nvalues(self, *args):
         """
@@ -190,7 +191,7 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, [_['close'] for _ in self.span]
+        period, values = self.period, self.__all_close
         if args:
             if isinstance(args[0], list): values = args[0]
             elif isinstance(args[0], str):
@@ -224,7 +225,7 @@ values (default: all available) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, [_['close'] for _ in self.span]
+        period, values = self.period, self.__all_close
         fast, slow = period, 2
         if args:
             if isinstance(values, list): values = args[0]
@@ -335,7 +336,7 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        period, values = self.period, [_['close'] for _ in self.span]
+        period, values = self.period, self.__all_close
         if args:
             if isinstance(args[0], list): values= args[0]
             elif isinstance(args[0], str):
@@ -365,7 +366,7 @@ date (default: last trade date) on record -- optional
 steps (default: period) -- optional
 --> float
         """
-        steps, values = self.period, [(_['close'], _['volume']) for _ in self.span]
+        steps, values = self.period, self.__all_close
         if args:
             if isinstance(args[0], list): values = args[0]
             elif isinstance(args[0], str):
