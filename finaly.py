@@ -111,12 +111,14 @@ Also in order to extract all available trade date from backend database, 'close'
                         if i['session'] == session: hdr[i['date']] = i['volume']
         _ = {}
         for i in list(hdr.keys()):
-            if not datetime.strptime(i, '%Y-%m-%d') > req_date: _[i] = hdr[i]
+            if datetime.strptime(i, '%Y-%m-%d') <= req_date: _[i] = hdr[i]
+        okeys = list(_.keys())
+        okeys.sort()
         if programmatic:
-            if field == 'date': return list(_.keys())
+            if field == 'date': return okeys
             return _
-        if field == 'date': return list(_.keys())
-        return list(_.values())
+        if field == 'date': return okeys
+        return [_[i] for i in okeys]
 
     def std(self, *args, **kwargs):
         field, date, period = 'close', self.latest, self.period

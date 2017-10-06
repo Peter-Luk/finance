@@ -62,7 +62,7 @@ Usage:
 All can be override with key-value pair. Acceptable keys are 'source' for 'src' type 'list', 'field' type 'string', 'session' type 'string' (one of 'A', 'F' or 'M'), and 'programmatic' type 'boolean'.
 Also in order to extract all available trade date from backend database, 'close' clause is pseudonymous used.
         """
-        hdr, field, programmatic, src, req_date = {}, 'close', False, self.__data, datetime.strptime(self.latest, '%Y-%m-%d')
+        hdr, field, programmatic, src, req_date = {}, 'close', False, self.span, datetime.strptime(self.latest, '%Y-%m-%d')
         if args: src = args[0]
         if len(args) > 1: field = args[1]
         if 'field' in list(kwargs.keys()): field = kwargs['field']
