@@ -53,6 +53,33 @@ Key-value pair not supported.
             i += 1
         return res
 
+    def extract(self, *args, **kwargs):
+        """
+Main method to extract data from backend database.
+Usage:
+    First positional argument 'src' for raw data from database,
+    Second positional argument 'field' for intended field (column) name (default: 'close'), and
+All can be override with key-value pair. Acceptable keys are 'source' for 'src' type 'list', 'field' type 'string', 'session' type 'string' (one of 'A', 'F' or 'M'), and 'programmatic' type 'boolean'.
+Also in order to extract all available trade date from backend database, 'close' clause is pseudonymous used.
+        """
+        hdr, field, programmatic, src, req_date = {}, 'close', False, self.__data, datetime.strptime(self.latest, '%Y-%m-%d')
+        if args: src = args[0]
+        if len(args) > 1: field = args[1]
+        if 'field' in list(kwargs.keys()): field = kwargs['field']
+        if 'source' in list(kwargs.keys()): src = kwargs['source']
+        if 'date' in list(kwargs.keys()): req_date = datetime.strptime(kwargs['date'], '%Y-%m-%d')
+        if 'programmatic' in list(kwargs.keys()): programmatic = kwargs['programmatic']
+        for i in src:
+            [hdr[i['date']] = i[_] for _ in ['open', 'high','low','close','volume']]
+        _ = {}
+        for i in list(hdr.keys()):
+            if not datetime.strptime(i, '%Y-%m-%d') > req_date: _[i] = hdr[i]
+        if programmatic:
+            if field == 'date': return list(_.keys())
+            return _
+        if field == 'date': return list(_.keys())
+        return list(_.values())
+
     def dataspan(self, *args, **kwargs):
         unit, nY = 'Year', 3
         if args:
