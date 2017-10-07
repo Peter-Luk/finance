@@ -442,11 +442,16 @@ date (default: last trade date) on record -- optional
 
         count = len(values)
         if count >= period:
-            while count > period:
-                if not self.digits < 0: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
-                return (self.atr(values[:-1], period) * (period - 1) + values[-1]) / period
-            if not self.digits < 0: return round(mean(values), self.digits)
-            return mean(values)
+            tmp = []
+            for i in range(count - period):
+                if i == 0: tmp.append(mean(values[:period]))
+                else: tmp.append((tmp[i-1] * (period - 1) + values[period + i]) / period)
+            return tmp[-1]
+            # while count > period:
+                # if not self.digits < 0: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                # return (self.atr(values[:-1], period) * (period - 1) + values[-1]) / period
+            # if not self.digits < 0: return round(mean(values), self.digits)
+            # return mean(values)
 
     def kc(self, *args, **kwargs):
         """
