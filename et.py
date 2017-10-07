@@ -442,16 +442,18 @@ date (default: last trade date) on record -- optional
 
         count = len(values)
         if count >= period:
-            tmp = []
-            for i in range(count - period):
-                if i == 0: tmp.append(mean(values[:period]))
-                else: tmp.append((tmp[i-1] * (period - 1) + values[period + i]) / period)
-            return tmp[-1]
-            # while count > period:
-                # if not self.digits < 0: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
-                # return (self.atr(values[:-1], period) * (period - 1) + values[-1]) / period
-            # if not self.digits < 0: return round(mean(values), self.digits)
-            # return mean(values)
+            if count > 50:
+                tmp = []
+                for i in range(count - period):
+                    if i == 0: tmp.append(mean(values[:period]))
+                    else: tmp.append((tmp[i-1] * (period - 1) + values[period + i]) / period)
+                return tmp[-1]
+            else:
+                while count > period:
+                    if not self.digits < 0: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                    return (self.atr(values[:-1], period) * (period - 1) + values[-1]) / period
+                if not self.digits < 0: return round(mean(values), self.digits)
+                return mean(values)
 
     def kc(self, *args, **kwargs):
         """
@@ -467,7 +469,8 @@ steps (default: period) -- optional
         if 'date' in list(kwargs.keys()): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ml = self.kama(date, period)
-        if not self.digits < 0: return round(ml + gr * self.atr(date, int(self.period/gr)) / 2, self.digits), round(ml - gr * self.atr(date, int(self.period/gr)) / 2, self.digits)
+        bw = self.atr(date, int(self.period/gr))
+        if not self.digits < 0: return round(ml + gr * bw / 2, self.digits), round(ml - gr * bw / 2, self.digits)
         return ml + gr * self.atr(date, int(self.period/gr)) / 2, ml - gr * self.atr(date, int(self.period/gr)) / 2
 
     def stc(self, *args, **kwargs):
