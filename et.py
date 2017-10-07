@@ -1,4 +1,4 @@
-from utilities import filepath
+from utilities import filepath, gr
 from datetime import datetime
 from statistics import mean, stdev
 import sqlite3 as lite
@@ -9,7 +9,7 @@ db_name, db_table = 'Securities', 'records'
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
-        self.period, self.digits, self.__field = 20, -1, 'close'
+        self.period, self.digits, self.__field, self.__span = 20, -1, 'close', 3
         self.conn = lite.connect(filepath(db_name))
         self.conn.row_factory = lite.Row
         if args:
@@ -24,6 +24,7 @@ class Equities(object):
                 if isinstance(kwargs['code'], str): self.code = int(kwargs['code'])
             except: pass
         if 'digits' in list(kwargs.keys()): self.digits = int(kwargs['digits'])
+        if 'span' in list(kwargs.keys()): self.__span = int(kwargs['span'])
         self.__raw_data = self.conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, self.code)).fetchall()
         self.latest = self.__raw_data[-1]['date']
         self.close = self.__raw_data[-1]['close']
@@ -32,8 +33,8 @@ class Equities(object):
 
     def __del__(self):
         self.conn.close()
-        self.conn = self.__data = self.code = self.period = self.digits = self.__raw_data = self.trade_date = self.latest = self.close = self.__all_close = None
-        del self.conn, self.__data, self.code, self.period, self.digits, self.__raw_data, self.trade_date, self.latest, self.close, self.__all_close
+        self.conn = self.__data = self.code = self.period = self.digits = self.__raw_data = self.trade_date = self.latest = self.close = self.__span = None
+        del self.conn, self.__data, self.code, self.period, self.digits, self.__raw_data, self.trade_date, self.latest, self.close, self.__span
 
     def __nvalues(self, *args):
         """
@@ -85,11 +86,12 @@ Also in order to extract all available trade date from backend database, 'close'
         return [_[i] for i in okeys]
 
     def dataspan(self, *args, **kwargs):
-        unit, nY = 'Year', 3
+        unit, nY = 'Year', self.__span
         if args:
             if isinstance(args[0], str): nY = int(args[0])
             if isinstance(args[0], int): nY = args[0]
         if 'unit' in list(kwargs.keys()): unit = kwargs['unit']
+        if 'span' in list(kwargs.keys()): nY = kwargs['span']
         if unit == 'Year':
             cY = datetime.today().year
             return [_ for _ in self.__raw_data if datetime.strptime(_['Date'], '%Y-%m-%d').year > (cY - nY - 1)]
@@ -214,31 +216,6 @@ Helper function for difference of (integer/float) values in single dimension lis
         else: src = self.extract(field=field, date=date)
         return mean(src)
 
-    def ema(self, *args, **kwargs):
-        """
-Exponential Moving Average
--- accept values(data series or date) as first positional variable and steps as second positional variable,
-values (default: all available) on record -- optional
-steps (default: period) -- optional
---> float
-        """
-        period, values = self.period, self.__data
-        if args:
-            if isinstance(args[0], list): values = args[0]
-            if isinstance(args[0], str):
-                try: values = self.extract(date=args[0])
-                except: pass
-        if len(args) > 1: period = args[1]
-        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
-        if 'period' in list(kwargs.keys()): period = kwargs['period']
-        count = len(values)
-        if count >= period:
-            while count > period:
-                if not self.digits < 0: return round((self.ema(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
-                return (self.ema(values[:-1], period) * (period - 1) + values[-1]) / period
-            if not self.digits < 0: return round(mean(values), self.digits)
-            return mean(values)
-
     def kama(self, *args, **kwargs):
         """
 Kaufman's Adaptive Moving Average
@@ -328,6 +305,59 @@ steps (default: period) -- optional
         if not self.digits < 0: return round(100 - 100 / (1 + rs), self.digits)
         return 100 - 100 / (1 + rs)
 
+    def ema(self, *args, **kwargs):
+        """
+Exponential Moving Average
+-- accept values(data series or date) as first positional variable and steps as second positional variable,
+values (default: all available) on record -- optional
+steps (default: period) -- optional
+--> float
+        """
+        period, values = self.period, self.__data
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            if isinstance(args[0], str):
+                try: values = self.extract(date=args[0])
+                except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        count = len(values)
+        if count >= period:
+            while count > period:
+                if not self.digits < 0: return round((self.ema(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                return (self.ema(values[:-1], period) * (period - 1) + values[-1]) / period
+            if not self.digits < 0: return round(mean(values), self.digits)
+            return mean(values)
+
+    def apz(self, *args, **kwargs):
+        """
+Adaptive Price Zone
+-- accept date and/or steps variables,
+date (default: last trade date) on record -- optional
+steps (default: period) -- optional
+--> tuple
+        """
+        period, date = int(self.period / gr), self.latest
+        if args: date = args[0]
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        cs = self.extract(date=date)
+        hs = self.extract(field='high', date=date)
+        ls = self.extract(field='low', date=date)
+        dhl = [_[0]-_[-1] for _ in self.__nvalues(hs, ls)]
+        estep, i = [], period
+        while i < len(dhl):
+            estep.append(self.ema(dhl[:i], period))
+            i += 1
+        vol = self.ema(estep, period)
+        ap = self.ema(cs, self.period)
+        ubw = (gr + 1) * vol
+        lbw = (gr - 1) * vol
+        if not self.digits < 0: return round(ap + ubw, self.digits), round(ap - lbw, self.digits)
+        return ap + ubw, ap - lbw
+
     def sma(self, *args, **kwargs):
         """
 Simple Moving Average
@@ -374,12 +404,8 @@ steps (default: period) -- optional
 
     def tr(self, *args, **kwargs):
         res = []
-        if args:
-            if isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
-            else: date = args[0]
-        if 'date' in list(kwargs.keys()):
-            if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
-            else: date = kwargs['date']
+        if args: date = args[0]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
         cs, hs, ls = self.extract(date=date), self.extract(field='high', date=date), self.extract(field='low', date=date)
         if len(cs) == len(hs) == len(ls):
             i = 1
@@ -391,6 +417,83 @@ steps (default: period) -- optional
                 res.append((h, l))
                 i += 1
         return res
+
+    def atr(self, *args, **kwargs):
+        """
+Average True Range
+-- accept date variables,
+date (default: last trade date) on record -- optional
+--> float
+        """
+        date, period = self.latest, self.period
+        values = [x[0]-x[-1] for x in self.tr(date)]
+        if args:
+            if isinstance(args[0], list): values = args[0]
+            if isinstance(args[0], str):
+                try:
+                    date = args[0]
+                    values = [x[0]-x[-1] for x in self.tr(date)]
+                except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()):
+            date = kwargs['date']
+            values = [x[0]-x[-1] for x in self.tr(date)]
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+
+        count = len(values)
+        if count >= period:
+            while count > period:
+                if not self.digits < 0: return round((self.atr(values[:-1], period) * (period - 1) + values[-1]) / period, self.digits)
+                return (self.atr(values[:-1], period) * (period - 1) + values[-1]) / period
+            if not self.digits < 0: return round(mean(values), self.digits)
+            return mean(values)
+
+    def kc(self, *args, **kwargs):
+        """
+Keltner Channels
+-- accept date and/or steps variables,
+date (default: last trade date) on record -- optional
+steps (default: period) -- optional
+--> tuple
+        """
+        date, period = self.latest, self.period
+        if args: date = args[0]
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        ml = self.kama(date, period)
+        if not self.digits < 0: return round(ml + gr * self.atr(date, int(self.period/gr)) / 2, self.digits), round(ml - gr * self.atr(date, int(self.period/gr)) / 2, self.digits)
+        return ml + gr * self.atr(date, int(self.period/gr)) / 2, ml - gr * self.atr(date, int(self.period/gr)) / 2
+
+    def stc(self, *args, **kwargs):
+        """
+Stochastic Oscillator
+-- accept date and/or steps variables,
+date (default: last trade date) on record -- optional
+steps (default: period) -- optional
+--> %k and %d as tuple in respective order.
+        """
+        date, period = self.latest, self.period
+        if args: date = args[0]
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): date = kwargs['date']
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        def pk(*args, **kwargs):
+            date, period = self.latest, self.period
+            if args: date = args[0]
+            if len(args) > 1: period = args[1]
+            if 'date' in list(kwargs.keys()): date = kwargs['date']
+            if 'period' in list(kwargs.keys()): period = kwargs['period']
+            hs = self.extract(field='high', date=date)
+            ls = self.extract(field='low', date=date)
+            lc = self.extract(date=date)[-1]
+            return (lc - min(ls[-period:])) / (max(hs[-period:]) - min(ls[-period:])) * 100
+        ds = self.extract(field='date', date=date)
+        pks = [pk(x, period) for x in ds[-3:]]
+        pd = mean(pks)
+        if len(self.trade_date) >= period:
+            if not self.digits < 0: return round(pks[-1], self.digits), round(pd, self.digits)
+            return pks[-1], pd
 
     def __dx(self, *args, **kwargs):
         period, date = self.period, self.trade_date[-1]
