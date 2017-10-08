@@ -9,7 +9,7 @@ db_name, db_table = 'Securities', 'records'
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
-        self.period, self.digits, self.__field, self.__span = 20, -1, 'close', 3
+        self.period, self.digits, self.__field, self.__span = 20, -1, 'close', 0
         self.conn = lite.connect(filepath(db_name))
         self.conn.row_factory = lite.Row
         if args:
@@ -506,12 +506,10 @@ steps (default: period) -- optional
     def __dx(self, *args, **kwargs):
         period, date = self.period, self.trade_date[-1]
         if args:
-            if isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
-            else: date = args[0]
+            date = args[0]
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
-            if isinstance(kwargs['date'], str): date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
-            else: date = kwargs['date']
+            date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ah, al = self.extract(field='high', date=date), self.extract(field='low', date=date)
         pdm, mdm, i, tr = [], [], 1, [_[0]-_[-1] for _ in self.tr(date, period)]
@@ -532,7 +530,9 @@ steps (default: period) -- optional
             if 'period' in list(kwargs.keys()): period = kwargs['period']
             count = len(src)
             while count > period:
-                return (sdm(src[:-1], period) * (period - 1) / 100 + (src[-1] / tr[-1])) / period * 100
+                tmp = sdm(src[:-1], period) * (period - 1) / 100
+                if tr[-1] == 0: return (tmp + src[-1]) / period * 100
+                return (tmp + (src[-1] / tr[-1])) / period * 100
             return mean(src) / mean(tr) * 100
 
         spd, smd = sdm(pdm, period), sdm(mdm, period)
@@ -545,23 +545,28 @@ Average Directional indeX
         period, date = self.period, self.trade_date[-1]
         if args:
             if isinstance(args[0], list): src = args[0]
-            elif isinstance(args[0], str): date = datetime.strptime(args[0], '%Y-%m-%d').date()
-            else: date = args[0]
+            if isinstance(args[0], str): date = args[0]
         if len(args) > 1: period = args[1]
         if 'date' in list(kwargs.keys()):
-            if isinstance(kwargs['date'], str): date = datetime(kwargs['date'], '%Y-%m-%d').date()
-            else: date = kwargs['date']
+            if isinstance(kwargs['date'], str): date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         if args:
             if isinstance(args[0], str) or ('date' in list(kwargs.keys())):
                 try: src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
                 except: pass
         else:
-            try: src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
-            except: pass
+            src = [self.__dx(_, period) for _ in self.trade_date[period:self.trade_date.index(date)]]
         count = len(src)
-        while count > period:
-            if not self.digits < 0: return round((self.adx(src[:-1], period) * (period - 1) + src[-1]) / period, self.digits)
-            return (self.adx(src[:-1], period) * (period - 1) + src[-1]) / period
-        if not self.digits < 0: return round(mean(src), self.digits)
-        return mean(src)
+        if count >= period:
+            if count > 50:
+                tmp = []
+                for i in range(count - period):
+                    if i == 0: tmp.append(mean(src[:period]))
+                    else: tmp.append((tmp[i-1] * (period - 1) + src[period + i]) / period)
+                return tmp[-1]
+            else:
+                while count > period:
+                    if not self.digits < 0: return round((self.atr(src[:-1], period) * (period - 1) + src[-1]) / period, self.digits)
+                    return (self.atr(src[:-1], period) * (period - 1) + src[-1]) / period
+                if not self.digits < 0: return round(mean(src), self.digits)
+                return mean(src)
