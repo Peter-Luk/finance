@@ -528,7 +528,13 @@ steps (default: period) -- optional
             if len(args) > 1: period = args[1]
             if 'source' in list(kwargs.keys()): src = kwargs['source']
             if 'period' in list(kwargs.keys()): period = kwargs['period']
-            count = len(src)
+            hdr, count = [], len(src)
+            # for i in range(period, count):
+                # if i == period: hdr.append(mean(src[:period]) / mean(tr[:period]) * 100)
+                # else:
+                    # if tr[i] == 0: hdr.append((hdr[-1] / 100 * (period - 1) + src[i]) / period * 100)
+                    # else: hdr.append((hdr[-1] / 100 * (period - 1) + src[i] / tr[i]) / period * 100)
+            # return hdr[-1]
             while count > period:
                 tmp = sdm(src[:-1], period) * (period - 1) / 100
                 if tr[-1] == 0: return (tmp + src[-1]) / period * 100
