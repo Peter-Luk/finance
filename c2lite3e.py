@@ -58,26 +58,37 @@ class Equities(object):
         if args: table_name = args[0]
         if 'name' in list(kwargs.keys()): table_name = kwargs['name']
         i, sd, nd = 0, [datetime.strptime(_['date'], '%Y-%m-%d').date() for _ in self.__stored_data], []
-        fields, vh = ['eid'], []
-        fields.extend([_.lower() for _ in self.fields])
-        for j in range(len(fields)):
-            if fields[j] == 'date': vh.append("'%s'")
-            elif fields[j] in ('volume', 'eid'): vh.append('%i')
-            else: vh.append('%f')
-        sqlstr = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(vh))
+        # fields, vh = ['eid'], []
+        # fields.extend([_.lower() for _ in self.fields])
+        fields = [_.lower() for _ in self.fields]
+        fields.insert(0, 'eid')
+        # for j in range(len(fields)):
+            # if fields[j] == 'date': vh.append("'%s'")
+            # elif fields[j] in ('volume', 'eid'): vh.append('%i')
+            # else: vh.append('%f')
+        # sqlstr = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(vh))
+        iqstr = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(['?' for _ in fields]))
         while i < len(self.__data):
             _ = self.__data[i]
             if _['date'] not in sd: nd.append(_)
             i += 1
-        i, vs = 0, []
-        while i < len(nd):
-            v = [eid]
-            v.extend([_ for _ in list(nd[i].values())])
-            for j in range(len(fields)):
-                if fields[j] == 'date':
-                    v[j] = v[j].strftime('%Y-%m-%d')
-            vs.append(tuple(v))
-            i += 1
-        if vs: [self.conn.cursor().execute(sqlstr % _) for _ in vs]
+        dl = []
+        for i in nd:
+            tmp = (int(self.code.split('.')[0]),)
+            for j in fields[1:]:
+                if j == 'date': tmp += (i[j].strftime('%Y-%m-%d'),)
+                else: tmp += (i[j],)
+            dl.append(tmp)
+        # i, vs = 0, []
+#         while i < len(nd):
+#             v = [eid]
+#             v.extend([_ for _ in list(nd[i].values())])
+#             for j in range(len(fields)):
+#                 if fields[j] == 'date':
+#                     v[j] = v[j].strftime('%Y-%m-%d')
+#             vs.append(tuple(v))
+#             i += 1
+#         if vs: [self.conn.cursor().execute(sqlstr % _) for _ in vs]
+        self.conn.cursor().executemany(iqstr, dl)
         self.conn.commit()
-        return i
+        return len(nd)
