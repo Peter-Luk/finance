@@ -6,9 +6,13 @@ for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 import os
 
 def update(*args, **kwargs):
+    folder = 'csv'
+    if args:
+        if isinstance(args[0], str): folder = args[0]
+    if 'folder' in list(kwargs.keys()): folder = kwargs['folder']
     nr, sd = 0, filepath('Securities')
     cp = sd.split(os.sep)[:-2]
-    cp.append('csv')
+    cp.append(folder)
     af = os.listdir(os.sep.join(cp))
     for i in af:
         d = Equities('.'.join(i.split('.')[:-1]))
