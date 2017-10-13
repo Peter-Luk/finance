@@ -2,8 +2,18 @@ db_name, db_table = 'Securities', 'records'
 him = getattr(__import__('handy'), 'him')
 iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
-for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
+for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 import os
+
+def update(*args, **kwargs):
+    nr, sd = 0, filepath('Securities')
+    cp = sd.split(os.sep)[:-2]
+    cp.append('csv')
+    af = os.listdir(os.sep.join(cp))
+    for i in af:
+        d = Equities('.'.join(i.split('.')[:-1]))
+        if len(d._Equities__data): nr += d.store()
+    return nr
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
@@ -76,9 +86,3 @@ class Equities(object):
         self.conn.cursor().executemany(iqstr, dl)
         self.conn.commit()
         return len(nd)
-
-    def update(self, *args, **kwargs):
-        sd = filepath('Securities')
-        cp = sd.split(os.sep)[:-2]
-        cp.append('csv')
-        af = os.listdir(os.sep.join(cp))
