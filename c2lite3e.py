@@ -10,16 +10,16 @@ def update(*args, **kwargs):
         if isinstance(args[0], str): folder = args[0]
     if 'folder' in list(kwargs.keys()): folder = kwargs['folder']
     if 'wipe' in list(kwargs.keys()): wipe = kwargs['wipe']
-    nr, sd = 0, filepath('Securities')
+    nr, sd = 0, filepath(db_name)
     cp = sd.split(sep)[:-2]
     cp.append(folder)
     cp = sep.join(cp)
     af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
-    for i in af:
-        d = Equities('.'.join(i.split('.')[:-1]))
+    for _ in af:
+        d = Equities('.'.join(_.split('.')[:-1]))
         if len(d._Equities__data):
             nr += d.store()
-            if wipe: os.remove(sep.join((cp, i)))
+            if wipe: os.remove(sep.join((cp, _)))
     return nr
 
 class Equities(object):
