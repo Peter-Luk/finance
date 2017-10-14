@@ -1,10 +1,15 @@
 db_name, db_table = 'Securities', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path', 'remove')}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path', 'remove')}, {'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 def update(*args, **kwargs):
+    """
+    Sequential update database with 'folder' directory.
+    First positional or 'folder' argument is sub-folder name (default: 'csv'), and
+    'wipe' argument initiate plunge file after new value stored (default: False).
+    """
     folder, wipe = 'csv', False
     if args:
         if isinstance(args[0], str): folder = args[0]
@@ -23,6 +28,9 @@ def update(*args, **kwargs):
     return nr
 
 class Equities(object):
+    """
+    Worker object for manipulate and transfer data from file system to database.
+    """
     def __init__(self, *args, **kwargs):
         if args: self.code = args[0]
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
@@ -38,6 +46,10 @@ class Equities(object):
         del self.fields, self.values, self.conn, self.code, self.__data, self.__stored_data
 
     def get(self, *args, **kwargs):
+        """
+Extract data in csv from file system,
+first positional or 'code' named is name in file system.
+        """
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if args: code = args[0]
         if 'code' in list(kwargs.keys()): code = kwargs['code']
@@ -67,7 +79,15 @@ class Equities(object):
             for _ in self.fields:
                 j = fields.index(_)
                 hdr[fields[j].lower()] = values[i][j]
-            tmp.append(hdr)
+            tf, c, _ = [hdr[_] for _ in ['open', 'high', 'low', 'close']], [], 0
+            while _ < len(tf):
+                r = False
+                if tf[_] == tf[_+1]: r = True
+                c.append(r)
+                _ += 1
+            c.append(hdr['volume'] == 0)
+            if not reduce((lambda x, y: x and y), c): tmp.append(hdr)
+            # tmp.append(hdr)
             i += 1
         return tmp
 
