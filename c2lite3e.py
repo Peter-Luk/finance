@@ -1,14 +1,15 @@
 db_name, db_table = 'Securities', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path')}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path', 'remove')}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 def update(*args, **kwargs):
-    folder = 'csv'
+    folder, wipe = 'csv', False
     if args:
         if isinstance(args[0], str): folder = args[0]
     if 'folder' in list(kwargs.keys()): folder = kwargs['folder']
+    if 'wipe' in list(kwargs.keys()): wipe = kwargs['wipe']
     nr, sd = 0, filepath('Securities')
     cp = sd.split(sep)[:-2]
     cp.append(folder)
@@ -16,7 +17,9 @@ def update(*args, **kwargs):
     af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
     for i in af:
         d = Equities('.'.join(i.split('.')[:-1]))
-        if len(d._Equities__data): nr += d.store()
+        if len(d._Equities__data):
+            nr += d.store()
+            if wipe: os.remove(sep.join((cp, i)))
     return nr
 
 class Equities(object):
