@@ -1,9 +1,8 @@
 db_name, db_table = 'Securities', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path')}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
-import os
 
 def update(*args, **kwargs):
     folder = 'csv'
@@ -11,9 +10,10 @@ def update(*args, **kwargs):
         if isinstance(args[0], str): folder = args[0]
     if 'folder' in list(kwargs.keys()): folder = kwargs['folder']
     nr, sd = 0, filepath('Securities')
-    cp = sd.split(os.sep)[:-2]
+    cp = sd.split(sep)[:-2]
     cp.append(folder)
-    af = os.listdir(os.sep.join(cp))
+    cp = sep.join(cp)
+    af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
     for i in af:
         d = Equities('.'.join(i.split('.')[:-1]))
         if len(d._Equities__data): nr += d.store()
