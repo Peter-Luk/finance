@@ -22,7 +22,7 @@ def update(*args, **kwargs):
     af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
     for _ in af:
         d = Equities('.'.join(_.split('.')[:-1]))
-        if len(d._Equities__data):
+        if len(d._Equities__data) != 0:
             nr += d.store()
             if wipe: os.remove(sep.join((cp, _)))
     return nr
@@ -80,7 +80,7 @@ first positional or 'code' named is name in file system.
                 j = fields.index(_)
                 hdr[fields[j].lower()] = values[i][j]
             tf, c, _ = [hdr[_] for _ in ['open', 'high', 'low', 'close']], [], 0
-            while _ < len(tf):
+            while _ < len(tf) - 1:
                 r = False
                 if tf[_] == tf[_+1]: r = True
                 c.append(r)
