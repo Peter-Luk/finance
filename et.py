@@ -6,7 +6,6 @@ import sys
 sys.setrecursionlimit(10000)
 
 db_name, db_table = 'Securities', 'records'
-
 class Equities(object):
     def __init__(self, *args, **kwargs):
         self.period, self.digits, self.__field, self.__span = 20, -1, 'close', 0
@@ -512,9 +511,9 @@ steps (default: period) -- optional
             date = kwargs['date']
         if 'period' in list(kwargs.keys()): period = kwargs['period']
         ah, al = self.extract(field='high', date=date), self.extract(field='low', date=date)
-        pdm, mdm, i, tr = [], [], 1, [_[0]-_[-1] for _ in self.tr(date, period)]
-        if len(ah) == len(al):
-            while i < len(ah):
+        pdm, mdm, i, tr, lah = [], [], 1, [_[0]-_[-1] for _ in self.tr(date, period)], len(ah)
+        if lah == len(al):
+            while i < lah:
                 th, tl = ah[i] - ah[i-1], al[i-1] - al[i]
                 if th > tl: pdm.append(th)
                 else: pdm.append(0)
@@ -529,13 +528,16 @@ steps (default: period) -- optional
             if 'source' in list(kwargs.keys()): src = kwargs['source']
             if 'period' in list(kwargs.keys()): period = kwargs['period']
             hdr, count = [], len(src)
-            # for i in range(period, count):
-                # if i == period: hdr.append(mean(src[:period]) / mean(tr[:period]) * 100)
-                # else:
-                    # if tr[i] == 0: hdr.append((hdr[-1] / 100 * (period - 1) + src[i]) / period * 100)
-                    # else: hdr.append((hdr[-1] / 100 * (period - 1) + src[i] / tr[i]) / period * 100)
-            # return hdr[-1]
-            while count > period:
+#             i = period
+#             while i < count - 1:
+#                 if i == period: hdr.append(mean(src[:period]) / mean(tr[:period]) * 100)
+#                 else:
+#                     if tr[i] == 0: hdr.append((hdr[-1] / 100 * (period - 1) + src[i]) / period * 100)
+#                     else: hdr.append((hdr[-1] / 100 * (period - 1) + src[i] / tr[i]) / period * 100)
+#                 i += 1
+#             return hdr[-1]
+            while period <= count:
+            # while count > period:
                 tmp = sdm(src[:-1], period) * (period - 1) / 100
                 if tr[-1] == 0: return (tmp + src[-1]) / period * 100
                 return (tmp + (src[-1] / tr[-1])) / period * 100

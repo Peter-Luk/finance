@@ -411,7 +411,7 @@ if __name__ == "__main__":
         __ms(contract)
         if version_info.major == 2:confirm = raw_input('Proceed Y/N? ')
         if version_info.major == 3:confirm = input('Proceed Y/N? ')
-    except:confirm = 'Y'
+    except: confirm = 'Y'
     while confirm.upper() != 'N':
         if version_info[0].major == 2:contract = raw_input("Contract code: ")
         if version_info.major == 3:contract = input("Contract code: ")

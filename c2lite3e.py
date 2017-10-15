@@ -22,7 +22,8 @@ def update(*args, **kwargs):
     af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
     for _ in af:
         d = Equities('.'.join(_.split('.')[:-1]))
-        if len(d._Equities__data) != 0:
+        ld = len(d._Equities__data)
+        if ld != 0:
             nr += d.store()
             if wipe: os.remove(sep.join((cp, _)))
     return nr
