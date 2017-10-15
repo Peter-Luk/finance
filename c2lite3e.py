@@ -92,6 +92,9 @@ first positional or 'code' named is name in file system.
         return tmp
 
     def store(self, *args, **kwargs):
+        """
+Transfer data to first positional argument database 'table_name' (default: 'db_table').
+        """
         eid, table_name = int(self.code.split('.')[0]), db_table
         if args: table_name = args[0]
         if 'name' in list(kwargs.keys()): table_name = kwargs['name']
