@@ -236,7 +236,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         while i < len(trade_day) - 1:
         # for i in range(period, len(trade_day)):
             if i == period:
-                ag[trade_day[i]], al[trade_day[i]] = sum([hdr[trade_day[j]] for j in range(i - period, i) if __gt0(hdr[trade_date[j]])]) / float(period), abs(sum([hdr[trade_day[j]] for j in range(i - period, i) if __lt0(hdr[trade_date[j]])])) / float(period)
+                ag[trade_day[i]], al[trade_day[i]] = sum([hdr[trade_day[j]] for j in range(i - period, i) if __gt0(hdr[trade_day[j]])]) / float(period), abs(sum([hdr[trade_day[j]] for j in range(i - period, i) if __lt0(hdr[trade_day[j]])])) / float(period)
                 # ag[trade_day[i]], al[trade_day[i]] = sum(list(filter(__gt0, [hdr[trade_day[j]] for j in range(i - period, i)]))) / float(period), abs(sum(list(filter(__lt0, [hdr[trade_day[j]] for j in range(i - period, i)])))) / float(period)
             else:
                 if hdr[trade_day[i]] > 0:
