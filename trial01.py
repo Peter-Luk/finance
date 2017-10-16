@@ -233,7 +233,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         i, ag, al = period, {}, {}
         trade_day = list(hdr.keys())
         trade_day.sort()
-        while i < len(trade_day) - 1:
+        while i < len(trade_day):
         # for i in range(period, len(trade_day)):
             if i == period:
                 ag[trade_day[i]], al[trade_day[i]] = sum([hdr[trade_day[j]] for j in range(i - period, i) if __gt0(hdr[trade_day[j]])]) / float(period), abs(sum([hdr[trade_day[j]] for j in range(i - period, i) if __lt0(hdr[trade_day[j]])])) / float(period)
