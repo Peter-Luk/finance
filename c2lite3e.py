@@ -25,7 +25,7 @@ def update(*args, **kwargs):
         ld = len(d._Equities__data)
         if ld != 0:
             nr += d.store()
-            if wipe: os.remove(sep.join((cp, _)))
+            if wipe: remove(sep.join((cp, _)))
     return nr
 
 class Equities(object):
