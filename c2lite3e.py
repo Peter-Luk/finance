@@ -1,6 +1,6 @@
 db_name, db_table = 'Securities', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path', 'remove')}, {'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path', 'remove')}, {'sys':('platform',)}, {'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
