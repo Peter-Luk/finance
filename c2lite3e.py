@@ -16,8 +16,17 @@ def update(*args, **kwargs):
     if 'folder' in list(kwargs.keys()): folder = kwargs['folder']
     if 'wipe' in list(kwargs.keys()): wipe = kwargs['wipe']
     nr, sd = 0, filepath(db_name)
-    cp = sd.split(sep)[:-2]
+    sdl = sd.split(sep)
+    cp = sdl[:-2]
     cp.append(folder)
+    if platform == 'linux':
+        si = sdl.index('storage')
+        cp = sdl[:si+1]
+        cp.extend(['shared', 'Download'])
+        cpl = listdir(cp)
+        if cpl == 0:
+            cp = sdl[:-2]
+            cp.append(folder)
     cp = sep.join(cp)
     af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
     for _ in af:
