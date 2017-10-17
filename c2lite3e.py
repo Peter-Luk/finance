@@ -28,7 +28,12 @@ def update(*args, **kwargs):
             cp = sdl[:-2]
             cp.append(folder)
     cp = sep.join(cp)
-    af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
+    # af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
+    af = []
+    for _ in listdir(cp):
+        if path.isfile(sep.join((cp, _))):
+            tfl = _.split('.')
+            if tfl[-1] == folder and len(tfl[:-1]) == 2: af.append(_)
     for _ in af:
         d = Equities('.'.join(_.split('.')[:-1]))
         ld = len(d._Equities__data)
