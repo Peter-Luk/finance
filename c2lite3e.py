@@ -4,43 +4,54 @@ iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir'
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
+def find_csv_path(*args, **kwargs):
+    folder, sd = 'csv', filepath(db_name)
+    if args:
+        folder = args[0]
+    if 'folder' in list(kwargs.keys()):
+        if isinstance(kwargs['folder'], str): folder = kwargs['folder']
+    sdl = sd.split(sep)
+    cp = sdl[:-2]
+    cp.append(folder)
+    if platform == 'linux':
+        si = sdl.index('storage')
+        cp = sdl[:si+1]
+        cp.extend(['shared', 'Download'])
+        cp = sep.join(cp)
+        cpl = len(listdir(cp))
+        if cpl == 0:
+            cp = sdl[:-2]
+            cp.append(folder)
+            cp = sep.join(cp)
+            cpl = len(listdir(cp))
+            if cpl == 0: return False
+        return cp
+
 def update(*args, **kwargs):
     """
     Sequential update database with 'folder' directory.
     First positional or 'folder' argument is sub-folder name (default: 'csv'), and
-    'wipe' argument initiate plunge file after new value stored (default: False).
+    'wipe' argument initiate plunge file after new value stored (default: True).
     """
-    folder, wipe = 'csv', False
+    folder, wipe = 'csv', True
     if args:
         if isinstance(args[0], str): folder = args[0]
     if 'folder' in list(kwargs.keys()): folder = kwargs['folder']
     if 'wipe' in list(kwargs.keys()): wipe = kwargs['wipe']
-    nr, sd = 0, filepath(db_name)
-    sdl = sd.split(sep)
-    cp = sdl[:-2]
-    cp.append(folder)
-#     if platform == 'linux':
-#         si = sdl.index('storage')
-#         cp = sdl[:si+1]
-#         cp.extend(['shared', 'Download'])
-#         cpl = listdir(sep.join(cp))
-#         if cpl == 0:
-#             cp = sdl[:-2]
-#             cp.append(folder)
-    cp = sep.join(cp)
-    # af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
-    af = []
-    for _ in listdir(cp):
-        if path.isfile(sep.join((cp, _))):
-            tfl = _.split('.')
-            if tfl[-1] == folder and len(tfl[:-1]) == 2: af.append(_)
-    for _ in af:
-        d = Equities('.'.join(_.split('.')[:-1]))
-        ld = len(d._Equities__data)
-        if ld != 0:
-            nr += d.store()
-            if wipe: remove(sep.join((cp, _)))
-    return nr
+    cp = find_csv_path()
+    if cp:
+        af = []
+        for _ in listdir(cp):
+            if path.isfile(sep.join((cp, _))):
+                tfl = _.split('.')
+                if tfl[-1] == folder and len(tfl[:-1]) == 2: af.append(_)
+        for _ in af:
+            d = Equities('.'.join(_.split('.')[:-1]))
+            ld = len(d._Equities__data)
+            if ld != 0:
+                nr += d.store()
+                if wipe: remove(sep.join((cp, _)))
+        return nr
 
 class Equities(object):
     """
@@ -50,7 +61,7 @@ class Equities(object):
         if args: self.code = args[0]
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         self.__db_fullpath = filepath(db_name)
-        self.__csv_fullpath = self.__find_csv_path()
+        self.__csv_fullpath = find_csv_path()
         if 'path' in list(kwargs.keys()):
             kpath = kwargs['path']
             if isinstance(kpath, str): self.__csv_fullpath = kpath
@@ -67,27 +78,6 @@ class Equities(object):
         self.conn.close()
         self.conn = self.fields = self.values = self.code = self.__data = self.__stored_data = self.__csv_fullpath = self.__db_fullpath = None
         del self.fields, self.values, self.conn, self.code, self.__data, self.__stored_data, self.__csv_fullpath, self.__db_fullpath
-
-    def __find_csv_path(self, *args, **kwargs):
-        folder, sd = 'csv', self.__db_fullpath
-        if args:
-            folder = args[0]
-        if 'folder' in list(kwargs.keys()):
-            if isinstance(kwargs['folder'], str): folder = kwargs['folder']
-        sdl = sd.split(sep)
-        cp = sdl[:-2]
-        cp.append(folder)
-        if platform == 'linux':
-            si = sdl.index('storage')
-            cp = sdl[:si+1]
-            cp.extend(['shared', 'Download'])
-            cp = sep.join(cp)
-            cpl = listdir(cp)
-            if cpl == 0:
-                cp = sdl[:-2]
-                cp.append(folder)
-                cp = sep.join(cp)
-        return cp
 
     def get(self, *args, **kwargs):
         """
