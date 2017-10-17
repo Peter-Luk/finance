@@ -116,6 +116,8 @@ Transfer data to first positional argument database 'table_name' (default: 'db_t
         i, sd, nd = 0, [datetime.strptime(_['date'], '%Y-%m-%d').date() for _ in self.__stored_data], []
         fields = [_.lower() for _ in self.fields]
         fields.insert(0, 'eid')
+        rfields = ['%s=?'% _ for _ in fields[2:]]
+        uqstr = "UPDATE ? SET %s WHERE eid=? AND date=?" % ','.join(rfields)
         iqstr = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(['?' for _ in fields]))
         while i < len(self.__data):
             _ = self.__data[i]
