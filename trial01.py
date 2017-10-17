@@ -2,10 +2,10 @@
 Powerhouse for techinal analysis between frontend like pandas, matplotlib and backend namely, sqlite3.
 """
 db_name, db_table = 'Futures', 'records'
-him = getattr(__import__('handy'),'him')
-iml = [{'utilities':('gr','filepath'),'datetime':('datetime',),'statistics':('mean','stdev'),'os':('sep','linesep')},({'sqlite3':()},"alias='lite'"),({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='upper'")]
+him = getattr(__import__('handy'), 'him')
+iml = [{'utilities':('gr', 'filepath'),'datetime':('datetime',),'statistics':('mean', 'stdev'),'os':('sep', 'linesep')},({'sqlite3':()}, "alias='lite'"),({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='upper'")]
 __ = him(iml)
-for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
+for _ in list(__.keys()): exec("%s = __['%s']" % (_, _))
 class I2(object):
     """
 Base class to provide techinal analysis for financial derivatives. Required 'product code'.
@@ -180,21 +180,21 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             tr[d] = tmp['close']
 
         i = period
-        while i < len(trade_day) - 1:
+        while i < len(trade_day):
         # for i in range(period, len(trade_day)):
             ch, vo = abs(tr[trade_day[i]] - tr[trade_day[i - period]]), sum([abs(tr[trade_day[x]] - tr[trade_day[x - 1]]) for x in range(i - period, i)])
             er[trade_day[i]] = ch / float(vo)
             i += 1
 
         i = slow
-        while i < len(trade_day) - 1:
+        while i < len(trade_day):
         # for i in range(slow, len(trade_day)):
             sfc, ssc = 2. / (fast + 1), 2. / (slow + 1)
             sc[trade_day[i]] = (er[trade_day[i]] * (sfc - ssc) + ssc) ** 2
             i += 1
 
         i = slow
-        while i < len(trade_day) - 1:
+        while i < len(trade_day):
         # for i in range(slow, len(trade_day)):
             if i == slow: res[trade_day[i]] = self.EMA(date=trade_day[i])
             else: res[trade_day[i]] = res[trade_day[i - 1]] + sc[trade_day[i]] * (tr[trade_day[i]] - res[trade_day[i - 1]])
