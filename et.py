@@ -376,6 +376,22 @@ steps (default: period) -- optional
             if self.digits >= 0: return round(mean(values[-period:]), self.digits)
             return mean(values[-period:])
 
+    def bb(self, *args, **kwargs):
+        """
+Bollinger Band
+        """
+        period, values = self.period, self.__data
+        if args:
+            if isinstance(args[0], list): values= args[0]
+            if isinstance(args[0], str):
+                try: values = self.extract(date=args[0])
+                except: pass
+        if len(args) > 1: period = args[1]
+        if 'date' in list(kwargs.keys()): values = self.extract(date=kwargs['date'])
+        if 'period' in list(kwargs.keys()): period = kwargs['period']
+        if not self.digits < 0: return round(self.sma(values, period) + gr / 2 * self.std(values, period=period), self.digits), round(self.sma(values, period) - gr / 2 * self.std(values, period=period), self.digits)
+        return self.sma(values, period) + gr / 2 * self.std(values, period=period), self.sma(values, period) - gr / 2 * self.std(values, period=period)
+
     def wma(self, *args, **kwargs):
         """
 Weighted Moving Average
