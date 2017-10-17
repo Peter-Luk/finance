@@ -19,14 +19,14 @@ def update(*args, **kwargs):
     sdl = sd.split(sep)
     cp = sdl[:-2]
     cp.append(folder)
-    if platform == 'linux':
-        si = sdl.index('storage')
-        cp = sdl[:si+1]
-        cp.extend(['shared', 'Download'])
-        cpl = listdir(cp)
-        if cpl == 0:
-            cp = sdl[:-2]
-            cp.append(folder)
+#     if platform == 'linux':
+#         si = sdl.index('storage')
+#         cp = sdl[:si+1]
+#         cp.extend(['shared', 'Download'])
+#         cpl = listdir(sep.join(cp))
+#         if cpl == 0:
+#             cp = sdl[:-2]
+#             cp.append(folder)
     cp = sep.join(cp)
     # af = [_ for _ in listdir(cp) if path.isfile(sep.join((cp, _)))]
     af = []
@@ -49,7 +49,15 @@ class Equities(object):
     def __init__(self, *args, **kwargs):
         if args: self.code = args[0]
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
-        self.conn = lite.connect(filepath(db_name))
+        self.__db_fullpath = filepath(db_name)
+        self.__csv_fullpath = self.__find_csv_path()
+        if 'path' in list(kwargs.keys()):
+            kpath = kwargs['path']
+            if isinstance(kpath, str): self.__csv_fullpath = kpath
+            if isinstance(kpath, dict):
+                if 'db' in list(kpath.keys()): self.__db_fullpath = kpath['db']
+                if 'csv' in list(kpath.keys()): self.__csv_fullpath = kpath['csv']
+        self.conn = lite.connect(self.__db_fullpath)
         self.conn.row_factory = lite.Row
         self.fields, self.values = [], []
         self.__data = self.get(self.code)
@@ -57,8 +65,29 @@ class Equities(object):
 
     def __del__(self):
         self.conn.close()
-        self.conn = self.fields = self.values = self.code = self.__data = self.__stored_data = None
-        del self.fields, self.values, self.conn, self.code, self.__data, self.__stored_data
+        self.conn = self.fields = self.values = self.code = self.__data = self.__stored_data = self.__csv_fullpath = self.__db_fullpath = None
+        del self.fields, self.values, self.conn, self.code, self.__data, self.__stored_data, self.__csv_fullpath, self.__db_fullpath
+
+    def __find_csv_path(self, *args, **kwargs):
+        folder, sd = 'csv', self.__db_fullpath
+        if args:
+            folder = args[0]
+        if 'folder' in list(kwargs.keys()):
+            if isinstance(kwargs['folder'], str): folder = kwargs['folder']
+        sdl = sd.split(sep)
+        cp = sdl[:-2]
+        cp.append(folder)
+        if platform == 'linux':
+            si = sdl.index('storage')
+            cp = sdl[:si+1]
+            cp.extend(['shared', 'Download'])
+            cp = sep.join(cp)
+            cpl = listdir(cp)
+            if cpl == 0:
+                cp = sdl[:-2]
+                cp.append(folder)
+                cp = sep.join(cp)
+        return cp
 
     def get(self, *args, **kwargs):
         """
@@ -68,7 +97,8 @@ first positional or 'code' named is name in file system.
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if args: code = args[0]
         if 'code' in list(kwargs.keys()): code = kwargs['code']
-        tmp = open(filepath('.'.join((code, 'csv')), subpath='csv'))
+        # tmp = open(filepath('.'.join((code, 'csv')), subpath='csv'))
+        tmp = open(sep.join((self.__csv_fullpath, '.'.join((code, 'csv')))))
         data = [_[:-1] for _ in tmp.readlines()]
         tmp.close()
         fields = data[0].split(',')
