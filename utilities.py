@@ -12,6 +12,21 @@ ph['2016'] = {'1':(1,), '2':(8, 9, 10), '3':(25, 28), '4':(4,), '5':(2,), '6':(9
 ph['2017'] = {'1':(2, 30, 31), '4':(4, 14, 17), '5':(1, 3, 30), '10':(2, 5), '12':(25, 26)}
 ph['2018'] = {'1':(1,), '2':(16, 19), '3':(30,), '4':(2, 5), '5':(1, 22), '6':(18,), '7':(2,), '9':(25,), '10':(1, 17), '12':(25, 26)}
 
+def in_limit(*args, **kwargs):
+    try:
+        num, limits = args[0], args[1]
+        if 'num' in list(kwargs.keys()): num = kwargs['num']
+        if 'limits' in list(kwargs.keys()): limits = kwargs['limits']
+        if isinstance(num, int) or isinstance(num, float):
+            if isinstance(limits, tuple) or isinstance(limits, list):
+                ll = len(limits)
+                if ll == 2:
+                    u, l = limits
+                    if limits[0] < limits[-1]: l, u = limits
+                    if num < u and num > l: return True
+        return False
+    except: pass
+
 def ltd(year=year, month=month, excluded={}):
     t, ld = 0, [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if not(year % 4):ld[1] += 1

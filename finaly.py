@@ -1,8 +1,8 @@
 db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf', 'in_limit'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
-for _ in list(__.keys()):exec("%s=__['%s']"%(_,_))
+for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 class Futures(object):
     """
@@ -12,7 +12,7 @@ Addition statistical method (mean, standard derivation) is provided to (sma, ema
 Statistic range (srange) also provided for all 'addition statistical method' supported.
     """
     def __init__(self, *args, **kwargs):
-        self.code, self.period, self.digits, self.session, self.__field = args[0], 12, -1, 'F', 'close'
+        self.in_limit, self.code, self.period, self.digits, self.session, self.__field = in_limit, args[0], 12, -1, 'F', 'close'
         if len(args) > 1: self.period = args[1]
         if len(args) > 2: self.__field = args[2]
         if len(args) > 3: self.session = args[3]
@@ -33,8 +33,8 @@ Statistic range (srange) also provided for all 'addition statistical method' sup
 Standard cleanup (garbage collection) method.
         """
         self.conn.close()
-        self.conn = self.code = self.__raw_data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = self.__field = self.__data = None
-        del self.conn, self.latest, self.code, self.trade_date, self.close, self.period, self.__raw_data, self.digits, self.session, self.__field, self.__data
+        self.in_limit = self.conn = self.code = self.__raw_data = self.period = self.close = self.trade_date = self.latest = self.digits = self.session = self.__field = self.__data = None
+        del self.in_limit, self.conn, self.latest, self.code, self.trade_date, self.close, self.period, self.__raw_data, self.digits, self.session, self.__field, self.__data
 
     def __nvalues(self, *args):
         """

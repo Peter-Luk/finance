@@ -1,4 +1,4 @@
-from utilities import filepath, gr
+from utilities import filepath, gr, in_limit
 from datetime import datetime
 from statistics import mean, stdev
 import sqlite3 as lite
@@ -7,24 +7,9 @@ sys.setrecursionlimit(10000)
 
 db_name, db_table = 'Securities', 'records'
 
-def in_limit(*args, **kwargs):
-    try:
-        num, limits = args[0], args[1]
-        if 'num' in list(kwargs.keys()): num = kwargs['num']
-        if 'limits' in list(kwargs.keys()): limits = kwargs['limits']
-        if isinstance(num, int) or isinstance(num, float):
-            if isinstance(limits, tuple) or isinstance(limits, list):
-                ll = len(limits)
-                if ll == 2:
-                    u, l = limits
-                    if limits[0] < limits[-1]: l, u = limits
-                    if num < u and num > l: return True
-        return False
-    except: pass
-
 class Equities(object):
     def __init__(self, *args, **kwargs):
-        self.period, self.digits, self.__field, self.__span = 20, -1, 'close', 0
+        self.in_limit, self.period, self.digits, self.__field, self.__span = in_limit, 20, -1, 'close', 0
         self.conn = lite.connect(filepath(db_name))
         self.conn.row_factory = lite.Row
         if args:
@@ -48,8 +33,8 @@ class Equities(object):
 
     def __del__(self):
         self.conn.close()
-        self.conn = self.__data = self.code = self.period = self.digits = self.__raw_data = self.trade_date = self.latest = self.close = self.__span = None
-        del self.conn, self.__data, self.code, self.period, self.digits, self.__raw_data, self.trade_date, self.latest, self.close, self.__span
+        self.in_limit = self.conn = self.__data = self.code = self.period = self.digits = self.__raw_data = self.trade_date = self.latest = self.close = self.__span = None
+        del self.in_limit, self.conn, self.__data, self.code, self.period, self.digits, self.__raw_data, self.trade_date, self.latest, self.close, self.__span
 
     def __nvalues(self, *args):
         """
