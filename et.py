@@ -6,6 +6,22 @@ import sys
 sys.setrecursionlimit(10000)
 
 db_name, db_table = 'Securities', 'records'
+
+def in_limit(*args, **kwargs):
+    try:
+        num, limits = args[0], args[1]
+        if 'num' in list(kwargs.keys()): num = kwargs['num']
+        if 'limits' in list(kwargs.keys()): limits = kwargs['limits']
+        if isinstance(num, int) or isinstance(num, float):
+            if isinstance(limits, tuple) or isinstance(limits, list):
+                ll = len(limits)
+                if ll == 2:
+                    u, l = limits
+                    if limits[0] < limits[-1]: l, u = limits
+                    if num < u and num > l: return True
+        return False
+    except: pass
+
 class Equities(object):
     def __init__(self, *args, **kwargs):
         self.period, self.digits, self.__field, self.__span = 20, -1, 'close', 0
