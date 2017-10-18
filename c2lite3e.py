@@ -40,7 +40,7 @@ def update(*args, **kwargs):
     if 'wipe' in list(kwargs.keys()): wipe = kwargs['wipe']
     cp = find_csv_path()
     if cp:
-        af = []
+        nr, af = 0, []
         for _ in listdir(cp):
             if path.isfile(sep.join((cp, _))):
                 tfl = _.split('.')
