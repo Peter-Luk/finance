@@ -31,6 +31,9 @@ class Equities(object):
         self.__data = self.extract(field=self.__field)
         self.trade_date = self.extract(field='date')
 
+    def __call__(self):
+        return self.code, self.latest, self.close
+
     def __del__(self):
         self.conn.close()
         self.in_limit = self.conn = self.__data = self.code = self.period = self.digits = self.__raw_data = self.trade_date = self.latest = self.close = self.__span = None
