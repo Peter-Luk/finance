@@ -34,7 +34,7 @@ Statistic range (srange) also provided for all 'addition statistical method' sup
         if 'option' in list(kwargs.keys()): option = kwargs['option']
         if option == 'programmatic':
             res['basic'] = {'code': self.code, 'date': self.latest, 'value': self.close}
-            res['indictors'] = {'SMA': self.sma(), 'WMA': self.wma(), 'EMA': self.ema(), 'KAMA': self.kama(), 'ATR': self.atr(), 'ADX': self.adx()}
+            res['indicators'] = {'SMA': self.sma(), 'WMA': self.wma(), 'EMA': self.ema(), 'KAMA': self.kama(), 'ATR': self.atr(), 'ADX': self.adx()}
             res['overlays'] = {'STC': self.stc(), 'KC': self.kc(), 'BB': self.bb(), 'APZ': self.apz()}
             return res
         return self.code, self.latest, self.close
