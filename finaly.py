@@ -28,6 +28,17 @@ Statistic range (srange) also provided for all 'addition statistical method' sup
         self.__data = self.extract(field=self.__field)
         self.trade_date = self.extract(field='date')
 
+    def __call__(self, *args, **kwargs):
+        option, res = 'basic', {}
+        if args: option = args[0]
+        if 'option' in list(kwargs.keys()): option = kwargs['option']
+        if option == 'programmatic':
+            res['basic'] = {'code': self.code, 'date': self.latest, 'value': self.close}
+            res['indictors'] = {'SMA': self.sma(), 'WMA': self.wma(), 'EMA': self.ema(), 'KAMA': self.kama(), 'ATR': self.atr(), 'ADX': self.adx()}
+            res['overlays'] = {'STC': self.stc(), 'KC': self.kc(), 'BB': self.bb(), 'APZ': self.apz()}
+            return res
+        return self.code, self.latest, self.close
+
     def __del__(self):
         """
 Standard cleanup (garbage collection) method.
