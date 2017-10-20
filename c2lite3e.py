@@ -138,11 +138,19 @@ Transfer data to first positional argument database 'table_name' (default: 'db_t
         fields = [_.lower() for _ in self.fields]
         fields.insert(0, 'eid')
         rfields = ['%s=?'% _ for _ in fields[2:]]
-        uqstr = "UPDATE ? SET %s WHERE eid=? AND date=?" % ','.join(rfields)
         iqstr = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(['?' for _ in fields]))
         while i < len(self.__data):
-            _ = self.__data[i]
-            if _['date'] not in sd: nd.append(_)
+            _, tmp = self.__data[i], {}
+            if _['date'] in sd:
+                tmp['table'] = 'records'
+                tmp['id'] = self.conn.cursor().execute("SELECT id FROM {table} WHERE eid={eid} AND date='{date}'".format(**{'table':tmp['table'], 'eid':eid, 'date':_['date']})).fetchone()['id']
+                ufvd = {}
+                for i in list(_.keys()):
+                    if i not in ['eid', 'date', 'id']: ufvd[i] = _[i]
+                tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd.items()])
+                self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
+                self.conn.commit()
+            else: nd.append(_)
             i += 1
         dl = []
         for i in nd:
