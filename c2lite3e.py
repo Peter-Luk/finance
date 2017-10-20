@@ -1,6 +1,6 @@
 db_name, db_table = 'Securities', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path', 'remove')}, {'sys':('platform',)}, {'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'linesep', 'sep', 'path', 'remove')}, {'sys':('platform',)}, {'pandas_datareader':('data',)}, {'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
@@ -87,6 +87,8 @@ first positional or 'code' named is name in file system.
         if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if args: code = args[0]
         if 'code' in list(kwargs.keys()): code = kwargs['code']
+        # df = data.DataReader('0700.HK','yahoo',start,end)
+        # rdata = df.to_csv().split(linesep)
         # tmp = open(filepath('.'.join((code, 'csv')), subpath='csv'))
         if self.__csv_fullpath:
             tmp = open(sep.join((self.__csv_fullpath, '.'.join((code, 'csv')))))
@@ -142,14 +144,15 @@ Transfer data to first positional argument database 'table_name' (default: 'db_t
         while i < len(self.__data):
             _, tmp = self.__data[i], {}
             if _['date'] in sd:
-                tmp['table'] = 'records'
-                tmp['id'] = self.conn.cursor().execute("SELECT id FROM {table} WHERE eid={eid} AND date='{date}'".format(**{'table':tmp['table'], 'eid':eid, 'date':_['date']})).fetchone()['id']
-                ufvd = {}
-                for i in list(_.keys()):
-                    if i not in ['eid', 'date', 'id']: ufvd[i] = _[i]
-                tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd.items()])
-                self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
-                self.conn.commit()
+                # tmp['table'] = 'records'
+                # tmp['id'] = self.conn.cursor().execute("SELECT id FROM {table} WHERE eid={eid} AND date='{date}'".format(**{'table':tmp['table'], 'eid':eid, 'date':_['date']})).fetchone()['id']
+                # ufvd = {}
+                # for i in list(_.keys()):
+                    # if i not in ['eid', 'date', 'id']: ufvd[i] = _[i]
+                # tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd.items()])
+                # self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
+                # self.conn.commit()
+                pass
             else: nd.append(_)
             i += 1
         dl = []
