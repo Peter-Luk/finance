@@ -84,20 +84,27 @@ class Equities(object):
 Extract data in csv from file system,
 first positional or 'code' named is name in file system.
         """
-        if 'code' in list(kwargs.keys()): self.code = kwargs['code']
         if args: code = args[0]
         if 'code' in list(kwargs.keys()): code = kwargs['code']
-        # df = data.DataReader('0700.HK','yahoo',start,end)
-        # rdata = df.to_csv().split(linesep)
-        # tmp = open(filepath('.'.join((code, 'csv')), subpath='csv'))
         if self.__csv_fullpath:
-            tmp = open(sep.join((self.__csv_fullpath, '.'.join((code, 'csv')))))
-            data = [_[:-1] for _ in tmp.readlines()]
-            tmp.close()
-            fields = data[0].split(',')
+            try:
+                tmp = open(sep.join((self.__csv_fullpath, '.'.join((code, 'csv')))))
+                rdata = [_[:-1] for _ in tmp.readlines()]
+                tmp.close()
+            except:
+                end = datetime.today()
+                m, y = end.month, end.year
+                if m == 1:
+                    m += 12
+                    y -= 1
+                m -= 1
+                start = datetime.strptime('{0}-{1}-01'.format(y, m), '%Y-%m-%d')
+                df = data.DataReader(code, 'yahoo', start, end)
+                rdata = df.to_csv().split(linesep)
+            fields = rdata[0].split(',')
             i, values = 1, []
-            while i < len(data):
-                tmp = data[i].split(',')
+            while i < len(rdata):
+                tmp = rdata[i].split(',')
                 try:
                     tmp[0] = datetime.strptime(tmp[0], '%Y-%m-%d').date()
                     tmp[-1] = int(tmp[-1])
@@ -125,7 +132,6 @@ first positional or 'code' named is name in file system.
                     _ += 1
                 c.append(hdr['volume'] == 0)
                 if not reduce((lambda x, y: x and y), c): tmp.append(hdr)
-                # tmp.append(hdr)
                 i += 1
             return tmp
 
@@ -144,15 +150,14 @@ Transfer data to first positional argument database 'table_name' (default: 'db_t
         while i < len(self.__data):
             _, tmp = self.__data[i], {}
             if _['date'] in sd:
-                # tmp['table'] = 'records'
-                # tmp['id'] = self.conn.cursor().execute("SELECT id FROM {table} WHERE eid={eid} AND date='{date}'".format(**{'table':tmp['table'], 'eid':eid, 'date':_['date']})).fetchone()['id']
-                # ufvd = {}
-                # for i in list(_.keys()):
-                    # if i not in ['eid', 'date', 'id']: ufvd[i] = _[i]
-                # tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd.items()])
-                # self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
-                # self.conn.commit()
-                pass
+                tmp['table'] = 'records'
+                tmp['id'] = self.conn.cursor().execute("SELECT id FROM {table} WHERE eid={eid} AND date='{date}'".format(**{'table':tmp['table'], 'eid':eid, 'date':_['date']})).fetchone()['id']
+                ufvd = {}
+                for j in list(_.keys()):
+                    if j not in ['eid', 'date', 'id']: ufvd[j] = _[j]
+                tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd.items()])
+                self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
+                self.conn.commit()
             else: nd.append(_)
             i += 1
         dl = []
