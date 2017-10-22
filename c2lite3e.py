@@ -52,6 +52,15 @@ def update(*args, **kwargs):
                 nr += d.store()
                 if wipe: remove(sep.join((cp, _)))
         return nr
+    else:
+        conn = lite.connect(filepath(db_name))
+        conn.row_factory = lite.Row
+        nr, ue = 0, conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
+        for _ in ['{:04d}.HK'.format(_['eid']) for _ in ue]:
+            d = Equities(_)
+            ld = len(d._Equities__data)
+            if ld != 0: nr += d.store()
+        return nr
 
 class Equities(object):
     """
@@ -151,13 +160,18 @@ Transfer data to first positional argument database 'table_name' (default: 'db_t
             _, tmp = self.__data[i], {}
             if _['date'] in sd:
                 tmp['table'] = 'records'
-                tmp['id'] = self.conn.cursor().execute("SELECT id FROM {table} WHERE eid={eid} AND date='{date}'".format(**{'table':tmp['table'], 'eid':eid, 'date':_['date']})).fetchone()['id']
-                ufvd = {}
-                for j in list(_.keys()):
-                    if j not in ['eid', 'date', 'id']: ufvd[j] = _[j]
-                tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd.items()])
-                self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
-                self.conn.commit()
+                hdr = self.conn.cursor().execute("SELECT * FROM {table} WHERE eid={eid} AND date='{date}'".format(**{'table':tmp['table'], 'eid':eid, 'date':_['date']})).fetchone()
+                tmp['id'] = hdr['id']
+                ufvd = [(j, _[j]) for j in list(_.keys()) if j not in ['eid', 'date', 'id']]
+                hd = [(j, hdr[j]) for j in list(hdr.keys()) if j not in ['eid', 'date', 'id']]
+                if not hd == ufvd:
+                    tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd])
+    #                 ufvd = {}
+    #                 for j in list(_.keys()):
+    #                     if j not in ['eid', 'date', 'id']: ufvd[j] = _[j]
+    #                 tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd.items()])
+                    self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
+                    self.conn.commit()
             else: nd.append(_)
             i += 1
         dl = []
