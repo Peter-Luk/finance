@@ -100,49 +100,50 @@ first positional or 'code' named is name in file system.
                 tmp = open(sep.join((self.__csv_fullpath, '.'.join((code, 'csv')))))
                 rdata = [_[:-1] for _ in tmp.readlines()]
                 tmp.close()
-            except:
-                end = datetime.today()
-                m, y = end.month, end.year
-                if m == 1:
-                    m += 12
-                    y -= 1
-                m -= 1
-                start = datetime.strptime('{0}-{1}-01'.format(y, m), '%Y-%m-%d')
-                df = data.DataReader(code, 'yahoo', start, end)
-                rdata = df.to_csv().split(linesep)
-            fields = rdata[0].split(',')
-            i, values = 1, []
-            while i < len(rdata):
-                tmp = rdata[i].split(',')
-                try:
-                    tmp[0] = datetime.strptime(tmp[0], '%Y-%m-%d').date()
-                    tmp[-1] = int(tmp[-1])
-                    j = 1
-                    while j < len(tmp) - 1:
-                        tmp[j] = float(tmp[j])
-                        j += 1
-                    values.append(tmp)
-                except: pass
-                i += 1
-            el  = ['Adj Close']
-            self.fields.extend([_ for _ in fields if _ not in el])
-            i, tmp  = 0, []
-            while i < len(values):
-                self.values.append(values[i])
-                hdr = {}
-                for _ in self.fields:
-                    j = fields.index(_)
-                    hdr[fields[j].lower()] = values[i][j]
-                tf, c, _ = [hdr[_] for _ in ['open', 'high', 'low', 'close']], [], 0
-                while _ < len(tf) - 1:
-                    r = False
-                    if tf[_] == tf[_+1]: r = True
-                    c.append(r)
-                    _ += 1
-                c.append(hdr['volume'] == 0)
-                if not reduce((lambda x, y: x and y), c): tmp.append(hdr)
-                i += 1
-            return tmp
+            except: pass
+        else:
+            end = datetime.today()
+            m, y = end.month, end.year
+            if m == 1:
+                m += 12
+                y -= 1
+            m -= 1
+            start = datetime.strptime('{0}-{1}-01'.format(y, m), '%Y-%m-%d')
+            df = data.DataReader(code, 'yahoo', start, end)
+            rdata = df.to_csv().split(linesep)
+        fields = rdata[0].split(',')
+        i, values = 1, []
+        while i < len(rdata):
+            tmp = rdata[i].split(',')
+            try:
+                tmp[0] = datetime.strptime(tmp[0], '%Y-%m-%d').date()
+                tmp[-1] = int(tmp[-1])
+                j = 1
+                while j < len(tmp) - 1:
+                    tmp[j] = float(tmp[j])
+                    j += 1
+                values.append(tmp)
+            except: pass
+            i += 1
+        el  = ['Adj Close']
+        self.fields.extend([_ for _ in fields if _ not in el])
+        i, tmp  = 0, []
+        while i < len(values):
+            self.values.append(values[i])
+            hdr = {}
+            for _ in self.fields:
+                j = fields.index(_)
+                hdr[fields[j].lower()] = values[i][j]
+            tf, c, _ = [hdr[_] for _ in ['open', 'high', 'low', 'close']], [], 0
+            while _ < len(tf) - 1:
+                r = False
+                if tf[_] == tf[_+1]: r = True
+                c.append(r)
+                _ += 1
+            c.append(hdr['volume'] == 0)
+            if not reduce((lambda x, y: x and y), c): tmp.append(hdr)
+            i += 1
+        return tmp
 
     def store(self, *args, **kwargs):
         """
