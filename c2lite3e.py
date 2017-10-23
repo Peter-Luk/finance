@@ -27,6 +27,23 @@ def find_csv_path(*args, **kwargs):
             if cpl == 0: return False
         return cp
 
+def insert(*args, **kwargs):
+    if args: code = args[0]
+    conn = lite.connect(filepath(db_name))
+    conn.row_factory = lite.Row
+    ue = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
+    if code not in ['{:04d}.HK'.format(_['eid']) for _ in ue]:
+        end = datetime.today()
+        m, y = end.month, end.year - 2
+        if m == 1:
+            m += 12
+            y -= 1
+        m -= 1
+        start = datetime.strptime('{0}-{1}-01'.format(y, m), '%Y-%m-%d')
+        df = data.DataReader(code, 'yahoo', start, end)
+        rdata = df.to_csv().split(linesep)
+
+
 def update(*args, **kwargs):
     """
     Sequential update database with 'folder' directory.
@@ -110,7 +127,7 @@ first positional or 'code' named is name in file system.
             m -= 1
             start = datetime.strptime('{0}-{1}-01'.format(y, m), '%Y-%m-%d')
             df = data.DataReader(code, 'yahoo', start, end)
-            rdata = df.to_csv().split(linesep)
+            rdata = df.to_csv().split(linesep)[:-1]
         fields = rdata[0].split(',')
         i, values = 1, []
         while i < len(rdata):
