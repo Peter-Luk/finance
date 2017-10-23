@@ -29,7 +29,7 @@ Statistic range (srange) also provided for all 'addition statistical method' sup
         self.trade_date = self.extract(field='date')
 
     def __call__(self, *args, **kwargs):
-        option, res = 'basic', {}
+        option, res = 'programmatic', {}
         if args: option = args[0]
         if 'option' in list(kwargs.keys()): option = kwargs['option']
         if option == 'programmatic':
