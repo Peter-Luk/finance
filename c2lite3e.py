@@ -80,11 +80,11 @@ def update(*args, **kwargs):
         m -= 1
         start = datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
         nr, ae = 0, conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
-        te = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} WHERE date='{2}'".format('eid', db_table, end.strftime('%Y-%m-%d')).fetchall()
-        # ae = ['{:04d}.HK'.format(_['eid']) for _ in ae]
-        # te = ['{:04d}.HK'.format(_['eid']) for _ in te]
-        # lo = [_ for _ in ae if _ not in te]
-        # df = data.DataReader(lo, 'yahoo', start, end)
+        te = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} WHERE date='{2}'".format('eid', db_table, end.strftime('%Y-%m-%d'))).fetchall()
+        ae = ['{:04d}.HK'.format(_['eid']) for _ in ae]
+        te = ['{:04d}.HK'.format(_['eid']) for _ in te]
+        lo = [_ for _ in ae if _ not in te]
+        df = data.DataReader(lo, 'yahoo', start, end).to_csv()[:-1]
 #             d = Equities(_)
 #             ld = len(d._Equities__data)
 #             if ld != 0: nr += d.store()
