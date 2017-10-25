@@ -84,7 +84,10 @@ def update(*args, **kwargs):
         ae = ['{:04d}.HK'.format(_['eid']) for _ in ae]
         te = ['{:04d}.HK'.format(_['eid']) for _ in te]
         lo = [_ for _ in ae if _ not in te]
-        df = data.DataReader(lo, 'yahoo', start, end).to_csv()[:-1]
+        df = data.DataReader(lo, 'yahoo', start, end)
+        hdr = {}
+        for _ in lo:
+            hdr[_] = df.minor_xs(_).to_csv().split(linesep)[1:-2]
 #             d = Equities(_)
 #             ld = len(d._Equities__data)
 #             if ld != 0: nr += d.store()
