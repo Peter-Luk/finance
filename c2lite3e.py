@@ -79,7 +79,7 @@ def update(*args, **kwargs):
             m += 12
         m -= 1
         start = datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
-        nr, ae = 0, conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
+        ae = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
         te = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} WHERE date='{2}'".format('eid', db_table, end.strftime('%Y-%m-%d'))).fetchall()
         ae = ['{:04d}.HK'.format(_['eid']) for _ in ae]
         te = ['{:04d}.HK'.format(_['eid']) for _ in te]
@@ -88,10 +88,23 @@ def update(*args, **kwargs):
         hdr = {}
         for _ in lo:
             hdr[_] = df.minor_xs(_).to_csv().split(linesep)[1:-2]
-#             d = Equities(_)
-#             ld = len(d._Equities__data)
-#             if ld != 0: nr += d.store()
-#         return nr
+        for _ in list(hdr.keys()):
+            tmp = hdr[_][0].split(',')
+            fields = ['{}'.format(_.lower()) for _ in tmp if _ not in ['Adj Close']]
+            fields.append('eid')
+            iqstr, values = "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(fields), ','.join(['{{{}}}'.format(_) for _ in fields])), []
+            for i in hdr[_][1:]:
+                temp = {}
+                for j in fields:
+                    if j == 'date': temp[j] = '{}'.format(hdr[_][i][fields.index(j)])
+                    elif j in ['eid', 'volume']:
+                        if j == 'eid': temp[j] = int(_.split('.')[0])
+                        else: temp[j] = int(hdr[_][i][fields.index(j)])
+                    else: temp[j] = hdr[_][i][fields.index(j)]
+                values.append(temp)
+            [conn.cursor().execute(iqstr.format(**_)) for _ in values]
+            conn.commit()
+        return len(ae)
 
 class Equities(object):
     """
