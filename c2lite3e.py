@@ -101,10 +101,10 @@ def update(*args, **kwargs):
                         if j == 'eid': temp[j] = int(_.split('.')[0])
                         else: temp[j] = int(hdr[_][i][fields.index(j)])
                     else: temp[j] = hdr[_][i][fields.index(j)]
-                values.append(temp)
+                if temp['date'] == end: values.append(temp)
             [conn.cursor().execute(iqstr.format(**_)) for _ in values]
             conn.commit()
-        return len(ae)
+        return len(lo)
 
 class Equities(object):
     """
