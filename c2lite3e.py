@@ -70,6 +70,7 @@ def update(*args, **kwargs):
                 if wipe: remove(sep.join((cp, _)))
         return nr
     else:
+        counter = 0
         conn = lite.connect(filepath(db_name))
         conn.row_factory = lite.Row
         end = datetime.today()
@@ -87,24 +88,32 @@ def update(*args, **kwargs):
         df = data.DataReader(lo, 'yahoo', start, end)
         hdr = {}
         for _ in lo:
-            hdr[_] = df.minor_xs(_).to_csv().split(linesep)[1:-2]
+            last_record = conn.cursor().execute("SELECT date FROM {0} WHERE eid={1} ORDER BY date DESC".format(db_table, int(_.split('.')[0]))).fetchall()[0]['date']
+            hdr[_] = df.minor_xs(_).to_csv().split(linesep)[:-2]
         for _ in list(hdr.keys()):
             tmp = hdr[_][0].split(',')
-            fields = ['{}'.format(_.lower()) for _ in tmp if _ not in ['Adj Close']]
+            fields = [_.lower() for _ in tmp]
             fields.append('eid')
-            iqstr, values = "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(fields), ','.join(['{{{}}}'.format(_) for _ in fields])), []
+            rfields = [_ for _ in fields if _ != 'adj close']
+            vfields = []
+            for j in rfields:
+                if j == 'date': vfields.append("'{{{}}}'".format(j))
+                else: vfields.append('{{{}}}'.format(j))
+            iqstr, values = "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(rfields), ','.join(vfields)), []
             for i in hdr[_][1:]:
-                temp = {}
+                value, temp = i.split(','), {}
                 for j in fields:
-                    if j == 'date': temp[j] = '{}'.format(hdr[_][i][fields.index(j)])
+                    if j == 'date': temp[j] = '{}'.format(value[fields.index(j)])
                     elif j in ['eid', 'volume']:
                         if j == 'eid': temp[j] = int(_.split('.')[0])
-                        else: temp[j] = int(hdr[_][i][fields.index(j)])
-                    else: temp[j] = hdr[_][i][fields.index(j)]
-                if temp['date'] == end: values.append(temp)
-            [conn.cursor().execute(iqstr.format(**_)) for _ in values]
-            conn.commit()
-        return len(lo)
+                        else: temp[j] = int(float(value[fields.index(j)]))
+                    elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
+                if datetime.strptime(temp['date'], '%Y-%m-%d') > datetime.strptime(last_record, '%Y-%m-%d'): values.append(temp)
+            for b in values:
+                conn.cursor().execute(iqstr.format(**b))
+                conn.commit()
+                counter += 1
+        return counter
 
 class Equities(object):
     """
