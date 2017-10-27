@@ -89,7 +89,6 @@ def update(*args, **kwargs):
         hdr = {}
         for _ in lo:
             all_record = conn.cursor().execute("SELECT date FROM {0} WHERE eid={1} ORDER BY date DESC".format(db_table, int(_.split('.')[0]))).fetchall()
-            last_record = all_record[0]['date']
             hdr[_] = df.minor_xs(_).to_csv().split(linesep)[:-2]
         for _ in list(hdr.keys()):
             tmp = hdr[_][0].split(',')
@@ -221,10 +220,6 @@ Transfer data to first positional argument database 'table_name' (default: 'db_t
                 hd = [(j, hdr[j]) for j in list(hdr.keys()) if j not in ['eid', 'date', 'id']]
                 if not hd == ufvd:
                     tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd])
-    #                 ufvd = {}
-    #                 for j in list(_.keys()):
-    #                     if j not in ['eid', 'date', 'id']: ufvd[j] = _[j]
-    #                 tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd.items()])
                     self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
                     self.conn.commit()
             else: nd.append(_)
