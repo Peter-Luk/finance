@@ -109,7 +109,7 @@ def update(*args, **kwargs):
                         if j == 'eid': temp[j] = int(_.split('.')[0])
                         else: temp[j] = int(float(value[fields.index(j)]))
                     elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
-                if datetime.strptime(temp['date'], '%Y-%m-%d') > datetime.strptime(last_record, '%Y-%m-%d'): values.append(temp)
+                if datetime.strptime(temp['date'], '%Y-%m-%d') not in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]: values.append(temp)
             for b in values:
                 conn.cursor().execute(iqstr.format(**b))
                 conn.commit()
