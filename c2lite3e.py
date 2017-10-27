@@ -88,7 +88,8 @@ def update(*args, **kwargs):
         df = data.DataReader(lo, 'yahoo', start, end)
         hdr = {}
         for _ in lo:
-            last_record = conn.cursor().execute("SELECT date FROM {0} WHERE eid={1} ORDER BY date DESC".format(db_table, int(_.split('.')[0]))).fetchall()[0]['date']
+            all_record = conn.cursor().execute("SELECT date FROM {0} WHERE eid={1} ORDER BY date DESC".format(db_table, int(_.split('.')[0]))).fetchall()
+            last_record = all_record[0]['date']
             hdr[_] = df.minor_xs(_).to_csv().split(linesep)[:-2]
         for _ in list(hdr.keys()):
             tmp = hdr[_][0].split(',')
