@@ -70,7 +70,7 @@ def update(*args, **kwargs):
                 if wipe: remove(sep.join((cp, _)))
         return nr
     else:
-        counter = 0
+        i_counter, u_counter = 0, 0
         conn = lite.connect(filepath(db_name))
         conn.row_factory = lite.Row
         end = datetime.today()
@@ -98,6 +98,7 @@ def update(*args, **kwargs):
             vfields = []
             for j in rfields:
                 if j == 'date': vfields.append("'{{{}}}'".format(j))
+        # return iqstr, values[0]
                 else: vfields.append('{{{}}}'.format(j))
             iqstr, values = "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(rfields), ','.join(vfields)), []
             for i in hdr[_][1:]:
@@ -108,12 +109,23 @@ def update(*args, **kwargs):
                         if j == 'eid': temp[j] = int(_.split('.')[0])
                         else: temp[j] = int(float(value[fields.index(j)]))
                     elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
-                if datetime.strptime(temp['date'], '%Y-%m-%d') not in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]: values.append(temp)
+                if datetime.strptime(temp['date'], '%Y-%m-%d') in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]:
+                    ssd = conn.cursor().execute("SELECT id, open, high, low, close, volume FROM {} WHERE eid={} AND date='{}'".format(db_table, _, temp['date'])).fetchone()
+                    id, cf = ssd['id'], ['open', 'high', 'low', 'close', 'volume']
+                    cv = [temp[__] == ssd[__] for __ in cf]
+                    if not reduce((lambda x, y: x and y), cv):
+                        sstr = ','.join(['{}={}'.format(__, temp[__]) for __ in cf])
+                        qstr = 'UPDATE {} SET {} WHERE id={:d}'.format(db_table, sstr, id)
+                else: values.append(temp)
             for b in values:
                 conn.cursor().execute(iqstr.format(**b))
                 conn.commit()
-                counter += 1
-        return counter
+                i_counter += 1
+            if qstr:
+                conn.cursor().execute(qstr)
+                conn.commit()
+                u_counter += 1
+        return i_counter, u_counter
 
 class Equities(object):
     """
