@@ -116,15 +116,14 @@ def update(*args, **kwargs):
                     if not reduce((lambda x, y: x and y), cv):
                         sstr = ','.join(['{}={}'.format(__, temp[__]) for __ in cf])
                         qstr = 'UPDATE {} SET {} WHERE id={:d}'.format(db_table, sstr, id)
+                        conn.cursor().execute(qstr)
+                        conn.commit()
+                        u_counter += 1
                 else: values.append(temp)
             for b in values:
                 conn.cursor().execute(iqstr.format(**b))
                 conn.commit()
                 i_counter += 1
-            if qstr:
-                conn.cursor().execute(qstr)
-                conn.commit()
-                u_counter += 1
         return i_counter, u_counter
 
 class Equities(object):
