@@ -32,7 +32,7 @@ class Equities(object):
         self.trade_date = self.extract(field='date')
 
     def __call__(self, *args, **kwargs):
-        option, res = 'basic', {}
+        option, res = 'programmatic', {}
         if args: option = args[0]
         if 'option' in list(kwargs.keys()): option = kwargs['option']
         if option == 'programmatic':
@@ -40,7 +40,7 @@ class Equities(object):
             res['indicators'] = {'SMA': round(self.sma(), 2), 'WMA': round(self.wma(), 2), 'EMA': round(self.ema(), 2), 'KAMA': round(self.kama(), 2), 'RSI': round(self.rsi(), 3), 'ATR': round(self.atr(), 3), 'ADX': round(self.adx(), 3)}
             res['overlays'] = {'STC': [round(_, 3) for _ in self.stc()], 'KC': [round(_, 2) for _ in self.kc()], 'BB': [round(_, 2) for _ in self.bb()], 'APZ': [round(_, 2) for _ in self.apz()]}
             return res
-        return self.code, self.latest, self.close
+        else: return '{p.code}.HK'.format(p=self), self.latest, self.close
 
     def __del__(self):
         self.conn.close()
