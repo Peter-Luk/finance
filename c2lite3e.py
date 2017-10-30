@@ -104,17 +104,21 @@ def update(*args, **kwargs):
             for i in hdr[_][1:]:
                 value, temp = i.split(','), {}
                 for j in fields:
-                    if j == 'date': temp[j] = '{}'.format(value[fields.index(j)])
+                    if j == 'date': temp[j] = value[fields.index(j)]
                     elif j in ['eid', 'volume']:
                         if j == 'eid': temp[j] = int(_.split('.')[0])
                         else: temp[j] = int(float(value[fields.index(j)]))
                     elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
                 if datetime.strptime(temp['date'], '%Y-%m-%d') in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]:
-                    ssd = conn.cursor().execute("SELECT id, open, high, low, close, volume FROM {} WHERE eid={} AND date='{}'".format(db_table, _, temp['date'])).fetchone()
-                    id, cf = ssd['id'], ['open', 'high', 'low', 'close', 'volume']
-                    cv = [temp[__] == ssd[__] for __ in cf]
-                    if not reduce((lambda x, y: x and y), cv):
-                        sstr = ','.join(['{}={}'.format(__, temp[__]) for __ in cf])
+                    cf = ['open', 'high', 'low', 'close', 'volume']
+                    ssd = conn.cursor().execute("SELECT id, {} FROM {} WHERE eid={} AND date='{}'".format(','.join(cf), db_table, int(_.split('.')[0]), temp['date'])).fetchone()
+                    id = ssd['id']
+                    if not reduce((lambda x, y: x and y), [temp[k] == ssd[k] for k in cf]):
+                        shdr = []
+                        for k in cf:
+                            if k == 'date': shdr.append("{}='{}'".format(k, temp[k]))
+                            else: shdr.append('{}={}'.format(k, temp[k]))
+                        sstr = ','.join(shdr)
                         qstr = 'UPDATE {} SET {} WHERE id={:d}'.format(db_table, sstr, id)
                         conn.cursor().execute(qstr)
                         conn.commit()
