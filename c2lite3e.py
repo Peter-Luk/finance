@@ -28,23 +28,9 @@ def find_csv_path(*args, **kwargs):
         return cp
 
 def insert(*args, **kwargs):
-    if args: code = args[0]
-    conn = lite.connect(filepath(db_name))
-    conn.row_factory = lite.Row
-    ue = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
-    if code not in ['{:04d}.HK'.format(_['eid']) for _ in ue]:
-        end = datetime.today()
-        m, y = end.month, end.year - 2
-        if m == 1:
-            m += 12
-            y -= 1
-        m -= 1
-        start = datetime.strptime('{0}-{1}-01'.format(y, m), '%Y-%m-%d')
-        df = data.DataReader(code, 'yahoo', start, end)
-        rdata = df.to_csv().split(linesep)
+    pass
 
-
-def update(*args, **kwargs):
+def append(*args, **kwargs):
     """
     Sequential update database with 'folder' directory.
     First positional or 'folder' argument is sub-folder name (default: 'csv'), and
@@ -73,7 +59,7 @@ def update(*args, **kwargs):
                 if wipe: remove(sep.join((cp, _)))
         return nr
     else:
-        i_counter, u_counter = 0, 0
+        i_counter = 0
         conn = lite.connect(filepath(db_name))
         conn.row_factory = lite.Row
         end = datetime.today()
@@ -111,26 +97,12 @@ def update(*args, **kwargs):
                         if j == 'eid': temp[j] = int(_.split('.')[0])
                         else: temp[j] = int(float(value[fields.index(j)]))
                     elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
-                if datetime.strptime(temp['date'], '%Y-%m-%d') in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]:
-                    cf = ['open', 'high', 'low', 'close', 'volume']
-#                     ssd = conn.cursor().execute("SELECT id, {} FROM {} WHERE eid={} AND date='{}'".format(','.join(cf), db_table, int(_.split('.')[0]), temp['date'])).fetchone()
-#                     id = ssd['id']
-#                     if not reduce((lambda x, y: x and y), [temp[k] == ssd[k] for k in cf]):
-#                         shdr = []
-#                         for k in cf:
-#                             if k == 'date': shdr.append("{}='{}'".format(k, temp[k]))
-#                             else: shdr.append('{}={}'.format(k, temp[k]))
-#                         sstr = ','.join(shdr)
-#                         qstr = 'UPDATE {} SET {} WHERE id={:d}'.format(db_table, sstr, id)
-#                         conn.cursor().execute(qstr)
-#                         conn.commit()
-#                         u_counter += 1
-                else: values.append(temp)
+                if datetime.strptime(temp['date'], '%Y-%m-%d') not in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]: values.append(temp)
             for b in values:
                 conn.cursor().execute(iqstr.format(**b))
                 conn.commit()
                 i_counter += 1
-        return i_counter, u_counter
+        return i_counter
 
 class Equities(object):
     """
@@ -138,15 +110,18 @@ class Equities(object):
     """
     def __init__(self, *args, **kwargs):
         if args: self.code = args[0]
-        if 'code' in list(kwargs.keys()): self.code = kwargs['code']
-        self.__db_fullpath = filepath(db_name)
-        self.__csv_fullpath = find_csv_path()
-        if 'path' in list(kwargs.keys()):
-            kpath = kwargs['path']
-            if isinstance(kpath, str): self.__csv_fullpath = kpath
-            if isinstance(kpath, dict):
-                if 'db' in list(kpath.keys()): self.__db_fullpath = kpath['db']
-                if 'csv' in list(kpath.keys()): self.__csv_fullpath = kpath['csv']
+        try:
+            lkkeys = list(kwargs.keys())
+            if 'code' in lkkeys: self.code = kwargs['code']
+            self.__db_fullpath = filepath(db_name)
+            self.__csv_fullpath = find_csv_path()
+            if 'path' in lkkeys:
+                kpath = kwargs['path']
+                if isinstance(kpath, str): self.__csv_fullpath = kpath
+                if isinstance(kpath, dict):
+                    if 'db' in list(kpath.keys()): self.__db_fullpath = kpath['db']
+                    if 'csv' in list(kpath.keys()): self.__csv_fullpath = kpath['csv']
+        except: pass
         self.conn = lite.connect(self.__db_fullpath)
         self.conn.row_factory = lite.Row
         self.fields, self.values = [], []
