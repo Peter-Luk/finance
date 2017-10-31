@@ -53,8 +53,11 @@ def update(*args, **kwargs):
     folder, wipe = 'csv', True
     if args:
         if isinstance(args[0], str): folder = args[0]
-    if 'folder' in list(kwargs.keys()): folder = kwargs['folder']
-    if 'wipe' in list(kwargs.keys()): wipe = kwargs['wipe']
+    try:
+        lkkeys = list(kwargs.keys())
+        if 'folder' in lkkeys: folder = kwargs['folder']
+        if 'wipe' in lkkeys: wipe = kwargs['wipe']
+    except: pass
     cp = find_csv_path()
     if cp:
         nr, af = 0, []
@@ -98,7 +101,6 @@ def update(*args, **kwargs):
             vfields = []
             for j in rfields:
                 if j == 'date': vfields.append("'{{{}}}'".format(j))
-        # return iqstr, values[0]
                 else: vfields.append('{{{}}}'.format(j))
             iqstr, values = "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(rfields), ','.join(vfields)), []
             for i in hdr[_][1:]:

@@ -21,9 +21,10 @@ class Hypertension(object):
         self.uid = self.iid = self.conn = None
         del self.uid, self.iid, self.conn
 
-    def amend(self, *args, **kwargs):
+    def append(self, *args, **kwargs):
+        data = {}
         if args:
-            data, lag = {}, len(args)
+            lag = len(args)
             if lag > 3: data['conditions'] = args[3]
             if lag > 2: data['pulse'] = args[2]
             if lag > 1:
@@ -31,7 +32,11 @@ class Hypertension(object):
                     data['dia'] = args[1]
                     data['sys'] = args[0]
                 except: pass
-        if 'data' in list(kwargs.keys()): data = kwargs['data']
+        try:
+            lkkeys = list(kwargs.keys())
+            if 'data' in lkkeys: data = kwargs['data']
+            if 'condition' in lkkeys: data['conditions'] = kwargs['condition']
+        except: pass
         td = datetime.today()
         date, time = td.strftime('%Y-%m-%d'), td.strftime('%H:%M:%S')
         data['date'] = date
