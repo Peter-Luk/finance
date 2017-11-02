@@ -31,6 +31,7 @@ def insert(*args, **kwargs):
     pass
 
 def amend(* args, **kwargs):
+    counter = 0
     conn = lite.connect(filepath('Securities'))
     conn.row_factory = lite.Row
     end = datetime.today()
@@ -62,6 +63,8 @@ def amend(* args, **kwargs):
                     uvstr = ','.join(['{0}={{{0}}}'.format(_) for _ in datafields])
                     conn.cursor().execute("UPDATE {} SET {} WHERE id={}".format('records', uvstr, sid).format(d))
                     conn.commit()
+                    counter += 1
+    return counter
 
 def append(*args, **kwargs):
     """
