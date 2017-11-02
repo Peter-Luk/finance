@@ -30,6 +30,39 @@ def find_csv_path(*args, **kwargs):
 def insert(*args, **kwargs):
     pass
 
+def amend(* args, **kwargs):
+    conn = lite.connect(filepath('Securities'))
+    conn.row_factory = lite.Row
+    end = datetime.today()
+    m, y = end.month, end.year
+    if m == 12:
+        y -= 1
+        m += 12
+    m -= 1
+    start = datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
+    rid = ['{:04d}.HK'.format(_['eid']) for _ in conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', 'records')).fetchall()]
+    dp = data.DataReader(rid, 'yahoo', start, end)
+    for r in rid:
+        rh = dp.minor_xs(r).to_csv().split(linesep)[:-2]
+        fields = rh[0].split(',')
+        dv = []
+        for rhs in rh[1:]:
+            hdr, rv = {}, rhs.split(',')
+            for f in fields:
+                if f == 'date': hdr[f] = "'{}'".format(rv[fields.index(f)])
+                elif f == 'volume': hdr[f] = int(float(rv[fields.index(f)]))
+                else: hdr[f] = float(rv[fields.index(f)])
+            dv.append(hdr)
+        for d in dv:
+            sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={}".format('id', 'records', d['date'], int(r.split('.')))).fetchone()['id']
+            if sid:
+                datafields = ['open', 'high', 'low', 'close', 'volume']
+                sv = conn.cursor().execute("SELECT {} FROM {} WHERE id={}".format(','.join(datafields), 'records', sid)).fetchone()
+                if not reduce((lambda x, y: x and y), [sv[_] == d[_] for _ in datafields]):
+                    uvstr = ','.join(['{0}={{{0}}}'.format(_) for _ in datafields])
+                    conn.cursor().execute("UPDATE {} SET {} WHERE id={}".format('records', uvstr, sid))
+                    conn.commit()
+
 def append(*args, **kwargs):
     """
     Sequential update database with 'folder' directory.
