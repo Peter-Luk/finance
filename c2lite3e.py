@@ -60,7 +60,7 @@ def amend(* args, **kwargs):
                 sv = conn.cursor().execute("SELECT {} FROM {} WHERE id={}".format(','.join(datafields), 'records', sid)).fetchone()
                 if not reduce((lambda x, y: x and y), [sv[_] == d[_] for _ in datafields]):
                     uvstr = ','.join(['{0}={{{0}}}'.format(_) for _ in datafields])
-                    conn.cursor().execute("UPDATE {} SET {} WHERE id={}".format('records', uvstr, sid))
+                    conn.cursor().execute("UPDATE {} SET {} WHERE id={}".format('records', uvstr, sid).format(d))
                     conn.commit()
 
 def append(*args, **kwargs):
