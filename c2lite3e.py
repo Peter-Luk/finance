@@ -145,7 +145,8 @@ class Equities(object):
     Worker object for manipulate and transfer data from file system to database.
     """
     def __init__(self, *args, **kwargs):
-        if args: self.code = args[0]
+        if args:
+            if isinstance(args[0], str): self.code = args[0]
         try:
             lkkeys = list(kwargs.keys())
             if 'code' in lkkeys: self.code = kwargs['code']
