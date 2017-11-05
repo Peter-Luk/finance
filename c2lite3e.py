@@ -50,15 +50,15 @@ def amend(* args, **kwargs):
         for rhs in rh[1:]:
             hdr, rv = {}, rhs.split(',')
             for f in fields:
-                if f == 'date': hdr[f] = "'{}'".format(rv[fields.index(f)])
+                if f == 'date': hdr[f] = '{}'.format(rv[fields.index(f)])
                 elif f == 'volume': hdr[f] = int(float(rv[fields.index(f)]))
                 else: hdr[f] = float(rv[fields.index(f)])
             dv.append(hdr)
         for d in dv:
-            sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={}".format('id', 'records', d['date'], int(r.split('.')))).fetchone()['id']
+            sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', 'records', d['date'], int(r.split('.')[0]))).fetchone()['id']
             if sid:
                 datafields = ['open', 'high', 'low', 'close', 'volume']
-                sv = conn.cursor().execute("SELECT {} FROM {} WHERE id={}".format(','.join(datafields), 'records', sid)).fetchone()
+                sv = conn.cursor().execute("SELECT {} FROM {} WHERE id={:d}".format(','.join(datafields), 'records', sid)).fetchone()
                 if not reduce((lambda x, y: x and y), [sv[_] == d[_] for _ in datafields]):
                     uvstr = ','.join(['{0}={{{0}}}'.format(_) for _ in datafields])
                     conn.cursor().execute("UPDATE {} SET {} WHERE id={}".format('records', uvstr, sid).format(d))
@@ -133,7 +133,12 @@ def append(*args, **kwargs):
                         if j == 'eid': temp[j] = int(_.split('.')[0])
                         else: temp[j] = int(float(value[fields.index(j)]))
                     elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
-                if datetime.strptime(temp['date'], '%Y-%m-%d') not in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]: values.append(temp)
+                if datetime.strptime(temp['date'], '%Y-%m-%d') in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]:
+                    sdata = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format(','.join(['id', 'open', 'high', 'low', 'close', 'volume']), db_table, temp['date'], int(_.split('.')[0]))).fetchone()
+                    rid = sdata['id']
+                    tc = reduce((lambda x, y: x and y), [temp[_] == sdata[_] for _ in ['open', 'high', 'low', 'close', 'volume']])
+                    if not tc: pass
+                else: values.append(temp)
             for b in values:
                 conn.cursor().execute(iqstr.format(**b))
                 conn.commit()
