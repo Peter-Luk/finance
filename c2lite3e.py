@@ -124,7 +124,7 @@ def append(*args, **kwargs):
             for j in rfields:
                 if j == 'date': vfields.append("'{{{}}}'".format(j))
                 else: vfields.append('{{{}}}'.format(j))
-            iqstr, values = "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(rfields), ','.join(vfields)), []
+            uqstr, iqstr, values = "UPDATE {} SET {{}} WHERE id={{:d}}".format(db_table), "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(rfields), ','.join(vfields)), []
             for i in hdr[_][1:]:
                 value, temp = i.split(','), {}
                 for j in fields:
@@ -134,10 +134,15 @@ def append(*args, **kwargs):
                         else: temp[j] = int(float(value[fields.index(j)]))
                     elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
                 if datetime.strptime(temp['date'], '%Y-%m-%d') in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]:
-                    sdata = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format(','.join(['id', 'open', 'high', 'low', 'close', 'volume']), db_table, temp['date'], int(_.split('.')[0]))).fetchone()
+                    dfields = ['id', 'open', 'high', 'low', 'close', 'volume']
+                    sdata = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format(','.join(dfields), db_table, temp['date'], int(_.split('.')[0]))).fetchone()
                     rid = sdata['id']
-                    tc = reduce((lambda x, y: x and y), [temp[_] == sdata[_] for _ in ['open', 'high', 'low', 'close', 'volume']])
-                    if not tc: pass
+                    tc = reduce((lambda x, y: x and y), [temp[_] == sdata[_] for _ in dfields if _ != 'id'])
+                    ustr = ','.join(['{0}={{{0}}}'.format(_) for _ in dfields if _ != 'id'])
+                    uqstr = uqstr.format(ustr, rid)
+                    if not tc:
+                        conn.cursor().execute(uqstr.format(**temp))
+                        conn.commit()
                 else: values.append(temp)
             for b in values:
                 conn.cursor().execute(iqstr.format(**b))
