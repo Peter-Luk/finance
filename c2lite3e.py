@@ -134,16 +134,17 @@ def append(*args, **kwargs):
                         else: temp[j] = int(float(value[fields.index(j)]))
                     elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
                 if datetime.strptime(temp['date'], '%Y-%m-%d') in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]:
-                    pass
-#                     dfields = ['id', 'open', 'high', 'low', 'close', 'volume']
-#                     sdata = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format(','.join(dfields), db_table, temp['date'], int(_.split('.')[0]))).fetchone()
-#                     rid = sdata['id']
-#                     tc = reduce((lambda x, y: x and y), [temp[_] == sdata[_] for _ in dfields if _ != 'id'])
-#                     ustr = ','.join(['{0}={{{0}}}'.format(_) for _ in dfields if _ != 'id'])
-#                     uqstr = uqstr.format(ustr, rid)
-#                     if not tc:
-#                         conn.cursor().execute(uqstr.format(**temp))
-#                         conn.commit()
+                    try:
+                        dfields = ['id', 'open', 'high', 'low', 'close', 'volume']
+                        sdata = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format(','.join(dfields), db_table, temp['date'], int(_.split('.')[0]))).fetchone()
+                        rid = sdata['id']
+                        tc = reduce((lambda x, y: x and y), [temp[_] == sdata[_] for _ in dfields if _ != 'id'])
+                        ustr = ','.join(['{0}={{{0}}}'.format(_) for _ in dfields if _ != 'id'])
+                        uqstr = uqstr.format(ustr, rid)
+                        if not tc:
+                            conn.cursor().execute(uqstr.format(**temp))
+                            conn.commit()
+                    except:pass
                 else: values.append(temp)
             for b in values:
                 conn.cursor().execute(iqstr.format(**b))
