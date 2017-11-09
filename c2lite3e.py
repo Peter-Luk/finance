@@ -71,6 +71,10 @@ def append(*args, **kwargs):
     Sequential update database with 'folder' directory.
     First positional or 'folder' argument is sub-folder name (default: 'csv'), and
     'wipe' argument initiate plunge file after new value stored (default: True).
+    Three ways to use this method to append data to sqlite3 database,
+    1). Make sure no .csv file(s) in both 'csv' and 'Download' folder, then apply this method with no argument. This will enable underlay process to obtain data(s) from finance.yahoo.com with pandas_datareader modules,
+    2). Download .csv format data file with corresponding varied stock code for finance.yahoo.com search to 'Download' folder, file will automatically 'wipe' off from 'Download' folder, and
+    3). Same as the second way, but with 'csv' folder instead of 'Download' folder.
     """
     folder, wipe = 'csv', True
     if args:
