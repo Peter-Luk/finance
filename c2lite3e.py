@@ -27,20 +27,68 @@ def find_csv_path(*args, **kwargs):
             if cpl == 0: return False
         return cp
 
-def insert(*args, **kwargs):
-    pass
+def c2d(*args, **kwargs):
+    lines, tmp = args[0], []
+    fields = lines[0].split(',')
+    for l in lines[1:]:
+        try:
+            hdr, dl = {}, l.split(',')
+            for f in fields:
+                if f != 'Adj Close':
+                    if f == 'Date': hdr[f.lower()] = '{}'.format(dl[fields.index(f)])
+                    elif f == 'Volume': hdr[f.lower()] = int(float(dl[fields.index(f)]))
+                    elif f in ['Open', 'High', 'Low', 'Close']: hdr[f.lower()] = float(dl[fields.index(f)])
+            tmp.append(hdr)
+        except: pass
+    return tmp
+
+def find_start(*args, **kwargs):
+    end, period, mode, lk = datetime.today(), args[0], 'm', list(kwargs.keys())
+    if len(args) > 1: mode = args[1]
+    if len(args) > 2: end = args[2]
+    if 'mode' in lk:
+        if isinstance(kwargs['mode'], str):
+            mode = kwargs['mode'][0].lower()
+    if mode == 'm':
+        y, m = end.year, end.month
+        if period > 12:
+            y -= int(period / 12)
+            period %= 12
+        if m - period < 0:
+            y -= 1
+            m += 12
+        m -= period
+        return datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
+
+def web_collect(*args, **kwargs):
+    src, lk, period, end, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), {}
+    if args:
+        code = args[0]
+        if len(args) > 1: period = args[1]
+    if 'code' in lk: code = kwargs['code']
+    if 'period' in lk: period = kwargs['period']
+    if 'source' in lk: src = kwargs['source']
+    if src == 'yahoo':
+        if isinstance(code, int):code = '{:04d}.HK'.format(code)
+        elif isinstance(code, list):code = ['{:04d}.HK'.format(_) for _ in code]
+    start = find_start(period)
+    if start:
+        if isinstance(code, str):
+            dp = data.DataReader(code, src, start, end)
+            lines = dp.to_csv().split(linesep)[:-1]
+            res[code] = c2d(lines)
+        elif isinstance(code, list):
+            dp = data.DataReader(code, src, start, end)
+            for c in code:
+                lines = dp.minor_xs(c).to_csv().split(linesep)[:-1]
+                res[c] = c2d(lines)
+        return res
 
 def amend(* args, **kwargs):
     counter = 0
     conn = lite.connect(filepath('Securities'))
     conn.row_factory = lite.Row
-    end = datetime.today()
-    m, y = end.month, end.year
-    if m == 12:
-        y -= 1
-        m += 12
-    m -= 1
-    start = datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
+    start = find_start(1)
     rid = ['{:04d}.HK'.format(_['eid']) for _ in conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', 'records')).fetchall()]
     dp = data.DataReader(rid, 'yahoo', start, end)
     for r in rid:
@@ -99,16 +147,9 @@ def append(*args, **kwargs):
                 if wipe: remove(sep.join((cp, _)))
         return nr
     else:
-        i_counter = 0
         conn = lite.connect(filepath(db_name))
         conn.row_factory = lite.Row
-        end = datetime.today()
-        m, y = end.month, end.year
-        if m == 1:
-            y -= 1
-            m += 12
-        m -= 1
-        start = datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
+        i_counter, start, end = 0, find_start(1), datetime.today()
         ae = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
         te = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} WHERE date='{2}'".format('eid', db_table, end.strftime('%Y-%m-%d'))).fetchall()
         ae = ['{:04d}.HK'.format(_['eid']) for _ in ae]
