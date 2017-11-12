@@ -3,6 +3,26 @@ him = getattr(__import__('handy'), 'him')
 iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'linesep', 'sep', 'path', 'remove')}, {'sys':('platform',)}, {'pandas_datareader':('data',)}, {'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
+def stored_data(*args, **kwargs):
+    fields, lk = ['date', 'open', 'high', 'low', 'close', 'volume'], list(kwargs.keys())
+    try:
+        a0 = args[0]
+        if isinstance(a0, str): a0 = int(float(a0))
+        if isinstance(a0, int): where = {'eid':a0}
+    except: pass
+    lk = list(kwargs.keys())
+    if 'where' in lk:
+        if isinstance(kwargs['where'], list): where = kwargs['where']
+        elif isinstance(kwargs['where'], str): wherre = [kwargs['where']]
+        elif isinstance(kwargs['where'], dict):
+            lkw = list(kwargs['where'].keys())
+            try:
+                where = ['{}={{{}}}'.format(_, _).format(**kwargs['where']) for _ in lkw]
+            except: pass
+    conn = lite.connect(filepath(db_name))
+    qstr = "SELECT {{{}}} FROM {}".format('', db_table)
+    if where:
+        qstr = ' WHERE '.join(qstr, ' and '.join(where))
 
 def find_csv_path(*args, **kwargs):
     folder, sd = 'csv', filepath(db_name)
