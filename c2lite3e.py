@@ -44,7 +44,8 @@ def c2d(*args, **kwargs):
 
 def find_start(*args, **kwargs):
     end, period, mode, lk = datetime.today(), args[0], 'm', list(kwargs.keys())
-    if len(args) > 1: mode = args[1]
+    if len(args) > 1:
+        if isinstance(args[1], str): mode = args[1][0].lower()
     if len(args) > 2: end = args[2]
     if 'end_date' in lk:
         if isinstance(kwargs['end_date'], datetime): end = kwargs['end_date']
@@ -53,8 +54,7 @@ def find_start(*args, **kwargs):
                 end = datetime.strptime(kwargs['end_date'], '%Y-%m-%d')
             except: pass
     if 'mode' in lk:
-        if isinstance(kwargs['mode'], str):
-            mode = kwargs['mode'][0].lower()
+        if isinstance(kwargs['mode'], str): mode = kwargs['mode'][0].lower()
     if 'period' in lk:
         if isinstance(kwargs['period'], int): period = kwargs['period']
         elif isinstance(kwargs['period'], float): period = int(kwargs['period'])
@@ -75,6 +75,9 @@ def find_start(*args, **kwargs):
             m += 12
         m -= period
         return datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
+    if mode == 'd':
+        eo = end.toordinal()
+        return datetime.fromordinal(eo - period)
 
 def web_collect(*args, **kwargs):
     src, lk, period, end, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), {}
