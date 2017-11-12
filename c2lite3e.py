@@ -46,9 +46,25 @@ def find_start(*args, **kwargs):
     end, period, mode, lk = datetime.today(), args[0], 'm', list(kwargs.keys())
     if len(args) > 1: mode = args[1]
     if len(args) > 2: end = args[2]
+    if 'end_date' in lk:
+        if isinstance(kwargs['end_date'], datetime): end = kwargs['end_date']
+        elif isinstance(kwargs['end_date'], str):
+            try:
+                end = datetime.strptime(kwargs['end_date'], '%Y-%m-%d')
+            except: pass
     if 'mode' in lk:
         if isinstance(kwargs['mode'], str):
             mode = kwargs['mode'][0].lower()
+    if 'period' in lk:
+        if isinstance(kwargs['period'], int): period = kwargs['period']
+        elif isinstance(kwargs['period'], float): period = int(kwargs['period'])
+        elif isinstance(kwargs['period'], str):
+            try:
+                period = int(float(kwargs['period']))
+            except: pass
+    if mode == 'y':
+        period = int(round(period * 12, 0))
+        mode = 'm'
     if mode == 'm':
         y, m = end.year, end.month
         if period > 12:
