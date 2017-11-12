@@ -62,7 +62,7 @@ def c2d(*args, **kwargs):
         except: pass
     return tmp
 
-def find_start(*args, **kwargs):
+def get_start(*args, **kwargs):
     end, period, mode, lk = datetime.today(), args[0], 'm', list(kwargs.keys())
     if len(args) > 1:
         if isinstance(args[1], str): mode = args[1][0].lower()
@@ -110,7 +110,7 @@ def web_collect(*args, **kwargs):
     if src == 'yahoo':
         if isinstance(code, int):code = '{:04d}.HK'.format(code)
         elif isinstance(code, list):code = ['{:04d}.HK'.format(_) for _ in code]
-    start = find_start(period)
+    start = get_start(period)
     if start:
         if isinstance(code, str):
             dp = data.DataReader(code, src, start, end)
@@ -127,7 +127,7 @@ def amend(* args, **kwargs):
     counter = 0
     conn = lite.connect(filepath('Securities'))
     conn.row_factory = lite.Row
-    start = find_start(1)
+    start = get_start(1)
     rid = ['{:04d}.HK'.format(_['eid']) for _ in conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', 'records')).fetchall()]
     dp = data.DataReader(rid, 'yahoo', start, end)
     for r in rid:
@@ -188,7 +188,7 @@ def append(*args, **kwargs):
     else:
         conn = lite.connect(filepath(db_name))
         conn.row_factory = lite.Row
-        i_counter, start, end = 0, find_start(1), datetime.today()
+        i_counter, start, end = 0, get_start(1), datetime.today()
         ae = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
         te = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} WHERE date='{2}'".format('eid', db_table, end.strftime('%Y-%m-%d'))).fetchall()
         ae = ['{:04d}.HK'.format(_['eid']) for _ in ae]
