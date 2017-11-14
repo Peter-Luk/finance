@@ -3,6 +3,7 @@ him = getattr(__import__('handy'), 'him')
 iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'linesep', 'sep', 'path', 'remove')}, {'sys':('platform',)}, {'pandas_datareader':('data',)}, {'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
+
 def stored_data(*args, **kwargs):
     fields, lk = ['date', 'open', 'high', 'low', 'close', 'volume'], list(kwargs.keys())
     try:
@@ -23,7 +24,7 @@ def stored_data(*args, **kwargs):
     conn.row_factory = lite.Row
     qstr = "SELECT {{{}}} FROM {}".format('', db_table)
     if where:
-        qstr = ' WHERE '.join(qstr, ' and '.join(where))
+        qstr = ' WHERE '.join([qstr, ' and '.join(where)])
         return conn.cursor().execute(qstr.format('id')).fetchone()['id']
 
 def find_csv_path(*args, **kwargs):
