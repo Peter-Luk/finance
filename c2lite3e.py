@@ -5,7 +5,7 @@ __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 def stored_data(*args, **kwargs):
-    fields, lk = ['date', 'open', 'high', 'low', 'close', 'volume'], list(kwargs.keys())
+    res, fields, lk = [], ['date', 'open', 'high', 'low', 'close', 'volume'], list(kwargs.keys())
     try:
         a0 = args[0]
         if isinstance(a0, str): a0 = int(float(a0))
@@ -14,18 +14,26 @@ def stored_data(*args, **kwargs):
     lk = list(kwargs.keys())
     if 'where' in lk:
         if isinstance(kwargs['where'], list): where = kwargs['where']
-        elif isinstance(kwargs['where'], str): wherre = [kwargs['where']]
+        elif isinstance(kwargs['where'], str): where = [kwargs['where']]
         elif isinstance(kwargs['where'], dict):
             lkw = list(kwargs['where'].keys())
             try:
                 where = ['{}={{{}}}'.format(_, _).format(**kwargs['where']) for _ in lkw]
             except: pass
+    if isinstance(where, dict):
+        lw = list(where.keys())
+        try:
+            where = ['{}={{{}}}'.format(_, _).format(**where) for _ in lw]
+        except: pass
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
     qstr = "SELECT {{{}}} FROM {}".format('', db_table)
     if where:
         qstr = ' WHERE '.join([qstr, ' and '.join(where)])
-        return conn.cursor().execute(qstr.format('id')).fetchone()['id']
+#        return qstr.format('id')
+        res.extend([_['id'] for _ in conn.cursor().execute(qstr.format('id')).fetchall()])
+    conn.close()
+    return res
 
 def find_csv_path(*args, **kwargs):
     folder, sd = 'csv', filepath(db_name)
