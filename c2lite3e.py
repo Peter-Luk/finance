@@ -20,9 +20,11 @@ def stored_data(*args, **kwargs):
                 where = ['{}={{{}}}'.format(_, _).format(**kwargs['where']) for _ in lkw]
             except: pass
     conn = lite.connect(filepath(db_name))
+    conn.row_factory = lite.Row
     qstr = "SELECT {{{}}} FROM {}".format('', db_table)
     if where:
         qstr = ' WHERE '.join(qstr, ' and '.join(where))
+        return conn.cursor().execute(qstr.format('id')).fetchone()['id']
 
 def find_csv_path(*args, **kwargs):
     folder, sd = 'csv', filepath(db_name)
