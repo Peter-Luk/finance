@@ -191,56 +191,56 @@ def append(*args, **kwargs):
                 nr += d.store()
                 if wipe: remove(sep.join((cp, _)))
         return nr
-    else:
-        conn = lite.connect(filepath(db_name))
-        conn.row_factory = lite.Row
-        i_counter, start, end = 0, get_start(1), datetime.today()
-        ae = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
-        te = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} WHERE date='{2}'".format('eid', db_table, end.strftime('%Y-%m-%d'))).fetchall()
-        ae = ['{:04d}.HK'.format(_['eid']) for _ in ae]
-        te = ['{:04d}.HK'.format(_['eid']) for _ in te]
-        lo = [_ for _ in ae if _ not in te]
-        df = data.DataReader(lo, 'yahoo', start, end)
-        hdr = {}
-        for _ in lo:
-            all_record = conn.cursor().execute("SELECT date FROM {0} WHERE eid={1} ORDER BY date DESC".format(db_table, int(_.split('.')[0]))).fetchall()
-            hdr[_] = df.minor_xs(_).to_csv().split(linesep)[:-2]
-        for _ in list(hdr.keys()):
-            tmp = hdr[_][0].split(',')
-            fields = [_.lower() for _ in tmp]
-            fields.append('eid')
-            rfields = [_ for _ in fields if _ != 'adj close']
-            vfields = []
-            for j in rfields:
-                if j == 'date': vfields.append("'{{{}}}'".format(j))
-                else: vfields.append('{{{}}}'.format(j))
-            uqstr, iqstr, values = "UPDATE {} SET {{}} WHERE id={{:d}}".format(db_table), "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(rfields), ','.join(vfields)), []
-            for i in hdr[_][1:]:
-                value, temp = i.split(','), {}
-                for j in fields:
-                    if j == 'date': temp[j] = value[fields.index(j)]
-                    elif j in ['eid', 'volume']:
-                        if j == 'eid': temp[j] = int(_.split('.')[0])
-                        else: temp[j] = int(float(value[fields.index(j)]))
-                    elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
-                if datetime.strptime(temp['date'], '%Y-%m-%d') in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]:
-                    try:
-                        dfields = ['id', 'open', 'high', 'low', 'close', 'volume']
-                        sdata = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format(','.join(dfields), db_table, temp['date'], int(_.split('.')[0]))).fetchone()
-                        rid = sdata['id']
-                        tc = reduce((lambda x, y: x and y), [temp[_] == sdata[_] for _ in dfields if _ != 'id'])
-                        ustr = ','.join(['{0}={{{0}}}'.format(_) for _ in dfields if _ != 'id'])
-                        uqstr = uqstr.format(ustr, rid)
-                        if not tc:
-                            conn.cursor().execute(uqstr.format(**temp))
-                            conn.commit()
-                    except:pass
-                else: values.append(temp)
-            for b in values:
-                conn.cursor().execute(iqstr.format(**b))
-                conn.commit()
-                i_counter += 1
-        return i_counter
+#     else:
+#         conn = lite.connect(filepath(db_name))
+#         conn.row_factory = lite.Row
+#         i_counter, start, end = 0, get_start(1), datetime.today()
+#         ae = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()
+#         te = conn.cursor().execute("SELECT DISTINCT {0} FROM {1} WHERE date='{2}'".format('eid', db_table, end.strftime('%Y-%m-%d'))).fetchall()
+#         ae = ['{:04d}.HK'.format(_['eid']) for _ in ae]
+#         te = ['{:04d}.HK'.format(_['eid']) for _ in te]
+#         lo = [_ for _ in ae if _ not in te]
+#         df = data.DataReader(lo, 'yahoo', start, end)
+#         hdr = {}
+#         for _ in lo:
+#             all_record = conn.cursor().execute("SELECT date FROM {0} WHERE eid={1} ORDER BY date DESC".format(db_table, int(_.split('.')[0]))).fetchall()
+#             hdr[_] = df.minor_xs(_).to_csv().split(linesep)[:-2]
+#         for _ in list(hdr.keys()):
+#             tmp = hdr[_][0].split(',')
+#             fields = [_.lower() for _ in tmp]
+#             fields.append('eid')
+#             rfields = [_ for _ in fields if _ != 'adj close']
+#             vfields = []
+#             for j in rfields:
+#                 if j == 'date': vfields.append("'{{{}}}'".format(j))
+#                 else: vfields.append('{{{}}}'.format(j))
+#             uqstr, iqstr, values = "UPDATE {} SET {{}} WHERE id={{:d}}".format(db_table), "INSERT INTO {} ({}) VALUES ({})".format(db_table, ','.join(rfields), ','.join(vfields)), []
+#             for i in hdr[_][1:]:
+#                 value, temp = i.split(','), {}
+#                 for j in fields:
+#                     if j == 'date': temp[j] = value[fields.index(j)]
+#                     elif j in ['eid', 'volume']:
+#                         if j == 'eid': temp[j] = int(_.split('.')[0])
+#                         else: temp[j] = int(float(value[fields.index(j)]))
+#                     elif j in ['open', 'high', 'low', 'close']: temp[j] = float(value[fields.index(j)])
+#                 if datetime.strptime(temp['date'], '%Y-%m-%d') in [datetime.strptime(_['date'], '%Y-%m-%d') for _ in all_record]:
+#                     try:
+#                         dfields = ['id', 'open', 'high', 'low', 'close', 'volume']
+#                         sdata = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format(','.join(dfields), db_table, temp['date'], int(_.split('.')[0]))).fetchone()
+#                         rid = sdata['id']
+#                         tc = reduce((lambda x, y: x and y), [temp[_] == sdata[_] for _ in dfields if _ != 'id'])
+#                         ustr = ','.join(['{0}={{{0}}}'.format(_) for _ in dfields if _ != 'id'])
+#                         uqstr = uqstr.format(ustr, rid)
+#                         if not tc:
+#                             conn.cursor().execute(uqstr.format(**temp))
+#                             conn.commit()
+#                     except:pass
+#                 else: values.append(temp)
+#             for b in values:
+#                 conn.cursor().execute(iqstr.format(**b))
+#                 conn.commit()
+#                 i_counter += 1
+#         return i_counter
 
 class Equities(object):
     """
