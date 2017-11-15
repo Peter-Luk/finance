@@ -30,6 +30,13 @@ def stored_data(*args, **kwargs):
     conn.close()
     return res
 
+def get_stored_eid():
+    conn = lite.connect(filepath(db_name))
+    conn.row_factory = lite.Row
+    res = [_['eid'] for _ in conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()]
+    conn.close()
+    return res
+
 def find_csv_path(*args, **kwargs):
     folder, sd = 'csv', filepath(db_name)
     if args:
@@ -129,7 +136,29 @@ def web_collect(*args, **kwargs):
                 res[c] = c2d(lines)
         return res
 
-def amend(* args, **kwargs):
+def wap(*args, **kwargs):
+    aid, kw = get_stored_eid(), kwargs
+    lkw = list(kw.keys())
+    if args:
+        if isinstance(args[0], int): aid = [args[0]]
+        elif isinstance(args[0], str):
+            try: aid = [int(float(args[0]))]
+            except: pass
+        elif isinstance(args[0], float): aid = [int(args[0])]
+        elif isinstance(args[0], list): aid = args[0]
+    if 'equities_id' in lks:
+        if isinstance(kw['equities_id'], int): aid = [kw['equities_id']]
+        elif isinstance(kw['equities_id'], str):
+            try: aid = [int(float(kw['equities_id']))]
+            except: pass
+        elif isinstance(kw['equities_id'], float): aid = [int(kw['equities_id'])]
+        elif isinstance(kw['equities_id'], list): aid = kw['equities_id']
+    wdp = web_collect(aid)
+    for _ in aid:
+        iw = wdp['{:04d}.HK'.format(_)]
+        sd = stored_data(_, date="'{}'".format(iw['date']))[0]
+
+def amend(*args, **kwargs):
     counter = 0
     conn = lite.connect(filepath('Securities'))
     conn.row_factory = lite.Row
