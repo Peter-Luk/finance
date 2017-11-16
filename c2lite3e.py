@@ -150,7 +150,7 @@ def wap(*args, **kwargs):
             except: pass
         elif isinstance(args[0], float): aid = [int(args[0])]
         elif isinstance(args[0], list): aid = args[0]
-    if 'equities_id' in lks:
+    if 'equities_id' in lkw:
         if isinstance(kw['equities_id'], int): aid = [kw['equities_id']]
         elif isinstance(kw['equities_id'], str):
             try: aid = [int(float(kw['equities_id']))]
@@ -161,17 +161,26 @@ def wap(*args, **kwargs):
     for _ in aid:
         iw = wdp['{:04d}.HK'.format(_)]
         for item in iw:
-            sd = stored_data(_, where={'date':"'{}'".format(item['date'])})[0]
-            if sd:
-                if not reduce((lambda x, y: x and y), [sd[i] == item[i] for i in datafields]):
-                    sstr = ','.join(['{}={{}}}'.format(i) for i in datafields])
-                    conn.cursor().execute(ustr.format(db_table, sstr, sd['id']).format(**item))
-                    uc += 1
-            else:
-                vstr = ','.join(['{{{}}}'.format(_) for _ in datafields])
-                conn.cursor().execute(istr.format(db_table, ','.join(datafields), vstr).format(**item))
+            try:
+                sd = stored_data(_, where={'date':"'{}'".format(item['date'])})[0]
+                if sd:
+                    if not reduce((lambda x, y: x and y), [sd[i] == item[i] for i in datafields]):
+                        sstr = ','.join(['{}={{}}}'.format(i) for i in datafields])
+                        conn.cursor().execute(ustr.format(db_table, sstr, sd['id']).format(**item))
+                        conn.commit()
+                        uc += 1
+            except:
+                im, idf = {'eid':_}, datafields
+                im['date'] = "'{}'".format(item['date'])
+                for i in ['open', 'high', 'low', 'close', 'volume']:
+                    im[i] = item[i]
+                idf.extend(['eid', 'date'])
+                vstr = ','.join(['{{{}}}'.format(i) for i in idf])
+                conn.cursor().execute(istr.format(db_table, ','.join(idf), vstr).format(**im))
+                conn.commit()
                 ic += 1
-    if reduce((lambda x: x > 0), [ic, uc]): return True
+    conn.close()
+    return ic, uc
 
 def amend(*args, **kwargs):
     counter = 0
