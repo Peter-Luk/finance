@@ -164,7 +164,7 @@ def wap(*args, **kwargs):
             try:
                 sd = stored_data(_, where={'date':"'{}'".format(item['date'])})[0]
                 if sd:
-                    if not reduce((lambda x, y: x and y), [sd[i] == item[i] for i in datafields]):
+                    if not reduce((lambda x, y: x and y), [item[i] == float(sd[i]) for i in datafields]):
                         sstr = ','.join(['{}={{}}}'.format(i) for i in datafields])
                         conn.cursor().execute(ustr.format(db_table, sstr, sd['id']).format(**item))
                         conn.commit()
