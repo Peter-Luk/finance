@@ -141,8 +141,8 @@ def wap(*args, **kwargs):
     lkw, datafields = list(kw.keys()), ['open', 'high', 'low', 'close', 'volume']
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
-    ustr = "UPDATE {} SET {} WHERE id={:d}"
     istr = "INSERT INTO {} ({}) VALUES ({})"
+    ustr = "UPDATE {} SET {} WHERE id={:d}"
     if args:
         if isinstance(args[0], int): aid = [args[0]]
         elif isinstance(args[0], str):
@@ -170,13 +170,12 @@ def wap(*args, **kwargs):
                         conn.commit()
                         uc += 1
             except:
-                im, idf = {'eid':_}, datafields
-                im['date'] = "'{}'".format(item['date'])
-                for i in ['open', 'high', 'low', 'close', 'volume']:
-                    im[i] = item[i]
-                idf.extend(['eid', 'date'])
-                vstr = ','.join(['{{{}}}'.format(i) for i in idf])
-                conn.cursor().execute(istr.format(db_table, ','.join(idf), vstr).format(**im))
+                im = {'eid':_}
+                im['date'] = '"{}"'.format(item['date'])
+                for i in datafields: im[i] = item[i]
+                imk = list(im.keys())
+                vstr = ','.join(['{{{}}}'.format(i) for i in imk])
+                conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
                 conn.commit()
                 ic += 1
     conn.close()
@@ -217,10 +216,9 @@ def append(*args, **kwargs):
     Sequential update database with 'folder' directory.
     First positional or 'folder' argument is sub-folder name (default: 'csv'), and
     'wipe' argument initiate plunge file after new value stored (default: True).
-    Three ways to use this method to append data to sqlite3 database,
-    1). Make sure no .csv file(s) in both 'csv' and 'Download' folder, then apply this method with no argument. This will enable underlay process to obtain data(s) from finance.yahoo.com with pandas_datareader modules,
-    2). Download .csv format data file with corresponding varied stock code for finance.yahoo.com search to 'Download' folder, file will automatically 'wipe' off from 'Download' folder, and
-    3). Same as the second way, but with 'csv' folder instead of 'Download' folder.
+    Two ways to use this method to append data to sqlite3 database,
+    1). Download .csv format data file with corresponding varied stock code for finance.yahoo.com search to 'Download' folder, file will automatically 'wipe' off from 'Download' folder, and
+    2). Same as the second way, but with 'csv' folder instead of 'Download' folder.
     """
     folder, wipe = 'csv', True
     if args:
