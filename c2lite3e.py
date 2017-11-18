@@ -162,7 +162,7 @@ def wap(*args, **kwargs):
         iw = wdp['{:04d}.HK'.format(_)]
         for item in iw:
             try:
-                sd = stored_data(_, where={'date':"'{}'".format(item['date'])})[0]
+                sd = stored_data(_, where={'date':"'{:%Y-%m-%d}'".format(datetime.strptime(item['date'], '%Y-%m-%d'))})[0]
                 if sd:
                     if not reduce((lambda x, y: x and y), [item[i] == float(sd[i]) for i in datafields]):
                         sstr = ','.join(['{}={{}}}'.format(i) for i in datafields])
