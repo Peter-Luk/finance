@@ -179,7 +179,8 @@ def wap(*args, **kwargs):
                     for ida in idates:
                         im = {'eid':_}
                         im['date'] = '"{:%Y-%m-%d}"'.format(ida)
-                        for f in datafields: im[f] = item[ida][f]
+                        if not reduce((lambda x, y: x == y), [item[ida][f.capitalize()] for f in datafields]):
+                            for f in datafields: im[f] = item[ida][f.capitalize()]
                         imk = list(im.keys())
                         vstr = ','.join(['{{{}}}'.format(i) for i in imk])
                         conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
