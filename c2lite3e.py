@@ -127,13 +127,14 @@ def web_collect(*args, **kwargs):
     if start:
         if isinstance(code, str):
             dp = data.DataReader(code, src, start, end)
-            lines = dp.to_csv().split(linesep)[:-1]
-            res[code] = c2d(lines)
+            res[code] = dp.transpose().to_dict()
+            # lines = dp.to_csv().split(linesep)[:-1]
+            # res[code] = c2d(lines)
         elif isinstance(code, list):
             dp = data.DataReader(code, src, start, end)
             for c in code:
-                lines = dp.minor_xs(c).to_csv().split(linesep)[:-1]
-                res[c] = c2d(lines)
+                res[c] = dp.minor_xs(c).transpose().to_dict()
+                # res[c] = c2d(lines)
         return res
 
 def wap(*args, **kwargs):
@@ -170,14 +171,21 @@ def wap(*args, **kwargs):
                         conn.commit()
                         uc += 1
             except:
-                im = {'eid':_}
-                im['date'] = '"{}"'.format(item['date'])
-                for i in datafields: im[i] = item[i]
-                imk = list(im.keys())
-                vstr = ','.join(['{{{}}}'.format(i) for i in imk])
-                conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
-                conn.commit()
-                ic += 1
+                tfields = datafields
+                tfields.append('date')
+                atd = [datetime.strptime(i['date'], '%Y-%m-%d') for i in conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(tfields), db_table, _)).fetchall()]
+                idates = [i for i in list(iw.keys()) if i not in atd]
+                try:
+                    for ida in idates:
+                        im = {'eid':_}
+                        im['date'] = '"{:%Y-%m-%d}"'.format(ida)
+                        for f in datafields: im[f] = item[ida][f]
+                        imk = list(im.keys())
+                        vstr = ','.join(['{{{}}}'.format(i) for i in imk])
+                        conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
+                        conn.commit()
+                        ic += 1
+                except: pass
     conn.close()
     return ic, uc
 
