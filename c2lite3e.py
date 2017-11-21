@@ -160,33 +160,34 @@ def wap(*args, **kwargs):
         elif isinstance(kw['equities_id'], list): aid = kw['equities_id']
     wdp = web_collect(aid)
     for _ in aid:
+        tfields = datafields
+        tfields.append('date')
+        atd = [datetime.strptime(i['date'], '%Y-%m-%d') for i in conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(tfields), db_table, _)).fetchall()]
         iw = wdp['{:04d}.HK'.format(_)]
-        for item in iw:
+        tdl = ['{:%Y-%m-%d}'.format(k) for k in list(wdp[iw.keys()])]
+        for item in list(iw.keys()):
             try:
-                sd = stored_data(_, where={'date':"'{:%Y-%m-%d}'".format(datetime.strptime(item['date'], '%Y-%m-%d'))})[0]
+                sd = stored_data(_, where={'date':"'{:%Y-%m-%d}'".format(item)})[0]
                 if sd:
-                    if not reduce((lambda x, y: x and y), [item[i] == float(sd[i]) for i in datafields]):
+                    if not reduce((lambda x, y: x and y), [wdp[item][i.capitalize()] == float(sd[i]) for i in datafields]):
                         sstr = ','.join(['{}={{}}}'.format(i) for i in datafields])
-                        conn.cursor().execute(ustr.format(db_table, sstr, sd['id']).format(**item))
+                        conn.cursor().execute(ustr.format(db_table, sstr, sd['id']).format(**wdp[item]))
                         conn.commit()
                         uc += 1
-            except:
-                tfields = datafields
-                tfields.append('date')
-                atd = [datetime.strptime(i['date'], '%Y-%m-%d') for i in conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(tfields), db_table, _)).fetchall()]
-                idates = [i for i in list(iw.keys()) if i not in atd]
-                try:
-                    for ida in idates:
-                        im = {'eid':_}
-                        im['date'] = '"{:%Y-%m-%d}"'.format(ida)
-                        if not reduce((lambda x, y: x == y), [item[ida][f.capitalize()] for f in datafields]):
-                            for f in datafields: im[f] = item[ida][f.capitalize()]
-                        imk = list(im.keys())
-                        vstr = ','.join(['{{{}}}'.format(i) for i in imk])
-                        conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
-                        conn.commit()
-                        ic += 1
-                except: pass
+            except: pass
+            idates = [i for i in list(iw.keys()) if i not in atd]
+            try:
+                for ida in idates:
+                    im = {'eid':_}
+                    im['date'] = '"{:%Y-%m-%d}"'.format(ida)
+                    if not reduce((lambda x, y: x == y), [wdp[item][f.capitalize()] for f in datafields]):
+                        for f in datafields: im[f] = wdp[item][f.capitalize()]
+                    imk = list(im.keys())
+                    vstr = ','.join(['{{{}}}'.format(i) for i in imk])
+                    conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
+                    conn.commit()
+                    ic += 1
+            except: pass
     conn.close()
     return ic, uc
 
