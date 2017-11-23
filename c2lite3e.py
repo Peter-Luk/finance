@@ -157,8 +157,7 @@ def wap(*args, **kwargs):
         elif isinstance(kw['equities_id'], list): aid = kw['equities_id']
     wdp = web_collect(aid)
     for _ in aid:
-        idate, tfields = [], datafields
-        tfields.append('date')
+        idate, tfields = [], datafields + ['date']
         ads = conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(tfields), db_table, _)).fetchall()
         atd = [i['date'] for i in ads]
         iw = wdp['{:04d}.HK'.format(_)]
@@ -168,7 +167,7 @@ def wap(*args, **kwargs):
             for i in idate:
                 im = {'eid':_}
                 im['date'] = "'{:%Y-%m-%d}'".format(i)
-                for f in ['open', 'high', 'low', 'close', 'volume']:
+                for f in datafields:
                     if f == 'volume':
                         im[f] = int(wdp['{:04d}.HK'.format(_)][i][f.capitalize()])
                     else:
