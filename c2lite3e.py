@@ -171,7 +171,7 @@ def wap(*args, **kwargs):
             for i in idate:
                 im = {'eid':_}
                 im['date'] = "'{:%Y-%m-%d}'".format(i)
-                for f in ['open', 'high', 'low', 'close', 'volume']:
+                for f in datafields:
                     if f == 'volume':
                         im[f] = int(wdp['{:04d}.HK'.format(_)][i][f.capitalize()])
                     else:
