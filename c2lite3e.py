@@ -157,9 +157,8 @@ def wap(*args, **kwargs):
         elif isinstance(kw['equities_id'], list): aid = kw['equities_id']
     wdp = web_collect(aid)
     for _ in aid:
-        idate, tfields = [], datafields + ['date']
-        ads = conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(tfields), db_table, _)).fetchall()
-        atd = [i['date'] for i in ads]
+        idate = []
+        atd = [i['date'] for i in conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(datafields + ['date']), db_table, _)).fetchall()]
         iw = wdp['{:04d}.HK'.format(_)]
         tdl = list(iw.keys())
         idate.extend([i for i in tdl if '{:%Y-%m-%d}'.format(i) not in atd])
@@ -173,8 +172,7 @@ def wap(*args, **kwargs):
                     else:
                         im[f] = wdp['{:04d}.HK'.format(_)][i][f.capitalize()]
                 imk = list(im.keys())
-                vstr = ','.join(['{{{}}}'.format(j) for j in imk])
-                conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
+                conn.cursor().execute(istr.format(db_table, ','.join(imk), ','.join(['{{{}}}'.format(j) for j in imk])).format(**im))
                 conn.commit()
                 ic += 1
     conn.close()
