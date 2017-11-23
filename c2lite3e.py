@@ -128,13 +128,10 @@ def web_collect(*args, **kwargs):
         if isinstance(code, str):
             dp = data.DataReader(code, src, start, end)
             res[code] = dp.transpose().to_dict()
-            # lines = dp.to_csv().split(linesep)[:-1]
-            # res[code] = c2d(lines)
         elif isinstance(code, list):
             dp = data.DataReader(code, src, start, end)
             for c in code:
                 res[c] = dp.minor_xs(c).transpose().to_dict()
-                # res[c] = c2d(lines)
         return res
 
 def wap(*args, **kwargs):
