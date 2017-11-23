@@ -160,36 +160,28 @@ def wap(*args, **kwargs):
         elif isinstance(kw['equities_id'], list): aid = kw['equities_id']
     wdp = web_collect(aid)
     for _ in aid:
-        tfields = datafields
+        idate, tfields = [], datafields
         tfields.append('date')
-        atd = [datetime.strptime(i['date'], '%Y-%m-%d') for i in conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(tfields), db_table, _)).fetchall()]
+        ads = conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(tfields), db_table, _)).fetchall()
+        atd = [i['date'] for i in ads]
         iw = wdp['{:04d}.HK'.format(_)]
-        tdl = ['{:%Y-%m-%d}'.format(k) for k in list(wdp[iw.keys()])]
-        for item in list(iw.keys()):
-            try:
-                sd = stored_data(_, where={'date':"'{:%Y-%m-%d}'".format(item)})[0]
-                if sd:
-                    if not reduce((lambda x, y: x and y), [wdp[item][i.capitalize()] == float(sd[i]) for i in datafields]):
-                        sstr = ','.join(['{}={{}}}'.format(i) for i in datafields])
-                        conn.cursor().execute(ustr.format(db_table, sstr, sd['id']).format(**wdp[item]))
-                        conn.commit()
-                        uc += 1
-            except: pass
-            idates = [i for i in list(iw.keys()) if i not in atd]
-            try:
-                for ida in idates:
-                    im = {'eid':_}
-                    im['date'] = '"{:%Y-%m-%d}"'.format(ida)
-                    if not reduce((lambda x, y: x == y), [wdp[item][f.capitalize()] for f in datafields]):
-                        for f in datafields: im[f] = wdp[item][f.capitalize()]
-                    imk = list(im.keys())
-                    vstr = ','.join(['{{{}}}'.format(i) for i in imk])
-                    conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
-                    conn.commit()
-                    ic += 1
-            except: pass
+        tdl = list(iw.keys())
+        idate.extend([i for i in tdl if '{:%Y-%m-%d}'.format(i) not in atd])
+        if idate:
+            for i in idate:
+                im = {'eid':_}
+                im['date'] = "'{:%Y-%m-%d}'".format(i)
+                for f in ['open', 'high', 'low', 'close', 'volume']:
+                    if f == 'volume':
+                        im[f] = int(wdp['{:04d}.HK'.format(_)][i][f.capitalize()])
+                    else:
+                        im[f] = wdp['{:04d}.HK'.format(_)][i][f.capitalize()]
+                imk = list(im.keys())
+                vstr = ','.join(['{{{}}}'.format(j) for j in imk])
+                conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
+                conn.commit()
     conn.close()
-    return ic, uc
+    return ic
 
 def amend(*args, **kwargs):
     counter = 0
