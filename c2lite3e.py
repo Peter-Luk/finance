@@ -171,7 +171,7 @@ def wap(*args, **kwargs):
             for i in idate:
                 im = {'eid':_}
                 im['date'] = "'{:%Y-%m-%d}'".format(i)
-                for f in datafields:
+                for f in ['open', 'high', 'low', 'close', 'volume']:
                     if f == 'volume':
                         im[f] = int(wdp['{:04d}.HK'.format(_)][i][f.capitalize()])
                     else:
@@ -180,6 +180,7 @@ def wap(*args, **kwargs):
                 vstr = ','.join(['{{{}}}'.format(j) for j in imk])
                 conn.cursor().execute(istr.format(db_table, ','.join(imk), vstr).format(**im))
                 conn.commit()
+                ic += 1
     conn.close()
     return ic
 
