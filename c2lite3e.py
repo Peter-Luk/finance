@@ -165,17 +165,18 @@ def wap(*args, **kwargs):
         idate.extend([i for i in tdl if '{:%Y-%m-%d}'.format(i) not in atd])
         if idate:
             for i in idate:
-                im = {'eid':_}
-                im['date'] = "'{:%Y-%m-%d}'".format(i)
-                for f in datafields:
-                    if f == 'volume':
-                        im[f] = int(wdp['{:04d}.HK'.format(_)][i][f.capitalize()])
-                    else:
-                        im[f] = wdp['{:04d}.HK'.format(_)][i][f.capitalize()]
-                imk = list(im.keys())
-                conn.cursor().execute(istr.format(db_table, ','.join(imk), ','.join(['{{{}}}'.format(j) for j in imk])).format(**im))
-                conn.commit()
-                ic += 1
+                if int(wdp['{:04d}.HK'.format(_)][i]['Volume']) != 0:
+                    im = {'eid':_}
+                    im['date'] = "'{:%Y-%m-%d}'".format(i)
+                    for f in datafields:
+                        if f == 'volume':
+                            im[f] = int(wdp['{:04d}.HK'.format(_)][i][f.capitalize()])
+                        else:
+                            im[f] = wdp['{:04d}.HK'.format(_)][i][f.capitalize()]
+                    imk = list(im.keys())
+                    conn.cursor().execute(istr.format(db_table, ','.join(imk), ','.join(['{{{}}}'.format(j) for j in imk])).format(**im))
+                    conn.commit()
+                    ic += 1
     conn.close()
     return ic
 
