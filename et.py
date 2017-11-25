@@ -1,10 +1,9 @@
-from utilities import filepath, gr, in_limit
-from datetime import datetime
-from statistics import mean, stdev
-import sqlite3 as lite
-import sys
-sys.setrecursionlimit(10000)
+him = getattr(__import__('handy'), 'him')
+iml = [{'utilities':('gr', 'filepath', 'in_limit'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'sys':()}, ({'sqlite3':()}, "alias='lite'")]
+__ = him(iml)
+for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
+sys.setrecursionlimit(10000)
 db_name, db_table = 'Securities', 'records'
 
 class Equities(object):
