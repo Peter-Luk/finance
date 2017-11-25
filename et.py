@@ -25,7 +25,7 @@ class Equities(object):
             except: pass
         if 'digits' in list(kwargs.keys()): self.digits = int(kwargs['digits'])
         if 'span' in list(kwargs.keys()): self.__span = int(kwargs['span'])
-        self.__raw_data = self.conn.cursor().execute("SELECT * FROM %s WHERE eid=%i ORDER BY date ASC" % (db_table, self.code)).fetchall()
+        self.__raw_data = self.conn.cursor().execute("SELECT * FROM {} WHERE eid={:d} ORDER BY date ASC".format(db_table, self.code)).fetchall()
         self.latest = self.__raw_data[-1]['date']
         self.close = self.__raw_data[-1]['close']
         self.__data = self.extract(field=self.__field)
