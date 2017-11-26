@@ -1,8 +1,9 @@
-db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'), 'him')
 iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf', 'in_limit'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'os':('sep', 'linesep')}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
+
+db_name, db_table = 'Futures', 'records'
 
 class Futures(object):
     """
