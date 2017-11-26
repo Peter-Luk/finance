@@ -4,6 +4,8 @@ iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir'
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
+db_name, db_table = 'Securities', 'records'
+
 def stored_data(*args, **kwargs):
     res, where, fields, lk = [], [], ['date', 'open', 'high', 'low', 'close', 'volume'], list(kwargs.keys())
     try:
@@ -165,7 +167,7 @@ def wap(*args, **kwargs):
         idate.extend([i for i in tdl if '{:%Y-%m-%d}'.format(i) not in atd])
         if idate:
             for i in idate:
-                if int(wdp['{:04d}.HK'.format(_)][i]['Volume']) != 0:
+                if wdp['{:04d}.HK'.format(_)][i]['Volume']:
                     im = {'eid':_}
                     im['date'] = "'{:%Y-%m-%d}'".format(i)
                     for f in datafields:
