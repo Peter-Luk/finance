@@ -92,14 +92,14 @@ def mtf(*args, **kwargs):
         else: ftype = list(kwargs['type'])
     fi, conn = [], lite.connect(filepath('Futures'))
     conn.row_factory = lite.Row
-    qstr = "SELECT volume FROM records WHERE code='%s' ORDER BY date DESC"
+    qstr = "SELECT volume FROM records WHERE code={} ORDER BY date DESC"
     for _ in ftype:
         aft = []
         for __ in waf():
             if _.upper() in __: aft.append(__)
         try:
-            nfv = conn.cursor().execute(qstr%aft[1]).fetchall()[0][0]
-            cfv = conn.cursor().execute(qstr%aft[0]).fetchall()[0][0]
+            nfv = conn.cursor().execute(qstr.format(aft[1])).fetchall()[0][0]
+            cfv = conn.cursor().execute(qstr.formar(aft[0])).fetchall()[0][0]
             if cfv > nfv: fi.append(aft[0])
             else:fi.append(aft[1])
         except:fi.append(aft[0])
