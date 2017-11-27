@@ -142,22 +142,23 @@ def product(v):
     return a
 
 class IP():
-    def __init__(self, mode=None):
-        if mode:
-            try:
-                self.mode = mode.lower()
-            except:pass
-        self.address = None
-        try:
-            if self.mode == 'public':
-                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                s.connect(("8.8.8.8", 80))
-                self.address = s.getsockname()[0]
-        except:pass
+    def __init__(self, *args, **kwargs):
+        self.mode, self.address = 'public', None
+        if args:
+            if isinstance(args[0], str): self.mode = args[0].lower()
+        if 'mode' in list(kwargs.keys()):
+            if isinstance(kwargs['mode'], str): self.mode = kwargs['mode'].lower()
+        if self.mode == 'public':
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            self.address = s.getsockname()[0]
+
     def __del__(self):
         self.address = self.mode = None
-        del(self.mode)
-        del(self.address)
+        del self.mode, self.address
+
+    def __call__(self):
+        return self.address
 
 def dvs(d):
     res, values = [], list(d.values())
