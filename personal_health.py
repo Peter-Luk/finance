@@ -25,7 +25,7 @@ class Hypertension(object):
         data = {}
         if args:
             lag = len(args)
-            if lag > 3: data['conditions'] = args[3]
+            if lag > 3: data['remarks'] = args[3]
             if lag > 2: data['pulse'] = args[2]
             if lag > 1:
                 try:
@@ -35,7 +35,7 @@ class Hypertension(object):
         try:
             lkkeys = list(kwargs.keys())
             if 'data' in lkkeys: data = kwargs['data']
-            if 'condition' in lkkeys: data['conditions'] = kwargs['condition']
+            if 'condition' in lkkeys: data['remarks'] = kwargs['condition']
         except: pass
         td = datetime.today()
         date, time = td.strftime('%Y-%m-%d'), td.strftime('%H:%M:%S')
@@ -46,7 +46,7 @@ class Hypertension(object):
         fields = list(data.keys())
         vstr = []
         for _ in fields:
-            if _ in ['date', 'time', 'conditions']: vstr.append("'{{{}}}'".format(_))
+            if _ in ['date', 'time', 'remarks']: vstr.append("'{{{}}}'".format(_))
             else: vstr.append('{{{}}}'.format(_))
         vstr = ','.join(vstr)
         iqstr = 'INSERT INTO {} ({}) VALUES ({})'.format(db_table, ','.join(fields), vstr)
