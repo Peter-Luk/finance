@@ -48,8 +48,7 @@ class Hypertension(object):
         for _ in fields:
             if _ in ['date', 'time', 'remarks']: vstr.append("'{{{}}}'".format(_))
             else: vstr.append('{{{}}}'.format(_))
-        vstr = ','.join(vstr)
-        iqstr = 'INSERT INTO {} ({}) VALUES ({})'.format(db_table, ','.join(fields), vstr)
+        iqstr = 'INSERT INTO {} ({}) VALUES ({})'.format(db_table, ','.join(fields), ','.join(vstr))
         try:
             self.conn.cursor().execute(iqstr.format(**data))
             self.conn.commit()
