@@ -21,6 +21,32 @@ class Hypertension(object):
         self.uid = self.iid = self.conn = None
         del self.uid, self.iid, self.conn
 
+    def __call__(self, *args, **kwargs):
+        mode = 'append'
+        if args:
+            if isinstance(args[0], str):
+                try: self.sid = int(args[0])
+                except: pass
+            if isinstance(args[0], int): self.sid = args[0]
+            if len(args) > 1:
+                try: sys = int(args[1])
+                except: pass
+            if len(args) > 2:
+                try: dia = int(args[2])
+                except: pass
+            if len(args) > 3:
+                try: pulse = int(args[3])
+                except: pass
+            if len(args) > 4:
+                try: remarks = '{}'.format(args[4])
+                except: pass
+        if 'mode' in list(kwargs.keys()):
+            try: mode = kwargs['mode'].lower()
+            except: pass
+        if mode == 'append':
+            try: return self.append(sys, dia, pulse, remarks)
+            except: pass
+
     def append(self, *args, **kwargs):
         data = {}
         if args:
