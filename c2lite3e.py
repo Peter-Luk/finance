@@ -1,4 +1,3 @@
-db_name, db_table = 'Securities', 'records'
 him = getattr(__import__('handy'), 'him')
 iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'linesep', 'sep', 'path', 'remove')}, {'sys':('platform',)}, {'pandas_datareader':('data',)}, {'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
