@@ -93,9 +93,12 @@ def mtf(*args, **kwargs):
     fi, conn = [], lite.connect(filepath('Futures'))
     conn.row_factory = lite.Row
     qstr = "SELECT volume FROM records WHERE code={} ORDER BY date DESC"
+    awaf = waf()
+    if today.day == ltd(today.year, today.month): awaf = waf(1)
     for _ in ftype:
         aft = []
-        for __ in waf():
+        # for __ in waf():
+        for __ in awaf:
             if _.upper() in __: aft.append(__)
         try:
             nfv = conn.cursor().execute(qstr.format(aft[1])).fetchall()[0][0]
