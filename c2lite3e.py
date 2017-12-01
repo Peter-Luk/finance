@@ -3,10 +3,10 @@ iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir'
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
-db_name, db_table = 'Securities', 'records'
+db_name, db_table, datafields = 'Securities', 'records', ['open', 'high', 'low', 'close', 'volume']
 
 def stored_data(*args, **kwargs):
-    res, where, fields, lk = [], [], ['date', 'open', 'high', 'low', 'close', 'volume'], list(kwargs.keys())
+    res, where, fields, lk = [], [], ['date'] + datafields, list(kwargs.keys())
     try:
         a0 = args[0]
         if isinstance(a0, str): a0 = int(float(a0))
@@ -138,7 +138,7 @@ def web_collect(*args, **kwargs):
 def wap(*args, **kwargs):
     ic, aid, kw = 0, get_stored_eid(), kwargs
 #     uc = 0
-    lkw, datafields = list(kw.keys()), ['open', 'high', 'low', 'close', 'volume']
+    lkw = list(kw.keys())
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
     istr = "INSERT INTO {} ({}) VALUES ({})"
@@ -202,7 +202,6 @@ def amend(*args, **kwargs):
         for d in dv:
             sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', 'records', d['date'], int(r.split('.')[0]))).fetchone()['id']
             if sid:
-                datafields = ['open', 'high', 'low', 'close', 'volume']
                 sv = conn.cursor().execute("SELECT {} FROM {} WHERE id={:d}".format(','.join(datafields), 'records', sid)).fetchone()
                 if not reduce((lambda x, y: x and y), [sv[_] == d[_] for _ in datafields]):
                     uvstr = ','.join(['{0}={{{0}}}'.format(_) for _ in datafields])
