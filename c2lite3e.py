@@ -178,6 +178,7 @@ def wap(*args, **kwargs):
                     conn.cursor().execute(istr.format(db_table, ','.join(imk), ','.join(['{{{}}}'.format(j) for j in imk])).format(**im))
                     conn.commit()
                     ic += 1
+        else: pass
     conn.close()
     return ic
 
