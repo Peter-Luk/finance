@@ -180,11 +180,20 @@ def wap(*args, **kwargs):
                     conn.commit()
                     ic += 1
         else:
+            sd = stored_data(_)
             for t in atd:
                 wt = wdp['{:04d}.HK'.format(_)][t]
-                if wt['Volume']: pass
+                spd = [i for i in sd if i['date'] == t].pop()
+                df = [d for d in datafields if d != 'volume']
+                if wt['Volume']:
+                    if not reduce((lambda x, y: x and y), [float(wt[f]) == float(spd[f]) for f in df]):
+                        sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', db_table, t, _)).fetchone()['id']
+                        uvstr = ','.join(['{0}={{{0}}}'.format(f) for f in datafields])
+                        conn.cursor().execute(ustr.format(db_table, uvstr, sid).format(**wt))
+                        conn.commit()
+                        uc += 1
     conn.close()
-    return ic
+    return ic, uc
 
 def amend(*args, **kwargs):
     counter = 0
