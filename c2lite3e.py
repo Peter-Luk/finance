@@ -137,12 +137,12 @@ def web_collect(*args, **kwargs):
 
 def wap(*args, **kwargs):
     ic, aid, kw = 0, get_stored_eid(), kwargs
-#     uc = 0
+    uc = 0
     lkw = list(kw.keys())
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
     istr = "INSERT INTO {} ({}) VALUES ({})"
-#     ustr = "UPDATE {} SET {} WHERE id={:d}"
+    ustr = "UPDATE {} SET {} WHERE id={:d}"
     if args:
         if isinstance(args[0], int): aid = [args[0]]
         elif isinstance(args[0], str):
