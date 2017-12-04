@@ -182,14 +182,16 @@ def wap(*args, **kwargs):
         else:
             sd = stored_data(_)
             for t in atd:
-                wt = wdp['{:04d}.HK'.format(_)][t]
+                wtd, wt = {}, wdp['{:04d}.HK'.format(_)][t]
                 spd = [i for i in sd if i['date'] == t].pop()
+                for d in datafields:
+                    wtd[d] = wt[d.capitalize()]
                 df = [d for d in datafields if d != 'volume']
-                if wt['Volume']:
-                    if not reduce((lambda x, y: x and y), [float(wt[f.capitalize()]) == float(spd[f]) for f in df]):
+                if wtd['volume']:
+                    if not reduce((lambda x, y: x and y), [float(wtd[f]) == float(spd[f]) for f in df]):
                         sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', db_table, t, _)).fetchone()['id']
                         uvstr = ','.join(['{0}={{{0}}}'.format(f) for f in datafields])
-                        conn.cursor().execute(ustr.format(db_table, uvstr, sid).format(**wt))
+                        conn.cursor().execute(ustr.format(db_table, uvstr, sid).format(**wtd))
                         conn.commit()
                         uc += 1
     conn.close()
