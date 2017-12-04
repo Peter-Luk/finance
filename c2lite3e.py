@@ -136,8 +136,10 @@ def web_collect(*args, **kwargs):
         return res
 
 def wap(*args, **kwargs):
-    ic, aid, kw = 0, get_stored_eid(), kwargs
-    uc = 0
+    """
+Obtain daily update thru API (Yahoo) and update 'local' database.
+    """
+    ic, uc, aid, kw = 0, 0, get_stored_eid(), kwargs
     lkw = list(kw.keys())
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
