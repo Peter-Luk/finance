@@ -183,15 +183,15 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
                     ic += 1
         else:
             sd = stored_data(_)
-            for t in tdl:
-                wtd, wt = {}, wdp['{:04d}.HK'.format(_)][t]
-                spd = [i for i in sd if i['date'] == '{:%Y-%m-%d}'.format(t)].pop()
+            for t in ['{:%Y-%m-%d}'.format(l) for l in tdl]:
+                wtd, wt = {}, wdp['{:04d}.HK'.format(_)][datetime.strptime(t, '%Y-%m-%d')]
+                spd = [i for i in sd if i['date'] == t].pop()
                 for d in datafields:
                     wtd[d] = wt[d.capitalize()]
                 df = [d for d in datafields if d != 'volume']
                 if wtd['volume']:
                     if not reduce((lambda x, y: x and y), [float(wtd[f]) == float(spd[f]) for f in df]):
-                        sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', db_table, '{:%Y-%m-%d}'.format(t), _)).fetchone()['id']
+                        sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', db_table, t, _)).fetchone()['id']
                         uvstr = ','.join(['{0}={{{0}}}'.format(f) for f in datafields])
                         conn.cursor().execute(ustr.format(db_table, uvstr, sid).format(**wtd))
                         conn.commit()
