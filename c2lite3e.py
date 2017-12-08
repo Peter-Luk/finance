@@ -188,9 +188,10 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
                 spd = [i for i in sd if i['date'] == t].pop()
                 for d in datafields:
                     wtd[d] = wt[d.capitalize()]
-                df = [d for d in datafields if d != 'volume']
+                # df = [d for d in datafields if d != 'volume']
                 if wtd['volume']:
-                    if not reduce((lambda x, y: x and y), ['{:.2f}'.format(wtd[f]) == '{:.2f}'.format(spd[f]) for f in df]):
+                    # if not reduce((lambda x, y: x and y), ['{:.2f}'.format(wtd[f]) == '{:.2f}'.format(spd[f]) for f in df]):
+                    if not reduce((lambda x, y: x and y), ['{:.2f}'.format(wtd[f]) == '{:.2f}'.format(spd[f]) for f in datafields]):
                         sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', db_table, t, _)).fetchone()['id']
                         uvstr = ','.join(['{0}={{{0}}}'.format(f) for f in datafields])
                         conn.cursor().execute(ustr.format(db_table, uvstr, sid).format(**wtd))
