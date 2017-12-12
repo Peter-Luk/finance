@@ -5,6 +5,16 @@ for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 db_name, db_table, datafields = 'Securities', 'records', ['open', 'high', 'low', 'close', 'volume']
 
+def dictfcomp(*args, **kwargs):
+    res = {}
+    if isinstance(args[0], dict): ad = args[0]
+    if isinstance(args[1], dict): rd = args[1]
+    for _ in list(rd.keys()):
+        if not reduce((lambda x, y: x and y), ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
+            res[_] = ad[_]
+            # res.append({_:ad[_]})
+    return res
+
 def pstored(*args, **kwargs):
     if args:
         if isinstance(args[0], str):
@@ -13,7 +23,7 @@ def pstored(*args, **kwargs):
         if isinstance(args[0], int): a0 = args[0]
     scon = lite.connect(filepath(db_name))
     end = datetime.today()
-    start = datetime(end.year, end.month - 1, 1)
+    start = get_start(1)
     qstr = "SELECT {} FROM {} WHERE eid={{:d}} AND date BETWEEN '{{:%Y-%m-%d}}' AND '{{:%Y-%m-%d}}' ORDER BY date ASC".format(', '.join(datafields + ['date']), db_table)
     d = pd.read_sql_query(qstr.format(a0, start, end), scon, parse_dates={'date':'%Y-%m-%d'}).transpose().to_dict().values()
     if d:
