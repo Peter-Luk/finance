@@ -10,6 +10,7 @@ def pstored(*args, **kwargs):
         if isinstance(args[0], str):
             try: a0 = int(args[0])
             except: pass
+        if isinstance(args[0], int): a0 = args[0]
     scon = lite.connect(filepath(db_name))
     end = datetime.today()
     start = datetime(end.year, end.month - 1, 1)
