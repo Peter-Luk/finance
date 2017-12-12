@@ -16,13 +16,14 @@ def pstored(*args, **kwargs):
     start = datetime(end.year, end.month - 1, 1)
     qstr = "SELECT {} FROM {} WHERE eid={{:d}} AND date BETWEEN '{{:%Y-%m-%d}}' AND '{{:%Y-%m-%d}}' ORDER BY date ASC".format(', '.join(datafields + ['date']), db_table)
     d = pd.read_sql_query(qstr.format(a0, start, end), scon, parse_dates={'date':'%Y-%m-%d'}).transpose().to_dict().values()
-    vd = {}
-    for _ in d: vd[_.pop('date')] = _
-    for _ in list(vd.keys()):
-        temp = {}
-        for __ in list(vd[_].keys()): temp[__.capitalize()] = vd[_][__]
-        vd[_] = temp
-    return vd
+    if d:
+        vd = {}
+        for _ in d: vd[_.pop('date')] = _
+        for _ in list(vd.keys()):
+            temp = {}
+            for __ in list(vd[_].keys()): temp[__.capitalize()] = vd[_][__]
+            vd[_] = temp
+        return vd
 
 def stored_data(*args, **kwargs):
     res, where, fields, lk = [], [], ['date'] + datafields, list(kwargs.keys())
