@@ -5,6 +5,21 @@ for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 db_name, db_table, datafields = 'Securities', 'records', ['open', 'high', 'low', 'close', 'volume']
 
+def d2lite(*args, **kwargs):
+    if isinstance(args[0], int): code = args[0]
+    if isinstance(args[1], dict): s_dict = args[1]
+    counter, conn = 0, args[2]
+    qstr = "UPDATE {} SET {{}} WHERE eid={:d} AND date='{{:%Y-%m-%d}}'".format(db_table, code)
+    for _ in list(s_dict.keys()):
+        sl = []
+        for __ in datafields:
+            if __ == 'volume': sl.append('{}={:d}'.format(__, int(s_dict[_][__.capitalize()])))
+            else: sl.append('{}={:.3f}'.format(__, s_dict[_][__.capitalize()]))
+        conn.cursor().execute(qstr.format(', '.join(sl), _))
+        counter += 1
+        conn.commit()
+    return counter
+
 def dictfcomp(*args, **kwargs):
     res = {}
     if isinstance(args[0], dict): ad = args[0]
@@ -12,7 +27,6 @@ def dictfcomp(*args, **kwargs):
     for _ in list(rd.keys()):
         if not reduce((lambda x, y: x and y), ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
             res[_] = ad[_]
-            # res.append({_:ad[_]})
     return res
 
 def pstored(*args, **kwargs):
