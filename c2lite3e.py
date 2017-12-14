@@ -12,12 +12,14 @@ def d2lite(*args, **kwargs):
     qstr = "UPDATE {} SET {{}} WHERE eid={:d} AND date='{{:%Y-%m-%d}}'".format(db_table, code)
     for _ in list(s_dict.keys()):
         sl = []
-        for __ in datafields:
-            if __ == 'volume': sl.append('{}={:d}'.format(__, int(s_dict[_][__.capitalize()])))
-            else: sl.append('{}={:.3f}'.format(__, s_dict[_][__.capitalize()]))
-        conn.cursor().execute(qstr.format(', '.join(sl), _))
-        counter += 1
-        conn.commit()
+        try:
+            for __ in datafields:
+                if __ == 'volume': sl.append('{}={:d}'.format(__, int(s_dict[_][__.capitalize()])))
+                else: sl.append('{}={:.3f}'.format(__, s_dict[_][__.capitalize()]))
+            conn.cursor().execute(qstr.format(', '.join(sl), _))
+            counter += 1
+            conn.commit()
+        except: pass
     return counter
 
 def dictfcomp(*args, **kwargs):
