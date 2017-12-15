@@ -247,33 +247,12 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
     return ic, uc
 
 def amend(*args, **kwargs):
-    counter = 0
-    conn = lite.connect(filepath('Securities'))
-    conn.row_factory = lite.Row
-    start = get_start(1)
-    rid = ['{:04d}.HK'.format(_['eid']) for _ in conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', 'records')).fetchall()]
-    dp = data.DataReader(rid, 'yahoo', start, end)
-    for r in rid:
-        rh = dp.minor_xs(r).to_csv().split(linesep)[:-2]
-        fields = rh[0].split(',')
-        dv = []
-        for rhs in rh[1:]:
-            hdr, rv = {}, rhs.split(',')
-            for f in fields:
-                if f == 'date': hdr[f] = '{}'.format(rv[fields.index(f)])
-                elif f == 'volume': hdr[f] = int(float(rv[fields.index(f)]))
-                else: hdr[f] = float(rv[fields.index(f)])
-            dv.append(hdr)
-        for d in dv:
-            sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', 'records', d['date'], int(r.split('.')[0]))).fetchone()['id']
-            if sid:
-                sv = conn.cursor().execute("SELECT {} FROM {} WHERE id={:d}".format(','.join(datafields), 'records', sid)).fetchone()
-                if not reduce((lambda x, y: x and y), [sv[_] == d[_] for _ in datafields]):
-                    uvstr = ','.join(['{0}={{{0}}}'.format(_) for _ in datafields])
-                    conn.cursor().execute("UPDATE {} SET {} WHERE id={}".format('records', uvstr, sid).format(d))
-                    conn.commit()
-                    counter += 1
-    return counter
+    count, ae = 0, get_stored_eid()
+    we, conn = web_collect(ae), lite.connect(filepath('Securities'))
+    for _ in ae:
+        df = dictfcomp(we['{:04d}.HK'.format(_)], pstored(_))
+        if df: count += d2lite(_, df, conn)
+    return count
 
 def append(*args, **kwargs):
     """
