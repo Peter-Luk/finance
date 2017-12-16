@@ -5,7 +5,13 @@ for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 db_name, db_table, datafields = 'Securities', 'records', ['open', 'high', 'low', 'close', 'volume']
 
-def d2lite(*args, **kwargs):
+def u2lite(*args, **kwargs):
+    """
+Update SQLite db with dict object, all three arguments are compulsory,
+1.) 'code' or 'eid' (Equities ID), type int, affected,
+2.) source, type dict, and
+3.) SQLite db, type connection.
+    """
     if isinstance(args[0], int): code = args[0]
     if isinstance(args[1], dict): s_dict = args[1]
     counter, conn = 0, args[2]
@@ -251,7 +257,8 @@ def amend(*args, **kwargs):
     we, conn = web_collect(ae), lite.connect(filepath('Securities'))
     for _ in ae:
         df = dictfcomp(we['{:04d}.HK'.format(_)], pstored(_))
-        if df: count += d2lite(_, df, conn)
+        if df: count += u2lite(_, df, conn)
+    conn.close()
     return count
 
 def append(*args, **kwargs):
