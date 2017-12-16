@@ -53,7 +53,7 @@ class Hypertension(object):
             except: pass
 
     def summary(self, *args, **kwargs):
-        lks, limits = list(kwargs.keys()), {'morning':datetime(2000, 1, 1, 10, 0).time(), 'evening':datetime(2000, 1, 1, 18, 30).time()}
+        lks, limits = list(kwargs.keys()), {'morning':datetime(2000, 1, 1, 10, 30).time(), 'evening':datetime(2000, 1, 1, 18, 30).time()}
         if 'subject_id' in lks:
             if isinstance(kwargs['subject_id'], str):
                 try: sid = int(kwargs['subject_id'])
