@@ -191,12 +191,11 @@ def wap(*args, **kwargs):
     """
 Obtain daily update thru API (Yahoo) and update 'local' database.
     """
-    ic, uc, aid, kw = 0, 0, get_stored_eid(), kwargs
+    ic, aid, kw = 0, get_stored_eid(), kwargs
     lkw = list(kw.keys())
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
     istr = "INSERT INTO {} ({}) VALUES ({})"
-    ustr = "UPDATE {} SET {} WHERE id={:d}"
     if args:
         if isinstance(args[0], int): aid = [args[0]]
         elif isinstance(args[0], str):
@@ -233,24 +232,8 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
                     conn.cursor().execute(istr.format(db_table, ','.join(imk), ','.join(['{{{}}}'.format(j) for j in imk])).format(**im))
                     conn.commit()
                     ic += 1
-        else:
-            sd = stored_data(_)
-            for t in ['{:%Y-%m-%d}'.format(l) for l in tdl]:
-                wtd, wt = {}, wdp['{:04d}.HK'.format(_)][datetime.strptime(t, '%Y-%m-%d')]
-                spd = [i for i in sd if i['date'] == t].pop()
-                for d in datafields:
-                    wtd[d] = wt[d.capitalize()]
-                # df = [d for d in datafields if d != 'volume']
-                if wtd['volume']:
-                    # if not reduce((lambda x, y: x and y), ['{:.2f}'.format(wtd[f]) == '{:.2f}'.format(spd[f]) for f in df]):
-                    if not reduce((lambda x, y: x and y), ['{:.2f}'.format(wtd[f]) == '{:.2f}'.format(spd[f]) for f in datafields]):
-                        sid = conn.cursor().execute("SELECT {} FROM {} WHERE date='{}' AND eid={:d}".format('id', db_table, t, _)).fetchone()['id']
-                        uvstr = ','.join(['{0}={{{0}}}'.format(f) for f in datafields])
-                        conn.cursor().execute(ustr.format(db_table, uvstr, sid).format(**wtd))
-                        conn.commit()
-                        uc += 1
     conn.close()
-    return ic, uc
+    return ic
 
 def amend(*args, **kwargs):
     count, ae = 0, get_stored_eid()
