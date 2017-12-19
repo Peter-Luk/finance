@@ -237,7 +237,7 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
     conn.close()
     return ic
 
-def amend(*args, **kwargs):
+def wam(*args, **kwargs):
     count, ae = 0, get_stored_eid()
     we, conn = web_collect(ae), lite.connect(filepath('Securities'))
     for _ in ae:
