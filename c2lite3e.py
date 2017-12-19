@@ -220,7 +220,8 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
         if idate:
             for i in idate:
                 wi = wdp['{:04d}.HK'.format(_)][i]
-                if wi['Volume']:
+                try:
+                # if wi['Volume']:
                     im = {'eid':_}
                     im['date'] = "'{:%Y-%m-%d}'".format(i)
                     for f in datafields:
@@ -232,6 +233,7 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
                     conn.cursor().execute(istr.format(db_table, ','.join(imk), ','.join(['{{{}}}'.format(j) for j in imk])).format(**im))
                     conn.commit()
                     ic += 1
+                except: pass
     conn.close()
     return ic
 
