@@ -74,15 +74,15 @@ class Hypertension(object):
             tcond = tcond.format(limits[period])
         hf = ['date', 'sys', 'dia', 'pulse', 'time']
         hstr = "SELECT {} FROM {} WHERE subject_id={{:d}} AND time{{}} ORDER BY date ASC".format(', '.join(hf), db_table)
-#         self.conn.row_factory = lite.Row
-#         sdata = self.conn.cursor().execute(hstr.format(self.sid, tcond)).fetchall()
-#         hdi = [pd.datetime.strptime(_['date'], '%Y-%m-%d') for _ in sdata]
-#         hdata = {'sys': [_['sys'] for _ in sdata]}
-#         hdata['dia'] = [_['dia'] for _ in sdata]
-#         hdata['pulse'] = [_['pulse'] for _ in sdata]
+        self.conn.row_factory = lite.Row
+        sdata = self.conn.cursor().execute(hstr.format(self.sid, tcond)).fetchall()
+        hdi = [pd.datetime.strptime(_['date'], '%Y-%m-%d') for _ in sdata]
+        hdata = {'sys': [_['sys'] for _ in sdata]}
+        hdata['dia'] = [_['dia'] for _ in sdata]
+        hdata['pulse'] = [_['pulse'] for _ in sdata]
 #         hdata['time'] = [datetime.strptime(_['time'], '%H:%M:%S') for _ in sdata]
-#         return pd.DataFrame(hdata, hdi)
-        return pd.read_sql_query(hstr.format(self.sid, tcond), self.conn, parse_dates=['date'])
+        return pd.DataFrame(hdata, hdi)
+#         return pd.read_sql_query(hstr.format(self.sid, tcond), self.conn, parse_dates=['date'])
 
     def append(self, *args, **kwargs):
         data = {}
