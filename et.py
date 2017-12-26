@@ -8,7 +8,8 @@ db_name, db_table = 'Securities', 'records'
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
-        self.in_limit, self.period, self.digits, self.__field, self.__span = in_limit, 20, -1, 'close', 0
+        self.in_limit, self.period, self.digits, self.__field, self.__span = in_limit, 20, -1, 'close', 1
+        if datetime.today().month > 9: self.__span -= 1
         self.conn = lite.connect(filepath(db_name))
         self.conn.row_factory = lite.Row
         if args:
