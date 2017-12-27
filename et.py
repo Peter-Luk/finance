@@ -1,10 +1,33 @@
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('gr', 'filepath', 'in_limit'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'sys':()}, ({'sqlite3':()}, "alias='lite'")]
+iml = [{'utilities':('gr', 'filepath', 'in_limit'), 'statistics':('mean', 'stdev'), 'datetime':('datetime',), 'sys':()}, ({'sqlite3':()}, "alias='lite'"), ({'pandas':()}, "alias='pd'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 sys.setrecursionlimit(10000)
 db_name, db_table = 'Securities', 'records'
+
+def pe(*args, **kwargs):
+    res, indicators = {}, ['kama', 'ema', 'sma', 'wma']
+    if args:
+        if isinstance(args[0], str):
+            try:code = [int(args[0])]
+            except: pass
+        if isinstance(args[0], int): code = [args[0]]
+        if isinstance(args[0], list): code = args[0]
+    for c in code:
+        e = Equities(c)
+        etd = e.trade_date[e.period:]
+        d = {}
+        for i in indicators:
+            if i == 'ema': d[i.upper()] = [e.ema(_) for _ in etd]
+            if i == 'sma': d[i.upper()] = [e.sma(_) for _ in etd]
+            if i == 'wma': d[i.upper()] = [e.wma(_) for _ in etd]
+            if i == 'rsi': d[i.upper()] = [e.rsi(_) for _ in etd]
+            if i == 'kama': d[i.upper()] = [e.kama(_) for _ in etd]
+#            eval("d[{}.upper()] = [e.{}(_) for _ in etd]".format(i, i))
+        p = pd.DataFrame(d, [pd.datetime.strptime(_, '%Y-%m-%d') for _ in etd])
+        res[c] = p
+    return res
 
 class Equities(object):
     def __init__(self, *args, **kwargs):
