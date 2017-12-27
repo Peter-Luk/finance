@@ -30,7 +30,6 @@ def pe(*args, **kwargs):
             if i == 'wma': d[i.upper()] = [e.wma(_) for _ in etd]
             if i == 'rsi': d[i.upper()] = [e.rsi(_) for _ in etd]
             if i == 'kama': d[i.upper()] = [e.kama(_) for _ in etd]
-#            eval("d[{}.upper()] = [e.{}(_) for _ in etd]".format(i, i))
         p = pd.DataFrame(d, [pd.datetime.strptime(_, '%Y-%m-%d') for _ in etd])
         res[c] = p
     return res
