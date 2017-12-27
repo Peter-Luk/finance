@@ -14,6 +14,12 @@ def pe(*args, **kwargs):
             except: pass
         if isinstance(args[0], int): code = [args[0]]
         if isinstance(args[0], list): code = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], str): indicators = [args[1]]
+            if isinstance(args[1], list): indicators = args[1]
+    if 'indicators' in list(kwargs.keys()):
+        if isinstance(kwargs['indicators'], str): indicators = [kwargs['indicators']]
+        if isinstance(kwargs['indicators'], list): indicators = kwargs['indicators']
     for c in code:
         e = Equities(c)
         etd = e.trade_date[e.period:]
