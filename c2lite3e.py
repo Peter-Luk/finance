@@ -156,7 +156,7 @@ def get_start(*args, **kwargs):
         if period > 12:
             y -= int(period / 12)
             period %= 12
-        if m - period < 0:
+        if m - period <= 0:
             y -= 1
             m += 12
         m -= period
