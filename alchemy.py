@@ -2,8 +2,6 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import mapper, sessionmaker
 from os import sep, environ, listdir
 from sys import platform
-# class Records(object):
-#     pass
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
 if platform in ['linux', 'linux2']:
     subpath = 'shared'
@@ -61,4 +59,4 @@ def get_stored_eid(*args):
     if args:
         if isinstance(args[0], str): db_name = args[0]
     db = load(db_name)
-    return [_[0] for _ in db[db_name]['engine'].execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC")]
+    return [_[0] for _ in db[db_name]['engine'].execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()]
