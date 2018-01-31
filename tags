@@ -1,0 +1,318 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+APZ	trial01.py	/^    def APZ(self, *args, **kwargs):$/;"	m	class:I2
+ATR	trial01.py	/^    def ATR(self, *args, **kwargs):$/;"	m	class:I2
+Analyser	derivatives.py	/^class Analyser(Futures):$/;"	c
+Analysor	cf2_c.py	/^class Analysor(object):$/;"	c
+Analysor	cfd.py	/^class Analysor(object):$/;"	c
+BB	trial01.py	/^    def BB(self, *args, **kwargs):$/;"	m	class:I2
+BBW	trial01.py	/^    def BBW(self, *args, **kwargs):$/;"	m	class:I2
+EMA	trial01.py	/^    def EMA(self, *args, **kwargs):$/;"	m	class:I2
+Equities	Securities.py	/^class Equities(Query):$/;"	c
+Equities	c2lite3e.py	/^class Equities(object):$/;"	c
+Equities	et.py	/^class Equities(object):$/;"	c
+Estimator	cf2_c.py	/^class Estimator(object):$/;"	c
+Estimator	cfd.py	/^class Estimator(object):$/;"	c
+Futures	derivatives.py	/^class Futures(Query):$/;"	c
+Futures	finaly.py	/^class Futures(object):$/;"	c
+I2	trial01.py	/^class I2(object):$/;"	c
+IP	utilities.py	/^class IP():$/;"	c
+Indicators	daw.py	/^class Indicators(Analyser):$/;"	c
+Inputter	cf2_c.py	/^class Inputter(object):$/;"	c
+Inputter	cfd.py	/^class Inputter(object):$/;"	c
+KAMA	trial01.py	/^    def KAMA(self, *args, **kwargs):$/;"	m	class:I2
+KC	trial01.py	/^    def KC(self, *args, **kwargs):$/;"	m	class:I2
+LF	bt.py	/^class LF(object):$/;"	c
+Methods	daa.py	/^class Methods():$/;"	c
+PI	pt_2.py	/^class PI(I2):$/;"	c
+Query	SQLiteHelper.py	/^class Query:$/;"	c
+RSI	trial01.py	/^    def RSI(self, *args, **kwargs):$/;"	m	class:I2
+SAR	trial01.py	/^    def SAR(self, **kwargs):$/;"	m	class:I2
+SMA	trial01.py	/^    def SMA(self, *args, **kwargs):$/;"	m	class:I2
+WMA	trial01.py	/^    def WMA(self, *args, **kwargs):$/;"	m	class:I2
+__	bt.py	/^__ = him(iml)$/;"	v
+__	c2lite3e.py	/^__ = him(iml)$/;"	v
+__	cf2_c.py	/^__ = him(iml)$/;"	v
+__	cfd.py	/^__ = him(iml)$/;"	v
+__	daa.py	/^__ = him({'utilities':('rnd', 'gr', 'average'),'statistics':('stdev',)})$/;"	v
+__	daw.py	/^__ = him(iml)$/;"	v
+__	derivatives.py	/^__ = him(iml)$/;"	v
+__	finaly.py	/^__ = him(iml)$/;"	v
+__	iolimits.py	/^    __ = him(rm)$/;"	v
+__	iolimits.py	/^__ = him([{'utilities':('mtf', 'waf'), 'pt_2':('PI',), 'sys':('version_info', 'platform')}])$/;"	v
+__	pt_2.py	/^__ = him([{'utilities':('dvs', 'gr', 'get_month')}, ({'trial01':('I2',), 'pandas':(), 'sys':('ve/;"	v
+__	tdDraw.py	/^__ = him({'datetime':('datetime',),'utilities':('today', 'filepath', 'mtf'), 'os':('sep',), 'bt'/;"	v
+__	trial01.py	/^__ = him(iml)$/;"	v
+__	utilities.py	/^__ = him(iml)$/;"	v
+__del__	SQLiteHelper.py	/^    def __del__(self):$/;"	m	class:Query
+__del__	Securities.py	/^    def __del__(self):$/;"	m	class:Equities
+__del__	bt.py	/^    def __del__(self):$/;"	m	class:LF
+__del__	c2lite3e.py	/^    def __del__(self):$/;"	m	class:Equities
+__del__	daa.py	/^    def __del__(self):$/;"	m	class:Methods
+__del__	daw.py	/^    def __del__(self):$/;"	m	class:Indicators
+__del__	derivatives.py	/^    def __del__(self):$/;"	m	class:Analyser
+__del__	derivatives.py	/^    def __del__(self):$/;"	m	class:Futures
+__del__	et.py	/^    def __del__(self):$/;"	m	class:Equities
+__del__	finaly.py	/^    def __del__(self):$/;"	m	class:Futures
+__del__	pt_2.py	/^    def __del__(self):$/;"	m	class:PI
+__del__	trial01.py	/^    def __del__(self):$/;"	m	class:I2
+__del__	utilities.py	/^    def __del__(self):$/;"	m	class:IP
+__delta	daa.py	/^    def __delta(self, v):return max(v) - min(v)$/;"	m	class:Methods	file:
+__dx	et.py	/^    def __dx(self, *args, **kwargs):$/;"	m	class:Equities	file:
+__dx	finaly.py	/^    def __dx(self, *args, **kwargs):$/;"	m	class:Futures	file:
+__gt0	trial01.py	/^        def __gt0(x):$/;"	f	member:I2.RSI	file:
+__hour	derivatives.py	/^    __today, __hour, __minute, __session = today.date(), today.hour, today.minute, 'A'$/;"	v	class:Futures	file:
+__init__	SQLiteHelper.py	/^    def __init__(self, connection):$/;"	m	class:Query
+__init__	Securities.py	/^    def __init__(self, connection=connect(fullpath)):$/;"	m	class:Equities
+__init__	bt.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:LF
+__init__	c2lite3e.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:Equities
+__init__	daa.py	/^    def __init__(self, ratio=None):$/;"	m	class:Methods
+__init__	daw.py	/^    def __init__(self, code):$/;"	m	class:Indicators
+__init__	derivatives.py	/^    def __init__(self):$/;"	m	class:Futures
+__init__	derivatives.py	/^    def __init__(self, contract):$/;"	m	class:Analyser
+__init__	et.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:Equities
+__init__	finaly.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:Futures
+__init__	pt_2.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:PI
+__init__	trial01.py	/^    def __init__(self, *args, **kwargs):$/;"	m	class:I2
+__init__	utilities.py	/^    def __init__(self, mode=None):$/;"	m	class:IP
+__lt0	trial01.py	/^        def __lt0(x):$/;"	f	member:I2.RSI	file:
+__minute	derivatives.py	/^    __today, __hour, __minute, __session = today.date(), today.hour, today.minute, 'A'$/;"	v	class:Futures	file:
+__ms	derivatives.py	/^def __ms(contract):$/;"	f
+__nvalues	et.py	/^    def __nvalues(self, *args):$/;"	m	class:Equities	file:
+__nvalues	finaly.py	/^    def __nvalues(self, *args):$/;"	m	class:Futures	file:
+__prvdate	daw.py	/^    def __prvdate(self, date):$/;"	m	class:Indicators	file:
+__rangefinder	trial01.py	/^    def __rangefinder(self, *args, **kwargs):$/;"	m	class:I2	file:
+__raw_data	daw.py	/^    def __raw_data(self, fields=('open', 'high', 'low', 'close', 'volume')):$/;"	m	class:Indicators	file:
+__s2dt	derivatives.py	/^    def __s2dt(self, dateString, separator='-'):$/;"	m	class:Analyser	file:
+__session	derivatives.py	/^    __today, __hour, __minute, __session = today.date(), today.hour, today.minute, 'A'$/;"	v	class:Futures	file:
+__today	derivatives.py	/^    __today = today.strftime('%d\/%m\/%Y')$/;"	v	class:Analyser	file:
+__today	derivatives.py	/^    __today, __hour, __minute, __session = today.date(), today.hour, today.minute, 'A'$/;"	v	class:Futures	file:
+__unique_date	derivatives.py	/^    def __unique_date(self):$/;"	m	class:Analyser	file:
+absum	et.py	/^        def absum(*args):$/;"	f	member:Equities.kama	file:
+absum	finaly.py	/^        def absum(*args):$/;"	f	member:Futures.kama	file:
+adx	et.py	/^    def adx(self, *args, **kwargs):$/;"	m	class:Equities
+adx	finaly.py	/^    def adx(self, *args, **kwargs):$/;"	m	class:Futures
+ag	et.py	/^        def ag(*args):$/;"	f	member:Equities.rsi	file:
+ag	finaly.py	/^        def ag(*args):$/;"	f	member:Futures.rsi	file:
+al	et.py	/^        def al(*args):$/;"	f	member:Equities.rsi	file:
+al	finaly.py	/^        def al(*args):$/;"	f	member:Futures.rsi	file:
+amend	SQLiteHelper.py	/^    def amend(self, table, **args):$/;"	m	class:Query
+amend	Securities.py	/^    def amend(self, **args):$/;"	m	class:Equities
+amend	derivatives.py	/^    def amend(self, **args):$/;"	m	class:Futures
+append	Securities.py	/^    def append(self, **args):$/;"	m	class:Equities
+append	cf2_c.py	/^    def append(self, contract, open, high, low, close, volume):$/;"	m	class:Inputter
+append	cfd.py	/^    def append(self, contract, open, high, low, close, volume):$/;"	m	class:Inputter
+append	derivatives.py	/^    def append(self, value, req_date=__today, session=__session):$/;"	m	class:Futures
+append	trial01.py	/^    def append(self, *args, **kwargs):$/;"	m	class:I2
+apz	daw.py	/^    def apz(self, date=None, period=5):$/;"	m	class:Indicators
+apz	et.py	/^    def apz(self, *args, **kwargs):$/;"	m	class:Equities
+apz	finaly.py	/^    def apz(self, *args, **kwargs):$/;"	m	class:Futures
+atr	et.py	/^    def atr(self, *args, **kwargs):$/;"	m	class:Equities
+atr	finaly.py	/^    def atr(self, *args, **kwargs):$/;"	m	class:Futures
+avail_fields	SQLiteHelper.py	/^    def avail_fields(self, table):$/;"	m	class:Query
+avail_indicators	utilities.py	/^avail_indicators, cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)$/;"	v
+avail_tables	SQLiteHelper.py	/^    def avail_tables(self):$/;"	m	class:Query
+average	utilities.py	/^def average(v):return sum(v) \/ len(v)$/;"	f
+axis_decorator	pt_2.py	/^        def axis_decorator(*args, **kwargs):$/;"	f	member:PI.plot	file:
+bb	daa.py	/^    def bb(self, data, date=None):$/;"	m	class:Methods
+bb	daw.py	/^    def bb(self, date=None):return self.__methods.bb(self.data, date)$/;"	m	class:Indicators
+bb	finaly.py	/^    def bb(self, *args, **kwargs):$/;"	m	class:Futures
+bbw	daa.py	/^    def bbw(self, data, date=None, period=None):$/;"	m	class:Methods
+bbw	daw.py	/^    def bbw(self, date=None, period=None):return self.__methods.bbw(self.data, date, period)$/;"	m	class:Indicators
+cal_month	utilities.py	/^avail_indicators, cal_month = ('wma','kama','ema','hv'), (3, 6, 9, 12)$/;"	v
+calandex	derivatives.py	/^def calandex():$/;"	f
+code	iolimits.py	/^        code = ''$/;"	v
+confirm	iolimits.py	/^    confirm = 'Y'$/;"	v
+daatr	trial01.py	/^    def daatr(self, *args, **kwargs):$/;"	m	class:I2
+daily	derivatives.py	/^    def daily(self, contract_code='MHI', month_initial=dex(), req_date=__today):$/;"	m	class:Futures
+daily	derivatives.py	/^    def daily(self, n=10, **args):$/;"	m	class:Analyser
+dataspan	et.py	/^    def dataspan(self, *args, **kwargs):$/;"	m	class:Equities
+date_range	daa.py	/^    def date_range(self, data, date=None, period=None):$/;"	m	class:Methods
+db_name	c2lite3e.py	/^db_name, db_table = 'Securities', 'records'$/;"	v
+db_name	et.py	/^db_name, db_table = 'Securities', 'records'$/;"	v
+db_name	finaly.py	/^db_name, db_table = 'Futures', 'records'$/;"	v
+db_name	trial01.py	/^db_name, db_table = 'Futures', 'records'$/;"	v
+db_table	c2lite3e.py	/^db_name, db_table = 'Securities', 'records'$/;"	v
+db_table	et.py	/^db_name, db_table = 'Securities', 'records'$/;"	v
+db_table	finaly.py	/^db_name, db_table = 'Futures', 'records'$/;"	v
+db_table	trial01.py	/^db_name, db_table = 'Futures', 'records'$/;"	v
+delete	SQLiteHelper.py	/^    def delete(self, table, **args):$/;"	m	class:Query
+delta	et.py	/^    def delta(self, *args):$/;"	m	class:Equities
+delta	finaly.py	/^    def delta(self, *args):$/;"	m	class:Futures
+dex	derivatives.py	/^def dex(n=0):$/;"	f
+dex	utilities.py	/^def dex(n=0):$/;"	f
+dhv	daw.py	/^    def dhv(self, date=None):$/;"	m	class:Indicators
+dmp	iolimits.py	/^        dmp = {}$/;"	v
+drs	daw.py	/^    def drs(self, atype='c', date=None):$/;"	m	class:Indicators
+ds	pt_2.py	/^    def ds(self, *args, **kwargs):$/;"	m	class:PI
+dstr	tdDraw.py	/^    trday, dstr = lf(_).fp.trade_day, ''$/;"	v
+dvs	utilities.py	/^def dvs(d):$/;"	f
+e	Securities.py	/^    e = Equities()$/;"	v
+ema	daa.py	/^    def ema(self, data, date=None, atype='c', period=None):$/;"	m	class:Methods
+ema	daw.py	/^    def ema(self, date=None, atype='c', period=None):return self.__methods.ema(self.data, date, /;"	m	class:Indicators
+ema	derivatives.py	/^    def ema(self, n=10, k=.2, type='C'):$/;"	m	class:Analyser
+ema	et.py	/^    def ema(self, *args, **kwargs):$/;"	m	class:Equities
+ema	finaly.py	/^    def ema(self, *args, **kwargs):$/;"	m	class:Futures
+email	pgsexample.py	/^email = 'peterluk.phillip@gmail.com'$/;"	v
+encoder	handy.py	/^def encoder(*args, **kwargs):$/;"	f
+estimate	derivatives.py	/^def estimate(pp, icode=waf()[0], gr=1\/gr, extended=False, programmatic=False):$/;"	f
+estimate	trial01.py	/^    def estimate(self, *args, **kwargs):$/;"	m	class:I2
+except	derivatives.py	/^    except: confirm = 'Y'$/;"	v
+extract	et.py	/^    def extract(self, *args, **kwargs):$/;"	m	class:Equities
+extract	finaly.py	/^    def extract(self, *args, **kwargs):$/;"	m	class:Futures
+f	iolimits.py	/^def f(x):$/;"	f
+fdc	pt_2.py	/^    def fdc(self, *args, **kwargs):$/;"	m	class:PI
+filepath	utilities.py	/^def filepath (*args, **kwargs):$/;"	f
+fullpath	Securities.py	/^fullpath = filepath('Sec12')$/;"	v
+fullpath	derivatives.py	/^fullpath, today = filepath('Futures'), datetime.today()$/;"	v
+futures_type	utilities.py	/^futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'Mar/;"	v
+get	c2lite3e.py	/^    def get(self, *args, **kwargs):$/;"	m	class:Equities
+get_month	utilities.py	/^def get_month(index):$/;"	f
+gr	utilities.py	/^gr = 1.61803399$/;"	v
+grapz	daw.py	/^    def grapz(self, date=None):$/;"	m	class:Indicators
+gratio	utilities.py	/^def gratio(n1, n2, ratio=None, enhanced=False):$/;"	f
+grbb	daw.py	/^    def grbb(self, date=None):$/;"	m	class:Indicators
+handle_data	zipline/examples/buyapple.py	/^def handle_data(context, data):$/;"	f
+handle_data	zipline/examples/dual_moving_average.py	/^def handle_data(context, data):$/;"	f
+him	bt.py	/^him = getattr(__import__('handy'), 'him')$/;"	v
+him	c2lite3e.py	/^him = getattr(__import__('handy'), 'him')$/;"	v
+him	cf2_c.py	/^him = getattr(__import__('handy'),'him')$/;"	v
+him	cfd.py	/^him = getattr(__import__('handy'),'him')$/;"	v
+him	daa.py	/^him = getattr(__import__('handy'),'him')$/;"	v
+him	daw.py	/^him = getattr(__import__('handy'),'him')$/;"	v
+him	derivatives.py	/^him = getattr(__import__('handy'),'him')$/;"	v
+him	finaly.py	/^him = getattr(__import__('handy'), 'him')$/;"	v
+him	handy.py	/^def him(*args):$/;"	f
+him	iolimits.py	/^him = getattr(__import__('handy'), 'him')$/;"	v
+him	pt_2.py	/^him = getattr(__import__('handy'), 'him')$/;"	v
+him	tdDraw.py	/^him = getattr(__import__('handy'), 'him')$/;"	v
+him	trial01.py	/^him = getattr(__import__('handy'),'him')$/;"	v
+him	utilities.py	/^him = getattr(__import__('handy'), 'him')$/;"	v
+hv	daa.py	/^    def hv(self, data, date=None):$/;"	m	class:Methods
+hv	daw.py	/^    def hv(self, date=None):return self.__methods.hv(self.data, date)$/;"	m	class:Indicators
+hv	derivatives.py	/^    def hv(self, n=10, type='C'):$/;"	m	class:Analyser
+iml	bt.py	/^iml = [{'bokeh.embed':('components',), 'bokeh.io':('output_notebook', 'output_file', 'show', 'sa/;"	v
+iml	c2lite3e.py	/^iml = [{'utilities':('filepath',)}, {'datetime':('datetime',)}, {'os':('listdir', 'sep', 'path',/;"	v
+iml	cf2_c.py	/^iml =[{'datetime':('datetime',),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd','/;"	v
+iml	cfd.py	/^iml = [{'cherrypy':(),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd',),'derivati/;"	v
+iml	daw.py	/^iml = [{'utilities':('rnd', 'gratio')},({'derivatives':('Analyser',),'daa':('Methods',)},"case='/;"	v
+iml	derivatives.py	/^iml = [({'SQLiteHelper':('Query',)}, "case='capitalize'"),{'sqlite3':('connect',),'sys':('argv',/;"	v
+iml	finaly.py	/^iml = [{'utilities':('gr', 'filepath', 'mtf', 'waf'), 'statistics':('mean', 'stdev'), 'datetime'/;"	v
+iml	trial01.py	/^iml = [{'utilities':('gr','filepath'),'datetime':('datetime',),'statistics':('mean','stdev'),'os/;"	v
+iml	utilities.py	/^iml = [{'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linese/;"	v
+index	cf2_c.py	/^    def index(self):$/;"	m	class:Analysor
+index	cf2_c.py	/^    def index(self):$/;"	m	class:Estimator
+index	cf2_c.py	/^    def index(self):$/;"	m	class:Inputter
+index	cfd.py	/^    def index(self):$/;"	m	class:Analysor
+index	cfd.py	/^    def index(self):$/;"	m	class:Estimator
+index	cfd.py	/^    def index(self):$/;"	m	class:Inputter
+indicate	derivatives.py	/^def indicate(code=waf()):$/;"	f
+indicate	indup.py	/^indicate = getattr(__import__('derivatives'),'indicate')$/;"	v
+initialize	zipline/examples/buyapple.py	/^def initialize(context):pass$/;"	f
+initialize	zipline/examples/dual_moving_average.py	/^def initialize(context):$/;"	f
+insert	SQLiteHelper.py	/^    def insert(self, table, **args):$/;"	m	class:Query
+kama	daa.py	/^    def kama(self, data, date=None, atype='c', period=None, fast=None, slow=None):$/;"	m	class:Methods
+kama	daw.py	/^    def kama(self, date=None, atype='c', period=None, fast=None, slow=None):return self.__method/;"	m	class:Indicators
+kama	derivatives.py	/^    def kama(self, n=10, fast=5, slow=10, k=.2, type='C'):$/;"	m	class:Analyser
+kama	et.py	/^    def kama(self, *args, **kwargs):$/;"	m	class:Equities
+kama	finaly.py	/^    def kama(self, *args, **kwargs):$/;"	m	class:Futures
+kc	et.py	/^    def kc(self, *args, **kwargs):$/;"	m	class:Equities
+kc	finaly.py	/^    def kc(self, *args, **kwargs):$/;"	m	class:Futures
+kfs	daw.py	/^    def kfs(self, atype='c', date=None, fast=5, slow=0):$/;"	m	class:Indicators
+l_out	ipytils.py	/^def l_out(obj, n=1):$/;"	f
+lite	et.py	/^import sqlite3 as lite$/;"	I
+ltd	utilities.py	/^def ltd(year=year, month=month, excluded={}):$/;"	f
+ltdmos	pt_2.py	/^    def ltdmos(self, *args, **kwargs):$/;"	m	class:PI
+ma_order	pt_2.py	/^        def ma_order(*args, **kwargs):$/;"	f	member:PI.fdc	file:
+mdates	pt_2.py	/^            import matplotlib.dates as mdates$/;"	I	member:PI.plot	file:
+mean	et.py	/^    def mean(self, *args, **kwargs):$/;"	m	class:Equities
+mean	finaly.py	/^    def mean(self, *args, **kwargs):$/;"	m	class:Futures
+month	derivatives.py	/^year, month, month_string = '%i' % today.year, today.month, today.strftime('%B')$/;"	v
+month	utilities.py	/^year, month, month_string = '%i' % today.year, today.month, today.strftime('%B')$/;"	v
+month_initial	utilities.py	/^futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January':'F', 'February':'G', 'Mar/;"	v
+month_string	derivatives.py	/^year, month, month_string = '%i' % today.year, today.month, today.strftime('%B')$/;"	v
+month_string	utilities.py	/^year, month, month_string = '%i' % today.year, today.month, today.strftime('%B')$/;"	v
+mtf	utilities.py	/^def mtf(*args, **kwargs):$/;"	f
+mticker	pt_2.py	/^            import matplotlib.ticker as mticker$/;"	I	member:PI.plot	file:
+p	iolimits.py	/^            p = Thread(target=f, name=_, args=(_,))$/;"	v
+p	iolimits.py	/^        p = Pool(4)$/;"	v
+panda	cf2_c.py	/^    panda = True$/;"	v
+panda	cf2_c.py	/^panda = False$/;"	v
+password	pgsexample.py	/^password = '80192641'$/;"	v
+pdate	tdDraw.py	/^        pdate = today.date()$/;"	v
+pdate	tdDraw.py	/^    pdate = datetime.strptime(trday[-1], '%Y-%m-%d').date()$/;"	v
+ph	utilities.py	/^ph = {'2015':{'1':(1,), '2':(19, 20), '4':(3, 6, 7), '5':(25,), '7':(1,), '9':(28,), '10':(1, 21/;"	v
+pk	et.py	/^        def pk(*args, **kwargs):$/;"	f	member:Equities.stc	file:
+pk	finaly.py	/^        def pk(*args, **kwargs):$/;"	f	member:Futures.stc	file:
+plot	bt.py	/^    def plot(self, *args, **kwargs):$/;"	m	class:LF
+plot	pt_2.py	/^    def plot(self, **kwargs):$/;"	m	class:PI
+plt	pt_2.py	/^            import matplotlib.pyplot as plt$/;"	I	member:PI.plot	file:
+previous_n	derivatives.py	/^    def previous_n(self, **args):$/;"	m	class:Analyser
+proceed	cf2_c.py	/^    def proceed(self, contract):$/;"	m	class:Analysor
+proceed	cf2_c.py	/^    def proceed(self, contract, pp):$/;"	m	class:Estimator
+process_request	cfd.py	/^    def process_request(self, contract, pp):$/;"	m	class:Estimator
+product	utilities.py	/^def product(v):$/;"	f
+q	iolimits.py	/^q = Queue()$/;"	v
+q	pt_2.py	/^q = Queue()$/;"	v
+res	Securities.py	/^        res = "# of equities with 'Futures' transaction: %i\\n" % len(e.show(criteria={'futures'/;"	v
+res	iolimits.py	/^        res = p.map(f, waf())$/;"	v
+rm	iolimits.py	/^    rm = [({'threading':('Thread',)}, "case='capitalize'")]$/;"	v
+rnd	utilities.py	/^def rnd(n, decimal_place=0):$/;"	f
+rsi	daa.py	/^    def rsi(self, data, date=None, atype='c', period=None):$/;"	m	class:Methods
+rsi	daw.py	/^    def rsi(self, date=None, atype='c', period=None):return self.__methods.rsi(self.data, date, /;"	m	class:Indicators
+rsi	daw.py	/^    def rsi(self, date=None, period=None):return self.__methods.rsi(self.data, date, period)$/;"	m	class:Indicators
+rsi	et.py	/^    def rsi(self, *args, **kwargs):$/;"	m	class:Equities
+rsi	finaly.py	/^    def rsi(self, *args, **kwargs):$/;"	m	class:Futures
+sar	daa.py	/^    def sar(self, data, date=None, atype='c', step=0.02, max=.2):$/;"	m	class:Methods
+sar	derivatives.py	/^    def sar(self, af=0.02):$/;"	m	class:Analyser
+sar	finaly.py	/^    def sar(self, *args, **kwargs):$/;"	m	class:Futures
+sdm	et.py	/^        def sdm(*args, **kwargs):$/;"	f	member:Equities.__dx	file:
+sdm	finaly.py	/^        def sdm(*args, **kwargs):$/;"	f	member:Futures.__dx	file:
+server_host	cf2_c.py	/^server_host, server_port = IP('public').address, 80$/;"	v
+server_host	cfd.py	/^server_host, server_port = IP('public').address, 2028$/;"	v
+server_port	cf2_c.py	/^server_host, server_port = IP('public').address, 80$/;"	v
+server_port	cfd.py	/^server_host, server_port = IP('public').address, 2028$/;"	v
+session	derivatives.py	/^    def session(self, n=20):$/;"	m	class:Analyser
+session_volume	derivatives.py	/^    def session_volume(self, **cond):$/;"	m	class:Analyser
+show	SQLiteHelper.py	/^    def show(self, table, **args):$/;"	m	class:Query
+show	Securities.py	/^    def show(self, **args):$/;"	m	class:Equities
+show	derivatives.py	/^    def show(self, **args):$/;"	m	class:Futures
+sma	daa.py	/^    def sma(self, data, date=None, atype='c', period=None):$/;"	m	class:Methods
+sma	daw.py	/^    def sma(self, date=None, atype='c', period=None):return self.__methods.sma(self.data, date, /;"	m	class:Indicators
+sma	derivatives.py	/^    def sma(self, n=10, type='C'):$/;"	m	class:Analyser
+sma	et.py	/^    def sma(self, *args, **kwargs):$/;"	m	class:Equities
+sma	finaly.py	/^    def sma(self, *args, **kwargs):$/;"	m	class:Futures
+snl	pt_2.py	/^        def snl(*args):$/;"	f	member:PI.xfinder	file:
+spr_client	pgsexample.py	/^spr_client = gdata.spreadsheet.service.SpreadsheetsService()$/;"	v
+spreadsheet_key	pgsexample.py	/^spreadsheet_key = '1JQuU8YnwxuCV0EN84TkBtcxzWA_wWL9Phl55eBqwRBU'$/;"	v
+srange	finaly.py	/^    def srange(self, *args, **kwargs):$/;"	m	class:Futures
+st	tdDraw.py	/^    st = 'full'$/;"	v
+stc	et.py	/^    def stc(self, *args, **kwargs):$/;"	m	class:Equities
+stc	finaly.py	/^    def stc(self, *args, **kwargs):$/;"	m	class:Futures
+std	et.py	/^    def std(self, *args, **kwargs):$/;"	m	class:Equities
+std	finaly.py	/^    def std(self, *args, **kwargs):$/;"	m	class:Futures
+store	c2lite3e.py	/^    def store(self, *args, **kwargs):$/;"	m	class:Equities
+summary	trial01.py	/^def summary(*args, **kwargs):$/;"	f
+today	derivatives.py	/^fullpath, today = filepath('Futures'), datetime.today()$/;"	v
+today	utilities.py	/^today = datetime.today()$/;"	v
+tr	et.py	/^    def tr(self, *args, **kwargs):$/;"	m	class:Equities
+tr	finaly.py	/^    def tr(self, *args, **kwargs):$/;"	m	class:Futures
+trday	tdDraw.py	/^    trday, dstr = lf(_).fp.trade_day, ''$/;"	v
+update	c2lite3e.py	/^def update(*args, **kwargs):$/;"	f
+waf	derivatives.py	/^def waf(delta=0):$/;"	f
+waf	utilities.py	/^def waf(delta=0):$/;"	f
+weight	pgsexample.py	/^weight = '180'$/;"	v
+wma	daa.py	/^    def wma(self, data, date=None, atype='c', period=None):$/;"	m	class:Methods
+wma	daw.py	/^    def wma(self, date=None, atype='c', period=None):return self.__methods.wma(self.data, date, /;"	m	class:Indicators
+wma	derivatives.py	/^    def wma(self, n=10, type='C'):$/;"	m	class:Analyser
+wma	et.py	/^    def wma(self, *args, **kwargs):$/;"	m	class:Equities
+wma	finaly.py	/^    def wma(self, *args, **kwargs):$/;"	m	class:Futures
+worksheet_id	pgsexample.py	/^worksheet_id = 'od6'$/;"	v
+xfinder	pt_2.py	/^    def xfinder(self, *args, **kwargs):$/;"	m	class:PI
+year	derivatives.py	/^year, month, month_string = '%i' % today.year, today.month, today.strftime('%B')$/;"	v
+year	utilities.py	/^year, month, month_string = '%i' % today.year, today.month, today.strftime('%B')$/;"	v
