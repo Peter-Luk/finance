@@ -229,10 +229,11 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
                             im[f] = int(wi[f.capitalize()])
                         else:
                             im[f] = wi[f.capitalize()]
-                    imk = list(im.keys())
-                    conn.cursor().execute(istr.format(db_table, ','.join(imk), ','.join(['{{{}}}'.format(j) for j in imk])).format(**im))
-                    conn.commit()
-                    ic += 1
+                    if im['volume'] >= 0:
+                        imk = list(im.keys())
+                        conn.cursor().execute(istr.format(db_table, ','.join(imk), ','.join(['{{{}}}'.format(j) for j in imk])).format(**im))
+                        conn.commit()
+                        ic += 1
                 except: pass
     conn.close()
     return ic
