@@ -13,6 +13,25 @@ if platform in ['linux', 'linux2']:
     except: pass
     home = sep.join([environ['HOME'], 'storage', subpath])
 
+class FD(object):
+    def __init__(self, *args):
+        self.date = None
+        self.open = 0
+        self.high = 0
+        self.low = 0
+        self.close = 0
+        self.volume = 0
+        if args:
+            if isinstance(args[0], dict):
+                self.date = list(args[0].keys())[0]
+                self.open = args[0][self.date]['open']
+                self.high = args[0][self.date]['high']
+                self.low = args[0][self.date]['low']
+                self.close = args[0][self.date]['close']
+                self.volume = args[0][self.date]['volume']
+    def __del__(self):
+        self.date = self.open = self.high = self.low = self.close = self.volume = None
+
 def get_db(*args, **kwargs):
     if isinstance(args[0], str): db_path = sep.join([home, args[0]])
     if isinstance(args[0], tuple): db_path = sep.join((home,) + args[0])
@@ -74,12 +93,13 @@ def daily(*args):
     exec("class {}(object): pass".format(ci))
     exec("mapper({}, db[db_name]['table'])".format(ci))
     fq = eval("db[db_name]['session'].query({})".format(ci))
-    td, res = [], {}
+    td, res = [], []
     try:
         rfd = fq.filter_by(code=code).all()
         for _ in rfd:
             if _.date not in td: td.append(_.date)
         for _ in td:
+            tmp = {}
             itd = fq.filter_by(code=code, date=_).all()
             if len(itd) == 2:
                 volume, open, close, high, low = 0, 0, 0, 0, 0
@@ -94,7 +114,8 @@ def daily(*args):
                         volume += __.volume
             if len(itd) == 1:
                 volume, open, high, low, close = itd[0].volume, itd[0].open, itd[0].high, itd[0].low, itd[0].close
-            res[_] = {'open':open, 'high':high, 'low':low, 'close':close, 'volume':volume}
+            tmp[_] = {'open':open, 'high':high, 'low':low, 'close':close, 'volume':volume}
+            res.append(FD(tmp))
     except: pass
     return res
 
