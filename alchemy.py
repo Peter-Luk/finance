@@ -2,6 +2,8 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import mapper, sessionmaker
 from os import sep, environ, listdir
 from sys import platform
+from utilities import datetime, mtf
+
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
 if platform in ['linux', 'linux2']:
     subpath = 'shared'
@@ -60,3 +62,12 @@ def get_stored_eid(*args):
         if isinstance(args[0], str): db_name = args[0]
     db = load(db_name)
     return [_[0] for _ in db[db_name]['engine'].execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()]
+
+def trade_date(*args):
+    db_name = 'Futures'
+    if args:
+        if isinstance(args[0], str): db_name = args[0]
+    db = load(db_name)
+    class FR(object): pass
+    mapper(FR, db[db_name]['table'])
+    fq = db[db_name]['session'].query(FR)
