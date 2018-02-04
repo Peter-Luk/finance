@@ -63,20 +63,38 @@ def get_stored_eid(*args):
         db = load(db_name)
     return [_[0] for _ in db[db_name]['engine'].execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()]
 
-def trade_date(*args):
+def daily(*args):
     db_name = 'Futures'
     if args:
         if isinstance(args[0], str): code = args[0]
-        if isinstance(args[1], str): db_name = args[1]
+        if len(args) > 1:
+            if isinstance(args[1], str): db_name = args[1]
         db = load(db_name)
     ci = '{}R'.format(db_name[0])
     exec("class {}(object): pass".format(ci))
-    exec("mapper({}exec, db[db_name]['table'])".format(ci))
+    exec("mapper({}, db[db_name]['table'])".format(ci))
     fq = eval("db[db_name]['session'].query({})".format(ci))
-    res = []
+    td, res = [], {}
     try:
-        for _ in fq.all():
-            if _.date not in res: res.append(_.date)
+        rfd = fq.filter_by(code=code).all()
+        for _ in rfd:
+            if _.date not in td: td.append(_.date)
+        for _ in td:
+            itd = rfd.filter_by(date=_).all()
+            if len(itd) == 2:
+                volume, open, close, high, low = 0, 0, 0, 0, 0
+                for __ in itd:
+                    if __.session == 'A':
+                        if __.high > high: high = __.high
+                        if __.low < low: low = __.low
+                        close = __.close
+                        volume += __.volume
+                    else:
+                        open, high, low, close = __.open, __.high, __.low, __.close
+                        volume += __.volume
+            if len(itd) == 1:
+                volume, open, high, low, close = itd[0].volume, itd[0].open, itd[0].high, itd[0].low, itd[0].close
+            res[_] = {'open':open, 'high':high, 'low':low, 'close':close}
     except: pass
     return res
 
