@@ -80,7 +80,7 @@ def daily(*args):
         for _ in rfd:
             if _.date not in td: td.append(_.date)
         for _ in td:
-            itd = rfd.filter_by(date=_).all()
+            itd = fq.filter_by(code=code, date=_).all()
             if len(itd) == 2:
                 volume, open, close, high, low = 0, 0, 0, 0, 0
                 for __ in itd:
@@ -94,7 +94,7 @@ def daily(*args):
                         volume += __.volume
             if len(itd) == 1:
                 volume, open, high, low, close = itd[0].volume, itd[0].open, itd[0].high, itd[0].low, itd[0].close
-            res[_] = {'open':open, 'high':high, 'low':low, 'close':close}
+            res[_] = {'open':open, 'high':high, 'low':low, 'close':close, 'volume':volume}
     except: pass
     return res
 
