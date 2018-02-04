@@ -66,9 +66,17 @@ def get_stored_eid(*args):
 def trade_date(*args):
     db_name = 'Futures'
     if args:
-        if isinstance(args[0], str): db_name = args[0]
+        if isinstance(args[0], str): code = args[0]
+        if isinstance(args[1], str): db_name = args[1]
         db = load(db_name)
     ci = '{}R'.format(db_name[0])
     exec("class {}(object): pass".format(ci))
     exec("mapper({}exec, db[db_name]['table'])".format(ci))
     fq = eval("db[db_name]['session'].query({})".format(ci))
+    res = []
+    try:
+        for _ in fq.all():
+            if _.date not in res: res.append(_.date)
+    except: pass
+    return res
+
