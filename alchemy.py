@@ -79,7 +79,7 @@ def get_stored_eid(*args):
     db_name = 'Securities'
     if args:
         if isinstance(args[0], str): db_name = args[0]
-        db = load(db_name)
+    db = load(db_name)
     return [_[0] for _ in db[db_name]['engine'].execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()]
 
 def daily(*args):
