@@ -14,7 +14,12 @@ if platform in ['linux', 'linux2']:
     except: pass
     home = sep.join([environ['HOME'], 'storage', subpath])
 
-def ema(data, period):
+def ema(*args):
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
     if not (len(data) > period): return mean(data)
     res, i = mean(data[:period]), period
     while i < len(data):
@@ -22,7 +27,12 @@ def ema(data, period):
         i += 1
     return res
 
-def sma(data, period):
+def sma(*args):
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
     if not (len(data) > period): return mean(data)
     return mean(data[-period:])
 
