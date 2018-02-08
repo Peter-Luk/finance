@@ -31,6 +31,7 @@ class FD(object):
                 self.volume = args[0][self.date]['volume']
     def __del__(self):
         self.date = self.open = self.high = self.low = self.close = self.volume = None
+        del(self.date, self.open, self.high, self.low, self.close, self.volume)
 
 def get_db(*args, **kwargs):
     if isinstance(args[0], str): db_path = sep.join([home, args[0]])
