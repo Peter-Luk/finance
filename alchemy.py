@@ -3,6 +3,7 @@ from sqlalchemy.orm import mapper, sessionmaker
 from os import sep, environ, listdir
 from sys import platform
 from utilities import datetime, mtf
+from statistics import mean
 
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
 if platform in ['linux', 'linux2']:
@@ -12,6 +13,14 @@ if platform in ['linux', 'linux2']:
         subpath = 'external-1'
     except: pass
     home = sep.join([environ['HOME'], 'storage', subpath])
+
+def ema(data, period):
+    if not (len(data) > period): return mean(data)
+    res, i = mean(data[:period]), period
+    while i < len(data):
+        res = (data[i] + res * (period - 1)) / period
+        i += 1
+    return res
 
 class FD(object):
     def __init__(self, *args):
