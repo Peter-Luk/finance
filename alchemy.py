@@ -22,6 +22,10 @@ def ema(data, period):
         i += 1
     return res
 
+def sma(data, period):
+    if not (len(data) > period): return mean(data)
+    return mean(data[-period:])
+
 class FD(object):
     def __init__(self, *args):
         self.date = None
