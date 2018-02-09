@@ -20,10 +20,10 @@ def ema(*args):
         if len(args) > 1:
             if isinstance(args[1], int): period = args[1]
             if isinstance(args[1], float): period = int(args[1])
-    if not (len(data) > period): return mean(data)
-    res, i = mean(data[:period]), period
+    if not (len(data) > period): return mean([_.close for _ in data])
+    res, i = mean([_.close for _ in data[:period]]), period
     while i < len(data):
-        res = (data[i] + res * (period - 1)) / period
+        res = (data[i].close + res * (period - 1)) / period
         i += 1
     return res
 
