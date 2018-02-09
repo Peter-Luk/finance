@@ -33,8 +33,17 @@ def sma(*args):
         if len(args) > 1:
             if isinstance(args[1], int): period = args[1]
             if isinstance(args[1], float): period = int(args[1])
-    if not (len(data) > period): return mean(data)
-    return mean(data[-period:])
+    if not (len(data) > period): return mean([_.close for _ in data])
+    return mean([_.close for _ in data[-period:]])
+
+def wma(*args):
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    if not (len(data) > period): return sum([_.close * _.volume for _ in data]) / sum([_.volume for _ in data])
+    return sum([_.close * _volume for _ in data[-period:]]) / sum([_.volume for _ in data[-period:]])
 
 class FD(object):
     def __init__(self, *args):
