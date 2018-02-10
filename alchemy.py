@@ -187,3 +187,32 @@ def daily(*args):
     except: pass
     return res
 
+def rsi(*args):
+    period = 14
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    def delta(*args):
+        i, hdr = 1, []
+        while i < len(args[0]):
+            hdr.append(args[0][i].close - args[0][i - 1].close)
+            i += 1
+        return hdr
+    i = period
+    while i < len(data):
+        if i == period:
+            ag = sum([_ for _ in delta(data[i-period:i]) if _ > 0]) / period
+            al = sum([abs(_) for _ in delta(data[i-period:i]) if _ < 0]) / period
+        else:
+            cdelta = data[i].close - data[i-1].close
+            if cdelta > 0:
+                ag = (cdelta + ag * (period - 1)) / period
+                al = al * (period - 1) / period
+            else:
+                ag = ag * (period - 1) / period
+                al = (abs(cdelta) + al * (period - 1)) / period
+        i += 1
+    try: return 100 - 100 / (1 + ag / al)
+    except: pass
