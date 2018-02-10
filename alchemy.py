@@ -28,11 +28,21 @@ def ema(*args):
     return res
 
 def kama(*args):
+    period = 20
     if args:
         if isinstance(args[0], list): data = args[0]
         if len(args) > 1:
             if isinstance(args[1], int): period = args[1]
             if isinstance(args[1], float): period = int(args[1])
+            try:
+                if isinstance(args[2], int): fast = args[2]
+                if isinstance(args[2], float): fast = int(args[2])
+            except: pass
+            try:
+                if isinstance(args[3], int): slow = args[3]
+                if isinstance(args[3], float): slow = int(args[3])
+            except: pass
+    fast, slow = 2, period
     def asum(*args):
         i, hdr = 1, []
         while i < len(args[0]):
@@ -40,9 +50,11 @@ def kama(*args):
             i += 1
         return sum([abs(_) for _ in hdr])
     if not (len(data) > period): return mean([_.close for _ in data])
-    res, i = mean([_.close for _ in data[:period]]), period
+    res, i, fc, sc = mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
     while i < len(data):
-        res = (data[i].close + res * (period - 1)) / period
+        er = (data[i].close - data[i-period].close) / asum([_.close for _ in data[:i]])
+        alpha = (er * (fc - sc) + sc) ** 2
+        # res = (data[i].close + res * (period - 1)) / period
         i += 1
     return res
 
