@@ -27,6 +27,25 @@ def ema(*args):
         i += 1
     return res
 
+def kama(*args):
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    def asum(*args):
+        i, hdr = 1, []
+        while i < len(args[0]):
+            hdr.append(args[0][i] - args[0][i - 1])
+            i += 1
+        return sum([abs(_) for _ in hdr])
+    if not (len(data) > period): return mean([_.close for _ in data])
+    res, i = mean([_.close for _ in data[:period]]), period
+    while i < len(data):
+        res = (data[i].close + res * (period - 1)) / period
+        i += 1
+    return res
+
 def sma(*args):
     if args:
         if isinstance(args[0], list): data = args[0]
