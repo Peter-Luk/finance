@@ -54,7 +54,7 @@ def kama(*args):
     while i < len(data):
         er = (data[i].close - data[i-period].close) / asum([_.close for _ in data[:i]])
         alpha = (er * (fc - sc) + sc) ** 2
-        res = sum(alpha * data[i].close, (1 - alpha) * res)
+        res = sum([alpha * data[i].close, (1 - alpha) * res])
         # res = (data[i].close + res * (period - 1)) / period
         i += 1
     return res
