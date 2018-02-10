@@ -52,9 +52,9 @@ def kama(*args):
     if not (len(data) > period): return mean([_.close for _ in data])
     res, i, fc, sc = mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
     while i < len(data):
-        tmp = asum([_.close for _ in data[i-period:i]])
-        if tmp:
-            er = (data[i].close - data[i-period].close) / tmp
+        volatility = asum([_.close for _ in data[i-period:i]])
+        if volatility:
+            er = (data[i].close - data[i-period].close) / volatility
             alpha = (er * (fc - sc) + sc) ** 2
             res += alpha * (data[i].close - res)
         i += 1
