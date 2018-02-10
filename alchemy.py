@@ -15,6 +15,7 @@ if platform in ['linux', 'linux2']:
     home = sep.join([environ['HOME'], 'storage', subpath])
 
 def ema(*args):
+    period = 20
     if args:
         if isinstance(args[0], list): data = args[0]
         if len(args) > 1:
@@ -28,7 +29,7 @@ def ema(*args):
     return res
 
 def kama(*args):
-    period = 20
+    period, fast, slow = 10, 2, 30
     if args:
         if isinstance(args[0], list): data = args[0]
         if len(args) > 1:
@@ -42,7 +43,6 @@ def kama(*args):
                 if isinstance(args[3], int): slow = args[3]
                 if isinstance(args[3], float): slow = int(args[3])
             except: pass
-    fast, slow = 2, period
     def asum(*args):
         i, hdr = 1, []
         while i < len(args[0]):
@@ -52,14 +52,14 @@ def kama(*args):
     if not (len(data) > period): return mean([_.close for _ in data])
     res, i, fc, sc = mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
     while i < len(data):
-        er = (data[i].close - data[i-period].close) / asum([_.close for _ in data[:i]])
+        er = (data[i].close - data[i-period].close) / asum([_.close for _ in data[i-period:i]])
         alpha = (er * (fc - sc) + sc) ** 2
-        res = alpha * data[i].close + (1 - alpha) * res
-        # res = (data[i].close + res * (period - 1)) / period
+        res += alpha * (data[i].close - res)
         i += 1
     return res
 
 def sma(*args):
+    period = 20
     if args:
         if isinstance(args[0], list): data = args[0]
         if len(args) > 1:
