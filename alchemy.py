@@ -216,3 +216,29 @@ def rsi(*args):
         i += 1
     try: return 100 - 100 / (1 + ag / al)
     except: pass
+
+def atr(*args):
+    period = 14
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    def tr(*args):
+        i, res = 0, []
+        while i < len(args[0]):
+            if i == 0: res.append(args[0][i].high - args[0][i].low)
+            else:
+                if (args[0][i].high > args[0][i-1].high) and (args[0][i].low < args[0][i-1].low): res.append(args[0][i].high - args[0][i].low)
+                if (args[0][i].high < args[0][i-1].low): res.append(args[0][i-1].close - args[0][i].low)
+                if args[0][i].low > args[0][i-1].high: res.append(args[0][i].high - args[0][i-1].close)
+                if args[0][i].high < args[0][i-1].high and args[0][i].low > args[0][i-1].close: res.append(args[0][i].high - args[0][i-1].close)
+            i += 1
+        try: return res
+        except: pass
+    i, trd = period, tr(data)
+    while i < len(data):
+        if i == period: res = mean(trd[:i])
+        else: res = (trd[i] + res * (period - 1)) / period
+        i += 1
+    return res
