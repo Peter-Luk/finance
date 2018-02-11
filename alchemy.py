@@ -234,8 +234,7 @@ def atr(*args):
                 if args[0][i].low > args[0][i-1].high: res.append(args[0][i].high - args[0][i-1].close)
                 if args[0][i].high < args[0][i-1].high and args[0][i].low > args[0][i-1].close: res.append(args[0][i].high - args[0][i-1].close)
             i += 1
-        try: return res
-        except: pass
+        return res
     i, trd = period, tr(data)
     while i < len(data):
         if i == period: res = mean(trd[:i])
