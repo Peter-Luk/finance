@@ -227,12 +227,16 @@ def atr(*args):
     def tr(*args):
         i, res = 0, []
         while i < len(args[0]):
+            gap = False
             if i == 0: res.append(args[0][i].high - args[0][i].low)
-            else:
-                if (args[0][i].high > args[0][i-1].high) and (args[0][i].low < args[0][i-1].low): res.append(args[0][i].high - args[0][i].low)
-                if (args[0][i].high < args[0][i-1].low): res.append(args[0][i-1].close - args[0][i].low)
-                if args[0][i].low > args[0][i-1].high: res.append(args[0][i].high - args[0][i-1].close)
-                if args[0][i].high < args[0][i-1].high and args[0][i].low > args[0][i-1].close: res.append(args[0][i].high - args[0][i-1].close)
+            if i > 0:
+                if args[0][i-1].close > args[0][i].high:
+                    gap = True
+                    res.append(args[0][i-1].close - args[0][i].low)
+                if args[0][i-1].close < args[0][i].low:
+                    gap = True
+                    res.append(args[0][i].high - args[0][i-1].close)
+                if not gap: res.append(args[0][i].high - args[0][i].low)
             i += 1
         return res
     i, trd = period, tr(data)
