@@ -14,6 +14,20 @@ if platform in ['linux', 'linux2']:
     except: pass
     home = sep.join([environ['HOME'], 'storage', subpath])
 
+def hm(*args, **kwargs):
+    cs = '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
+    if isinstance(args[0], int): sid = args[0]
+    if 'time_period' in list(kwargs.keys()):
+        if kwargs['time_period'][0].upper() == 'E': cs = '> datetime(1900,1,1,{:d},{:d},0).time()'.format(18,0)
+        if kwargs['time_period'][0].upper() == 'M': cs = '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
+    db = load('Health')
+    class HR(object): pass
+    mapper(HR, db['Health']['table'])
+    hq = db['Health']['session'].query(HR)
+    phr = hq.filter_by(subject_id=sid).all()
+    hdr = eval("[_ for _ in phr if _.time {}]".format(cs))
+    return hdr
+
 def ema(*args):
     period = 20
     if args:
