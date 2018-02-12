@@ -16,6 +16,7 @@ if platform in ['linux', 'linux2']:
 
 def hm(*args, **kwargs):
     cs = '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
+    if datetime.now().time() > datetime(1900,1,1,18,0,0).time(): cs = '> datetime(1900,1,1,{0:d},{0:d},0).time()'.format(18,0)
     if isinstance(args[0], int): sid = args[0]
     if 'time_period' in list(kwargs.keys()):
         if kwargs['time_period'][0].upper() == 'E': cs = '> datetime(1900,1,1,{:d},{:d},0).time()'.format(18,0)
