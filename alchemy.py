@@ -248,6 +248,55 @@ def tr(*args):
         i += 1
     return res
 
+def dm(*args):
+    i, res = 1, []
+    if args:
+        if args[1] == '+':
+            while i < len(args[0]):
+                value = 0
+                if args[0][i].high - args[0][i-1].high > args[0][i-1].low -args[0][i].low:
+                    if args[0][i].high > args[0][i-1].high:
+                        value = args[0][i].high - args[0][i-1].high
+                res.append(value)
+                i += 1
+        if args[1] == '-':
+            while i < len(args[0]):
+                value = 0
+                if args[0][i-1].low - args[0][i].low > args[0][i].high -args[0][i-1].high:
+                    if args[0][i-1].low > args[0][i].low:
+                        value = args[0][i-1].low - args[0][i].low
+                res.append(value)
+                i += 1
+    return res
+
+def adx(*args):
+    period = 14
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    i, trd, dmp, dmm = period, tr(data), dm(data, '+'), dm(data, '-')
+    while i < len(data):
+        if i == period:
+            trs = mean(trd[:i])
+            dmps = mean(dmp[:i-1])
+            dmms = mean(dmm[:i-1])
+            dip = dmps / trs
+            dim = dmms / trs
+            dx = abs(dip - dim) / (dip + dim) * 100
+            res = dx
+        else:
+            trs = (trs * (period - 1) + trd[i]) / period
+            dmps = (dmps * (period - 1) + dmp[i-1]) / period
+            dmms = (dmms * (period - 1) + dmm[i-1]) / period
+            dip = dmps / trs
+            dim = dmms / trs
+            dx = abs(dip - dim) / (dip + dim) * 100
+            res = (res * (period - 1) + dx) / period
+        i += 1
+    return res
+    
 def atr(*args):
     period = 14
     if args:
