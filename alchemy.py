@@ -296,7 +296,7 @@ def adx(*args):
             res = (res * (period - 1) + dx) / period
         i += 1
     return res
-    
+
 def atr(*args):
     period = 14
     if args:
