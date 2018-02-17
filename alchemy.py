@@ -310,3 +310,12 @@ def atr(*args):
         else: res = (trd[i] + res * (period - 1)) / period
         i += 1
     return res
+
+def kc(*args):
+    ma_period, tr_period = 20, 10
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], list): ma_period, tr_period = args[1]
+            if isinstance(args[1], tuple): ma_period, tr_period = list(args[1])
+    return [kama(data, ma_period) + 2 * atr(data, tr_period), kama(data, ma_period) - 2 * atr(data, tr_period)]
