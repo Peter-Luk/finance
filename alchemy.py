@@ -326,7 +326,8 @@ def kc(*args):
         if len(args) > 1:
             if isinstance(args[1], list): ma_period, tr_period = args[1]
             if isinstance(args[1], tuple): ma_period, tr_period = list(args[1])
-    return [kama(data, ma_period) + 2 * atr(data, tr_period), kama(data, ma_period) - 2 * atr(data, tr_period)]
+    axis, delta = kama(data, ma_period), atr(data, tr_period)
+    return [axis + gr * delta, axis - gr * delta]
 
 def apz(*args):
     period = 5
