@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import mapper, sessionmaker
 from os import sep, environ, listdir
 from sys import platform
-from utilities import datetime, mtf
+from utilities import datetime, mtf, gr
 from statistics import mean
 
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
@@ -327,3 +327,19 @@ def kc(*args):
             if isinstance(args[1], list): ma_period, tr_period = args[1]
             if isinstance(args[1], tuple): ma_period, tr_period = list(args[1])
     return [kama(data, ma_period) + 2 * atr(data, tr_period), kama(data, ma_period) - 2 * atr(data, tr_period)]
+
+def apz(*args):
+    period = 5
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    vl = [_.high - _.low for _ in data]
+    i, vpl, epl = period, [], []
+    while i < len(data):
+        vpl.append(ema(vl[:i], period))
+        epl.append(ema(data[:i], period))
+        i += 1
+    evp, eep = ema(vpl, period), ema(epl, period)
+    return [eep + evp, eep - evp]
