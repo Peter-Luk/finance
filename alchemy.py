@@ -39,7 +39,9 @@ def ema(*args):
         if len(args) > 1:
             if isinstance(args[1], int): period = args[1]
             if isinstance(args[1], float): period = int(args[1])
-    if not (len(data) > period): return mean([_.close for _ in data])
+    if not (len(data) > period):
+        if numtype: return mean(data)
+        return mean([_.close for _ in data])
     if numtype: res = mean(data[:period])
     else: res = mean([_.close for _ in data[:period]])
     i = period
