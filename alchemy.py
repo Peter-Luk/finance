@@ -30,16 +30,22 @@ def hm(*args, **kwargs):
     return hdr
 
 def ema(*args):
-    period = 20
+    numtype, period = False, 20
     if args:
-        if isinstance(args[0], list): data = args[0]
+        if isinstance(args[0], list):
+            if isinstance(args[0][0], int): numtype = True
+            if isinstance(args[0][0], float): numtype = True
+            data = args[0]
         if len(args) > 1:
             if isinstance(args[1], int): period = args[1]
             if isinstance(args[1], float): period = int(args[1])
     if not (len(data) > period): return mean([_.close for _ in data])
-    res, i = mean([_.close for _ in data[:period]]), period
+    if numtype: res = mean(data[:period])
+    else: res = mean([_.close for _ in data[:period]])
+    i = period
     while i < len(data):
-        res = (data[i].close + res * (period - 1)) / period
+        if numtype: res = (data[i] + res * (period - 1)) / period
+        else: res = (data[i].close + res * (period - 1)) / period
         i += 1
     return res
 
