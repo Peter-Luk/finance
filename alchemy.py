@@ -344,3 +344,17 @@ def apz(*args):
         i += 1
     evp, eep = ema(vpl, period), ema(epl, period)
     return [eep + evp, eep - evp]
+
+def stc(*args):
+    period = 14
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    def pk(*args):
+        data, period = args[0], args[1]
+        pma, pmi = max([_.high for _ in data[-period:]]), min([_.low for _ in data[-period:]])
+        return (data[-1].close - pmi) / (pma - pmi) * 100
+    return [pk(data, period), mean([pk(data, period), pk(data[:-1], period), pk(data[:-2], period)])]
+
