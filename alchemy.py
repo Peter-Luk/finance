@@ -136,16 +136,19 @@ def daily(*args):
     except: pass
     return res
 
-class Santa(object):
+class Danta(object):
     def __init__(self, *args, **kwargs):
-        self.__max_n, db, ae = 500, load('Securities'), get_stored_eid()
-        class SR(object): pass
-        mapper(SR, db['Securities']['table'])
-        sq = db['Securities']['session'].query(SR)
+        self.data, self.__max_n, db, ae = [], 500, load('Securities'), get_stored_eid()
         if 'max_n' in list(kwargs.keys()): self.__max_n = kwargs['max_n']
+        class SR(object): pass
         if args[0] in ae:
+            mapper(SR, db['Securities']['table'])
+            sq = db['Securities']['session'].query(SR)
             self.data = sq.filter_by(eid=args[0]).all()
             if len(self.data) > self.__max_n: self.data = self.data[-self.__max_n:]
+        else:
+            try: self.data = daily(args[0])
+            except: pass
 
     def __del__(self):
         self.__max_n = self.data = None
