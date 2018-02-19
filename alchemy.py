@@ -136,6 +136,21 @@ def daily(*args):
     except: pass
     return res
 
+class Santa(object):
+    def __init__(self, *args, **kwargs):
+        self.__max_n, db, ae = 500, load('Securities'), get_stored_eid()
+        class SR(object): pass
+        mapper(SR, db['Securities']['table'])
+        sq = db['Securities']['session'].query(SR)
+        if 'max_n' in list(kwargs.keys()): self.__max_n = kwargs['max_n']
+        if args[0] in ae:
+            self.data = sq.filter_by(eid=args[0]).all()
+            if len(self.data) > self.__max_n: self.data = self.data[-self.__max_n:]
+
+    def __del__(self):
+        self.__max_n = self.data = None
+        del(self.__max_n, self.data)
+
 def ema(*args):
     numtype, period = False, 20
     if args:
