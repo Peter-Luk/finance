@@ -358,3 +358,22 @@ def stc(*args):
         return (data[-1].close - pmi) / (pma - pmi) * 100
     return [pk(data, period), mean([pk(data, period), pk(data[:-1], period), pk(data[:-2], period)])]
 
+def macd(*args):
+    mf_period, ms_period, s_period = 12, 26, 9
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): s_period = args[1]
+            if isinstance(args[1], float): s_period = int(args[1])
+    mfl, msl, ml = [], [], []
+    i = ms_period
+    while i < len(data):
+        mfl.append(ema(data[:i], mf_period))
+        msl.append(ema(data[:i], ms_period))
+        i += 1
+    i = 0
+    while i < (len(data) - ms_period):
+        ml.append(mfl[i] - msl[i])
+        i += 1
+    s = ema(ml, s_period)
+    return ml[-1], s, ml[-1] - s
