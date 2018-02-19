@@ -29,80 +29,6 @@ def hm(*args, **kwargs):
     hdr = eval("[_ for _ in phr if _.time {}]".format(cs))
     return hdr
 
-def ema(*args):
-    numtype, period = False, 20
-    if args:
-        if isinstance(args[0], list):
-            if isinstance(args[0][0], int): numtype = True
-            if isinstance(args[0][0], float): numtype = True
-            data = args[0]
-        if len(args) > 1:
-            if isinstance(args[1], int): period = args[1]
-            if isinstance(args[1], float): period = int(args[1])
-    if not (len(data) > period):
-        if numtype: return mean(data)
-        return mean([_.close for _ in data])
-    if numtype: res = mean(data[:period])
-    else: res = mean([_.close for _ in data[:period]])
-    i = period
-    while i < len(data):
-        if numtype: res = (data[i] + res * (period - 1)) / period
-        else: res = (data[i].close + res * (period - 1)) / period
-        i += 1
-    return res
-
-def kama(*args):
-    period, fast, slow = 10, 2, 30
-    if args:
-        if isinstance(args[0], list): data = args[0]
-        if len(args) > 1:
-            if isinstance(args[1], int): period = args[1]
-            if isinstance(args[1], float): period = int(args[1])
-            try:
-                if isinstance(args[2], int): fast = args[2]
-                if isinstance(args[2], float): fast = int(args[2])
-            except: pass
-            try:
-                if isinstance(args[3], int): slow = args[3]
-                if isinstance(args[3], float): slow = int(args[3])
-            except: pass
-    def asum(*args):
-        i, hdr = 1, []
-        while i < len(args[0]):
-            hdr.append(args[0][i] - args[0][i - 1])
-            i += 1
-        return sum([abs(_) for _ in hdr])
-    if not (len(data) > period): return mean([_.close for _ in data])
-    res, i, fc, sc = mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
-    while i < len(data):
-        volatility = asum([_.close for _ in data[i-period:i]])
-        if volatility:
-            er = (data[i].close - data[i-period].close) / volatility
-            alpha = (er * (fc - sc) + sc) ** 2
-            res += alpha * (data[i].close - res)
-        i += 1
-    return res
-
-def sma(*args):
-    period = 20
-    if args:
-        if isinstance(args[0], list): data = args[0]
-        if len(args) > 1:
-            if isinstance(args[1], int): period = args[1]
-            if isinstance(args[1], float): period = int(args[1])
-    if not (len(data) > period): return mean([_.close for _ in data])
-    return mean([_.close for _ in data[-period:]])
-
-def wma(*args):
-    period = 20
-    if args:
-        if isinstance(args[0], list): data = args[0]
-        if len(args) > 1:
-            if isinstance(args[1], int): period = args[1]
-            if isinstance(args[1], float): period = int(args[1])
-    if not (len(data) > period): return sum([_.close * _.volume for _ in data]) / sum([_.volume for _ in data])
-    return sum([_.close * _.volume for _ in data[-period:]]) / sum([_.volume for _ in data[-period:]])
-
 class FD(object):
     def __init__(self, *args):
         self.date = None
@@ -209,6 +135,80 @@ def daily(*args):
             res.append(FD(tmp))
     except: pass
     return res
+
+def ema(*args):
+    numtype, period = False, 20
+    if args:
+        if isinstance(args[0], list):
+            if isinstance(args[0][0], int): numtype = True
+            if isinstance(args[0][0], float): numtype = True
+            data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    if not (len(data) > period):
+        if numtype: return mean(data)
+        return mean([_.close for _ in data])
+    if numtype: res = mean(data[:period])
+    else: res = mean([_.close for _ in data[:period]])
+    i = period
+    while i < len(data):
+        if numtype: res = (data[i] + res * (period - 1)) / period
+        else: res = (data[i].close + res * (period - 1)) / period
+        i += 1
+    return res
+
+def kama(*args):
+    period, fast, slow = 10, 2, 30
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+            try:
+                if isinstance(args[2], int): fast = args[2]
+                if isinstance(args[2], float): fast = int(args[2])
+            except: pass
+            try:
+                if isinstance(args[3], int): slow = args[3]
+                if isinstance(args[3], float): slow = int(args[3])
+            except: pass
+    def asum(*args):
+        i, hdr = 1, []
+        while i < len(args[0]):
+            hdr.append(args[0][i] - args[0][i - 1])
+            i += 1
+        return sum([abs(_) for _ in hdr])
+    if not (len(data) > period): return mean([_.close for _ in data])
+    res, i, fc, sc = mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
+    while i < len(data):
+        volatility = asum([_.close for _ in data[i-period:i]])
+        if volatility:
+            er = (data[i].close - data[i-period].close) / volatility
+            alpha = (er * (fc - sc) + sc) ** 2
+            res += alpha * (data[i].close - res)
+        i += 1
+    return res
+
+def sma(*args):
+    period = 20
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    if not (len(data) > period): return mean([_.close for _ in data])
+    return mean([_.close for _ in data[-period:]])
+
+def wma(*args):
+    period = 20
+    if args:
+        if isinstance(args[0], list): data = args[0]
+        if len(args) > 1:
+            if isinstance(args[1], int): period = args[1]
+            if isinstance(args[1], float): period = int(args[1])
+    if not (len(data) > period): return sum([_.close * _.volume for _ in data]) / sum([_.volume for _ in data])
+    return sum([_.close * _.volume for _ in data[-period:]]) / sum([_.volume for _ in data[-period:]])
 
 def rsi(*args):
     period = 14
