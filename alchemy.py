@@ -77,7 +77,6 @@ def load(*args):
         metadata = MetaData(engine)
         records = Table('records', metadata, autoload=True)
         eval('mapper({}, records)'.format(dbn))
-#        mapper(Records, records)
         Session = sessionmaker(bind=engine)
         session = Session()
         if dbn in ['Futures', 'Securities']:
