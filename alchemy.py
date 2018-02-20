@@ -176,6 +176,38 @@ class Danta(object):
             i += 1
         return res
 
+    def kama(self, *args):
+        data, period, fast, slow = self.data, 10, 2, 30
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if len(args) > 1:
+                if isinstance(args[1], int): period = args[1]
+                if isinstance(args[1], float): period = int(args[1])
+                try:
+                    if isinstance(args[2], int): fast = args[2]
+                    if isinstance(args[2], float): fast = int(args[2])
+                except: pass
+                try:
+                    if isinstance(args[3], int): slow = args[3]
+                    if isinstance(args[3], float): slow = int(args[3])
+                except: pass
+        def asum(*args):
+            i, hdr = 1, []
+            while i < len(args[0]):
+                hdr.append(args[0][i] - args[0][i - 1])
+                i += 1
+            return sum([abs(_) for _ in hdr])
+        if not (len(data) > period): return mean([_.close for _ in data])
+        res, i, fc, sc = mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
+        while i < len(data):
+            volatility = asum([_.close for _ in data[i-period:i]])
+            if volatility:
+                er = (data[i].close - data[i-period].close) / volatility
+                alpha = (er * (fc - sc) + sc) ** 2
+                res += alpha * (data[i].close - res)
+            i += 1
+        return res
+
     def apz(self, *args):
         data, period = self.data, 5
         if args:
