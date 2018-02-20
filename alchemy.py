@@ -176,6 +176,22 @@ class Danta(object):
             i += 1
         return res
 
+    def apz(self, *args):
+        data, period = self.data, 5
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if len(args) > 1:
+                if isinstance(args[1], int): period = args[1]
+                if isinstance(args[1], float): period = int(args[1])
+        vl = [_.high - _.low for _ in data]
+        i, vpl, epl = period, [], []
+        while i < len(data):
+            vpl.append(self.ema(vl[:i], period))
+            epl.append(self.ema(data[:i], period))
+            i += 1
+        evp, eep = self.ema(vpl, period), self.ema(epl, period)
+        return [eep + evp, eep - evp]
+
 def ema(*args):
     numtype, period = False, 20
     if args:
