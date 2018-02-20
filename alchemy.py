@@ -274,6 +274,128 @@ class Danta(object):
         evp, eep = self.ema(vpl, period), self.ema(epl, period)
         return [eep + evp, eep - evp]
 
+    def __tr(self, *args):
+        i, res = 0, []
+        while i < len(args[0]):
+            gap = False
+            if i == 0: res.append(args[0][i].high - args[0][i].low)
+            if i > 0:
+                if args[0][i-1].close > args[0][i].high:
+                    gap = True
+                    res.append(args[0][i-1].close - args[0][i].low)
+                if args[0][i-1].close < args[0][i].low:
+                    gap = True
+                    res.append(args[0][i].high - args[0][i-1].close)
+                if not gap: res.append(args[0][i].high - args[0][i].low)
+            i += 1
+        return res
+
+    def __dm(self, *args):
+        i, res = 1, []
+        if args:
+            if args[1] == '+':
+                while i < len(args[0]):
+                    value = 0
+                    if args[0][i].high - args[0][i-1].high > args[0][i-1].low -args[0][i].low:
+                        if args[0][i].high > args[0][i-1].high:
+                            value = args[0][i].high - args[0][i-1].high
+                    res.append(value)
+                    i += 1
+            if args[1] == '-':
+                while i < len(args[0]):
+                    value = 0
+                    if args[0][i-1].low - args[0][i].low > args[0][i].high -args[0][i-1].high:
+                        if args[0][i-1].low > args[0][i].low:
+                            value = args[0][i-1].low - args[0][i].low
+                    res.append(value)
+                    i += 1
+        return res
+
+    def adx(self, *args):
+        data, period = self.data, 14
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if len(args) > 1:
+                if isinstance(args[1], int): period = args[1]
+                if isinstance(args[1], float): period = int(args[1])
+        i, trd, dmp, dmm = period, self.__tr(data), self.__dm(data, '+'), self.__dm(data, '-')
+        while i < len(data):
+            if i == period:
+                trs = mean(trd[:i])
+                dmps = mean(dmp[:i-1])
+                dmms = mean(dmm[:i-1])
+                dip = dmps / trs
+                dim = dmms / trs
+                dx = abs(dip - dim) / (dip + dim) * 100
+                res = dx
+            else:
+                trs = (trs * (period - 1) + trd[i]) / period
+                dmps = (dmps * (period - 1) + dmp[i-1]) / period
+                dmms = (dmms * (period - 1) + dmm[i-1]) / period
+                dip = dmps / trs
+                dim = dmms / trs
+                dx = abs(dip - dim) / (dip + dim) * 100
+                res = (res * (period - 1) + dx) / period
+            i += 1
+        return res
+
+    def atr(self, *args):
+        data, period = self.data, 14
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if len(args) > 1:
+                if isinstance(args[1], int): period = args[1]
+                if isinstance(args[1], float): period = int(args[1])
+        i, trd = period, self.__tr(data)
+        while i < len(data):
+            if i == period: res = mean(trd[:i])
+            else: res = (trd[i] + res * (period - 1)) / period
+            i += 1
+        return res
+
+    def kc(self, *args):
+        data, ma_period, tr_period = self.data, 20, 10
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if len(args) > 1:
+                if isinstance(args[1], list): ma_period, tr_period = args[1]
+                if isinstance(args[1], tuple): ma_period, tr_period = list(args[1])
+        axis, delta = self.kama(data, ma_period), self.atr(data, tr_period)
+        return [axis + gr * delta, axis - gr * delta]
+
+    def stc(self, *args):
+        data, period = self.data, 14
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if len(args) > 1:
+                if isinstance(args[1], int): period = args[1]
+                if isinstance(args[1], float): period = int(args[1])
+        def pk(*args):
+            data, period = args[0], args[1]
+            pma, pmi = max([_.high for _ in data[-period:]]), min([_.low for _ in data[-period:]])
+            return (data[-1].close - pmi) / (pma - pmi) * 100
+        return [pk(data, period), mean([pk(data, period), pk(data[:-1], period), pk(data[:-2], period)])]
+
+    def macd(self, *args):
+        data, mf_period, ms_period, s_period = self.data, 12, 26, 9
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if len(args) > 1:
+                if isinstance(args[1], int): s_period = args[1]
+                if isinstance(args[1], float): s_period = int(args[1])
+        mfl, msl, ml = [], [], []
+        i = ms_period
+        while i < len(data):
+            mfl.append(self.ema(data[:i], mf_period))
+            msl.append(self.ema(data[:i], ms_period))
+            i += 1
+        i = 0
+        while i < (len(data) - ms_period):
+            ml.append(mfl[i] - msl[i])
+            i += 1
+        s = self.ema(ml, s_period)
+        return ml[-1], s, ml[-1] - s
+
 def ema(*args):
     numtype, period = False, 20
     if args:
