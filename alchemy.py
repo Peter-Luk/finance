@@ -106,26 +106,19 @@ def aquery(*args):
 
 avail_eid = get_stored_eid()
 sqa = aquery('Securities')
+fqa = aquery('Futures')
 
 def daily(*args):
-    db_name = 'Futures'
     if args:
         if isinstance(args[0], str): code = args[0]
-        if len(args) > 1:
-            if isinstance(args[1], str): db_name = args[1]
-        db = load(db_name)
-    ci = '{}R'.format(db_name[0])
-    exec("class {}(object): pass".format(ci))
-    exec("mapper({}, db[db_name]['table'])".format(ci))
-    fq = eval("db[db_name]['session'].query({})".format(ci))
     td, res = [], []
     try:
-        rfd = fq.filter_by(code=code).all()
+        rfd = fqa.filter_by(code=code).all()
         for _ in rfd:
             if _.date not in td: td.append(_.date)
         for _ in td:
             tmp = {}
-            itd = fq.filter_by(code=code, date=_).all()
+            itd = fqa.filter_by(code=code, date=_).all()
             if len(itd) == 2:
                 volume, open, close, high, low = 0, 0, 0, 0, 0
                 for __ in itd:
