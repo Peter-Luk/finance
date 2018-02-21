@@ -98,7 +98,14 @@ def get_stored_eid(*args):
     db = load(db_name)
     return [_[0] for _ in db[db_name]['engine'].execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()]
 
+def aquery(*args):
+    db = load(args[0])
+    class FR(object): pass
+    mapper(FR, db[args[0]]['table'])
+    return db[args[0]]['session'].query(FR)
+
 avail_eid = get_stored_eid()
+sqa = aquery('Securities')
 
 def daily(*args):
     db_name = 'Futures'
@@ -139,13 +146,10 @@ def daily(*args):
 
 class Danta(object):
     def __init__(self, *args, **kwargs):
-        self.data, self.__max_n, db = [], 500, load('Securities')
+        self.data, self.__max_n = [], 500
         if 'max_n' in list(kwargs.keys()): self.__max_n = kwargs['max_n']
-        class SR(object): pass
         if args[0] in avail_eid:
-            mapper(SR, db['Securities']['table'])
-            sq = db['Securities']['session'].query(SR)
-            self.data = sq.filter_by(eid=args[0]).all()
+            self.data = sqa.filter_by(eid=args[0]).all()
             if len(self.data) > self.__max_n: self.data = self.data[-self.__max_n:]
         else:
             try: self.data = daily(args[0])
