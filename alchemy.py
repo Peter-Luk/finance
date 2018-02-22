@@ -30,9 +30,19 @@ class FD(object):
                 self.low = args[0][self.date]['low']
                 self.close = args[0][self.date]['close']
                 self.volume = args[0][self.date]['volume']
+
     def __del__(self):
         self.date = self.open = self.high = self.low = self.close = self.volume = None
         del(self.date, self.open, self.high, self.low, self.close, self.volume)
+
+    def __call__(self):
+        hdr = {'open': self.open}
+        hdr['high'] = self.high
+        hdr['low'] = self.low
+        hdr['close'] = self.close
+        hdr['volume'] = self.volume
+        hdr['date'] = self.date
+        return hdr
 
 def get_db(*args, **kwargs):
     if isinstance(args[0], str): db_path = sep.join([home, args[0]])
@@ -390,3 +400,23 @@ class Danta(object):
             i += 1
         s = self.ema(ml, s_period)
         return ml[-1], s, ml[-1] - s
+
+    def patr(self, *args):
+        data = self.data
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], tuple): data = list(args[0])
+        lc = data[-1].close
+        lr = self.atr(data)
+        return [lc + lr, lc + lr / gr, lc + lr * (1 - 1 / gr), lc - lr * (1 - 1 / gr), lc - lr / gr, lc - lr]
+
+    def pgap(self, *args):
+        data = self.data
+        if args:
+            if isinstance(args[0], float): pivot = args[0]
+            if isinstance(args[0], int): pivot = args[0]
+            if len(args) > 1:
+                if isinstance(args[1], list): data = args[1]
+                if isinstance(args[1], tuple): data = list(args[1])
+        gap = pivot - data[-1].close
+        return [pivot + gap, pivot + gap / gr, pivot + gap * (1 - 1 / gr), pivot - gap * (1 - 1 / gr), pivot - gap / gr, pivot - gap]
