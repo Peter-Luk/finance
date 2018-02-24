@@ -93,16 +93,14 @@ def get_stored_eid(*args):
     db = load(db_name)
     return [_[0] for _ in db[db_name]['engine'].execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()]
 
-def aquery(*args):
+def __query(*args):
     db = load(args[0])
     class FR(object): pass
     mapper(FR, db[args[0]]['table'])
     return db[args[0]]['session'].query(FR)
 
 avail_eid = get_stored_eid()
-sqa = aquery('Securities')
-fqa = aquery('Futures')
-hqa = aquery('Health')
+sqa = __query('Securities')
 
 def hm(*args, **kwargs):
     cs = '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
@@ -111,13 +109,14 @@ def hm(*args, **kwargs):
     if 'time_period' in list(kwargs.keys()):
         if kwargs['time_period'][0].upper() == 'E': cs = '> datetime(1900,1,1,{:d},{:d},0).time()'.format(18,0)
         if kwargs['time_period'][0].upper() == 'M': cs = '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
-    phr = hqa.filter_by(subject_id=sid).all()
+    phr = __query('Health').filter_by(subject_id=sid).all()
     hdr = eval("[_ for _ in phr if _.time {}]".format(cs))
     return hdr
 
 def daily(*args):
     if args:
         if isinstance(args[0], str): code = args[0]
+    fqa = __query('Futures')
     td, res = [], []
     try:
         rfd = fqa.filter_by(code=code).all()
