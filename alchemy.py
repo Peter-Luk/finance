@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import mapper, sessionmaker
 from os import sep, environ, listdir
 from sys import platform
-from utilities import datetime, mtf, gr
+from utilities import datetime, nitem, gslice, mtf, gr
 from statistics import mean
 
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
@@ -185,7 +185,7 @@ class Danta(object):
             if len(args) > 1:
                 if isinstance(args[1], int): period = args[1]
                 if isinstance(args[1], float): period = int(args[1])
-        def delta(*args):
+        def __delta(*args):
             i, hdr = 1, []
             while i < len(args[0]):
                 hdr.append(args[0][i].close - args[0][i - 1].close)
@@ -194,8 +194,8 @@ class Danta(object):
         i = period
         while i < len(data):
             if i == period:
-                ag = sum([_ for _ in delta(data[i-period:i]) if _ > 0]) / period
-                al = sum([abs(_) for _ in delta(data[i-period:i]) if _ < 0]) / period
+                ag = sum([_ for _ in __delta(data[i-period:i]) if _ > 0]) / period
+                al = sum([abs(_) for _ in __delta(data[i-period:i]) if _ < 0]) / period
             else:
                 cdelta = data[i].close - data[i-1].close
                 if cdelta > 0:
