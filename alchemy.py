@@ -5,6 +5,8 @@ from sys import platform
 from utilities import datetime, nitem, gslice, mtf, gr
 from statistics import mean
 
+import pandas as pd
+
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
 if platform in ['linux', 'linux2']:
     subpath = 'shared'
@@ -104,7 +106,7 @@ sqa = __query('Securities')
 
 def hm(*args, **kwargs):
     cs = '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
-    if datetime.now().time() > datetime(1900,1,1,18,0,0).time(): cs = '> datetime(1900,1,1,{0:d},{0:d},0).time()'.format(18,0)
+    if datetime.now().time() > datetime(1900,1,1,18,0,0).time(): cs = '> datetime(1900,1,1,{:d},{:d},0).time()'.format(18,0)
     if isinstance(args[0], int): sid = args[0]
     if 'time_period' in list(kwargs.keys()):
         if kwargs['time_period'][0].upper() == 'E': cs = '> datetime(1900,1,1,{:d},{:d},0).time()'.format(18,0)
@@ -150,13 +152,16 @@ class Danta(object):
         if args[0] in avail_eid:
             self.data = sqa.filter_by(eid=args[0]).all()
             if len(self.data) > self.__max_n: self.data = self.data[-self.__max_n:]
+            self.__trade_date = [_.date for _ in self.data]
         else:
-            try: self.data = daily(args[0])
+            try:
+                self.data = daily(args[0])
+                self.__trade_date = [_.date for _ in self.data]
             except: pass
 
     def __del__(self):
-        self.__max_n = self.data = None
-        del(self.__max_n, self.data)
+        self.__max_n = self.data = self.__trade_date = None
+        del(self.__max_n, self.data, self.__trade_date)
 
     def sma(self, *args):
         data, period = self.data, 20
@@ -419,3 +424,72 @@ class Danta(object):
                 if isinstance(args[1], tuple): data = list(args[1])
         gap = pivot - data[-1].close
         return [pivot + gap, pivot + gap / gr, pivot + gap * (1 - 1 / gr), pivot - gap * (1 - 1 / gr), pivot - gap / gr, pivot - gap]
+
+    def SMA(self, *args):
+        period, hdr = 20, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+        for __ in self.__trade_date[period:]: hdr[__] = self.sma([_ for _ in self.data if not _.date > __], period)
+        res = pd.DataFrame.from_dict(hdr, orient='index')
+        res.rename(columns={'index':'Date', 0:'SMA'}, inplace=True)
+        return res
+
+    def WMA(self, *args):
+        period, hdr = 20, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+        for __ in self.__trade_date[period:]: hdr[__] = self.wma([_ for _ in self.data if not _.date > __], period)
+        res = pd.DataFrame.from_dict(hdr, orient='index')
+        res.rename(columns={'index':'Date', 0:'WMA'}, inplace=True)
+        return res
+
+    def EMA(self, *args):
+        period, hdr = 20, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+        for __ in self.__trade_date[period:]: hdr[__] = self.ema([_ for _ in self.data if not _.date > __], period)
+        res = pd.DataFrame.from_dict(hdr, orient='index')
+        res.rename(columns={'index':'Date', 0:'EMA'}, inplace=True)
+        return res
+
+    def KAMA(self, *args):
+        period, fast, slow, hdr = 10, 2, 30, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+            if len(args) > 1:
+                try:
+                    if isinstance(args[1], int): fast = args[1]
+                    if isinstance(args[1], float): fast = int(args[1])
+                except: pass
+                try:
+                    if isinstance(args[2], int): slow = args[2]
+                    if isinstance(args[2], float): slow = int(args[2])
+                except: pass
+        for __ in self.__trade_date[period:]: hdr[__] = self.kama([_ for _ in self.data if not _.date > __], period, fast, slow)
+        res = pd.DataFrame.from_dict(hdr, orient='index')
+        res.rename(columns={'index':'Date', 0:'KAMA'}, inplace=True)
+        return res
+
+    def RSI(self, *args):
+        period, hdr = 14, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+        for __ in self.__trade_date[period:]: hdr[__] = self.rsi([_ for _ in self.data if not _.date > __], period)
+        res = pd.DataFrame.from_dict(hdr, orient='index')
+        res.rename(columns={'index':'Date', 0:'RSI'}, inplace=True)
+        return res
+
+    def ADX(self, *args):
+        period, hdr = 14, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+        for __ in self.__trade_date[period:]: hdr[__] = self.adx([_ for _ in self.data if not _.date > __], period)
+        res = pd.DataFrame.from_dict(hdr, orient='index')
+        res.rename(columns={'index':'Date', 0:'ADX'}, inplace=True)
+        return res
