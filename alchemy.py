@@ -163,6 +163,14 @@ class Danta(object):
         self.__max_n = self.data = self.__trade_date = None
         del(self.__max_n, self.data, self.__trade_date)
 
+    def __call__(self, *args):
+        data = self.data
+        if args:
+            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], tuple): data = list(args[0])
+        mas = pd.concat([self.SMA(data), self.WMA(data), self.EMA(data), self.KAMA(data)], axis=1, join='inner', ignore_index=False)
+        return {'MA': mas}
+
     def sma(self, *args):
         data, period = self.data, 20
         if args:
