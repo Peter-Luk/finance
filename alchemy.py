@@ -164,12 +164,13 @@ class Danta(object):
         del(self.__max_n, self.data, self.__trade_date)
 
     def __call__(self, *args):
-        period, data = 20, self.data
+        period = 20
         if args:
             if isinstance(args[0], int): period = args[0]
             if isinstance(args[0], float): period = int(args[0])
         mas = pd.concat([self.SMA(period), self.WMA(period), self.EMA(period), self.KAMA()], axis=1, join='inner', ignore_index=False)
-        return {'MA': mas}
+        ids = pd.concat([self.RSI(), self.ADX()], axis=1, join='inner', ignore_index=False)
+        return {'MA': mas, 'Ind':ids}
 
     def sma(self, *args):
         data, period = self.data, 20
@@ -345,7 +346,7 @@ class Danta(object):
                 dim = dmms / trs
                 dx = abs(dip - dim) / (dip + dim) * 100
                 res = dx
-            else:
+            if i > period:
                 trs = (trs * (period - 1) + trd[i]) / period
                 dmps = (dmps * (period - 1) + dmp[i-1]) / period
                 dmms = (dmms * (period - 1) + dmm[i-1]) / period
