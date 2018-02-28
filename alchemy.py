@@ -310,7 +310,7 @@ class Danta(object):
             epl.append(self.ema(data[:i], period))
             i += 1
         evp, eep = self.ema(vpl, period), self.ema(epl, period)
-        return [eep + evp, eep - evp]
+        return self.BD(eep + evp, eep - evp)
 
     def __tr(self, *args):
         i, res = 0, []
@@ -399,7 +399,7 @@ class Danta(object):
                 if isinstance(args[1], list): ma_period, tr_period = args[1]
                 if isinstance(args[1], tuple): ma_period, tr_period = list(args[1])
         axis, delta = self.kama(data, ma_period), self.atr(data, tr_period)
-        return [axis + gr * delta, axis - gr * delta]
+        return self.BD(axis + gr * delta, axis - gr * delta)
 
     def stc(self, *args):
         data, period, mean_n = self.data, 14, 3
@@ -539,4 +539,32 @@ class Danta(object):
         pkd.rename(columns={'index':'Date', 0:'%K'}, inplace=True)
         pdd.rename(columns={'index':'Date', 0:'%D'}, inplace=True)
         res = pd.concat([pkd, pdd], axis=1, join='inner', ignore_index=False)
+        return res
+
+    def KC(self, *args):
+        ud, ld = {}, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+        for __ in self.__trade_date:
+            hdr = self.kc([_ for _ in self.data if not _.date > __])
+            ud[__], ld[__] = hdr.Upper, hdr.Lower
+        pud, pld = pd.DataFrame.from_dict(ud, orient='index'), pd.DataFrame.from_dict(ld, orient='index')
+        pud.rename(columns={'index':'Date', 0:'Upper'}, inplace=True)
+        pld.rename(columns={'index':'Date', 0:'Lower'}, inplace=True)
+        res = pd.concat([pud, pld], axis=1, join='inner', ignore_index=False)
+        return res
+
+    def APZ(self, *args):
+        period, ud, ld = 5, {}, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+        for __ in self.__trade_date[period:]:
+            hdr = self.apz([_ for _ in self.data if not _.date > __], period)
+            ud[__], ld[__] = hdr.Upper, hdr.Lower
+        pud, pld = pd.DataFrame.from_dict(ud, orient='index'), pd.DataFrame.from_dict(ld, orient='index')
+        pud.rename(columns={'index':'Date', 0:'Upper'}, inplace=True)
+        pld.rename(columns={'index':'Date', 0:'Lower'}, inplace=True)
+        res = pd.concat([pud, pld], axis=1, join='inner', ignore_index=False)
         return res
