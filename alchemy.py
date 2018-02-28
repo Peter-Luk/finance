@@ -146,6 +146,26 @@ def daily(*args):
     return res
 
 class Danta(object):
+    class BD(object):
+        def __init__(self, *args):
+            if isinstance(args[0], float) or isinstance(args[0], int): self.Upper = args[0]
+            if isinstance(args[1], float) or isinstance(args[1], int): self.Lower = args[1]
+            if self.Upper < self.Lower:
+                t = self.Upper
+                self.Upper = self.Lower
+                self.Lower = t
+        def __del__(self):
+            self.Upper = self.Lower = None
+            del(self.Upper, self.Lower)
+
+    class SCD(object):
+        def __init__(self, *args):
+            if isinstance(args[0], float) or isinstance(args[0], int): self.K = args[0]
+            if isinstance(args[1], float) or isinstance(args[1], int): self.D = args[1]
+        def __del__(self):
+            self.K = self.D = None
+            del(self.K, self.D)
+
     def __init__(self, *args, **kwargs):
         self.data, self.__max_n = [], 500
         if 'max_n' in list(kwargs.keys()): self.__max_n = kwargs['max_n']
@@ -169,7 +189,7 @@ class Danta(object):
             if isinstance(args[0], int): period = args[0]
             if isinstance(args[0], float): period = int(args[0])
         mas = pd.concat([self.SMA(period), self.WMA(period), self.EMA(period), self.KAMA()], axis=1, join='inner', ignore_index=False)
-        ids = pd.concat([self.RSI(), self.ADX()], axis=1, join='inner', ignore_index=False)
+        ids = pd.concat([self.STC(), self.RSI(), self.ADX()], axis=1, join='inner', ignore_index=False)
         return {'MA': mas, 'Ind':ids}
 
     def sma(self, *args):
@@ -382,7 +402,7 @@ class Danta(object):
         return [axis + gr * delta, axis - gr * delta]
 
     def stc(self, *args):
-        data, period = self.data, 14
+        data, period, mean_n = self.data, 14, 3
         if args:
             if isinstance(args[0], list): data = args[0]
             if len(args) > 1:
@@ -392,8 +412,12 @@ class Danta(object):
             data, period = args[0], args[1]
             pma, pmi = max([_.high for _ in data[-period:]]), min([_.low for _ in data[-period:]])
             return (data[-1].close - pmi) / (pma - pmi) * 100
-        return [pk(data, period), mean([pk(data, period), pk(data[:-1], period), pk(data[:-2], period)])]
-
+        i, lnpk = 1, [pk(data, period)]
+        while i < mean_n:
+            lnpk.append(pk(data[:-i], period))
+            i += 1
+        lnpk.reverse()
+        return self.SCD(lnpk[-1], mean(lnpk))
     def macd(self, *args):
         data, mf_period, ms_period, s_period = self.data, 12, 26, 9
         if args:
@@ -501,4 +525,18 @@ class Danta(object):
         for __ in self.__trade_date[period:]: hdr[__] = self.adx([_ for _ in self.data if not _.date > __], period)
         res = pd.DataFrame.from_dict(hdr, orient='index')
         res.rename(columns={'index':'Date', 0:'ADX'}, inplace=True)
+        return res
+
+    def STC(self, *args):
+        period, kd, dd = 14, {}, {}
+        if args:
+            if isinstance(args[0], int): period = args[0]
+            if isinstance(args[0], float): period = int(args[0])
+        for __ in self.__trade_date[period:]:
+            hdr = self.stc([_ for _ in self.data if not _.date > __], period)
+            kd[__], dd[__] = hdr.K, hdr.D
+        pkd, pdd = pd.DataFrame.from_dict(kd, orient='index'), pd.DataFrame.from_dict(dd, orient='index')
+        pkd.rename(columns={'index':'Date', 0:'%K'}, inplace=True)
+        pdd.rename(columns={'index':'Date', 0:'%D'}, inplace=True)
+        res = pd.concat([pkd, pdd], axis=1, join='inner', ignore_index=False)
         return res
