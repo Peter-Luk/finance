@@ -542,12 +542,12 @@ class Danta(object):
         return res
 
     def KC(self, *args):
-        ud, ld = {}, {}
+        period, ud, ld = (20, 10), {}, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
-        for __ in self.__trade_date:
-            hdr = self.kc([_ for _ in self.data if not _.date > __])
+            if isinstance(args[0], tuple): period = args[0]
+            if isinstance(args[0], list): period = tuple(args[0])
+        for __ in self.__trade_date[period[0]:]:
+            hdr = self.kc([_ for _ in self.data if not _.date > __], period)
             ud[__], ld[__] = hdr.Upper, hdr.Lower
         pud, pld = pd.DataFrame.from_dict(ud, orient='index'), pd.DataFrame.from_dict(ld, orient='index')
         pud.rename(columns={'index':'Date', 0:'Upper'}, inplace=True)
