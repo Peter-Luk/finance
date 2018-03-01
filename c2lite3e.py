@@ -239,7 +239,7 @@ Obtain daily update thru API (Yahoo) and update 'local' database.
     return ic
 
 def wam(*args, **kwargs):
-    count, ae = 0, get_stored_eid()
+    count, ae = 0, [_ for _ in get_stored_eid() if _ not in [805]]
     we, conn = web_collect(ae), lite.connect(filepath('Securities'))
     for _ in ae:
         df = dictfcomp(we['{:04d}.HK'.format(_)], pstored(_))
