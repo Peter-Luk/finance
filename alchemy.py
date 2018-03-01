@@ -445,7 +445,9 @@ class Danta(object):
             if isinstance(args[0], tuple): data = list(args[0])
         lc = data[-1].close
         lr = self.atr(data)
-        return [lc + lr, lc + lr / gr, lc + lr * (1 - 1 / gr), lc - lr * (1 - 1 / gr), lc - lr / gr, lc - lr]
+        res = gslice([lc + lr, lc])
+        res.extend(gslice([lc, lc -lr]))
+        return res
 
     def pgap(self, *args):
         data = self.data
@@ -456,7 +458,9 @@ class Danta(object):
                 if isinstance(args[1], list): data = args[1]
                 if isinstance(args[1], tuple): data = list(args[1])
         gap = pivot - data[-1].close
-        return [pivot + gap, pivot + gap / gr, pivot + gap * (1 - 1 / gr), pivot - gap * (1 - 1 / gr), pivot - gap / gr, pivot - gap]
+        res = gslice([pivot + gap, pivot])
+        res.extend(gslice([pivot, pivot - gap]))
+        return res
 
     def SMA(self, *args):
         period, hdr = 20, {}
