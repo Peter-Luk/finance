@@ -191,7 +191,7 @@ def wap(*args, **kwargs):
     """
 Obtain daily update thru API (Yahoo) and update 'local' database.
     """
-    ic, aid, kw = 0, get_stored_eid(), kwargs
+    ic, aid, kw = 0, [_ for _ in get_stored_eid() if _ not in [805]], kwargs
     lkw = list(kw.keys())
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
