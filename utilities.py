@@ -20,10 +20,13 @@ def nitem(*args):
     return hdr.index(min(hdr))
 
 def gslice(*args):
-    lag = args[0]
-    lag.sort()
-    diff = lag[-1] - lag[0]
-    return [lag[0] + diff * (1 - 1 / gr), lag[0] + diff / gr]
+    if isinstance(args[0], list): lag = args[0]
+    if isinstance(args[0], tuple): lag = list(args[0])
+    try:
+        lag.sort()
+        diff = lag[-1] - lag[0]
+        return [lag[0] + diff * (1 - 1 / gr), lag[0] + diff / gr]
+    except: pass
 
 def in_limit(*args, **kwargs):
     try:
