@@ -447,6 +447,7 @@ class Danta(object):
         lr = self.atr(data)
         res = gslice([lc + lr, lc])
         res.extend(gslice([lc, lc -lr]))
+        res.sort()
         return res
 
     def pgap(self, *args):
@@ -460,6 +461,7 @@ class Danta(object):
         gap = pivot - data[-1].close
         res = gslice([pivot + gap, pivot])
         res.extend(gslice([pivot, pivot - gap]))
+        res.sort()
         return res
 
     def SMA(self, *args):
