@@ -159,9 +159,10 @@ class Danta(object):
             del(self.Upper, self.Lower)
 
     class SCD(object):
-        def __init__(self, *args):
+        def __init__(self, *args, **kwargs):
             if isinstance(args[0], float) or isinstance(args[0], int): self.K = args[0]
             if isinstance(args[1], float) or isinstance(args[1], int): self.D = args[1]
+            if 'step_value' in list(kwargs.keys()): sv = kwargs['step_value']
         def __del__(self):
             self.K = self.D = None
             del(self.K, self.D)
