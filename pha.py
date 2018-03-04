@@ -20,7 +20,7 @@ class Hyper(object):
         del(self.sid, self.session, self.query)
 
     def summary(self, *args, **kwargs):
-        inc_time, cs = False, '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
+        inc_time, inc_remarks, cs = False, False, '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
         if datetime.now().time() > datetime(1900,1,1,18,0,0).time(): cs = '> datetime(1900,1,1,{:d},{:d},0).time()'.format(18,0)
         if args:
             if isinstance(args[0], str):
@@ -31,29 +31,41 @@ class Hyper(object):
             if 'time_period' in lkeys:
                 if kwargs['time_period'][0].upper() == 'E': cs = '> datetime(1900,1,1,{:d},{:d},0).time()'.format(18,0)
                 if kwargs['time_period'][0].upper() == 'M': cs = '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
-            if 'time_included' in lkeys:
-                if isinstance(kwargs['time_included'], bool): inc_time = kwargs['time_included']
+            if 'flag' in lkeys:
+                if isinstance(kwargs['flag'], dict):
+                    flag = kwargs['flag']
+                    try:
+                        if isinstance(flag['time'], bool): inc_time = flag['time']
+                    except: pass
+                    try:
+                        if isinstance(flag['remarks'], bool): inc_remarks = flag['remarks']
+                    except: pass
         phr = self.query.filter_by(subject_id=self.sid).all()
         hdr = eval("[_ for _ in phr if _.time {}]".format(cs))
         if hdr:
-            d_sys, d_dia, d_pulse, d_time = {}, {}, {}, {}
+            d_sys, d_dia, d_pulse, d_time, d_remarks = {}, {}, {}, {}, {}
             for __ in hdr:
                 d_sys[__.date] = __.sys
                 d_dia[__.date] = __.dia
                 d_pulse[__.date] = __.pulse
                 d_time[__.date] = __.time
+                d_remarks[__.date] = __.remarks
             p_sys = pd.DataFrame.from_dict(d_sys, orient='index')
             p_sys.rename(columns={'index':'Date', 0:'sys'}, inplace=True)
             p_dia = pd.DataFrame.from_dict(d_dia, orient='index')
             p_dia.rename(columns={'index':'Date', 0:'dia'}, inplace=True)
             p_pulse = pd.DataFrame.from_dict(d_pulse, orient='index')
             p_pulse.rename(columns={'index':'Date', 0:'pulse'}, inplace=True)
+            plist = [p_sys, p_dia, p_pulse]
             if inc_time:
                 p_time = pd.DataFrame.from_dict(d_time, orient='index')
                 p_time.rename(columns={'index':'Date', 0:'time'}, inplace=True)
-                res = pd.concat([p_sys, p_dia, p_pulse, p_time], axis=1, join='inner', ignore_index=False)
-            else: res = pd.concat([p_sys, p_dia, p_pulse], axis=1, join='inner', ignore_index=False)
-            return res
+                plist.append(p_time)
+            if inc_remarks:
+                p_remarks = pd.DataFrame.from_dict(d_remarks, orient='index')
+                p_remarks.rename(columns={'index':'Date', 0:'remarks'}, inplace=True)
+                plist.append(p_remarks)
+            return pd.concat(plist, axis=1, join='inner', ignore_index=False)
 
     def append(self, *args, **kwargs):
         nr = FR()
