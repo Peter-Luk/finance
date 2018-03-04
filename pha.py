@@ -1,4 +1,7 @@
-from alchemy import datetime, pd, mapper, load
+from alchemy import mapper, load
+from datetime import datetime
+
+import pandas as pd
 
 class FR(object): pass
 db_name = 'Health'
