@@ -100,13 +100,14 @@ def get_start(*args, **kwargs):
         return datetime.fromordinal(eo - period)
 
 def web_collect(*args, **kwargs):
-    src, lk, period, end, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), {}
+    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), 'basic', {}
     if args:
         code = args[0]
         if len(args) > 1: period = args[1]
     if 'code' in lk: code = kwargs['code']
     if 'period' in lk: period = kwargs['period']
     if 'source' in lk: src = kwargs['source']
+    if 'format' in lk: efor = kwargs['format']
     if src == 'yahoo':
         if isinstance(code, int):code = '{:04d}.HK'.format(code)
         elif isinstance(code, list):code = ['{:04d}.HK'.format(_) for _ in code]
@@ -115,10 +116,12 @@ def web_collect(*args, **kwargs):
         if isinstance(code, str):
             dp = data.DataReader(code, src, start, end)
             res[code] = dp.transpose().to_dict()
+            if efor == 'pandas': res[code] = dp
         elif isinstance(code, list):
             dp = data.DataReader(code, src, start, end)
             for c in code:
                 res[c] = dp.minor_xs(c).transpose().to_dict()
+                if efor == 'pandas': res[c] = dp.minor_xs(c)
         return res
 
 def get_month(index):

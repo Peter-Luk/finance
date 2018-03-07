@@ -31,15 +31,10 @@ class Hyper(object):
             if 'time_period' in lkeys:
                 if kwargs['time_period'][0].upper() == 'E': cs = '> datetime(1900,1,1,{:d},{:d},0).time()'.format(18,0)
                 if kwargs['time_period'][0].upper() == 'M': cs = '< datetime(1900,1,1,{:d},{:d},0).time()'.format(11,45)
-            if 'flag' in lkeys:
-                if isinstance(kwargs['flag'], dict):
-                    flag = kwargs['flag']
-                    try:
-                        if isinstance(flag['time'], bool): inc_time = flag['time']
-                    except: pass
-                    try:
-                        if isinstance(flag['remarks'], bool): inc_remarks = flag['remarks']
-                    except: pass
+            if 'time' in lkeys:
+                if isinstance(kwargs['time'], bool): inc_time = kwargs['time']
+            if 'remarks' in lkeys:
+                if isinstance(kwargs['remarks'], bool): inc_remarks = kwargs['remarks']
         phr = self.query.filter_by(subject_id=self.sid).all()
         hdr = eval("[_ for _ in phr if _.time {}]".format(cs))
         if hdr:
