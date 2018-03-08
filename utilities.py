@@ -1,5 +1,5 @@
 him = getattr(__import__('handy'), 'him')
-iml = [{'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ'), 'pandas_datareader':('data',)},({'sqlite3':()}, "alias='lite'")]
+iml = [{'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ'), 'functools':('reduce',), 'pandas_datareader':('data',)},({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
 for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 gr = 1.61803399
@@ -42,6 +42,15 @@ def in_limit(*args, **kwargs):
                     if num < u and num > l: return True
         return False
     except: pass
+
+def dictfcomp(*args, **kwargs):
+    res = {}
+    if isinstance(args[0], dict): ad = args[0]
+    if isinstance(args[1], dict): rd = args[1]
+    for _ in list(rd.keys()):
+        if not reduce((lambda x, y: x and y), ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
+            res[_] = ad[_]
+    return res
 
 def ltd(year=year, month=month, excluded={}):
     t, ld = 0, [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]

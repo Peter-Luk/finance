@@ -1,5 +1,5 @@
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('filepath', 'get_start', 'web_collect'), 'datetime':('datetime',), 'os':('listdir', 'linesep', 'sep', 'path', 'remove'), 'sys':('platform',), 'pandas_datareader':('data',), 'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'"), ({'pandas':()}, "alias='pd'")]
+iml = [{'utilities':('filepath', 'get_start', 'web_collect', 'dictfcomp'), 'datetime':('datetime',), 'os':('listdir', 'linesep', 'sep', 'path', 'remove'), 'sys':('platform',), 'pandas_datareader':('data',), 'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'"), ({'pandas':()}, "alias='pd'")]
 __ = him(iml)
 for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
@@ -27,15 +27,15 @@ Update SQLite db with dict object, all three arguments are compulsory,
             conn.commit()
         except: pass
     return counter
-
-def dictfcomp(*args, **kwargs):
-    res = {}
-    if isinstance(args[0], dict): ad = args[0]
-    if isinstance(args[1], dict): rd = args[1]
-    for _ in list(rd.keys()):
-        if not reduce((lambda x, y: x and y), ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
-            res[_] = ad[_]
-    return res
+# 
+# def dictfcomp(*args, **kwargs):
+#     res = {}
+#     if isinstance(args[0], dict): ad = args[0]
+#     if isinstance(args[1], dict): rd = args[1]
+#     for _ in list(rd.keys()):
+#         if not reduce((lambda x, y: x and y), ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
+#             res[_] = ad[_]
+#     return res
 
 def pstored(*args, **kwargs):
     if args:
