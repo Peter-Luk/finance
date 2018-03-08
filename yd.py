@@ -25,3 +25,4 @@ try:
                     s_session.add(nr)
                     s_session.commit()
                     s_session.flush()
+except: pass
