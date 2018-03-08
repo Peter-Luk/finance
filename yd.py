@@ -14,14 +14,16 @@ try:
         witem = wdata['{:04d}.HK'.format(_)]
         lwik = [_.to_datetime().date() for _ in witem.keys()]
         lwik.sort()
-        sitemdate = [_[0] for s_query.filter(RD.eid==_).values(RD.date)]
+        sitemdate = [_[0] for _ in s_query.filter(RD.eid == _).values(RD.date)]
         for __ in lwik:
             if __ not in sitemdate:
-                if s_query.filter(RD.eid==_, RD.date==__).value(RD.volume) != 0:
+                if s_query.filter(RD.eid == _, RD.date == __).value(RD.volume) != 0:
                     nr = RD()
-                    nr['eid'] = _
-                    nr['date'] = __
-                    for f in ifields: nr[f] = witem[__][f.capitalize()]
+                    nr.eid = _
+                    nr.date = __
+                    for f in ifields:
+                        exec('nr.{0} = witem[__][{0}.capitalize()]'.format(f))
+                        if f == 'volume': exec('nr.{0} = int(witem[__][{0}.capitalize()])'.format(f))
                     s_session.add(nr)
                     s_session.commit()
                     s_session.flush()
