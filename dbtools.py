@@ -21,6 +21,7 @@ class Equities(object):
         del(self.db_name, self.db, self.session, self.query, self.eid, self.data_fields)
 
     def check(self):
+        i_count = 0
         try:
             wdata = web_collect(self.eid)
             for _ in self.eid:
@@ -39,5 +40,7 @@ class Equities(object):
                                 if f == 'volume': exec('nr.{0} = int(witem[__][{0}.capitalize()])'.format(f))
                             self.session.add(nr)
                             self.session.commit()
+                            i_count += 1
                             self.session.flush()
         except: pass
+        return i_count

@@ -27,15 +27,6 @@ Update SQLite db with dict object, all three arguments are compulsory,
             conn.commit()
         except: pass
     return counter
-# 
-# def dictfcomp(*args, **kwargs):
-#     res = {}
-#     if isinstance(args[0], dict): ad = args[0]
-#     if isinstance(args[1], dict): rd = args[1]
-#     for _ in list(rd.keys()):
-#         if not reduce((lambda x, y: x and y), ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
-#             res[_] = ad[_]
-#     return res
 
 def pstored(*args, **kwargs):
     if args:
@@ -127,65 +118,6 @@ def c2d(*args, **kwargs):
             tmp.append(hdr)
         except: pass
     return tmp
-
-# def get_start(*args, **kwargs):
-#     end, period, mode, lk = datetime.today(), args[0], 'm', list(kwargs.keys())
-#     if len(args) > 1:
-#         if isinstance(args[1], str): mode = args[1][0].lower()
-#     if len(args) > 2: end = args[2]
-#     if 'end_date' in lk:
-#         if isinstance(kwargs['end_date'], datetime): end = kwargs['end_date']
-#         elif isinstance(kwargs['end_date'], str):
-#             try:
-#                 end = datetime.strptime(kwargs['end_date'], '%Y-%m-%d')
-#             except: pass
-#     if 'mode' in lk:
-#         if isinstance(kwargs['mode'], str): mode = kwargs['mode'][0].lower()
-#     if 'period' in lk:
-#         if isinstance(kwargs['period'], int): period = kwargs['period']
-#         elif isinstance(kwargs['period'], float): period = int(kwargs['period'])
-#         elif isinstance(kwargs['period'], str):
-#             try:
-#                 period = int(float(kwargs['period']))
-#             except: pass
-#     if mode == 'y':
-#         period = int(round(period * 12, 0))
-#         mode = 'm'
-#     if mode == 'm':
-#         y, m = end.year, end.month
-#         if period > 12:
-#             y -= int(period / 12)
-#             period %= 12
-#         if m - period <= 0:
-#             y -= 1
-#             m += 12
-#         m -= period
-#         return datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
-#     if mode == 'd':
-#         eo = end.toordinal()
-#         return datetime.fromordinal(eo - period)
-# 
-# def web_collect(*args, **kwargs):
-#     src, lk, period, end, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), {}
-#     if args:
-#         code = args[0]
-#         if len(args) > 1: period = args[1]
-#     if 'code' in lk: code = kwargs['code']
-#     if 'period' in lk: period = kwargs['period']
-#     if 'source' in lk: src = kwargs['source']
-#     if src == 'yahoo':
-#         if isinstance(code, int):code = '{:04d}.HK'.format(code)
-#         elif isinstance(code, list):code = ['{:04d}.HK'.format(_) for _ in code]
-#     start = get_start(period)
-#     if start:
-#         if isinstance(code, str):
-#             dp = data.DataReader(code, src, start, end)
-#             res[code] = dp.transpose().to_dict()
-#         elif isinstance(code, list):
-#             dp = data.DataReader(code, src, start, end)
-#             for c in code:
-#                 res[c] = dp.minor_xs(c).transpose().to_dict()
-#         return res
 
 def wap(*args, **kwargs):
     """
