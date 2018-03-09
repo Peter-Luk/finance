@@ -22,7 +22,7 @@ class Equities(object):
         del(self.RD, self.db_name, self.db, self.session, self.query, self.eid, self.data_fields)
 
     def check(self):
-        i_count = 0
+        res, u_count, i_count = '', 0, 0
         try:
             wdata = web_collect(self.eid)
             for _ in self.eid:
@@ -31,10 +31,23 @@ class Equities(object):
                 lwik.sort()
                 sitemdate = [_[0] for _ in self.query.filter(self.RD.eid == _).values(self.RD.date)]
                 for __ in lwik:
-                    if __ in sitemdate: pass
-                        iitem = self.query.filter(self.RD.eid == _, self.RD.date == __)
+                    vol = witem[__]['Volume']
+                    if __ in sitemdate:
+                        dhdr, iitem = {}, self.query.filter(self.RD.eid == _, self.RD.date == __)
+                        if vol != 0:
+                            # dhdr['eid'] = _
+                            # dhdr['date'] = __
+                            if iitem.value(self.RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
+                            if iitem.value(self.RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
+                            if iitem.value(self.RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
+                            if iitem.value(self.RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
+                            if iitem.value(self.RD.volume) != vol: dhdr['volume'] = vol
+                        if dhdr:
+                            iitem.update(dhdr)
+                            self.session.commit()
+                            u_count += 1
+                            self.session.flush()
                     else:
-                        vol = witem[__]['Volume']
                         if vol != 0:
                             nr = self.RD()
                             nr.eid = _
@@ -47,4 +60,8 @@ class Equities(object):
                             i_count += 1
                             self.session.flush()
         except: pass
-        return i_count
+        if i_count:
+            if u_count: res = '{:d} append, {:d} amend'.format(i_count, u_count)
+            res = '{:d} append'.format(i_count)
+        elif u_count: res = '{:d} amend'.format(u_count)
+        if res: return res
