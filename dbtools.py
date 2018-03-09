@@ -1,5 +1,6 @@
 from alchemy import load, mapper
 from utilities import web_collect
+from sfa import Danta
 class RD(object): pass
 
 class Equities(object):
@@ -20,6 +21,12 @@ class Equities(object):
     def __del__(self):
         self.RD = self.db_name = self.db = self.session = self.query = self.eid = self.data_fields = None
         del(self.RD, self.db_name, self.db, self.session, self.query, self.eid, self.data_fields)
+
+    def __call__(self, *args):
+        if args:
+            if isinstance(args[0], (int, float)): eid = int(args[0])
+        if eid in self.eid:
+            return Danta(eid)
 
     def check(self):
         res, u_count, i_count = '', 0, 0
