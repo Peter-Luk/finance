@@ -18,8 +18,8 @@ class Equities(object):
         self.data_fields = ['open', 'high', 'low', 'close',  'volume']
 
     def __del__(self):
-        self.db_name = self.db = self.session = self.query = self.eid = self.data_fields = None
-        del(self.db_name, self.db, self.session, self.query, self.eid, self.data_fields)
+        self.RD = self.db_name = self.db = self.session = self.query = self.eid = self.data_fields = None
+        del(self.RD, self.db_name, self.db, self.session, self.query, self.eid, self.data_fields)
 
     def check(self):
         i_count = 0
@@ -32,13 +32,14 @@ class Equities(object):
                 sitemdate = [_[0] for _ in self.query.filter(self.RD.eid == _).values(self.RD.date)]
                 for __ in lwik:
                     if __ not in sitemdate:
-                        if self.query.filter(self.RD.eid == _, self.RD.date == __).value(self.RD.volume) != 0:
+                        vol = self.query.filter(self.RD.eid == _, self.RD.date == __).value(self.RD.volume)
+                        if vol != 0:
                             nr = self.RD()
                             nr.eid = _
                             nr.date = __
-                            for f in self.data_fields:
+                            nr.volume = int(vol)
+                            for f in [_ for _ in self.data_fields if _ not in ['volume']]:
                                 exec('nr.{0} = witem[__][{0}.capitalize()]'.format(f))
-                                if f == 'volume': exec('nr.{0} = int(witem[__][{0}.capitalize()])'.format(f))
                             self.session.add(nr)
                             self.session.commit()
                             i_count += 1
