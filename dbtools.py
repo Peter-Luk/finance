@@ -31,8 +31,10 @@ class Equities(object):
                 lwik.sort()
                 sitemdate = [_[0] for _ in self.query.filter(self.RD.eid == _).values(self.RD.date)]
                 for __ in lwik:
-                    if __ not in sitemdate:
-                        vol = self.query.filter(self.RD.eid == _, self.RD.date == __).value(self.RD.volume)
+                    if __ in sitemdate: pass
+                        iitem = self.query.filter(self.RD.eid == _, self.RD.date == __)
+                    else:
+                        vol = witem[__]['Volume']
                         if vol != 0:
                             nr = self.RD()
                             nr.eid = _
