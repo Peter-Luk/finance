@@ -26,7 +26,7 @@ class Equities(object):
             wdata = web_collect(self.eid)
             for _ in self.eid:
                 witem = wdata['{:04d}.HK'.format(_)]
-                lwik = [_.to_datetime().date() for _ in witem.keys()]
+                lwik = [_.to_pydatetime().date() for _ in witem.keys()]
                 lwik.sort()
                 sitemdate = [_[0] for _ in self.query.filter(RD.eid == _).values(RD.date)]
                 for __ in lwik:
