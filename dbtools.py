@@ -5,13 +5,14 @@ class RD(object): pass
 class Equities(object):
     def __init__(self, *args):
         self.db_name = 'Securities'
+        self.RD = RD
         if args:
             if isinstance(args[0], str): self.db_name = args[0]
         self.db = load(self.db_name)
-        mapper(RD, self.db[self.db_name]['table'])
+        mapper(self.RD, self.db[self.db_name]['table'])
         self.session = self.db[self.db_name]['session']
-        self.query = self.session.query(RD)
-        avail_eid = [_[0] for _ in self.session.query(RD.eid).distinct()]
+        self.query = self.session.query(self.RD)
+        avail_eid = [_[0] for _ in self.session.query(self.RD.eid).distinct()]
         avail_eid.sort()
         self.eid = [_ for _ in avail_eid if _ not in [805]]
         self.data_fields = ['open', 'high', 'low', 'close',  'volume']
@@ -28,11 +29,11 @@ class Equities(object):
                 witem = wdata['{:04d}.HK'.format(_)]
                 lwik = [_.to_pydatetime().date() for _ in witem.keys()]
                 lwik.sort()
-                sitemdate = [_[0] for _ in self.query.filter(RD.eid == _).values(RD.date)]
+                sitemdate = [_[0] for _ in self.query.filter(self.RD.eid == _).values(self.RD.date)]
                 for __ in lwik:
                     if __ not in sitemdate:
-                        if self.query.filter(RD.eid == _, RD.date == __).value(RD.volume) != 0:
-                            nr = RD()
+                        if self.query.filter(self.RD.eid == _, self.RD.date == __).value(self.RD.volume) != 0:
+                            nr = self.RD()
                             nr.eid = _
                             nr.date = __
                             for f in self.data_fields:
