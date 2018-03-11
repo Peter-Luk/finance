@@ -396,6 +396,15 @@ class Danta(object):
         res.sort()
         return res
 
+    def full_range(self):
+        res, hdr = [], []
+        [hdr.extend(self.pgap(_)) for _ in self.patr()]
+        hdr.sort()
+        while len(hdr):
+            ph = hdr.pop()
+            if ph not in hdr: res.append(ph)
+        return res
+
     def SMA(self, *args):
         period, hdr = 20, {}
         if args:
