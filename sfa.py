@@ -77,7 +77,7 @@ def daily(*args):
     return res
 
 class Danta(object):
-    class BD(object):
+    class __BD(object):
         def __init__(self, *args):
             if isinstance(args[0], float) or isinstance(args[0], int): self.Upper = args[0]
             if isinstance(args[1], float) or isinstance(args[1], int): self.Lower = args[1]
@@ -89,7 +89,7 @@ class Danta(object):
             self.Upper = self.Lower = None
             del(self.Upper, self.Lower)
 
-    class SCD(object):
+    class __SCD(object):
         def __init__(self, *args, **kwargs):
             if isinstance(args[0], float) or isinstance(args[0], int): self.K = args[0]
             if isinstance(args[1], float) or isinstance(args[1], int): self.D = args[1]
@@ -242,7 +242,7 @@ class Danta(object):
             epl.append(self.ema(data[:i], period))
             i += 1
         evp, eep = self.ema(vpl, period), self.ema(epl, period)
-        return self.BD(eep + evp, eep - evp)
+        return self.__BD(eep + evp, eep - evp)
 
     def __tr(self, *args):
         i, res = 0, []
@@ -331,7 +331,7 @@ class Danta(object):
                 if isinstance(args[1], list): ma_period, tr_period = args[1]
                 if isinstance(args[1], tuple): ma_period, tr_period = list(args[1])
         axis, delta = self.kama(data, ma_period), self.atr(data, tr_period)
-        return self.BD(axis + gr * delta, axis - gr * delta)
+        return self.__BD(axis + gr * delta, axis - gr * delta)
 
     def stc(self, *args):
         data, period, mean_n = self.data, 14, 3
@@ -349,7 +349,7 @@ class Danta(object):
             lnpk.append(pk(data[:-i], period))
             i += 1
         lnpk.reverse()
-        return self.SCD(lnpk[-1], mean(lnpk))
+        return self.__SCD(lnpk[-1], mean(lnpk))
     def macd(self, *args):
         data, mf_period, ms_period, s_period = self.data, 12, 26, 9
         if args:
