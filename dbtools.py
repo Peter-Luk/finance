@@ -29,43 +29,43 @@ class Equities(object):
 
     def check(self):
         res, u_count, i_count = '', 0, 0
-        try:
-            wdata = web_collect(self.eid)
-            for _ in self.eid:
-                witem = wdata['{:04d}.HK'.format(_)]
-                lwik = [_.to_pydatetime().date() for _ in witem.keys()]
-                lwik.sort()
-                sitemdate = [_[0] for _ in self.query.filter(self.__RD.eid == _).values(self.__RD.date)]
-                for __ in lwik:
-                    vol = witem[__]['Volume']
-                    if __ in sitemdate:
-                        dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __)
-                        if vol != 0:
-                            # dhdr['eid'] = _
-                            # dhdr['date'] = __
-                            if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
-                            if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
-                            if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
-                            if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
-                            if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
-                        if dhdr:
-                            iitem.update(dhdr)
-                            self.__session.commit()
-                            u_count += 1
-                            self.__session.flush()
-                    else:
-                        if vol != 0:
-                            nr = self.__RD()
-                            nr.eid = _
-                            nr.date = __
-                            nr.volume = int(vol)
-                            for f in [_ for _ in self.data_fields if _ not in ['volume']]:
-                                exec('nr.{0} = witem[__][{0}.capitalize()]'.format(f))
-                            self.__session.add(nr)
-                            self.__session.commit()
-                            i_count += 1
-                            self.__session.flush()
-        except: pass
+#    try:
+        wdata = web_collect(self.eid)
+        for _ in self.eid:
+            witem = wdata['{:04d}.HK'.format(_)]
+            lwik = [__.to_pydatetime().date() for __ in witem.keys()]
+            lwik.sort()
+            sitemdate = [__[0] for __ in self.query.filter(self.__RD.eid == _).values(self.__RD.date)]
+            for __ in lwik:
+                vol = witem[__]['Volume']
+                if __ in sitemdate:
+                    dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __)
+                    if vol != 0:
+                        # dhdr['eid'] = _
+                        # dhdr['date'] = __
+                        if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
+                        if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
+                        if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
+                        if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
+                        if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
+                    if dhdr:
+                        iitem.update(dhdr)
+                        self.__session.commit()
+                        u_count += 1
+                        self.__session.flush()
+                else:
+                    if vol != 0:
+                        nr = self.__RD()
+                        nr.eid = _
+                        nr.date = __
+                        nr.volume = int(vol)
+                        for f in [_ for _ in self.data_fields if _ not in ['volume']]:
+                            exec('nr.{0} = witem[__][{0}.capitalize()]'.format(f))
+                        self.__session.add(nr)
+                        self.__session.commit()
+                        i_count += 1
+                        self.__session.flush()
+#        except: pass
         if i_count:
             if u_count: res = '{:d} append, {:d} amend'.format(i_count, u_count)
             res = '{:d} append'.format(i_count)
