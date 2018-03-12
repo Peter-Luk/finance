@@ -40,7 +40,7 @@ class Equities(object):
                 vol = witem[__]['Volume']
                 if __.to_pydatetime().date() in sitemdate:
                     dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __)
-                    if vol != 0:
+                    if vol:
                         # dhdr['eid'] = _
                         # dhdr['date'] = __
                         if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
@@ -54,7 +54,7 @@ class Equities(object):
                         u_count += 1
                         self.__session.flush()
                 else:
-                    if vol != 0:
+                    if vol:
                         nr = self.__RD()
                         nr.eid = _
                         nr.date = __
