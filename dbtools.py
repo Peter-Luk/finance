@@ -33,12 +33,12 @@ class Equities(object):
         wdata = web_collect(self.eid)
         for _ in self.eid:
             witem = wdata['{:04d}.HK'.format(_)]
-            lwik = [__.to_pydatetime().date() for __ in witem.keys()]
+            lwik = list(witem.keys())
             lwik.sort()
             sitemdate = [__[0] for __ in self.query.filter(self.__RD.eid == _).values(self.__RD.date)]
             for __ in lwik:
                 vol = witem[__]['Volume']
-                if __ in sitemdate:
+                if __.to_pydatetime().date() in sitemdate:
                     dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __)
                     if vol != 0:
                         # dhdr['eid'] = _
