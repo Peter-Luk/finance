@@ -36,7 +36,7 @@ class Equities(object):
             lwik = list(witem.keys())
             lwik.sort()
             sitemdate = [__[0] for __ in self.query.filter(self.__RD.eid == _).values(self.__RD.date)]
-            for __ in lwik:
+            for __ in lwik[1:]:
                 vol = witem[__]['Volume']
                 if __.to_pydatetime().date() in sitemdate:
                     dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __)
