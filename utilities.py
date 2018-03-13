@@ -1,7 +1,7 @@
 him = getattr(__import__('handy'), 'him')
 iml = [{'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ'), 'functools':('reduce',), 'pandas_datareader':('data',)},({'sqlite3':()}, "alias='lite'")]
 __ = him(iml)
-for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
+for _ in list(__.keys()): exec("{0}=__['{0}']".format(_))
 gr = 1.61803399
 
 today = datetime.today()
