@@ -55,21 +55,27 @@ class Equities(object):
                         self.__session.flush()
                 else:
                     if vol:
-                        nr = self.__RD()
-                        nr.eid = _
-                        nr.date = __
-                        nr.volume = int(vol)
+                        nr = {'eid': _}
+                        nr['date'] = __.to_pydatetime().date()
+                        nr['volume'] = int(vol)
+#                         nr = self.__RD()
+#                         nr.eid = _
+#                         nr.date = __
+#                         nr.volume = int(vol)
                         for f in [_ for _ in self.data_fields if _ not in ['volume']]:
-                            exec("nr.{} = witem[__]['{}']".format(f, f.capitalize()))
+                            exec("nr['{}'] = witem[__]['{}']".format(f, f.capitalize()))
+                            # exec("nr.{} = witem[__]['{}']".format(f, f.capitalize()))
                         nrl.append(nr)
 #                        self.__session.add(nr)
 #                        self.__session.commit()
-                        i_count += 1
+                        # i_count += 1
 #                        self.__session.flush()
 #        except: pass
-        if i_count:
+        if len(nrl) > 0:
+        # if i_count:
             try:
-                self.__session.add_all(nrl)
+                self.__session.bulk_insert_mappings(self.__db[self.db_name]['table'], nrl)
+                # self.__session.add_all(nrl)
                 self.__session.commit()
             except: self.__session.rollback()
 #             if u_count: res = '{:d} append, {:d} amend'.format(i_count, u_count)
