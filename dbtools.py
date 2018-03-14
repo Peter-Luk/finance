@@ -60,7 +60,7 @@ class Equities(object):
                         nr.date = __
                         nr.volume = int(vol)
                         for f in [_ for _ in self.data_fields if _ not in ['volume']]:
-                            exec('nr.{} = witem[__][{}]'.format(f, f.capitalize()))
+                            exec("nr.{} = witem[__]['{}']".format(f, f.capitalize()))
                         self.__session.add(nr)
                         self.__session.commit()
                         i_count += 1
