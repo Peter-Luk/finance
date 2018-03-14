@@ -30,7 +30,7 @@ class Equities(object):
     def check(self):
         res, u_count, i_count = '', 0, 0
 #    try:
-        wdata = web_collect(self.eid)
+        nrl, wdata = [], web_collect(self.eid)
         for _ in self.eid:
             witem = wdata['{:04d}.HK'.format(_)]
             lwik = list(witem.keys())
@@ -61,13 +61,18 @@ class Equities(object):
                         nr.volume = int(vol)
                         for f in [_ for _ in self.data_fields if _ not in ['volume']]:
                             exec("nr.{} = witem[__]['{}']".format(f, f.capitalize()))
-                        self.__session.add(nr)
-                        self.__session.commit()
+                        nrl.append(nr)
+#                        self.__session.add(nr)
+#                        self.__session.commit()
                         i_count += 1
-                        self.__session.flush()
+#                        self.__session.flush()
 #        except: pass
         if i_count:
-            if u_count: res = '{:d} append, {:d} amend'.format(i_count, u_count)
-            res = '{:d} append'.format(i_count)
-        elif u_count: res = '{:d} amend'.format(u_count)
-        if res: return res
+            try:
+                self.__session.add_all(nrl)
+                self.__session.commit()
+            except: self.__session.rollback()
+#             if u_count: res = '{:d} append, {:d} amend'.format(i_count, u_count)
+#             res = '{:d} append'.format(i_count)
+#         elif u_count: res = '{:d} amend'.format(u_count)
+#         if res: return res
