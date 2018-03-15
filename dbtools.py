@@ -82,7 +82,7 @@ class Equities(object):
             except: self.__session.rollback()
         if len(udl) > 0:
             try:
-                self.__session.bulk_insert_mappings(self.__db[self.db_name]['table'], udl)
+                self.__session.bulk_update_mappings(self.__db[self.db_name]['table'], udl)
                 self.__session.commit()
             except: self.__session.rollback()
 #             if u_count: res = '{:d} append, {:d} amend'.format(i_count, u_count)
