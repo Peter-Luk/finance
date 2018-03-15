@@ -35,7 +35,7 @@ class Equities(object):
             lwik.sort()
             sitemdate = [__[0] for __ in self.query.filter(self.__RD.eid == _).values(self.__RD.date)]
             for __ in lwik[1:]:
-                vol = witem[__]['Volume']
+                vol = int(witem[__]['Volume'])
                 if __.to_pydatetime().date() in sitemdate:
                     dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __.to_pydatetime().date())
                     if vol:
@@ -50,7 +50,7 @@ class Equities(object):
                     if vol:
                         nr = {'eid': _}
                         nr['date'] = __.to_pydatetime().date()
-                        nr['volume'] = int(vol)
+                        nr['volume'] = vol
                         for f in [_ for _ in self.data_fields if _ not in ['volume']]:
                             exec("nr['{}'] = witem[__]['{}']".format(f, f.capitalize()))
                         nrl.append(nr)
