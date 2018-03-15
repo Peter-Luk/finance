@@ -28,7 +28,7 @@ class Equities(object):
             return Danta(eid)
 
     def check(self):
-        res, erl, udl, wdata = [], [], [], web_collect(self.eid)
+        u_count, res, nrl, wdata = 0, [], [], [], web_collect(self.eid)
         for _ in self.eid:
             witem = wdata['{:04d}.HK'.format(_)]
             lwik = list(witem.keys())
@@ -37,15 +37,19 @@ class Equities(object):
             for __ in lwik[1:]:
                 vol = int(witem[__]['Volume'])
                 if __.to_pydatetime().date() in sitemdate:
-                    dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __.to_pydatetime().date())
-                    if vol:
-                        dhdr['id'] = iitem.value(self.__RD.id)
-                        if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
-                        if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
-                        if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
-                        if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
-                        if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
-                    udl.append(dhdr)
+                    pass
+#                     dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __.to_pydatetime().date())
+#                     if vol:
+#                         # dhdr['id'] = iitem.value(self.__RD.id)
+#                         if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
+#                         if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
+#                         if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
+#                         if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
+#                         if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
+#                         if dhdr:
+#                             iitem.update(dhdr)
+#                             u_count += 1
+                    # udl.append(hdr)
                 else:
                     if vol:
                         nr = {'eid': _}
@@ -62,11 +66,11 @@ class Equities(object):
             except:
                 self.__session.rollback()
                 res.append('no records added')
-        if len(udl) > 0:
+        if u_count:
             try:
-                self.__session.bulk_update_mappings(self.__db[self.db_name]['table'], udl)
+                # self.__session.bulk_update_mappings(self.__db[self.db_name]['table'], udl)
                 self.__session.commit()
-                res.append('{:d} record(s) updated'.format(len(udl)))
+                res.append('{:d} record(s) updated'.format(u_count))
             except:
                 self.__session.rollback()
                 res.append('no record updated')
