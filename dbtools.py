@@ -37,7 +37,7 @@ class Equities(object):
             for __ in lwik[1:]:
                 vol = witem[__]['Volume']
                 if __.to_pydatetime().date() in sitemdate:
-                    dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __)
+                    dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __.to_pydatetime().date())
                     if vol:
                         dhdr['id'] = iitem.value(self.__RD.id)
                         if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
