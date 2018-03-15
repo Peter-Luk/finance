@@ -30,7 +30,7 @@ class Equities(object):
     def check(self):
         res, u_count, i_count = '', 0, 0
 #    try:
-        nrl, wdata = [], web_collect(self.eid)
+        nrl, udl, wdata = [], [], web_collect(self.eid)
         for _ in self.eid:
             witem = wdata['{:04d}.HK'.format(_)]
             lwik = list(witem.keys())
@@ -43,16 +43,18 @@ class Equities(object):
                     if vol:
                         # dhdr['eid'] = _
                         # dhdr['date'] = __
+                        dhdr['id'] = iitem.value(self.__RD.id)
                         if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
                         if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
                         if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
                         if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
                         if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
-                    if dhdr:
-                        iitem.update(dhdr)
-                        self.__session.commit()
-                        u_count += 1
-                        self.__session.flush()
+                    udl.append(dhdr)
+#                     if dhdr:
+#                         iitem.update(dhdr)
+#                         self.__session.commit()
+#                         u_count += 1
+#                         self.__session.flush()
                 else:
                     if vol:
                         nr = {'eid': _}
@@ -76,6 +78,11 @@ class Equities(object):
             try:
                 self.__session.bulk_insert_mappings(self.__db[self.db_name]['table'], nrl)
                 # self.__session.add_all(nrl)
+                self.__session.commit()
+            except: self.__session.rollback()
+        if len(udl) > 0:
+            try:
+                self.__session.bulk_insert_mappings(self.__db[self.db_name]['table'], udl)
                 self.__session.commit()
             except: self.__session.rollback()
 #             if u_count: res = '{:d} append, {:d} amend'.format(i_count, u_count)
