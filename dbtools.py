@@ -28,8 +28,6 @@ class Equities(object):
             return Danta(eid)
 
     def check(self):
-        # res, u_count, i_count = '', 0, 0
-#    try:
         nrl, udl, wdata = [], [], web_collect(self.eid)
         for _ in self.eid:
             witem = wdata['{:04d}.HK'.format(_)]
@@ -41,8 +39,6 @@ class Equities(object):
                 if __.to_pydatetime().date() in sitemdate:
                     dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __)
                     if vol:
-                        # dhdr['eid'] = _
-                        # dhdr['date'] = __
                         dhdr['id'] = iitem.value(self.__RD.id)
                         if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
                         if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
@@ -50,34 +46,17 @@ class Equities(object):
                         if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
                         if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
                     udl.append(dhdr)
-#                     if dhdr:
-#                         iitem.update(dhdr)
-#                         self.__session.commit()
-#                         u_count += 1
-#                         self.__session.flush()
                 else:
                     if vol:
                         nr = {'eid': _}
                         nr['date'] = __.to_pydatetime().date()
                         nr['volume'] = int(vol)
-#                         nr = self.__RD()
-#                         nr.eid = _
-#                         nr.date = __
-#                         nr.volume = int(vol)
                         for f in [_ for _ in self.data_fields if _ not in ['volume']]:
                             exec("nr['{}'] = witem[__]['{}']".format(f, f.capitalize()))
-                            # exec("nr.{} = witem[__]['{}']".format(f, f.capitalize()))
                         nrl.append(nr)
-#                        self.__session.add(nr)
-#                        self.__session.commit()
-                        # i_count += 1
-#                        self.__session.flush()
-#        except: pass
         if len(nrl) > 0:
-        # if i_count:
             try:
                 self.__session.bulk_insert_mappings(self.__db[self.db_name]['table'], nrl)
-                # self.__session.add_all(nrl)
                 self.__session.commit()
             except: self.__session.rollback()
         if len(udl) > 0:
@@ -85,7 +64,3 @@ class Equities(object):
                 self.__session.bulk_update_mappings(self.__db[self.db_name]['table'], udl)
                 self.__session.commit()
             except: self.__session.rollback()
-#             if u_count: res = '{:d} append, {:d} amend'.format(i_count, u_count)
-#             res = '{:d} append'.format(i_count)
-#         elif u_count: res = '{:d} amend'.format(u_count)
-#         if res: return res
