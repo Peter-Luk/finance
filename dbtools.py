@@ -28,7 +28,7 @@ class Equities(object):
             return Danta(eid)
 
     def check(self):
-        nrl, udl, wdata = [], [], web_collect(self.eid)
+        res, erl, udl, wdata = [], [], [], web_collect(self.eid)
         for _ in self.eid:
             witem = wdata['{:04d}.HK'.format(_)]
             lwik = list(witem.keys())
@@ -58,9 +58,16 @@ class Equities(object):
             try:
                 self.__session.bulk_insert_mappings(self.__db[self.db_name]['table'], nrl)
                 self.__session.commit()
-            except: self.__session.rollback()
+                res.append('{:d} record(s) added'.format(len(nrl)))
+            except:
+                self.__session.rollback()
+                res.append('no records added')
         if len(udl) > 0:
             try:
                 self.__session.bulk_update_mappings(self.__db[self.db_name]['table'], udl)
                 self.__session.commit()
-            except: self.__session.rollback()
+                res.append('{:d} record(s) updated'.format(len(udl)))
+            except:
+                self.__session.rollback()
+                res.append('no record updated')
+        return ','.join(res)
