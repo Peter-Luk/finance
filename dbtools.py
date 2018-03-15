@@ -28,7 +28,7 @@ class Equities(object):
             return Danta(eid)
 
     def check(self):
-        res, u_count, i_count = '', 0, 0
+        # res, u_count, i_count = '', 0, 0
 #    try:
         nrl, udl, wdata = [], [], web_collect(self.eid)
         for _ in self.eid:
