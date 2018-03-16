@@ -37,18 +37,18 @@ class Equities(object):
             for __ in lwik[1:]:
                 vol = int(witem[__]['Volume'])
                 if __.to_pydatetime().date() in sitemdate:
-                    pass
-#                     dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __.to_pydatetime().date())
-#                     if vol:
-#                         # dhdr['id'] = iitem.value(self.__RD.id)
-#                         if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
-#                         if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
-#                         if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
-#                         if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
-#                         if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
-#                         if dhdr:
-#                             iitem.update(dhdr)
-#                             u_count += 1
+                    # pass
+                    dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __.to_pydatetime().date())
+                    if vol:
+                        # dhdr['id'] = iitem.value(self.__RD.id)
+                        if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
+                        if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
+                        if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
+                        if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
+                        if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
+                        if dhdr:
+                            iitem.update(dhdr)
+                            u_count += 1
                     # udl.append(hdr)
                 else:
                     if vol:
