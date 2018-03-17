@@ -48,8 +48,10 @@ def dictfcomp(*args, **kwargs):
     if isinstance(args[0], dict): ad = args[0]
     if isinstance(args[1], dict): rd = args[1]
     for _ in list(rd.keys()):
-        if not reduce((lambda x, y: x and y), ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
-            res[_] = ad[_]
+        try:
+            if not reduce((lambda x, y: x and y), ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
+                res[_] = ad[_]
+        except: pass
     return res
 
 def ltd(year=year, month=month, excluded={}):
