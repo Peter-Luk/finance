@@ -102,7 +102,7 @@ class Danta(object):
             del(self.K, self.D)
 
         def __call__(self):
-            return {'K':self.K, 'D':self.D}
+            return {'K':round(self.K, 3), 'D':round(self.D, 3)}
     def __init__(self, *args, **kwargs):
         self.data, self.__max_n = [], 500
         if 'max_n' in list(kwargs.keys()): self.__max_n = kwargs['max_n']
