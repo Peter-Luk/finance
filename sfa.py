@@ -335,7 +335,7 @@ class Danta(object):
                 if 'MA' in list(kwargs['period'].keys()):
                     if isinstance(kwargs['period']['MA'], (int, float)): ma_period = int(kwargs['period']['MA'])
                 if 'TR' in list(kwargs['period'].keys()):
-                    if isinstance(kwargs['period']['TR'], (int, float)): ma_period = int(kwargs['period']['TR'])
+                    if isinstance(kwargs['period']['TR'], (int, float)): tr_period = int(kwargs['period']['TR'])
             if isinstance(kwargs['period'], (list, tuple)): ma_period, tr_period = list(kwargs['period'])
         axis, delta = self.kama(data, ma_period), self.atr(data, tr_period)
         return self.__BD(axis + gr * delta, axis - gr * delta)
