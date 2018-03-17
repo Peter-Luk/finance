@@ -79,8 +79,8 @@ def daily(*args):
 class Danta(object):
     class __BD(object):
         def __init__(self, *args):
-            if isinstance(args[0], float) or isinstance(args[0], int): self.Upper = args[0]
-            if isinstance(args[1], float) or isinstance(args[1], int): self.Lower = args[1]
+            if isinstance(args[0], (int, float)): self.Upper = args[0]
+            if isinstance(args[1], (int, float)): self.Lower = args[1]
             if self.Upper < self.Lower:
                 t = self.Upper
                 self.Upper = self.Lower
@@ -91,8 +91,8 @@ class Danta(object):
 
     class __SCD(object):
         def __init__(self, *args, **kwargs):
-            if isinstance(args[0], float) or isinstance(args[0], int): self.K = args[0]
-            if isinstance(args[1], float) or isinstance(args[1], int): self.D = args[1]
+            if isinstance(args[0], (int, float)): self.K = args[0]
+            if isinstance(args[1], (int, float)): self.D = args[1]
             if 'step_value' in list(kwargs.keys()): sv = kwargs['step_value']
         def __del__(self):
             self.K = self.D = None
@@ -118,8 +118,7 @@ class Danta(object):
     def __call__(self, *args):
         period = 20
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
         mas = pd.concat([self.SMA(period), self.WMA(period), self.EMA(period), self.KAMA()], axis=1, join='inner', ignore_index=False)
         ids = pd.concat([self.STC(), self.RSI(), self.ADX()], axis=1, join='inner', ignore_index=False)
         return {'MA': mas, 'Ind':ids}
@@ -127,36 +126,35 @@ class Danta(object):
     def sma(self, *args):
         data, period = self.data, 20
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
+                if isinstance(args[1], (int, float)): period = int(args[1])
         if not (len(data) > period): return mean([_.close for _ in data])
         return mean([_.close for _ in data[-period:]])
 
     def wma(self, *args):
         data, period = self.data, 20
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
+                if isinstance(args[1], (int, float)): period = int(args[1])
         if not (len(data) > period): return sum([_.close * _.volume for _ in data]) / sum([_.volume for _ in data])
         return sum([_.close * _.volume for _ in data[-period:]]) / sum([_.volume for _ in data[-period:]])
 
     def rsi(self, *args):
         data, period = self.data, 14
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
+                if isinstance(args[1], (int, float)): period = int(args[1])
+
         def __delta(*args):
             i, hdr = 1, []
             while i < len(args[0]):
                 hdr.append(args[0][i].close - args[0][i - 1].close)
                 i += 1
             return hdr
+
         i = period
         while i < len(data):
             if i == period:
@@ -178,12 +176,10 @@ class Danta(object):
         data, numtype, period = self.data, False, 20
         if args:
             if isinstance(args[0], list):
-                if isinstance(args[0][0], int): numtype = True
-                if isinstance(args[0][0], float): numtype = True
+                if isinstance(args[0][0], (int, float)): numtype = True
                 data = args[0]
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
+                if isinstance(args[1], (int, float)): period = int(args[1])
         if not (len(data) > period):
             if numtype: return mean(data)
             return mean([_.close for _ in data])
@@ -199,24 +195,21 @@ class Danta(object):
     def kama(self, *args):
         data, period, fast, slow = self.data, 10, 2, 30
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
-                try:
-                    if isinstance(args[2], int): fast = args[2]
-                    if isinstance(args[2], float): fast = int(args[2])
-                except: pass
-                try:
-                    if isinstance(args[3], int): slow = args[3]
-                    if isinstance(args[3], float): slow = int(args[3])
-                except: pass
+                if isinstance(args[1], (int, float)): period = int(args[1])
+            if len(args) > 2:
+                if isinstance(args[2], (int, float)): fast = int(args[2])
+            if len(args) > 3:
+                if isinstance(args[3], (int, float)): slow = int(args[3])
+
         def asum(*args):
             i, hdr = 1, []
             while i < len(args[0]):
                 hdr.append(args[0][i] - args[0][i - 1])
                 i += 1
             return sum([abs(_) for _ in hdr])
+
         if not (len(data) > period): return mean([_.close for _ in data])
         res, i, fc, sc = mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
         while i < len(data):
@@ -231,10 +224,9 @@ class Danta(object):
     def apz(self, *args):
         data, period = self.data, 5
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
+                if isinstance(args[1], (int, float)): period = int(args[1])
         vl = [_.high - _.low for _ in data]
         i, vpl, epl = period, [], []
         while i < len(data):
@@ -284,10 +276,9 @@ class Danta(object):
     def adx(self, *args):
         data, period = self.data, 14
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
+                if isinstance(args[1], (int, float)): period = int(args[1])
         i, trd, dmp, dmm = period, self.__tr(data), self.__dm(data, '+'), self.__dm(data, '-')
         while i < len(data):
             if i == period:
@@ -312,7 +303,7 @@ class Danta(object):
     def atr(self, *args, **kwargs):
         data, period = self.data, 14
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
         if 'period' in list(kwargs.keys()):
@@ -327,7 +318,7 @@ class Danta(object):
     def kc(self, *args, **kwargs):
         data, ma_period, tr_period = self.data, 20, 10
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
                 if isinstance(args[1], (list, tuple)): ma_period, tr_period = list(args[1])
         if 'period' in list(kwargs.keys()):
@@ -340,10 +331,10 @@ class Danta(object):
         axis, delta = self.kama(data, ma_period), self.atr(data, tr_period)
         return self.__BD(axis + gr * delta, axis - gr * delta)
 
-    def stc(self, *args):
+    def stc(self, *args, **kwargs):
         data, period, mean_n = self.data, 14, 3
         if args:
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
             if len(args) > 2:
