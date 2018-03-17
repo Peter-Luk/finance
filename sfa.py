@@ -101,8 +101,13 @@ class Danta(object):
             self.K = self.D = None
             del(self.K, self.D)
 
-        def __call__(self):
-            return {'K':round(self.K, 3), 'D':round(self.D, 3)}
+        def __call__(self, *args, **kwargs):
+            digit = 3
+            if args:
+                if isinstance(args[0], (int, float)): digit = int(args[0])
+            if 'digit' in list(kwargs.keys()):
+                if isinstance(kwargs['digit'], (int, float)): digit = int(kwargs['digit'])
+            return {'K':round(self.K, digit), 'D':round(self.D, digit)}
 
     def __init__(self, *args, **kwargs):
         self.data, self.__max_n = [], 500
