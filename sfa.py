@@ -88,16 +88,21 @@ class Danta(object):
         def __del__(self):
             self.Upper = self.Lower = None
             del(self.Upper, self.Lower)
+        def __call__(self):
+            return {'upper':self.Upper, 'lower':self.Lower}
 
     class __SCD(object):
         def __init__(self, *args, **kwargs):
             if isinstance(args[0], (int, float)): self.K = args[0]
             if isinstance(args[1], (int, float)): self.D = args[1]
-            if 'step_value' in list(kwargs.keys()): sv = kwargs['step_value']
+            # if 'step_value' in list(kwargs.keys()): sv = kwargs['step_value']
+
         def __del__(self):
             self.K = self.D = None
             del(self.K, self.D)
 
+        def __call__(self):
+            return {'K':self.K, 'D':self.D}
     def __init__(self, *args, **kwargs):
         self.data, self.__max_n = [], 500
         if 'max_n' in list(kwargs.keys()): self.__max_n = kwargs['max_n']
