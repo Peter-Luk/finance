@@ -309,13 +309,14 @@ class Danta(object):
             i += 1
         return res
 
-    def atr(self, *args):
+    def atr(self, *args, **kwargs):
         data, period = self.data, 14
         if args:
             if isinstance(args[0], list): data = args[0]
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
+                if isinstance(args[1], (int, float)): period = int(args[1])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
         i, trd = period, self.__tr(data)
         while i < len(data):
             if i == period: res = mean(trd[:i])
@@ -323,13 +324,19 @@ class Danta(object):
             i += 1
         return res
 
-    def kc(self, *args):
+    def kc(self, *args, **kwargs):
         data, ma_period, tr_period = self.data, 20, 10
         if args:
             if isinstance(args[0], list): data = args[0]
             if len(args) > 1:
-                if isinstance(args[1], list): ma_period, tr_period = args[1]
-                if isinstance(args[1], tuple): ma_period, tr_period = list(args[1])
+                if isinstance(args[1], (list, tuple)): ma_period, tr_period = list(args[1])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], dict):
+                if 'MA' in list(kwargs['period'].keys()):
+                    if isinstance(kwargs['period']['MA'], (int, float)): ma_period = int(kwargs['period']['MA'])
+                if 'TR' in list(kwargs['period'].keys()):
+                    if isinstance(kwargs['period']['TR'], (int, float)): ma_period = int(kwargs['period']['TR'])
+            if isinstance(kwargs['period'], (list, tuple)): ma_period, tr_period = list(kwargs['period'])
         axis, delta = self.kama(data, ma_period), self.atr(data, tr_period)
         return self.__BD(axis + gr * delta, axis - gr * delta)
 
@@ -338,8 +345,7 @@ class Danta(object):
         if args:
             if isinstance(args[0], list): data = args[0]
             if len(args) > 1:
-                if isinstance(args[1], int): period = args[1]
-                if isinstance(args[1], float): period = int(args[1])
+                if isinstance(args[1], (int, float)): period = int(args[1])
         def pk(*args):
             data, period = args[0], args[1]
             pma, pmi = max([_.high for _ in data[-period:]]), min([_.low for _ in data[-period:]])
@@ -396,9 +402,12 @@ class Danta(object):
         res.sort()
         return res
 
-    def full_range(self):
-        res, hdr = [], []
-        [hdr.extend(self.pgap(_)) for _ in self.patr()]
+    def full_range(self, *args):
+        data, res, hdr = self.data, [], []
+        if args:
+            if isinstance(args[0], tuple): data = list(args[0])
+            if isinstance(args[0], list): data = args[0]
+        [hdr.extend(self.pgap(_, data)) for _ in self.patr(data)]
         hdr.sort()
         while len(hdr):
             ph = hdr.pop()
