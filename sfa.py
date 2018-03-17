@@ -346,23 +346,31 @@ class Danta(object):
             if isinstance(args[0], list): data = args[0]
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
+            if len(args) > 2:
+                if isinstance(args[2], (int, float)): mean_n = int(args[2])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
+        if 'n' in list(kwargs.keys()):
+            if isinstance(kwargs['n'], (int, float)): mean_n = int(kwargs['n'])
+
         def pk(*args):
             data, period = args[0], args[1]
             pma, pmi = max([_.high for _ in data[-period:]]), min([_.low for _ in data[-period:]])
             return (data[-1].close - pmi) / (pma - pmi) * 100
+
         i, lnpk = 1, [pk(data, period)]
         while i < mean_n:
             lnpk.append(pk(data[:-i], period))
             i += 1
         lnpk.reverse()
         return self.__SCD(lnpk[-1], mean(lnpk))
+
     def macd(self, *args):
         data, mf_period, ms_period, s_period = self.data, 12, 26, 9
         if args:
             if isinstance(args[0], list): data = args[0]
             if len(args) > 1:
-                if isinstance(args[1], int): s_period = args[1]
-                if isinstance(args[1], float): s_period = int(args[1])
+                if isinstance(args[1], (int, float)): s_period = int(args[1])
         mfl, msl, ml = [], [], []
         i = ms_period
         while i < len(data):
@@ -379,8 +387,7 @@ class Danta(object):
     def patr(self, *args):
         data = self.data
         if args:
-            if isinstance(args[0], list): data = args[0]
-            if isinstance(args[0], tuple): data = list(args[0])
+            if isinstance(args[0], (list, tuple)): data = list(args[0])
         lc = data[-1].close
         lr = self.atr(data)
         res = gslice([lc + lr, lc])
@@ -391,11 +398,9 @@ class Danta(object):
     def pgap(self, *args):
         data = self.data
         if args:
-            if isinstance(args[0], float): pivot = args[0]
-            if isinstance(args[0], int): pivot = args[0]
+            if isinstance(args[0], (int, float)): pivot = args[0]
             if len(args) > 1:
-                if isinstance(args[1], list): data = args[1]
-                if isinstance(args[1], tuple): data = list(args[1])
+                if isinstance(args[1], (list, tuple)): data = list(args[1])
         gap = pivot - data[-1].close
         res = gslice([pivot + gap, pivot])
         res.extend(gslice([pivot, pivot - gap]))
@@ -405,8 +410,7 @@ class Danta(object):
     def full_range(self, *args):
         data, res, hdr = self.data, [], []
         if args:
-            if isinstance(args[0], tuple): data = list(args[0])
-            if isinstance(args[0], list): data = args[0]
+            if isinstance(args[0], (tuple, list)): data = list(args[0])
         [hdr.extend(self.pgap(_, data)) for _ in self.patr(data)]
         hdr.sort()
         while len(hdr):
@@ -417,8 +421,7 @@ class Danta(object):
     def SMA(self, *args):
         period, hdr = 20, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
         for __ in self.__trade_date[period:]: hdr[__] = self.sma([_ for _ in self.data if not _.date > __], period)
         res = pd.DataFrame.from_dict(hdr, orient='index')
         res.rename(columns={'index':'Date', 0:'SMA'}, inplace=True)
@@ -427,8 +430,7 @@ class Danta(object):
     def WMA(self, *args):
         period, hdr = 20, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
         for __ in self.__trade_date[period:]: hdr[__] = self.wma([_ for _ in self.data if not _.date > __], period)
         res = pd.DataFrame.from_dict(hdr, orient='index')
         res.rename(columns={'index':'Date', 0:'WMA'}, inplace=True)
@@ -437,8 +439,7 @@ class Danta(object):
     def EMA(self, *args):
         period, hdr = 20, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
         for __ in self.__trade_date[period:]: hdr[__] = self.ema([_ for _ in self.data if not _.date > __], period)
         res = pd.DataFrame.from_dict(hdr, orient='index')
         res.rename(columns={'index':'Date', 0:'EMA'}, inplace=True)
@@ -447,17 +448,11 @@ class Danta(object):
     def KAMA(self, *args):
         period, fast, slow, hdr = 10, 2, 30, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
             if len(args) > 1:
-                try:
-                    if isinstance(args[1], int): fast = args[1]
-                    if isinstance(args[1], float): fast = int(args[1])
-                except: pass
-                try:
-                    if isinstance(args[2], int): slow = args[2]
-                    if isinstance(args[2], float): slow = int(args[2])
-                except: pass
+                if isinstance(args[1], (int, float)): fast = int(args[1])
+            if len(args) > 1:
+                if isinstance(args[2], (int, float)): slow = int(args[2])
         for __ in self.__trade_date[period:]: hdr[__] = self.kama([_ for _ in self.data if not _.date > __], period, fast, slow)
         res = pd.DataFrame.from_dict(hdr, orient='index')
         res.rename(columns={'index':'Date', 0:'KAMA'}, inplace=True)
@@ -466,8 +461,7 @@ class Danta(object):
     def RSI(self, *args):
         period, hdr = 14, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
         for __ in self.__trade_date[period:]: hdr[__] = self.rsi([_ for _ in self.data if not _.date > __], period)
         res = pd.DataFrame.from_dict(hdr, orient='index')
         res.rename(columns={'index':'Date', 0:'RSI'}, inplace=True)
@@ -476,8 +470,7 @@ class Danta(object):
     def ADX(self, *args):
         period, hdr = 14, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
         for __ in self.__trade_date[period:]: hdr[__] = self.adx([_ for _ in self.data if not _.date > __], period)
         res = pd.DataFrame.from_dict(hdr, orient='index')
         res.rename(columns={'index':'Date', 0:'ADX'}, inplace=True)
@@ -486,8 +479,7 @@ class Danta(object):
     def STC(self, *args):
         period, kd, dd = 14, {}, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
         for __ in self.__trade_date[period:]:
             hdr = self.stc([_ for _ in self.data if not _.date > __], period)
             kd[__], dd[__] = hdr.K, hdr.D
@@ -500,8 +492,7 @@ class Danta(object):
     def KC(self, *args):
         period, ud, ld = (20, 10), {}, {}
         if args:
-            if isinstance(args[0], tuple): period = args[0]
-            if isinstance(args[0], list): period = tuple(args[0])
+            if isinstance(args[0], (tuple, list)): period = tuple(args[0])
         for __ in self.__trade_date[period[0]:]:
             hdr = self.kc([_ for _ in self.data if not _.date > __], period)
             ud[__], ld[__] = hdr.Upper, hdr.Lower
@@ -514,8 +505,7 @@ class Danta(object):
     def APZ(self, *args):
         period, ud, ld = 5, {}, {}
         if args:
-            if isinstance(args[0], int): period = args[0]
-            if isinstance(args[0], float): period = int(args[0])
+            if isinstance(args[0], (int, float)): period = int(args[0])
         for __ in self.__trade_date[period:]:
             hdr = self.apz([_ for _ in self.data if not _.date > __], period)
             ud[__], ld[__] = hdr.Upper, hdr.Lower
