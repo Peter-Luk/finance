@@ -134,30 +134,36 @@ class Danta(object):
         ids = pd.concat([self.STC(), self.RSI(), self.ADX()], axis=1, join='inner', ignore_index=False)
         return {'MA': mas, 'Ind':ids}
 
-    def sma(self, *args):
+    def sma(self, *args, **kwargs):
         data, period = self.data, 20
         if args:
             if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
         if not (len(data) > period): return mean([_.close for _ in data])
         return mean([_.close for _ in data[-period:]])
 
-    def wma(self, *args):
+    def wma(self, *args, **kwargs):
         data, period = self.data, 20
         if args:
             if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
         if not (len(data) > period): return sum([_.close * _.volume for _ in data]) / sum([_.volume for _ in data])
         return sum([_.close * _.volume for _ in data[-period:]]) / sum([_.volume for _ in data[-period:]])
 
-    def rsi(self, *args):
+    def rsi(self, *args, **kwargs):
         data, period = self.data, 14
         if args:
             if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
 
         def __delta(*args):
             i, hdr = 1, []
@@ -183,7 +189,7 @@ class Danta(object):
         try: return 100 - 100 / (1 + ag / al)
         except: pass
 
-    def ema(self, *args):
+    def ema(self, *args, **kwargs):
         data, numtype, period = self.data, False, 20
         if args:
             if isinstance(args[0], list):
@@ -191,6 +197,8 @@ class Danta(object):
                 data = args[0]
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
         if not (len(data) > period):
             if numtype: return mean(data)
             return mean([_.close for _ in data])
@@ -203,7 +211,7 @@ class Danta(object):
             i += 1
         return res
 
-    def kama(self, *args):
+    def kama(self, *args, **kwargs):
         data, period, fast, slow = self.data, 10, 2, 30
         if args:
             if isinstance(args[0], (tuple, list)): data = list(args[0])
@@ -213,6 +221,8 @@ class Danta(object):
                 if isinstance(args[2], (int, float)): fast = int(args[2])
             if len(args) > 3:
                 if isinstance(args[3], (int, float)): slow = int(args[3])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
 
         def asum(*args):
             i, hdr = 1, []
@@ -232,12 +242,14 @@ class Danta(object):
             i += 1
         return res
 
-    def apz(self, *args):
+    def apz(self, *args, **kwargs):
         data, period = self.data, 5
         if args:
             if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
         vl = [_.high - _.low for _ in data]
         i, vpl, epl = period, [], []
         while i < len(data):
@@ -284,12 +296,14 @@ class Danta(object):
                     i += 1
         return res
 
-    def adx(self, *args):
+    def adx(self, *args, **kwargs):
         data, period = self.data, 14
         if args:
             if isinstance(args[0], (tuple, list)): data = list(args[0])
             if len(args) > 1:
                 if isinstance(args[1], (int, float)): period = int(args[1])
+        if 'period' in list(kwargs.keys()):
+            if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
         i, trd, dmp, dmm = period, self.__tr(data), self.__dm(data, '+'), self.__dm(data, '-')
         while i < len(data):
             if i == period:
