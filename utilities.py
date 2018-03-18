@@ -114,15 +114,20 @@ def get_start(*args, **kwargs):
 def web_collect(*args, **kwargs):
     src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), 'basic', {}
     if args:
-        code = args[0]
-        if len(args) > 1: period = args[1]
-    if 'code' in lk: code = kwargs['code']
-    if 'period' in lk: period = kwargs['period']
-    if 'source' in lk: src = kwargs['source']
-    if 'format' in lk: efor = kwargs['format']
+        if isinstance(args[0], (int, float)): code = int(args[0])
+        if len(args) > 1:
+            if isinstance(args[1], (int, float)): period = int(args[1])
+    if 'code' in lk:
+        if isinstance(kwargs['code'], (int, float)): code = int(kwargs['code'])
+    if 'period' in lk:
+        if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
+    if 'source' in lk:
+        if isinstance(kwargs['source'], str): src = kwargs['source']
+    if 'format' in lk:
+        if isinstance(kwargs['format'], str): efor = kwargs['format']
     if src == 'yahoo':
-        if isinstance(code, int):code = '{:04d}.HK'.format(code)
-        elif isinstance(code, list):code = ['{:04d}.HK'.format(_) for _ in code]
+        if isinstance(code, int): code = '{:04d}.HK'.format(code)
+        elif isinstance(code, (tuple, list)): code = ['{:04d}.HK'.format(_) for _ in list(code)]
     start = get_start(period)
     if start:
         if isinstance(code, str):
