@@ -114,13 +114,13 @@ def get_start(*args, **kwargs):
 def web_collect(*args, **kwargs):
     src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), 'basic', {}
     if args:
-        if isinstance(args[0], (int, float)): code = int(args[0])
         if isinstance(args[0], (tuple, list)): code = list(args[0])
+        if isinstance(args[0], (int, float)): code = [int(args[0])]
         if len(args) > 1:
             if isinstance(args[1], (int, float)): period = int(args[1])
     if 'code' in lk:
-        if isinstance(kwargs['code'], (int, float)): code = int(kwargs['code'])
         if isinstance(kwargs['code'], (tuple, list)): code = list(kwargs['code'])
+        if isinstance(kwargs['code'], (int, float)): code = [int(kwargs['code'])]
     if 'period' in lk:
         if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
     if 'source' in lk:
@@ -128,19 +128,24 @@ def web_collect(*args, **kwargs):
     if 'format' in lk:
         if isinstance(kwargs['format'], str): efor = kwargs['format']
     if src == 'yahoo':
-        if isinstance(code, int): code = '{:04d}.HK'.format(code)
-        elif isinstance(code, list): code = ['{:04d}.HK'.format(_) for _ in code]
+        # if isinstance(code, int): code = '{:04d}.HK'.format(code)
+        # elif isinstance(code, list): code = ['{:04d}.HK'.format(_) for _ in code]
+        code = ['{:04d}.HK'.format(_) for _ in code]
     start = get_start(period)
     if start:
-        if isinstance(code, str):
-            dp = data.DataReader(code, src, start, end)
-            res[code] = dp.transpose().to_dict()
-            if efor == 'pandas': res[code] = dp
-        elif isinstance(code, list):
-            dp = data.DataReader(code, src, start, end)
-            for c in code:
-                res[c] = dp.minor_xs(c).transpose().to_dict()
-                if efor == 'pandas': res[c] = dp.minor_xs(c)
+#         if isinstance(code, str):
+#             dp = data.DataReader(code, src, start, end)
+#             res[code] = dp.transpose().to_dict()
+#             if efor == 'pandas': res[code] = dp
+#         elif isinstance(code, list):
+#             dp = data.DataReader(code, src, start, end)
+#             for c in code:
+#                 res[c] = dp.minor_xs(c).transpose().to_dict()
+#                 if efor == 'pandas': res[c] = dp.minor_xs(c)
+        dp = data.DataReader(code, src, start, end)
+        for c in code:
+            res[c] = dp.minor_xs(c).transpose().to_dict()
+            if efor == 'pandas': res[c] = dp.minor_xs(c)
         return res
 
 def get_month(index):
