@@ -85,10 +85,14 @@ class Danta(object):
                 t = self.Upper
                 self.Upper = self.Lower
                 self.Lower = t
+
         def __del__(self):
             self.Upper = self.Lower = None
             del(self.Upper, self.Lower)
+
         def __call__(self):
+            if self.Lower > 1000:
+                return {'upper':round(self.Upper, 0), 'lower':round(self.Lower, 0)}
             return {'upper':self.Upper, 'lower':self.Lower}
 
     class __SCD(object):
