@@ -91,20 +91,20 @@ class Danta(object):
             del(self.Upper, self.Lower)
 
         def __call__(self):
-            if self.Lower > 10:
-                return {'upper':round(self.Upper, 2), 'lower':round(self.Lower, 2)}
-            if self.Lower > 20:
-                return {'upper':round(self.Upper * 5, 2) / 5, 'lower':round(self.Lower * 5, 2) / 5}
-            if self.Lower > 50:
-                return {'upper':round(self.Upper * 2, 2) / 2, 'lower':round(self.Lower * 2, 2) / 2}
-            if self.Lower > 100:
-                return {'upper':round(self.Upper, 1), 'lower':round(self.Lower, 1)}
-            if self.Lower > 200:
-                return {'upper':round(self.Upper * 5, 1) / 5, 'lower':round(self.Lower * 5, 1) / 5}
-            if self.Lower > 500:
-                return {'upper':round(self.Upper * 2, 1) / 2, 'lower':round(self.Lower * 2, 1) / 2}
             if self.Lower > 1000:
                 return {'upper':round(self.Upper, 0), 'lower':round(self.Lower, 0)}
+            if self.Lower > 500:
+                return {'upper':round(self.Upper * 2, 1) / 2, 'lower':round(self.Lower * 2, 1) / 2}
+            if self.Lower > 200:
+                return {'upper':round(self.Upper * 5, 1) / 5, 'lower':round(self.Lower * 5, 1) / 5}
+            if self.Lower > 100:
+                return {'upper':round(self.Upper, 1), 'lower':round(self.Lower, 1)}
+            if self.Lower > 50:
+                return {'upper':round(self.Upper * 2, 2) / 2, 'lower':round(self.Lower * 2, 2) / 2}
+            if self.Lower > 20:
+                return {'upper':round(self.Upper * 5, 2) / 5, 'lower':round(self.Lower * 5, 2) / 5}
+            if self.Lower > 10:
+                return {'upper':round(self.Upper, 2), 'lower':round(self.Lower, 2)}
             return {'upper':self.Upper, 'lower':self.Lower}
 
     class __SCD(object):
