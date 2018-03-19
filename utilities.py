@@ -128,20 +128,9 @@ def web_collect(*args, **kwargs):
     if 'pandas' in lk:
         if isinstance(kwargs['pandas'], bool): efor = kwargs['pandas']
     if src == 'yahoo':
-        # if isinstance(code, int): code = '{:04d}.HK'.format(code)
-        # elif isinstance(code, list): code = ['{:04d}.HK'.format(_) for _ in code]
         code = ['{:04d}.HK'.format(_) for _ in code]
     start = get_start(period)
     if start:
-#         if isinstance(code, str):
-#             dp = data.DataReader(code, src, start, end)
-#             res[code] = dp.transpose().to_dict()
-#             if efor == 'pandas': res[code] = dp
-#         elif isinstance(code, list):
-#             dp = data.DataReader(code, src, start, end)
-#             for c in code:
-#                 res[c] = dp.minor_xs(c).transpose().to_dict()
-#                 if efor == 'pandas': res[c] = dp.minor_xs(c)
         dp = data.DataReader(code, src, start, end)
         for c in code:
             res[c] = dp.minor_xs(c).transpose().to_dict()
