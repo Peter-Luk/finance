@@ -259,3 +259,12 @@ def dvs(d):
     values.sort()
     for v in values: res.extend([i[0] for i in list(d.keys()) if d[i] == v])
     return ''.join(res)
+
+def lique(*args):
+    if isinstance(args[0], (tuple, list)): target = list(args[0])
+    res = []
+    while len(target):
+        _ = target.pop()
+        if _ not in target: res.append(_)
+    res.sort()
+    return res

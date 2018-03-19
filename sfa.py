@@ -1,5 +1,5 @@
 from alchemy import load, mapper
-from utilities import datetime, nitem, gslice, mtf, gr
+from utilities import datetime, nitem, gslice, mtf, gr, lique
 from statistics import mean
 
 import pandas as pd
@@ -422,8 +422,9 @@ class Danta(object):
             if isinstance(args[0], (list, tuple)): data = list(args[0])
         lc = data[-1].close
         lr = self.atr(data)
-        res = gslice([lc + lr, lc])
-        res.extend(gslice([lc, lc -lr]))
+        res = [lc + lr, lc, lc - lr]
+        res.extend(gslice([lc + lr, lc]))
+        res.extend(gslice([lc, lc - lr]))
         res.sort()
         return res
 
@@ -444,11 +445,7 @@ class Danta(object):
         if args:
             if isinstance(args[0], (tuple, list)): data = list(args[0])
         [hdr.extend(self.pgap(_, data)) for _ in self.patr(data)]
-        hdr.sort()
-        while len(hdr):
-            ph = hdr.pop()
-            if ph not in hdr: res.append(ph)
-        return res
+        return lique(hdr)
 
     def SMA(self, *args):
         period, hdr = 20, {}
