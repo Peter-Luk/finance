@@ -112,7 +112,7 @@ def get_start(*args, **kwargs):
         return datetime.fromordinal(eo - period)
 
 def web_collect(*args, **kwargs):
-    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), 'basic', {}
+    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), False, {}
     if args:
         if isinstance(args[0], (tuple, list)): code = list(args[0])
         if isinstance(args[0], (int, float)): code = [int(args[0])]
@@ -125,8 +125,8 @@ def web_collect(*args, **kwargs):
         if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
     if 'source' in lk:
         if isinstance(kwargs['source'], str): src = kwargs['source']
-    if 'format' in lk:
-        if isinstance(kwargs['format'], str): efor = kwargs['format']
+    if 'pandas' in lk:
+        if isinstance(kwargs['pandas'], bool): efor = kwargs['pandas']
     if src == 'yahoo':
         # if isinstance(code, int): code = '{:04d}.HK'.format(code)
         # elif isinstance(code, list): code = ['{:04d}.HK'.format(_) for _ in code]
@@ -145,7 +145,7 @@ def web_collect(*args, **kwargs):
         dp = data.DataReader(code, src, start, end)
         for c in code:
             res[c] = dp.minor_xs(c).transpose().to_dict()
-            if efor == 'pandas': res[c] = dp.minor_xs(c)
+            if efor: res[c] = dp.minor_xs(c)
         return res
 
 def get_month(index):
