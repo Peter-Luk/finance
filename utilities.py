@@ -60,7 +60,8 @@ def ltd(year=year, month=month, excluded={}):
     if not(year % 4):ld[1] += 1
     day = ld[month - 1]
     if excluded:
-        if '%'%year in excluded.keys():
+        # if '%'%year in excluded.keys():
+        if year in excluded.keys():
             if month in excluded[year].keys():
                 if day not in excluded[year][month]:t += 1
     while t < 1:
@@ -146,7 +147,8 @@ def dex(n=0):
     if n in range(12):
         n_month, n_year = month + n, today.year
         if n_month > 12 and n_month != n_month % 12:n_month, n_year = n_month % 12, n_year + 1
-        return month_initial[datetime(n_year, n_month, 1).strftime('%B')] + ('%i' % n_year)[-1]
+        # return month_initial[datetime(n_year, n_month, 1).strftime('%B')] + ('%i' % n_year)[-1]
+        return month_initial[datetime(n_year, n_month, 1).strftime('%B')] + '{:d}'.format(n_year)[-1]
     else:print("Out of range (0 - 11)")
 
 def waf(delta=0):
