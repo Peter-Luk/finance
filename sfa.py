@@ -440,7 +440,7 @@ class Danta(object):
         res.sort()
         return res
 
-    def full_range(self, *args):
+    def rander(self, *args):
         data, res, hdr = self.data, [], []
         if args:
             if isinstance(args[0], (tuple, list)): data = list(args[0])
@@ -543,3 +543,15 @@ class Danta(object):
         pld.rename(columns={'index':'Date', 0:'Lower'}, inplace=True)
         res = pd.concat([pud, pld], axis=1, join='inner', ignore_index=False)
         return res
+
+    def inact(self, *args):
+        res, req_date = {}, args[0]
+        if not req_date > self.__trade_date[-1]:
+            ldata = [_ for _ in self.data if not _.date > req_date][-1]
+            idata = [_ for _ in self.data if _.date < ldata.date]
+            pset = self.rander(idata)
+            for f in ['open', 'high', 'low', 'close']:
+                num = eval('nitem(ldata.{}, pset)'.format(f))
+                val = eval('ldata.{} - pset[num]'.format(f))
+                res[f] = {num: val}
+            return res
