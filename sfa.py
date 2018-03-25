@@ -545,7 +545,8 @@ class Danta(object):
         return res
 
     def inact(self, *args):
-        res, req_date = {}, args[0]
+        res, req_date = {}, self.__trade_date[-1]
+        if args: req_date = args[0]
         if not req_date > self.__trade_date[-1]:
             ldata = [_ for _ in self.data if not _.date > req_date][-1]
             idata = [_ for _ in self.data if _.date < ldata.date]
