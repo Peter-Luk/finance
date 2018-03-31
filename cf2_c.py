@@ -8,7 +8,7 @@ try:
     PI = getattr(__import__('pt_2'),'PI')
     panda = True
 except:
-    summary = grtattr(__import__(trial01),'summary')
+    summary = getattr(__import__(trial01),'summary')
 
 server_host, server_port = IP('public').address, 80
 if len(argv) > 1: server_host = argv[1]
