@@ -555,7 +555,7 @@ class Danta(object):
             ldata = [_ for _ in self.data if not _.date > req_date][-1]
             idata = [_ for _ in self.data if _.date < ldata.date]
             pset = self.rander(idata)
-            if not(digit < 0): pset = lique([round(_, digit) for _ in self.rander(idata)])
+            if not digit < 0: pset = lique([round(_, digit) for _ in self.rander(idata)])
             for f in ['open', 'high', 'low', 'close']:
                 num = eval('nitem(ldata.{}, pset)'.format(f))
                 val = eval('ldata.{} - pset[num]'.format(f))
