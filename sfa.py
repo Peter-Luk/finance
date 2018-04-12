@@ -544,13 +544,18 @@ class Danta(object):
         res = pd.concat([pud, pld], axis=1, join='inner', ignore_index=False)
         return res
 
-    def inact(self, *args):
-        res, req_date = {}, self.__trade_date[-1]
-        if args: req_date = args[0]
+    def inact(self, *args, **kwargs):
+        res, req_date, digit = {}, self.__trade_date[-1], -1
+        if args:
+            req_date = args[0]
+            if len(args) > 1 and not(args[1] < 0): digit = int(args[1])
+        if 'digit' in list(kwargs.keys()):
+            if not(kwargs['digit'] < 0): digit = int(kwargs['digit'])
         if not req_date > self.__trade_date[-1]:
             ldata = [_ for _ in self.data if not _.date > req_date][-1]
             idata = [_ for _ in self.data if _.date < ldata.date]
             pset = self.rander(idata)
+            if not(digit < 0): pset = lique([round(_, digit) for _ in self.rander(idata)])
             for f in ['open', 'high', 'low', 'close']:
                 num = eval('nitem(ldata.{}, pset)'.format(f))
                 val = eval('ldata.{} - pset[num]'.format(f))
