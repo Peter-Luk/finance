@@ -546,18 +546,22 @@ class Danta(object):
 
     def inact(self, *args, **kwargs):
         res, req_date, digit = {}, self.__trade_date[-1], -1
-        if args:
-            req_date = args[0]
-            if len(args) > 1 and not(args[1] < 0): digit = int(args[1])
         if 'digit' in list(kwargs.keys()):
-            if not(kwargs['digit'] < 0): digit = int(kwargs['digit'])
-        if not req_date > self.__trade_date[-1]:
-            ldata = [_ for _ in self.data if not _.date > req_date][-1]
-            idata = [_ for _ in self.data if _.date < ldata.date]
-            pset = self.rander(idata)
-            if not digit < 0: pset = lique([round(_, digit) for _ in self.rander(idata)])
-            for f in ['open', 'high', 'low', 'close']:
-                num = eval('nitem(ldata.{}, pset)'.format(f))
-                val = eval('ldata.{} - pset[num]'.format(f))
-                res[f] = {num: val}
-            return res
+            if not kwargs['digit'] < 0: digit = int(kwargs['digit'])
+        ldata = [_ for _ in self.data if not _.date > req_date][-1]
+        idata = [_ for _ in self.data if _.date < ldata.date]
+        if args:
+            if isinstance(args[0], (list, tuple)): idata = list(args[0])
+            else:
+                req_date = args[0]
+                if not req_date > self.__trade_date[-1]:
+                    ldata = [_ for _ in self.data if not _.date > req_date][-1]
+                    idata = [_ for _ in self.data if _.date < ldata.date]
+            if len(args) > 1 and not args[1] < 0: digit = int(args[1])
+        pset = self.rander(idata)
+        if not digit < 0: pset = lique([round(_, digit) for _ in self.rander(idata)])
+        for f in ['open', 'high', 'low', 'close']:
+            num = eval('nitem(ldata.{}, pset)'.format(f))
+            val = eval('ldata.{} - pset[num]'.format(f))
+            res[f] = {num: val}
+        return res
