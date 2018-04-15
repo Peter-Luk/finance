@@ -76,6 +76,7 @@ def daily(*args):
     except: pass
     return res
 
+from math import ceil, floor
 class Danta(object):
     class __BD(object):
         def __init__(self, *args):
@@ -90,7 +91,8 @@ class Danta(object):
             self.Upper = self.Lower = None
             del(self.Upper, self.Lower)
 
-        def __call__(self):
+        # def __call__(self):
+        def __dict__(self):
             if self.Lower > 1000:
                 return {'upper':round(self.Upper, 0), 'lower':round(self.Lower, 0)}
             if self.Lower > 500:
@@ -106,6 +108,18 @@ class Danta(object):
             if self.Lower > 1:
                 return {'upper':round(self.Upper, 2), 'lower':round(self.Lower, 2)}
             return {'upper':self.Upper, 'lower':self.Lower}
+
+        def within(self, *args):
+            if args:
+                if isinstance(args[0], (int, float)):
+                    return args[0] in range(floor(self.Lower), ceil(self.Upper))
+
+        def nearest(self, *args):
+            if args:
+                if self.within(args[0]):
+                    ub, lb = args[0] - self.Upper, args[0] - self.Lower
+                    if abs(ub) < lb: return ub
+                    return lb
 
     class __SCD(object):
         def __init__(self, *args, **kwargs):
