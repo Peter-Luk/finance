@@ -114,12 +114,17 @@ class Danta(object):
                 if isinstance(args[0], (int, float)):
                     return args[0] in range(floor(self.Lower), ceil(self.Upper))
 
-        def nearest(self, *args):
+        def nearest(self, *args, **kwargs):
+            dtype, res = 'absolute', 0
+            if 'type' in list(kwargs.keys()):
+                if isinstance(kwargs['type'], str): dtype = kwargs['type']
             if args:
                 if self.within(args[0]):
-                    ub, lb = args[0] - self.Upper, args[0] - self.Lower
-                    if abs(ub) < lb: return ub
-                    return lb
+                    if dtype == 'absolute':
+                        ub, lb = args[0] - self.Upper, args[0] - self.Lower
+                        if abs(ub) < lb: res = ub
+                        res =  lb
+            return res
 
     class __SCD(object):
         def __init__(self, *args, **kwargs):
