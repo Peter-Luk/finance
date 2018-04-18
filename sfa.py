@@ -564,9 +564,12 @@ class Danta(object):
         return res
 
     def inact(self, *args, **kwargs):
-        res, req_date, digit = {}, self.__trade_date[-1], -1
-        if 'digit' in list(kwargs.keys()):
+        res, req_date, digit, psteps, step = {}, self.__trade_date[-1], -1, frozenset([1, 2, 5]), 0
+        if kwargs: lkeys = list(kwargs.keys())
+        if 'digit' in lkeys:
             if not kwargs['digit'] < 0: digit = int(kwargs['digit'])
+        if 'step' in lkeys:
+            if isinstance(kwargs['step'], (int, float)): step = kwargs['step']
         ldata = [_ for _ in self.data if not _.date > req_date][-1]
         idata = [_ for _ in self.data if _.date < ldata.date]
         if args:
@@ -578,7 +581,7 @@ class Danta(object):
                     idata = [_ for _ in self.data if _.date < ldata.date]
             if len(args) > 1 and not args[1] < 0: digit = int(args[1])
         pset = self.rander(idata)
-        if not digit < 0: pset = lique([round(_, digit) for _ in self.rander(idata)])
+        if step in psteps and not digit < 0: pset = lique([round(_ * 10 / step, digit) / 10 * step for _ in self.rander(idata)])
         for f in ['open', 'high', 'low', 'close']:
             num = eval('nitem(ldata.{}, pset)'.format(f))
             val = eval('ldata.{} - pset[num]'.format(f))
