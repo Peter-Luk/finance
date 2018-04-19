@@ -583,7 +583,7 @@ class Danta(object):
             if len(args) > 1 and not args[1] < 0: digit = int(args[1])
         pset = self.rander(idata)
         if not digit < 0:
-            if step in psteps: pset = lique([round(_ * 10 / step, digit) / 10 * step for _ in self.rander(idata)])
+            if step in psteps: pset = lique([round(_ * 10 / step, digit - 1) / 10 * step for _ in self.rander(idata)])
         for f in ['open', 'high', 'low', 'close']:
             num = eval('nitem(ldata.{}, pset)'.format(f))
             val = eval('ldata.{} - pset[num]'.format(f))
