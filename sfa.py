@@ -435,6 +435,22 @@ class Danta(object):
         s = self.ema(ml, s_period)
         return ml[-1], s, ml[-1] - s
 
+    def pma(self, *args, **kwargs):
+        mtype, data = 'kama', self.data
+        if args:
+            if isinstance(args[0], (list, tuple)): data = list(args[0])
+        if 'type' in list(kwargs.keys()):
+            if isinstance(kwargs['type'], str): mtype = kwargs['type']
+        lc = data[-1].close
+        ma = eval('self.{}(data)'.format(mtype))
+        lr = lc - ma
+        if lr < 0: lr = -lr
+        res = [lc + lr, lc, lc - lr]
+        res.extend(gslice([lc + lr, lc]))
+        res.extend(gslice([lc, lc - lr]))
+        res.sort()
+        return res
+
     def patr(self, *args):
         data = self.data
         if args:
