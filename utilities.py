@@ -1,7 +1,15 @@
-him = getattr(__import__('handy'), 'him')
-iml = [{'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ'), 'functools':('reduce',), 'pandas_datareader':('data',)},({'sqlite3':()}, "alias='lite'")]
-__ = him(iml)
-for _ in list(__.keys()): exec("{0}=__['{0}']".format(_))
+#him = getattr(__import__('handy'), 'him')
+#iml = [{'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ'), 'functools':('reduce',), 'pandas_datareader':('data',)},({'sqlite3':()}, "alias='lite'")]
+#__ = him(iml)
+#for _ in list(__.keys()): exec("{0}=__['{0}']".format(_))
+import socket
+from datetime import datetime
+from sys import platform, version_info
+from os import linesep, sep, environ
+from functools import reduce
+#from pandas_datareader import data
+import sqlite3 as lite
+
 gr = 1.61803399
 
 today = datetime.today()
@@ -111,7 +119,7 @@ def get_start(*args, **kwargs):
     if mode == 'd':
         eo = end.toordinal()
         return datetime.fromordinal(eo - period)
-
+"""
 def web_collect(*args, **kwargs):
     src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), False, {}
     if args:
@@ -137,7 +145,7 @@ def web_collect(*args, **kwargs):
             res[c] = dp.minor_xs(c).transpose().to_dict()
             if efor: res[c] = dp.minor_xs(c)
         return res
-
+"""
 def get_month(index):
     if index.upper() in month_initial.values():
         for i in list(month_initial.items()):
@@ -156,7 +164,7 @@ def waf(delta=0):
     futures += [''.join((f,dex(delta+1))) for f in futures_type[:-2]]
     return tuple(futures)
 
-def filepath (*args, **kwargs):
+def filepath(*args, **kwargs):
     name, file_type, data_path = args[0], 'data', 'sqlite3'
     if 'type' in list(kwargs.keys()): file_type = kwargs['type']
     if 'subpath' in list(kwargs.keys()): data_path = kwargs['subpath']
