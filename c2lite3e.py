@@ -1,12 +1,8 @@
 #him = getattr(__import__('handy'), 'him')
 #iml = [{'utilities':('filepath', 'get_start', 'web_collect', 'dictfcomp'), 'datetime':('datetime',), 'os':('listdir', 'linesep', 'sep', 'path', 'remove'), 'sys':('platform',), 'pandas_datareader':('data',), 'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'"), ({'pandas':()}, "alias='pd'")]
 #__ = him(iml)
-from utilities import filepath, get_start, dictfcomp
-from datetime import datetime
-from sys import platform
-from functools import reduce
-from os import listdir, linesep, sep, path, remove
-import sqlite3 as lite
+from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, linesep, sep, path, lite
+from os import listdir, remove
 import pandas as pd
 #for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
