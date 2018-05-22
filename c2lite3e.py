@@ -1,7 +1,14 @@
-him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('filepath', 'get_start', 'web_collect', 'dictfcomp'), 'datetime':('datetime',), 'os':('listdir', 'linesep', 'sep', 'path', 'remove'), 'sys':('platform',), 'pandas_datareader':('data',), 'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'"), ({'pandas':()}, "alias='pd'")]
-__ = him(iml)
-for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
+#him = getattr(__import__('handy'), 'him')
+#iml = [{'utilities':('filepath', 'get_start', 'web_collect', 'dictfcomp'), 'datetime':('datetime',), 'os':('listdir', 'linesep', 'sep', 'path', 'remove'), 'sys':('platform',), 'pandas_datareader':('data',), 'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'"), ({'pandas':()}, "alias='pd'")]
+#__ = him(iml)
+from utilities import filepath, get_start, dictfcomp
+from datetime import datetime
+from sys import platform
+from functools import reduce
+from os import listdir, linesep, sep, path, remove
+import sqlite3 as lite
+import pandas as pd
+#for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 db_name, db_table, datafields = 'Securities', 'records', ['open', 'high', 'low', 'close', 'volume']
 
@@ -90,7 +97,7 @@ def find_csv_path(*args, **kwargs):
     sdl = sd.split(sep)
     cp = sdl[:-2]
     cp.append(folder)
-    if platform == 'linux':
+    if platform in ['linux', 'linux2']:
         si = sdl.index('storage')
         cp = sdl[:si+1]
         cp.extend(['shared', 'Download'])
@@ -118,11 +125,11 @@ def c2d(*args, **kwargs):
             tmp.append(hdr)
         except: pass
     return tmp
-
+"""
 def wap(*args, **kwargs):
-    """
-Obtain daily update thru API (Yahoo) and update 'local' database.
-    """
+"""
+#Obtain daily update thru API (Yahoo) and update 'local' database.
+"""
     ic, aid, kw = 0, [_ for _ in get_stored_eid() if _ not in [805]], kwargs
     lkw = list(kw.keys())
     conn = lite.connect(filepath(db_name))
@@ -178,7 +185,7 @@ def wam(*args, **kwargs):
         if df: count += u2lite(_, df, conn)
     conn.close()
     return count
-
+"""
 def append(*args, **kwargs):
     """
     Sequential update database with 'folder' directory.
@@ -254,16 +261,16 @@ first positional or 'code' named is name in file system.
                 rdata = [_[:-1] for _ in tmp.readlines()]
                 tmp.close()
             except: pass
-        else:
-            end = datetime.today()
-            m, y = end.month, end.year
-            if m == 1:
-                m += 12
-                y -= 1
-            m -= 1
-            start = datetime.strptime('{0}-{1}-01'.format(y, m), '%Y-%m-%d')
-            df = data.DataReader(code, 'yahoo', start, end)
-            rdata = df.to_csv().split(linesep)[:-1]
+#         else:
+#             end = datetime.today()
+#             m, y = end.month, end.year
+#             if m == 1:
+#                 m += 12
+#                 y -= 1
+#             m -= 1
+#             start = datetime.strptime('{0}-{1}-01'.format(y, m), '%Y-%m-%d')
+#             df = data.DataReader(code, 'yahoo', start, end)
+#             rdata = df.to_csv().split(linesep)[:-1]
         fields = rdata[0].split(',')
         i, values = 1, []
         while i < len(rdata):
