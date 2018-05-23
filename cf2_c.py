@@ -1,7 +1,3 @@
-# him = getattr(__import__('handy'),'him')
-# iml =[{'datetime':('datetime',),'os':('linesep',),'sys':('argv','platform'),'utilities':('ltd','waf','today'),'cherrypy':(),'bt':('LF',)},({'utilities':('IP',),'tags':('HTML', 'HEAD', 'TITLE', 'LINK', 'BODY', 'FORM', 'TABLE', 'TR', 'TD', 'LABEL', 'SELECT', 'OPTION', 'BUTTON', 'INPUT')}, "case='upper'")]
-# __ = him(iml)
-# for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 import cherrypy
 from bt import LF as lf
 from utilities import datetime, linesep, platform, ltd, waf, today, IP
