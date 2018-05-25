@@ -2,7 +2,7 @@
 #iml = [{'utilities':('filepath', 'get_start', 'web_collect', 'dictfcomp'), 'datetime':('datetime',), 'os':('listdir', 'linesep', 'sep', 'path', 'remove'), 'sys':('platform',), 'pandas_datareader':('data',), 'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'"), ({'pandas':()}, "alias='pd'")]
 #__ = him(iml)
 from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, linesep, sep, lite
-from os import path, listdir, remove
+from os import environ, path, listdir, remove
 import pandas as pd
 #for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
@@ -93,6 +93,10 @@ def find_csv_path(*args, **kwargs):
     sdl = sd.split(sep)
     cp = sdl[:-2]
     cp.append(folder)
+    if platform == 'win32':
+        file_drive, file_path = environ['HOMEDRIVE'], environ['HOMEPATH']
+        file_path = sep.join((file_drive, file_path, 'Downloads'))
+        return file_path
     if platform in ['linux', 'linux2']:
         si = sdl.index('storage')
         cp = sdl[:si+1]
