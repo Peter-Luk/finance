@@ -1,7 +1,3 @@
-#him = getattr(__import__('handy'), 'him')
-#iml = [{'socket':(), 'datetime':('datetime',), 'sys':('platform', 'version_info'), 'os':('linesep', 'sep', 'environ'), 'functools':('reduce',), 'pandas_datareader':('data',)},({'sqlite3':()}, "alias='lite'")]
-#__ = him(iml)
-#for _ in list(__.keys()): exec("{0}=__['{0}']".format(_))
 import socket
 from datetime import datetime
 from sys import platform, version_info
