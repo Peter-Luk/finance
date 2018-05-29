@@ -1,10 +1,6 @@
-#him = getattr(__import__('handy'), 'him')
-#iml = [{'utilities':('filepath', 'get_start', 'web_collect', 'dictfcomp'), 'datetime':('datetime',), 'os':('listdir', 'linesep', 'sep', 'path', 'remove'), 'sys':('platform',), 'pandas_datareader':('data',), 'functools':('reduce',)}, ({'sqlite3':()}, "alias='lite'"), ({'pandas':()}, "alias='pd'")]
-#__ = him(iml)
 from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, linesep, sep, lite
-from os import environ, path, listdir, remove
+from os import path, listdir, remove
 import pandas as pd
-#for _ in list(__.keys()):exec("%s=__['%s']" % (_, _))
 
 db_name, db_table, datafields = 'Securities', 'records', ['open', 'high', 'low', 'close', 'volume']
 
@@ -94,9 +90,9 @@ def find_csv_path(*args, **kwargs):
     cp = sdl[:-2]
     cp.append(folder)
     if platform == 'win32':
-        file_drive, file_path = environ['HOMEDRIVE'], environ['HOMEPATH']
-        file_path = sep.join((file_drive, file_path, 'Downloads'))
-        return file_path
+        tmp = cp[:-2]
+        tmp.append('Downloads')
+        return sep.join(tmp)
     if platform in ['linux', 'linux2']:
         si = sdl.index('storage')
         cp = sdl[:si+1]
