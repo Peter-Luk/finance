@@ -5,6 +5,7 @@ from os import linesep, sep, environ
 from functools import reduce
 #from pandas_datareader import data
 import sqlite3 as lite
+import fix_yahoo_finance as yf
 
 gr = 1.61803399
 
@@ -115,7 +116,7 @@ def get_start(*args, **kwargs):
     if mode == 'd':
         eo = end.toordinal()
         return datetime.fromordinal(eo - period)
-"""
+
 def web_collect(*args, **kwargs):
     src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), False, {}
     if args:
@@ -136,12 +137,13 @@ def web_collect(*args, **kwargs):
         code = ['{:04d}.HK'.format(_) for _ in code]
     start = get_start(period)
     if start:
-        dp = data.DataReader(code, src, start, end)
+        dp = yf.download(code, start, end)
+#        dp = data.DataReader(code, src, start, end)
         for c in code:
             res[c] = dp.minor_xs(c).transpose().to_dict()
             if efor: res[c] = dp.minor_xs(c)
         return res
-"""
+
 def get_month(index):
     if index.upper() in month_initial.values():
         for i in list(month_initial.items()):
