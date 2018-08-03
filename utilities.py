@@ -137,11 +137,12 @@ def web_collect(*args, **kwargs):
         code = ['{:04d}.HK'.format(_) for _ in code]
     start = get_start(period)
     if start:
-        dp = yf.download(code, start, end)
+        dp = yf.download(code, start, end, group_by='ticker')
 #        dp = data.DataReader(code, src, start, end)
         for c in code:
-            res[c] = dp.minor_xs(c).transpose().to_dict()
-            if efor: res[c] = dp.minor_xs(c)
+#            res[c] = dp.minor_xs(c).transpose().to_dict()
+            res[c] = dp[c].transpose().to_dict()
+#            if efor: res[c] = dp.minor_xs(c)
         return res
 
 def get_month(index):
