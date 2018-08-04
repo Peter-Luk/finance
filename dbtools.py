@@ -1,5 +1,4 @@
 from sfa import load, mapper, Danta
-# import fix_yahoo_finance as yf
 from utilities import web_collect
 class RD(object): pass
 

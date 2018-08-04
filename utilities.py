@@ -118,7 +118,7 @@ def get_start(*args, **kwargs):
         return datetime.fromordinal(eo - period)
 
 def web_collect(*args, **kwargs):
-    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 1, datetime.today(), False, {}
+    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 2, datetime.today(), False, {}
     if args:
         if isinstance(args[0], (tuple, list)): code = list(args[0])
         if isinstance(args[0], (int, float)): code = [int(args[0])]
@@ -147,6 +147,7 @@ def web_collect(*args, **kwargs):
             for _ in list(tmp.keys()):
                 hdr[_.to_pydatetime()] = tmp[_]
             res[c] = hdr
+            if efor: res[c] = dp[c].transpose()
 #            if efor: res[c] = dp.minor_xs(c)
         return res
 
