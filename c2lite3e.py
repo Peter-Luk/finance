@@ -121,11 +121,11 @@ def c2d(*args, **kwargs):
             tmp.append(hdr)
         except: pass
     return tmp
-"""
+
 def wap(*args, **kwargs):
-"""
+
 #Obtain daily update thru API (Yahoo) and update 'local' database.
-"""
+
     ic, aid, kw = 0, [_ for _ in get_stored_eid() if _ not in [805]], kwargs
     lkw = list(kw.keys())
     conn = lite.connect(filepath(db_name))
@@ -172,7 +172,7 @@ def wap(*args, **kwargs):
                 except: pass
     conn.close()
     return ic
-
+"""
 def wam(*args, **kwargs):
     count, ae = 0, [_ for _ in get_stored_eid() if _ not in [805]]
     we, conn = web_collect(ae), lite.connect(filepath('Securities'))
