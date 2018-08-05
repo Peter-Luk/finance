@@ -1,4 +1,4 @@
-from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, linesep, sep, lite
+from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, linesep, sep, web_collect, lite
 from os import path, listdir, remove
 import pandas as pd
 
