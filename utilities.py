@@ -118,7 +118,7 @@ def get_start(*args, **kwargs):
         return datetime.fromordinal(eo - period)
 
 def web_collect(*args, **kwargs):
-    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 2, datetime.today(), False, {}
+    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 20, datetime.today(), False, {}
     if args:
         if isinstance(args[0], (tuple, list)): code = list(args[0])
         if isinstance(args[0], (int, float)): code = [int(args[0])]
@@ -135,7 +135,7 @@ def web_collect(*args, **kwargs):
         if isinstance(kwargs['pandas'], bool): efor = kwargs['pandas']
     if src == 'yahoo':
         code = ['{:04d}.HK'.format(_) for _ in code]
-    start = get_start(period, 'y')
+    start = get_start(period)
     if start:
         dp = yf.download(code, start, end, group_by='ticker')
 #        dp = data.DataReader(code, src, start, end)
