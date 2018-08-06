@@ -173,7 +173,7 @@ def wap(*args, **kwargs):
                 except: pass
     conn.close()
     return ic
-"""
+
 def wam(*args, **kwargs):
     count, ae = 0, [_ for _ in get_stored_eid() if _ not in [805]]
     we, conn = web_collect(ae), lite.connect(filepath('Securities'))
@@ -182,7 +182,7 @@ def wam(*args, **kwargs):
         if df: count += u2lite(_, df, conn)
     conn.close()
     return count
-"""
+
 def append(*args, **kwargs):
     """
     Sequential update database with 'folder' directory.
