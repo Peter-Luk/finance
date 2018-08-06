@@ -151,8 +151,8 @@ def wap(*args, **kwargs):
         atd = [i['date'] for i in conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(datafields + ['date']), db_table, _)).fetchall()]
         iw = wdp['{:04d}.HK'.format(_)]
         tdl = list(iw.keys())
-        idate.extend([i for i in tdl if i not in atd])
-        # idate.extend([i for i in tdl if '{:%Y-%m-%d}'.format(i) not in atd])
+        # idate.extend([i for i in tdl if i not in atd])
+        idate.extend([i for i in tdl if '{:%Y-%m-%d}'.format(i) not in atd])
         if idate:
             for i in idate:
                 wi = wdp['{:04d}.HK'.format(_)][i]

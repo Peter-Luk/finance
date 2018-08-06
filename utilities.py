@@ -145,7 +145,7 @@ def web_collect(*args, **kwargs):
             tmp = dp[c].transpose().to_dict()
             hdr = {}
             for _ in list(tmp.keys()):
-                hdr[_.to_pydatetime()] = tmp[_]
+                hdr[_.to_pydatetime().date()] = tmp[_]
             res[c] = hdr
             if efor: res[c] = dp[c].transpose()
 #            if efor: res[c] = dp.minor_xs(c)
