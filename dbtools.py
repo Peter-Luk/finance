@@ -32,53 +32,53 @@ class Equities(object):
             eid = int(args[0])
             return [__[0] for __ in self.query.filter(self.__RD.eid == eid).values(self.__RD.date)]
 
-#     def check(self):
-#         u_count, res, nrl, wdata = 0, [], [], web_collect(self.eid)
-#         for _ in self.eid:
-#             witem = wdata['{:04d}.HK'.format(_)]
-#             lwik = list(witem.keys())
-#             lwik.sort()
-#             # sitemdate = [__[0] for __ in self.query.filter(self.__RD.eid == _).values(self.__RD.date)]
-#             for __ in lwik[1:]:
-#                 try:
-#                     vol = int(witem[__]['Volume'])
-#                     if __.to_pydatetime().date() in self.__trade_date(_):
-#                         # pass
-#                         dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __.to_pydatetime().date())
-#                         if vol:
-#                             # dhdr['id'] = iitem.value(self.__RD.id)
-#                             if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
-#                             if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
-#                             if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
-#                             if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
-#                             if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
-#                             if dhdr:
-#                                 iitem.update(dhdr)
-#                                 u_count += 1
-#                         # udl.append(hdr)
-#                     else:
-#                         if vol:
-#                             nr = {'eid': _}
-#                             nr['date'] = __.to_pydatetime().date()
-#                             nr['volume'] = vol
-#                             for f in [_ for _ in self.data_fields if _ not in ['volume']]:
-#                                 exec("nr['{}'] = witem[__]['{}']".format(f, f.capitalize()))
-#                             nrl.append(nr)
-#                 except: pass
-#         if len(nrl) > 0:
-#             try:
-#                 self.__session.bulk_insert_mappings(self.__db[self.db_name]['table'], nrl)
-#                 self.__session.commit()
-#                 res.append('{:d} record(s) added'.format(len(nrl)))
-#             except:
-#                 self.__session.rollback()
-#                 res.append('no records added')
-#         if u_count:
-#             try:
-#                 # self.__session.bulk_update_mappings(self.__db[self.db_name]['table'], udl)
-#                 self.__session.commit()
-#                 res.append('{:d} record(s) updated'.format(u_count))
-#             except:
-#                 self.__session.rollback()
-#                 res.append('no record updated')
-#         return ','.join(res)
+    def check(self):
+        u_count, res, nrl, wdata = 0, [], [], web_collect(self.eid)
+        for _ in self.eid:
+            witem = wdata['{:04d}.HK'.format(_)]
+            lwik = list(witem.keys())
+            lwik.sort()
+            # sitemdate = [__[0] for __ in self.query.filter(self.__RD.eid == _).values(self.__RD.date)]
+            for __ in lwik[1:]:
+                try:
+                    vol = int(witem[__]['Volume'])
+                    if __ in self.__trade_date(_):
+                        # pass
+                        dhdr, iitem = {}, self.query.filter(self.__RD.eid == _, self.__RD.date == __)
+                        if vol:
+                            # dhdr['id'] = iitem.value(self.__RD.id)
+                            if iitem.value(self.__RD.open) != witem[__]['Open']: dhdr['open'] = witem[__]['Open']
+                            if iitem.value(self.__RD.high) != witem[__]['High']: dhdr['high'] = witem[__]['High']
+                            if iitem.value(self.__RD.low) != witem[__]['Low']: dhdr['low'] = witem[__]['Low']
+                            if iitem.value(self.__RD.close) != witem[__]['Close']: dhdr['close'] = witem[__]['Close']
+                            if iitem.value(self.__RD.volume) != vol: dhdr['volume'] = vol
+                            if dhdr:
+                                iitem.update(dhdr)
+                                u_count += 1
+                        # udl.append(hdr)
+                    else:
+                        if vol:
+                            nr = {'eid': _}
+                            nr['date'] = __
+                            nr['volume'] = vol
+                            for f in [_ for _ in self.data_fields if _ not in ['volume']]:
+                                exec("nr['{}'] = witem[__]['{}']".format(f, f.capitalize()))
+                            nrl.append(nr)
+                except: pass
+        if len(nrl) > 0:
+            try:
+                self.__session.bulk_insert_mappings(self.__db[self.db_name]['table'], nrl)
+                self.__session.commit()
+                res.append('{:d} record(s) added'.format(len(nrl)))
+            except:
+                self.__session.rollback()
+                res.append('no records added')
+        if u_count:
+            try:
+                # self.__session.bulk_update_mappings(self.__db[self.db_name]['table'], udl)
+                self.__session.commit()
+                res.append('{:d} record(s) updated'.format(u_count))
+            except:
+                self.__session.rollback()
+                res.append('no record updated')
+        return ','.join(res)
