@@ -6,7 +6,7 @@ def cdu(eid):
     cur = conn.cursor()
     ar = cur.execute('SELECT COUNT(date) FROM records WHERE eid={:d}'.format(eid)).fetchone()[0]
     ur = cur.execute('SELECT COUNT(DISTINCT date) FROM records WHERE eid={:d}'.format(eid)).fetchone()[0]
-    if ar != ur: return True
+    if ar > ur: return True
 
 def rdu(eid):
     cur = conn.cursor()
