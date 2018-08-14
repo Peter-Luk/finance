@@ -1,7 +1,7 @@
 from alchemy import load, mapper
 from utilities import datetime, nitem, gslice, mtf, gr, lique
-from statistics import mean
-
+# from statistics import mean
+import numpy as np
 import pandas as pd
 
 class FD(object):
@@ -177,8 +177,8 @@ class Danta(object):
                 if isinstance(args[1], (int, float)): period = int(args[1])
         if 'period' in list(kwargs.keys()):
             if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
-        if not (len(data) > period): return mean([_.close for _ in data])
-        return mean([_.close for _ in data[-period:]])
+        if not (len(data) > period): return np.mean([_.close for _ in data])
+        return np.mean([_.close for _ in data[-period:]])
 
     def wma(self, *args, **kwargs):
         data, period = self.data, 20
@@ -235,10 +235,10 @@ class Danta(object):
         if 'period' in list(kwargs.keys()):
             if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
         if not (len(data) > period):
-            if numtype: return mean(data)
-            return mean([_.close for _ in data])
-        if numtype: res = mean(data[:period])
-        else: res = mean([_.close for _ in data[:period]])
+            if numtype: return np.mean(data)
+            return np.mean([_.close for _ in data])
+        if numtype: res = np.mean(data[:period])
+        else: res = np.mean([_.close for _ in data[:period]])
         i = period
         while i < len(data):
             if numtype: res = (data[i] + res * (period - 1)) / period
@@ -266,8 +266,8 @@ class Danta(object):
                 i += 1
             return sum([abs(_) for _ in hdr])
 
-        if not (len(data) > period): return mean([_.close for _ in data])
-        res, i, fc, sc = mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
+        if not (len(data) > period): return np.mean([_.close for _ in data])
+        res, i, fc, sc = np.mean([_.close for _ in data[:period]]), period, 2 / (fast + 1), 2 / (slow + 1)
         while i < len(data):
             volatility = asum([_.close for _ in data[i-period:i]])
             if volatility:
@@ -342,9 +342,9 @@ class Danta(object):
         i, trd, dmp, dmm = period, self.__tr(data), self.__dm(data, '+'), self.__dm(data, '-')
         while i < len(data):
             if i == period:
-                trs = mean(trd[:i])
-                dmps = mean(dmp[:i-1])
-                dmms = mean(dmm[:i-1])
+                trs = np.mean(trd[:i])
+                dmps = np.mean(dmp[:i-1])
+                dmms = np.mean(dmm[:i-1])
                 dip = dmps / trs
                 dim = dmms / trs
                 dx = abs(dip - dim) / (dip + dim) * 100
@@ -370,7 +370,7 @@ class Danta(object):
             if isinstance(kwargs['period'], (int, float)): period = int(kwargs['period'])
         i, trd = period, self.__tr(data)
         while i < len(data):
-            if i == period: res = mean(trd[:i])
+            if i == period: res = np.mean(trd[:i])
             else: res = (trd[i] + res * (period - 1)) / period
             i += 1
         return res
@@ -414,7 +414,7 @@ class Danta(object):
             lnpk.append(pk(data[:-i], period))
             i += 1
         lnpk.reverse()
-        return self.__SCD(lnpk[-1], mean(lnpk))
+        return self.__SCD(lnpk[-1], np.mean(lnpk))
 
     def macd(self, *args):
         data, mf_period, ms_period, s_period = self.data, 12, 26, 9
