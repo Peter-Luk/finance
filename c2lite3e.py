@@ -123,11 +123,13 @@ def c2d(*args, **kwargs):
     return tmp
 
 def wap(*args, **kwargs):
-
-#Obtain daily update thru API (Yahoo) and update 'local' database.
-
-    ic, aid, kw = 0, [_ for _ in get_stored_eid() if _ not in [805]], kwargs
-    lkw = list(kw.keys())
+"""
+Original obtain daily update thru API (Yahoo) via Pandas DataReader
+but depicted since 0.6, cuurently using 'fix yahoo finance' to scrape data and update 'local' database.
+"""
+    ic, aid, period = 0, [_ for _ in get_stored_eid() if _ not in [805]], 20
+    lkw = list(kwargs.keys())
+    if 'period' in lkw: period = kwargs['period']
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
     istr = "INSERT INTO {} ({}) VALUES ({})"
@@ -145,7 +147,7 @@ def wap(*args, **kwargs):
             except: pass
         elif isinstance(kw['equities_id'], float): aid = [int(kw['equities_id'])]
         elif isinstance(kw['equities_id'], list): aid = kw['equities_id']
-    wdp = web_collect(aid)
+    wdp = web_collect(aid, period=period)
     for _ in aid:
         idate = []
         atd = [i['date'] for i in conn.cursor().execute("SELECT {} FROM {} WHERE eid={:d}".format(', '.join(datafields + ['date']), db_table, _)).fetchall()]
