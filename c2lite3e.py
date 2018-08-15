@@ -123,10 +123,10 @@ def c2d(*args, **kwargs):
     return tmp
 
 def wap(*args, **kwargs):
-"""
+    """
 Original obtain daily update thru API (Yahoo) via Pandas DataReader
 but depicted since 0.6, cuurently using 'fix yahoo finance' to scrape data and update 'local' database.
-"""
+    """
     ic, aid, period = 0, [_ for _ in get_stored_eid() if _ not in [805]], 20
     lkw = list(kwargs.keys())
     if 'period' in lkw: period = kwargs['period']
@@ -141,12 +141,12 @@ but depicted since 0.6, cuurently using 'fix yahoo finance' to scrape data and u
         elif isinstance(args[0], float): aid = [int(args[0])]
         elif isinstance(args[0], list): aid = args[0]
     if 'equities_id' in lkw:
-        if isinstance(kw['equities_id'], int): aid = [kw['equities_id']]
-        elif isinstance(kw['equities_id'], str):
-            try: aid = [int(float(kw['equities_id']))]
+        if isinstance(kwargs['equities_id'], int): aid = [kwargs['equities_id']]
+        elif isinstance(kwargs['equities_id'], str):
+            try: aid = [int(float(kwargs['equities_id']))]
             except: pass
-        elif isinstance(kw['equities_id'], float): aid = [int(kw['equities_id'])]
-        elif isinstance(kw['equities_id'], list): aid = kw['equities_id']
+        elif isinstance(kwargs['equities_id'], float): aid = [int(kwargs['equities_id'])]
+        elif isinstance(kwargs['equities_id'], list): aid = kwargs['equities_id']
     wdp = web_collect(aid, period=period)
     for _ in aid:
         idate = []
