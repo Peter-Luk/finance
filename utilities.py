@@ -133,6 +133,12 @@ def web_collect(*args, **kwargs):
         if isinstance(kwargs['source'], str): src = kwargs['source']
     if 'pandas' in lk:
         if isinstance(kwargs['pandas'], bool): efor = kwargs['pandas']
+    def stored_eid():
+        conn = lite.connect(filepath('Securities'))
+        cur = conn.cursor()
+        return [__ for __ in [_[0] for _ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if __ not in [805]]
+    try: code
+    except: code = stored_eid()
     if src == 'yahoo':
         code = ['{:04d}.HK'.format(_) for _ in code]
     process, start = True, get_start(period)
