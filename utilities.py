@@ -135,9 +135,11 @@ def web_collect(*args, **kwargs):
         if isinstance(kwargs['pandas'], bool): efor = kwargs['pandas']
     if src == 'yahoo':
         code = ['{:04d}.HK'.format(_) for _ in code]
-    start = get_start(period)
+    process, start = True, get_start(period)
     if start:
-        dp = yf.download(code, start, end, group_by='ticker')
+        while process:
+            dp = yf.download(code, start, end, group_by='ticker')
+            if len(dp): process = not process
 #        dp = data.DataReader(code, src, start, end)
         for c in code:
 #            res[c] = dp.minor_xs(c).transpose().to_dict()
