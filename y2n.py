@@ -17,4 +17,4 @@ def fetch():
         rd = ar['{:04d}.HK'.format(_)]
         d = rd.T
         res[_] = np.asarray(pd.concat([rd[__] for __ in [___ for ___ in d.index if ___ not in ['Adj Close']]], axis=1, join='inner', ignore_index=False))
-    return res
+    return pd.Series(res)
