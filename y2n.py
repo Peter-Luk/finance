@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import fix_yahoo_finance as yf
 from utilities import filepath
+from time import sleep
 
 def fetch():
     def stored_eid():
@@ -13,6 +14,9 @@ def fetch():
     while process:
         ar = yf.download(['{:04d}.HK'.format(_) for _ in aid], '2016-01-01', group_by='ticker')
         if len(ar): process = not process
+        else:
+            print('Retry in 10 seconds')
+            sleep(10)
     for _ in aid:
         rd = ar['{:04d}.HK'.format(_)]
         d = rd.T
