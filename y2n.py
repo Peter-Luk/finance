@@ -29,6 +29,7 @@ def fetch(code=None, start=None, table='Securities'):
     return pd.Series(res)
 
 def ma(raw, period=20, favour='s', req_field='close'):
+    res = []
     def process(raw, period, favour, req_field):
         res, i = [], 0
         while i < len(raw):
@@ -44,7 +45,13 @@ def ma(raw, period=20, favour='s', req_field='close'):
                     else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
                     res.append(hdr)
             i += 1
-        return pd.Series({'{}ma'.format(favour).upper():res})
+        return res
     rflag = np.isnan(raw).any(axis=1)
-    if rflag.any(): pass
-    else: return process(raw, period, favour, req_field)
+    if rflag.any():
+        i = len(rflag)
+        while i:
+            res.append(np.nan)
+            i -= 1
+        res.extend(process(raw[~rflag], period, favour, req_field))
+    else: res.extend(process(raw, period, favour, req_field))
+    return pd.Series({'{}ma'.format(favour).upper(): res})
