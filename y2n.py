@@ -23,9 +23,12 @@ def fetch(code=None, start=None, table='Securities'):
             print('Retry in 30 seconds')
             sleep(30)
     for _ in aid:
+        hdr = {}
         rd = ar['{:04d}.HK'.format(_)]
         d = rd.T
-        res[_] = np.asarray(pd.concat([rd[__] for __ in [___ for ___ in d.index if ___ not in ['Adj Close']]], axis=1, join='inner', ignore_index=False))
+        hdr['Date'] = [__.to_pydatetime() for __ in rd.index]
+        hdr['Data'] = np.asarray(pd.concat([rd[__] for __ in [___ for ___ in d.index if ___ not in ['Adj Close']]], axis=1, join='inner', ignore_index=False))
+        res[_] = hdr
     return pd.Series(res)
 
 def ma(raw, period=20, favour='s', req_field='close'):
