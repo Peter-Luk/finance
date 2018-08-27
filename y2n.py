@@ -49,12 +49,12 @@ def ma(raw, period=20, favour='s', req_field='close'):
                     res.append(hdr)
             i += 1
         return res
-    rflag = np.isnan(raw).any(axis=1)
+    rflag = np.isnan(raw['Data']).any(axis=1)
     if rflag.any():
         i = 0
-        while i < len(raw[rflag]):
+        while i < len(raw['Data'][rflag]):
             mres.append(np.nan)
             i += 1
-        mres.extend(process(raw[~rflag], period, favour, req_field))
-    else: mres.extend(process(raw, period, favour, req_field))
-    return pd.Series({'{}ma'.format(favour).upper(): mres})
+        mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
+    else: mres.extend(process(raw['Data'], period, favour, req_field))
+    return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
