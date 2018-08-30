@@ -58,3 +58,25 @@ def ma(raw, period=20, favour='s', req_field='close'):
         mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
     else: mres.extend(process(raw['Data'], period, favour, req_field))
     return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
+
+def atr(raw, period=20):
+    mres = []
+    def process(raw, period):
+        res, i = [], 0
+        while i < len(raw):
+            # if i == 0: res.append(rdata[1:3].ptp())
+            # else:
+                # if i == period - 1: hdr = rdata.sum() / period
+                # else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
+                # res.append(hdr)
+            i += 1
+        return res
+    rflag = np.isnan(raw['Data']).any(axis=1)
+    if rflag.any():
+        i = 0
+        while i < len(raw['Data'][rflag]):
+            mres.append(np.nan)
+            i += 1
+        mres.extend(process(raw['Data'][~rflag], period))
+    else: mres.extend(process(raw['Data'], period))
+    return pd.DataFrame({'ATR': mres}, index=raw['Date'])
