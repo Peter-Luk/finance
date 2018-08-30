@@ -61,11 +61,12 @@ def ma(raw, period=20, favour='s', req_field='close'):
 
 def atr(raw, period=20):
     mres = []
-    def process(raw, period):
-        res, i = [], 0
+    def process(raw):
+        nr, res, i = raw[:,:-1].ptp(axis=1).tolist(), [], 0
         while i < len(raw):
-            # if i == 0: res.append(rdata[1:3].ptp())
-            # else:
+            if i == 0: res.append(nr[i])
+            else:
+                pass
                 # if i == period - 1: hdr = rdata.sum() / period
                 # else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
                 # res.append(hdr)
@@ -77,6 +78,6 @@ def atr(raw, period=20):
         while i < len(raw['Data'][rflag]):
             mres.append(np.nan)
             i += 1
-        mres.extend(process(raw['Data'][~rflag], period))
-    else: mres.extend(process(raw['Data'], period))
+        mres.extend(process(raw['Data'][~rflag]))
+    else: mres.extend(process(raw['Data']))
     return pd.DataFrame({'ATR': mres}, index=raw['Date'])
