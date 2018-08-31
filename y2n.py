@@ -66,10 +66,11 @@ def atr(raw, period=20):
         while i < len(raw):
             if i == 0: res.append(nr[i])
             else:
-                pass
-                # if i == period - 1: hdr = rdata.sum() / period
-                # else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
-                # res.append(hdr)
+                hmpc, lmpc = abs(raw[i, 1] - raw[i - 1, -1]), abs(raw[i, 2] - raw[i - 1, -1])
+                if lmpc > nr[i]:
+                    if lmpc > hmpc: res.append(lmpc)
+                elif hmpc > nr[i]: res.append(hmpc)
+                else: res.append(nr[i])
             i += 1
         return res
     rflag = np.isnan(raw['Data']).any(axis=1)
