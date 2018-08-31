@@ -61,7 +61,7 @@ def ma(raw, period=20, favour='s', req_field='close'):
 
 def atr(raw, period=20):
     mres = []
-    def process(raw):
+    def tr(raw):
         nr, res, i = raw[:,:-1].ptp(axis=1).tolist(), [], 0
         while i < len(raw):
             if i == 0: res.append(nr[i])
@@ -71,6 +71,11 @@ def atr(raw, period=20):
                     if lmpc > hmpc: res.append(lmpc)
                 elif hmpc > nr[i]: res.append(hmpc)
                 else: res.append(nr[i])
+            i += 1
+        return res
+    def process(raw, period=20):
+        res, i = [], 0
+        while i < len(raw):
             i += 1
         return res
     rflag = np.isnan(raw['Data']).any(axis=1)
