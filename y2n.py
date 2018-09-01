@@ -124,6 +124,17 @@ def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
             i += 1
         return res
 
+    def process(raw, period):
+        res, i, vsc = [], 0, sc(raw, period)
+        while i < len(res):
+            if i < period['slow']: res.append(np.nan)
+            else:
+                if i == period: hdr = ma(raw, period['slow'])[i]
+                else: hdr = res[-1] + vsc[i] * (raw[i, -2] - res[-1])
+                res.append(hdr)
+            i += 1
+        return res
+
     rflag = np.isnan(raw['Data']).any(axis=1)
     if rflag.any():
         i = 0
