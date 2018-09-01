@@ -77,7 +77,7 @@ def atr(raw, period=20):
             i += 1
         return res
 
-    def process(data, period=20):
+    def process(data, period):
         res, i, truerange = [], 0, tr(data)
         while i < len(data):
             if i < period: hdr = np.nan
@@ -111,6 +111,16 @@ def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
                     delta += abs(raw[i + j, -2] - raw[i + j - 1, -2])
                     j += 1
                 res.append(d_close / delta)
+            i += 1
+        return res
+
+    def sc(raw, period=period):
+        res, i, ver, fma, sma  = [], 0, er(raw, period), ma(raw, period['fast'], 'e'), ma(raw, period['slow'], 'e')
+        while i < len(raw):
+            if i < period['slow']: res.append(np.nan)
+            else:
+                fsc, ssc = 2 / (period['fast'] + 1) * fma[i], 2 / (period['slow'] + 1) * sma[i]
+                res.append((ver[i] * (fsc - ssc) + ssc) ** 2)
             i += 1
         return res
 
