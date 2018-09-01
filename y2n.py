@@ -97,3 +97,29 @@ def atr(raw, period=20):
         mres.extend(process(raw['Data'][~rflag], period))
     else: mres.extend(process(raw['Data'], period))
     return pd.DataFrame({'ATR': mres}, index=raw['Date'])
+
+def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
+    mres = []
+
+    def er(raw, period=period['er']):
+        res, i = [], 0
+        while i < len(raw):
+            if i < period: res.append(np.nan)
+            else:
+                j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period, -2])
+                while j < period:
+                    delta += abs(raw[i + j, -2] - raw[i + j - 1, -2])
+                    j += 1
+                res.append(d_close / delta)
+            i += 1
+        return res
+
+    rflag = np.isnan(raw['Data']).any(axis=1)
+    if rflag.any():
+        i = 0
+        while i < len(raw['Data'][rflag]):
+            mres.append(np.nan)
+            i += 1
+        mres.extend(process(raw['Data'][~rflag], period))
+    else: mres.extend(process(raw['Data'], period))
+    return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
