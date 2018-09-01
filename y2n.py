@@ -33,7 +33,7 @@ def fetch(code=None, start=None, table='Securities', exclude=[805], years=4):
         res[_] = hdr
     return pd.Series(res)
 
-def ma(raw, period=20, favour='s', req_field='close'):
+def ma(raw, period=20, favour='s', req_field='close', programmatic=False):
     mres = []
     def process(raw, period, favour, req_field):
         res, i = [], 0
@@ -59,7 +59,8 @@ def ma(raw, period=20, favour='s', req_field='close'):
             i += 1
         mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
     else: mres.extend(process(raw['Data'], period, favour, req_field))
-    return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
+    if programmatic: return mres
+    else: return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
 
 def atr(raw, period=20):
     mres = []
@@ -108,14 +109,14 @@ def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
             else:
                 j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period['er'], -2])
                 while j < period['er']:
-                    delta += abs(raw[i + j, -2] - raw[i + j - 1, -2])
+                    delta += abs(raw[i - period['er'] + j, -2] - raw[i - period['er'] + j - 1, -2])
                     j += 1
                 res.append(d_close / delta)
             i += 1
         return res
 
     def sc(raw, period):
-        res, i, ver, fma, sma  = [], 0, er(raw, period), ma(raw, period['fast'], 'e'), ma(raw, period['slow'], 'e')
+        res, i, ver, fma, sma  = [], 0, er(raw, period), ma(raw, period['fast'], 'e', programmatic=True), ma(raw, period['slow'], 'e', programmatic=True)
         while i < len(raw):
             if i < period['slow']: res.append(np.nan)
             else:
