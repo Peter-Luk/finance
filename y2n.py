@@ -101,20 +101,20 @@ def atr(raw, period=20):
 def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
     mres = []
 
-    def er(raw, period=period['er']):
+    def er(raw, period):
         res, i = [], 0
         while i < len(raw):
-            if i < period: res.append(np.nan)
+            if i < period['er']: res.append(np.nan)
             else:
-                j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period, -2])
-                while j < period:
+                j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period['er'], -2])
+                while j < period['er']:
                     delta += abs(raw[i + j, -2] - raw[i + j - 1, -2])
                     j += 1
                 res.append(d_close / delta)
             i += 1
         return res
 
-    def sc(raw, period=period):
+    def sc(raw, period):
         res, i, ver, fma, sma  = [], 0, er(raw, period), ma(raw, period['fast'], 'e'), ma(raw, period['slow'], 'e')
         while i < len(raw):
             if i < period['slow']: res.append(np.nan)
