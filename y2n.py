@@ -3,15 +3,17 @@ import numpy as np
 import pandas as pd
 import fix_yahoo_finance as yf
 from utilities import filepath
+from datetime import datetime
 from time import sleep
 
-def fetch(code=None, start=None, table='Securities'):
+def fetch(code=None, start=None, table='Securities', exclude=[805], years=4):
     def stored_eid(table):
         conn = lite.connect(filepath(table))
         cur = conn.cursor()
-        return [_ for _ in [__[0] for __ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if _ not in [805]]
+        return [_ for _ in [__[0] for __ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if _ not in exclude]
 
-    if not start: start = '2016-01-01'
+    if not start:
+        start = datetime(datetime.now().year - years, 1, 1)
     if code:
         if isinstance(code, [int, float]): aid = [int(code)]
     else: aid = stored_eid(table=table)
@@ -44,7 +46,7 @@ def ma(raw, period=20, favour='s', req_field='close'):
                 if favour[0].lower() == 's': res.append(rdata.sum() / period)
                 if favour[0].lower() == 'w': res.append((rdata * raw[i - period + 1: i + 1, -1]).sum() / raw[i - period + 1: i + 1, -1].sum())
                 if favour[0].lower() == 'e':
-                    if i == period - 1: hdr = rdata.sum() / period
+                    if i == period: hdr = rdata.sum() / period
                     else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
                     res.append(hdr)
             i += 1
@@ -61,29 +63,37 @@ def ma(raw, period=20, favour='s', req_field='close'):
 
 def atr(raw, period=20):
     mres = []
-    def tr(raw):
-        nr, res, i = raw[:,:-1].ptp(axis=1).tolist(), [], 0
-        while i < len(raw):
+    def tr(data):
+        nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
+        while i < len(data):
             if i == 0: res.append(nr[i])
             else:
-                hmpc, lmpc = abs(raw[i, 1] - raw[i - 1, -1]), abs(raw[i, 2] - raw[i - 1, -1])
+                hmpc, lmpc = abs(data[i, 1] - data[i - 1, -2]), abs(data[i, 2] - data[i - 1, -2])
+                hdr = hmpc
                 if lmpc > nr[i]:
-                    if lmpc > hmpc: res.append(lmpc)
-                elif hmpc > nr[i]: res.append(hmpc)
-                else: res.append(nr[i])
+                    if lmpc > hmpc: hdr = lmpc
+                elif hmpc < nr[i]: hdr = nr[i]
+                res.append(hdr)
             i += 1
         return res
-    def process(raw, period=20):
-        res, i = [], 0
-        while i < len(raw):
+
+    def process(data, period=20):
+        res, i, truerange = [], 0, tr(data)
+        while i < len(data):
+            if i < period: hdr = np.nan
+            else:
+                if i == period: hdr = np.mean(truerange[:i])
+                else: hdr = (res[-1] * (period - 1) + truerange[i]) / period
+            res.append(hdr)
             i += 1
         return res
+
     rflag = np.isnan(raw['Data']).any(axis=1)
     if rflag.any():
         i = 0
         while i < len(raw['Data'][rflag]):
             mres.append(np.nan)
             i += 1
-        mres.extend(process(raw['Data'][~rflag]))
-    else: mres.extend(process(raw['Data']))
+        mres.extend(process(raw['Data'][~rflag], period))
+    else: mres.extend(process(raw['Data'], period))
     return pd.DataFrame({'ATR': mres}, index=raw['Date'])
