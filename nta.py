@@ -117,11 +117,24 @@ def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
 
 def adx(raw, period=14):
     mres, average_true_range = [], atr(raw, period, True)
+    def tr(data):
+        nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
+        while i < len(data):
+            if i == 0: res.append(nr[i])
+            else:
+                hmpc, lmpc = abs(data[i, 1] - data[i - 1, -2]), abs(data[i, 2] - data[i - 1, -2])
+                hdr = hmpc
+                if lmpc > nr[i]:
+                    if lmpc > hmpc: hdr = lmpc
+                elif hmpc < nr[i]: hdr = nr[i]
+                res.append(hdr)
+            i += 1
+        return res
 
-    def dm(raw):
+    def dm(data):
         i, res = 1, {'+':[0], '-':[0]}
-        while i < len(raw):
-            dh, dl = raw[i][1] - raw[i - 1][1], raw[i - 1][2] - raw[i][2]
+        while i < len(data):
+            dh, dl = data[i][1] - data[i - 1][1], data[i - 1][2] - data[i][2]
             if dh > dl and dh > 0: res['+'].append(dh)
             else: res['+'].append(0)
             if dl > dh and dl > 0: res['-'].append(dl)
