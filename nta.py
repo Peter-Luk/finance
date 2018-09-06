@@ -116,7 +116,7 @@ def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
     return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
 
 def adx(raw, period=14):
-    mres = []
+    mres, average_true_range = [], atr(raw, period, True)
 
     def dm(raw):
         i, res = 1, {'+':[0], '-':[0]}
@@ -129,6 +129,7 @@ def adx(raw, period=14):
             i += 1
         return res
 
+    directional_movement = dm(raw['Data'])
     rflag = np.isnan(raw['Data']).any(axis=1)
     if rflag.any():
         i = 0
