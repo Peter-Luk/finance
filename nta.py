@@ -142,7 +142,19 @@ def adx(raw, period=14):
             i += 1
         return res
 
-    directional_movement = dm(raw['Data'])
+    def di(data, period=period):
+        res, dir_mov, true_range, i = {'+':[np.nan], '-':[np.nan]}, 0, dm(data), tr(data)
+        while i < len(dir_mov['+']):
+            if i < period:
+                res['+'].append(np.nan)
+                res['-'].append(np.nan)
+            else:
+                res['+'].append(sum(dir_mov['+'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
+                res['-'].append(sum(dir_mov['-'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
+            i += 1
+        return res
+
+    # directional_movement = dm(raw['Data'])
     rflag = np.isnan(raw['Data']).any(axis=1)
     if rflag.any():
         i = 0
