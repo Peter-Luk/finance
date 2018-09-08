@@ -1,34 +1,43 @@
 import numpy as np
 import pandas as pd
 
-def ma(raw, period=20, favour='s', req_field='close', programmatic=False):
-    mres = []
-    def process(raw, period, favour, req_field):
-        res, i = [], 0
-        while i < len(raw):
-            if i < period - 1: res.append(np.nan)
-            else:
-                if req_field.lower() in ['close', 'c']: rdata = raw[i - period + 1: i + 1, -2]
-                if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[i - period + 1: i + 1, :-1].mean(axis=1)
-                if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[i - period + 1: i + 1, 1:3].mean(axis=1)
-                if favour[0].lower() == 's': res.append(rdata.sum() / period)
-                if favour[0].lower() == 'w': res.append((rdata * raw[i - period + 1: i + 1, -1]).sum() / raw[i - period + 1: i + 1, -1].sum())
-                if favour[0].lower() == 'e':
-                    if i == period: hdr = rdata.sum() / period
-                    else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
-                    res.append(hdr)
-            i += 1
-        return res
-    rflag = np.isnan(raw['Data']).any(axis=1)
-    if rflag.any():
-        i = 0
-        while i < len(raw['Data'][rflag]):
-            mres.append(np.nan)
-            i += 1
-        mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
-    else: mres.extend(process(raw['Data'], period, favour, req_field))
-    if programmatic: return mres
-    return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
+class ONA(object):
+    def __init__(self, data):
+        self.data = data
+
+    def __del__(self):
+        self.data = None
+        del(self.data)
+
+    def ma(self, raw=None, period=20, favour='s', req_field='close', programmatic=False):
+        if not raw: raw = self.data
+        mres = []
+        def process(raw, period, favour, req_field):
+            res, i = [], 0
+            while i < len(raw):
+                if i < period - 1: res.append(np.nan)
+                else:
+                    if req_field.lower() in ['close', 'c']: rdata = raw[i - period + 1: i + 1, -2]
+                    if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[i - period + 1: i + 1, :-1].mean(axis=1)
+                    if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[i - period + 1: i + 1, 1:3].mean(axis=1)
+                    if favour[0].lower() == 's': res.append(rdata.sum() / period)
+                    if favour[0].lower() == 'w': res.append((rdata * raw[i - period + 1: i + 1, -1]).sum() / raw[i - period + 1: i + 1, -1].sum())
+                    if favour[0].lower() == 'e':
+                        if i == period: hdr = rdata.sum() / period
+                        else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
+                        res.append(hdr)
+                i += 1
+            return res
+        rflag = np.isnan(raw['Data']).any(axis=1)
+        if rflag.any():
+            i = 0
+            while i < len(raw['Data'][rflag]):
+                mres.append(np.nan)
+                i += 1
+            mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
+        else: mres.extend(process(raw['Data'], period, favour, req_field))
+        if programmatic: return mres
+        return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
 
 def atr(raw, period=14, programmatic=False):
     mres = []
