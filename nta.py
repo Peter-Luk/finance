@@ -87,43 +87,44 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
 
-def atr(raw, period=14, programmatic=False):
-    mres = []
-    def tr(data):
-        nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
-        while i < len(data):
-            if i == 0: res.append(nr[i])
-            else:
-                hmpc, lmpc = abs(data[i, 1] - data[i - 1, -2]), abs(data[i, 2] - data[i - 1, -2])
-                hdr = hmpc
-                if lmpc > nr[i]:
-                    if lmpc > hmpc: hdr = lmpc
-                elif hmpc < nr[i]: hdr = nr[i]
+    def atr(self, raw=None, period=14, programmatic=False):
+        if not raw: raw = self.data
+        mres = []
+        def tr(data):
+            nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
+            while i < len(data):
+                if i == 0: res.append(nr[i])
+                else:
+                    hmpc, lmpc = abs(data[i, 1] - data[i - 1, -2]), abs(data[i, 2] - data[i - 1, -2])
+                    hdr = hmpc
+                    if lmpc > nr[i]:
+                        if lmpc > hmpc: hdr = lmpc
+                    elif hmpc < nr[i]: hdr = nr[i]
+                    res.append(hdr)
+                i += 1
+            return res
+
+        def process(data, period):
+            res, i, truerange = [], 0, tr(data)
+            while i < len(data):
+                if i < period: hdr = np.nan
+                else:
+                    if i == period: hdr = np.mean(truerange[:i])
+                    else: hdr = (res[-1] * (period - 1) + truerange[i]) / period
                 res.append(hdr)
-            i += 1
-        return res
+                i += 1
+            return res
 
-    def process(data, period):
-        res, i, truerange = [], 0, tr(data)
-        while i < len(data):
-            if i < period: hdr = np.nan
-            else:
-                if i == period: hdr = np.mean(truerange[:i])
-                else: hdr = (res[-1] * (period - 1) + truerange[i]) / period
-            res.append(hdr)
-            i += 1
-        return res
-
-    rflag = np.isnan(raw['Data']).any(axis=1)
-    if rflag.any():
-        i = 0
-        while i < len(raw['Data'][rflag]):
-            mres.append(np.nan)
-            i += 1
-        mres.extend(process(raw['Data'][~rflag], period))
-    else: mres.extend(process(raw['Data'], period))
-    if programmatic: return mres
-    return pd.DataFrame({'ATR': mres}, index=raw['Date'])
+        rflag = np.isnan(raw['Data']).any(axis=1)
+        if rflag.any():
+            i = 0
+            while i < len(raw['Data'][rflag]):
+                mres.append(np.nan)
+                i += 1
+            mres.extend(process(raw['Data'][~rflag], period))
+        else: mres.extend(process(raw['Data'], period))
+        if programmatic: return mres
+        return pd.DataFrame({'ATR': mres}, index=raw['Date'])
 
 # def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
 #     mres, fma, sma = [], ma(raw, period['fast'], 'e', 'c', True), ma(raw, period['slow'], 'e', 'c', True)
