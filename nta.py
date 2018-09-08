@@ -41,7 +41,7 @@ class ONA(object):
 
     def kama(self, raw=None, period={'er':10, 'fast':2, 'slow':30}):
         if not raw: raw = self.data
-        mres, fma, sma = [], self.ma(period['fast'], 'e', 'c', True), self.ma(period['slow'], 'e', 'c', True)
+        mres, fma, sma = [], self.ma(raw, period['fast'], 'e', 'c', True), self.ma(raw, period['slow'], 'e', 'c', True)
 
         def er(raw, period):
             res, i = [], 0
