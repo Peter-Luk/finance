@@ -41,16 +41,17 @@ class ONA(object):
 
     def kama(self, raw=None, period={'er':10, 'fast':2, 'slow':30}):
         if not raw: raw = self.data
-        mres, fma, sma = [], self.ma(raw, period['fast'], 'e', 'c', True), self.ma(raw, period['slow'], 'e', 'c', True)
+        mres, sma = [], self.ma(raw, period['slow'], 'e', 'c', True)
+        # mres, fma, sma = [], self.ma(raw, period['fast'], 'e', 'c', True), self.ma(raw, period['slow'], 'e', 'c', True)
 
         def er(raw, period):
             res, i = [], 0
             while i < len(raw):
                 if i < period['er']: res.append(np.nan)
                 else:
-                    j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period['er'], -2])
+                    j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period['er'] + 1, -2])
                     while j < period['er']:
-                        delta += abs(raw[i - period['er'] + j, -2] - raw[i - period['er'] + j - 1, -2])
+                        delta += abs(raw[i - period['er'] + 1 + j, -2] - raw[i - period['er'] + j, -2])
                         j += 1
                     res.append(d_close / delta)
                 i += 1
@@ -61,17 +62,17 @@ class ONA(object):
             while i < len(raw):
                 if i < period['slow']: res.append(np.nan)
                 else:
-                    fsc, ssc = 2 / (period['fast'] + 1) * fma[i], 2 / (period['slow'] + 1) * sma[i]
+                    fsc, ssc = 2 / (period['fast'] + 1), 2 / (period['slow'] + 1)
                     res.append((ver[i] * (fsc - ssc) + ssc) ** 2)
                 i += 1
             return res
 
         def process(raw, period):
             res, i, vsc = [], 0, sc(raw, period)
-            while i < len(res):
+            while i < len(raw):
                 if i < period['slow']: res.append(np.nan)
                 else:
-                    if i == period: hdr = ma(raw, period['slow'])[i]
+                    if i == period['slow']: hdr = sma[i]
                     else: hdr = res[-1] + vsc[i] * (raw[i, -2] - res[-1])
                     res.append(hdr)
                 i += 1
@@ -125,53 +126,6 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period))
         if programmatic: return mres
         return pd.DataFrame({'ATR': mres}, index=raw['Date'])
-
-# def kama(raw, period={'er':10, 'fast':2, 'slow':30}):
-#     mres, fma, sma = [], ma(raw, period['fast'], 'e', 'c', True), ma(raw, period['slow'], 'e', 'c', True)
-# 
-#     def er(raw, period):
-#         res, i = [], 0
-#         while i < len(raw):
-#             if i < period['er']: res.append(np.nan)
-#             else:
-#                 j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period['er'], -2])
-#                 while j < period['er']:
-#                     delta += abs(raw[i - period['er'] + j, -2] - raw[i - period['er'] + j - 1, -2])
-#                     j += 1
-#                 res.append(d_close / delta)
-#             i += 1
-#         return res
-# 
-#     def sc(raw, period):
-#         res, i, ver = [], 0, er(raw, period)
-#         while i < len(raw):
-#             if i < period['slow']: res.append(np.nan)
-#             else:
-#                 fsc, ssc = 2 / (period['fast'] + 1) * fma[i], 2 / (period['slow'] + 1) * sma[i]
-#                 res.append((ver[i] * (fsc - ssc) + ssc) ** 2)
-#             i += 1
-#         return res
-# 
-#     def process(raw, period):
-#         res, i, vsc = [], 0, sc(raw, period)
-#         while i < len(res):
-#             if i < period['slow']: res.append(np.nan)
-#             else:
-#                 if i == period: hdr = ma(raw, period['slow'])[i]
-#                 else: hdr = res[-1] + vsc[i] * (raw[i, -2] - res[-1])
-#                 res.append(hdr)
-#             i += 1
-#         return res
-# 
-#     rflag = np.isnan(raw['Data']).any(axis=1)
-#     if rflag.any():
-#         i = 0
-#         while i < len(raw['Data'][rflag]):
-#             mres.append(np.nan)
-#             i += 1
-#         mres.extend(process(raw['Data'][~rflag], period))
-#     else: mres.extend(process(raw['Data'], period))
-#     return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
 
 def adx(raw, period=14):
     mres, average_true_range = [], atr(raw, period, True)
