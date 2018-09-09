@@ -155,7 +155,7 @@ def adx(raw, period=14):
         return res
 
     def di(data, period=period):
-        res, dir_mov, true_range, i = {'+':[np.nan], '-':[np.nan]}, 0, dm(data), tr(data)
+        res, i, dir_mov, true_range = {'+':[np.nan], '-':[np.nan]}, 0, dm(data), tr(data)
         while i < len(dir_mov['+']):
             if i < period:
                 res['+'].append(np.nan)
