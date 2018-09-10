@@ -127,7 +127,8 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'ATR': mres}, index=raw['Date'])
 
-    def adx(self, raw, period=14):
+    def adx(self, raw=None, period=14):
+        if not raw: raw = self.data
         mres = []
         def tr(data):
             nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
@@ -187,3 +188,49 @@ class ONA(object):
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'ADR': mres}, index=raw['Date'])
+
+    def rsi(self, raw=None, period=14):
+        if not raw: raw = self.data
+        mres = []
+        def process(raw, period):
+            i, gain, loss, res = 0, [], [], []
+            while i < len(raw):
+                if i == 0:
+                    if raw[i, -2] > raw[i, 0]:
+                        gain.append(raw[i, -2] - raw[i, 0])
+                        loss.append(0)
+                    elif raw[i, -2] == raw[i, 0]:
+                        gain.append(0)
+                        loss.append(0)
+                    else:
+                        gain.append(0)
+                        loss.append(raw[i, 0] - raw[i, -2])
+                else:
+                    if raw[i, -2] > raw[i - 1, -2]:
+                        gain.append(raw[i, -2] - raw[i - 1, -2])
+                        loss.append(0)
+                    elif raw[i, -2] == raw[i - 1, -2]:
+                        gain.append(0)
+                        loss.append(0)
+                    else:
+                        gain.append(0)
+                        loss.append(raw[i -1, -2] - raw[i, -2])
+                i += 1
+            i = 0
+            while i < len(raw):
+                if i < period: res.append(np.nan)
+                elif i == period: res.append(100 - 100 / ((1 + np.mean(gain[:i]) / np.mean(loss[:i]))))
+                else:
+                    res.append(100 - 100 / (( 1 + np.mean(gain[i - period:i]) / np.mean(loss[i - period:i]))))
+                i += 1
+            return res
+
+        rflag = np.isnan(raw['Data']).any(axis=1)
+        if rflag.any():
+            i = 0
+            while i < len(raw['Data'][rflag]):
+                mres.append(np.nan)
+                i += 1
+            mres.extend(process(raw['Data'][~rflag], period))
+        else: mres.extend(process(raw['Data'], period))
+        return pd.DataFrame({'RSI': mres}, index=raw['Date'])
