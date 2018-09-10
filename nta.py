@@ -127,52 +127,63 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'ATR': mres}, index=raw['Date'])
 
-def adx(raw, period=14):
-    mres, average_true_range = [], atr(raw, period, True)
-    def tr(data):
-        nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
-        while i < len(data):
-            if i == 0: res.append(nr[i])
-            else:
-                hmpc, lmpc = abs(data[i, 1] - data[i - 1, -2]), abs(data[i, 2] - data[i - 1, -2])
-                hdr = hmpc
-                if lmpc > nr[i]:
-                    if lmpc > hmpc: hdr = lmpc
-                elif hmpc < nr[i]: hdr = nr[i]
+    def adx(self, raw, period=14):
+        mres = []
+        def tr(data):
+            nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
+            while i < len(data):
+                if i == 0: res.append(nr[i])
+                else:
+                    hmpc, lmpc = abs(data[i, 1] - data[i - 1, -2]), abs(data[i, 2] - data[i - 1, -2])
+                    hdr = hmpc
+                    if lmpc > nr[i]:
+                        if lmpc > hmpc: hdr = lmpc
+                    elif hmpc < nr[i]: hdr = nr[i]
+                    res.append(hdr)
+                i += 1
+            return res
+
+        def dm(data):
+            i, res = 1, {'+':[0], '-':[0]}
+            while i < len(data):
+                dh, dl = data[i][1] - data[i - 1][1], data[i - 1][2] - data[i][2]
+                if dh > dl and dh > 0: res['+'].append(dh)
+                else: res['+'].append(0)
+                if dl > dh and dl > 0: res['-'].append(dl)
+                else: res['-'].append(0)
+                i += 1
+            return res
+
+        def di(data, period=period):
+            res, i, dir_mov, true_range = {'+':[np.nan], '-':[np.nan]}, 0, dm(data), tr(data)
+            while i < len(dir_mov['+']):
+                if i < period:
+                    res['+'].append(np.nan)
+                    res['-'].append(np.nan)
+                else:
+                    res['+'].append(sum(dir_mov['+'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
+                    res['-'].append(sum(dir_mov['-'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
+                i += 1
+            return res
+
+        def process(data, period):
+            res, i, dx = [], 0, di(data, period)
+            while i < len(data):
+                if i < period: hdr = np.nan
+                else:
+                    if i == period: hdr = np.mean(dx[:i])
+                    else: hdr = (res[-1] * (period - 1) + dx[i]) / period
                 res.append(hdr)
-            i += 1
-        return res
+                i += 1
+            return res
 
-    def dm(data):
-        i, res = 1, {'+':[0], '-':[0]}
-        while i < len(data):
-            dh, dl = data[i][1] - data[i - 1][1], data[i - 1][2] - data[i][2]
-            if dh > dl and dh > 0: res['+'].append(dh)
-            else: res['+'].append(0)
-            if dl > dh and dl > 0: res['-'].append(dl)
-            else: res['-'].append(0)
-            i += 1
-        return res
-
-    def di(data, period=period):
-        res, i, dir_mov, true_range = {'+':[np.nan], '-':[np.nan]}, 0, dm(data), tr(data)
-        while i < len(dir_mov['+']):
-            if i < period:
-                res['+'].append(np.nan)
-                res['-'].append(np.nan)
-            else:
-                res['+'].append(sum(dir_mov['+'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
-                res['-'].append(sum(dir_mov['-'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
-            i += 1
-        return res
-
-    # directional_movement = dm(raw['Data'])
-    rflag = np.isnan(raw['Data']).any(axis=1)
-    if rflag.any():
-        i = 0
-        while i < len(raw['Data'][rflag]):
-            mres.append(np.nan)
-            i += 1
-        mres.extend(process(raw['Data'][~rflag], period))
-    else: mres.extend(process(raw['Data'], period))
-    return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
+        # directional_movement = dm(raw['Data'])
+        rflag = np.isnan(raw['Data']).any(axis=1)
+        if rflag.any():
+            i = 0
+            while i < len(raw['Data'][rflag]):
+                mres.append(np.nan)
+                i += 1
+            mres.extend(process(raw['Data'][~rflag], period))
+        else: mres.extend(process(raw['Data'], period))
+        return pd.DataFrame({'ADR': mres}, index=raw['Date'])
