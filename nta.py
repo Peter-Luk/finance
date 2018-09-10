@@ -163,22 +163,36 @@ class ONA(object):
                     res['-'].append(np.nan)
                 else:
                     res['+'].append(sum(dir_mov['+'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
+                    # if i == period: hdr = ma(raw, period['slow'])[i]
                     res['-'].append(sum(dir_mov['-'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
                 i += 1
             return res
 
-        def process(data, period):
-            res, i, dx = [], 0, di(data, period)
-            while i < len(data):
-                if i < period: hdr = np.nan
+        def dx(raw, period):
+            i, res, dip = 0, [], di(raw, period)
+            while i < len(raw):
+                if np.isnan(dip['+'][i]) or np.isnan(dip['-'][i]): hdr = np.nan
                 else:
-                    if i == period: hdr = np.mean(dx[:i])
-                    else: hdr = (res[-1] * (period - 1) + dx[i]) / period
+                    hdr = abs(dip['+'][i] - dip['-'][i]) / (dip['+'][i] + dip['-'][i]) * 100
                 res.append(hdr)
                 i += 1
             return res
 
-        # directional_movement = dm(raw['Data'])
+        def process(data, period):
+            res, nc, i, vdx = [], 0, 0, dx(data, period)
+            while i < len(data):
+                if np.isnan(vdx[i]):
+                    hdr = np.nan
+                    nc += 1
+                else:
+                    if i < period + nc: hdr = np.nan
+                    else:
+                        if i == period + nc: hdr = np.mean(vdx[nc:i])
+                        else: hdr = (res[-1] * (period - 1) + vdx[i]) / period
+                res.append(hdr)
+                i += 1
+            return res
+
         rflag = np.isnan(raw['Data']).any(axis=1)
         if rflag.any():
             i = 0
@@ -187,7 +201,7 @@ class ONA(object):
                 i += 1
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
-        return pd.DataFrame({'ADR': mres}, index=raw['Date'])
+        return pd.DataFrame({'ADX': mres}, index=raw['Date'])
 
     def rsi(self, raw=None, period=14):
         if not raw: raw = self.data
