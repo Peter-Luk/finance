@@ -159,12 +159,13 @@ class ONA(object):
             res, i, dir_mov, true_range = {'+':[np.nan], '-':[np.nan]}, 0, dm(data), tr(data)
             while i < len(dir_mov['+']):
                 if i < period:
-                    res['+'].append(np.nan)
-                    res['-'].append(np.nan)
+                    phdr = np.nan
+                    mhdr = np.nan
                 else:
-                    res['+'].append(sum(dir_mov['+'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
-                    # if i == period: hdr = ma(raw, period['slow'])[i]
-                    res['-'].append(sum(dir_mov['-'][period:period + i]) / sum(true_range[period + 1:period + i + 1]))
+                    phdr = sum(dir_mov['+'][i - period:i]) / sum(true_range[i - period + 1:i + 1])
+                    mhdr = sum(dir_mov['-'][i - period:i]) / sum(true_range[i - period + 1:i + 1])
+                res['+'].append(phdr)
+                res['-'].append(mhdr)
                 i += 1
             return res
 
