@@ -265,4 +265,6 @@ class ONA(object):
             lower.append(lhdr)
             i += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
-        return pd.DataFrame({'Upper':upper, 'Lower':lower}, index=['Date'])
+        res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
+        res.index = raw['Date']
+        return res
