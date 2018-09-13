@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from utilities import gr
 
 class ONA(object):
     def __init__(self, data):
@@ -249,3 +250,19 @@ class ONA(object):
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'RSI': mres}, index=raw['Date'])
+
+    def kc(self, raw=None, period={'atr':14, 'er':10, 'fast':2, 'slow':30}, ratio=gr, programmatic=False):
+        upper, lower = [], []
+        if not raw: raw = self.data
+        kma, ar = self.kama(raw=raw, period={'er':period['er'], 'fast':period['fast'], 'slow':period['slow']}, programmatic=True), self.atr(raw=raw, period=period['atr'], programmatic=True)
+        i = 0
+        while i < len(kma):
+            uhdr, lhdr = np.nan, np.nan
+            if not np.isnan([kma[i], ar[i]]).any():
+                uhdr = kma[i] + ratio * ar[i]
+                lhdr = kma[i] - ratio * ar[i]
+            upper.append(uhdr)
+            lower.append(lhdr)
+            i += 1
+        if programmatic: return {'Upper':upper, 'Lower':lower}
+        return pd.DataFrame({'Upper':upper, 'Lower':lower}, index=['Date'])
