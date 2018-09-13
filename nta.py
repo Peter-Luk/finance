@@ -39,10 +39,9 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
 
-    def kama(self, raw=None, period={'er':10, 'fast':2, 'slow':30}):
+    def kama(self, raw=None, period={'er':10, 'fast':2, 'slow':30}, programmatic=False):
         if not raw: raw = self.data
         mres, sma = [], self.ma(raw, period['slow'], 'e', 'c', True)
-        # mres, fma, sma = [], self.ma(raw, period['fast'], 'e', 'c', True), self.ma(raw, period['slow'], 'e', 'c', True)
 
         def er(raw, period):
             res, i = [], 0
@@ -86,6 +85,7 @@ class ONA(object):
                 i += 1
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
+        if programmatic: return mres
         return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
 
     def atr(self, raw=None, period=14, programmatic=False):
