@@ -268,3 +268,21 @@ class ONA(object):
         res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
         res.index = raw['Date']
         return res
+
+class Assistant(ONA):
+    def __init__(self, code):
+        self.code = code
+
+    def __del__(self):
+        self.code = None
+        del(self.code)
+
+    def mas(self, code=None):
+        if not code: code = self.code
+        dcode = ONA(code)
+        return dcode.kama().merge(dcode.ma(favour='e'), left_index=True, right_index=True).merge(dcode.ma(), left_index=True, right_index=True)
+
+    def idrs(self, code=None):
+        if not code: code = self.code
+        dcode = ONA(code)
+        return dcode.adx().merge(dcode.rsi(), left_index=True, right_index=True).merge(dcode.atr(), left_index=True, right_index=True)
