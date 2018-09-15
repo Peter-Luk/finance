@@ -269,7 +269,7 @@ class ONA(object):
         res.index = raw['Date']
         return res
 
-class Assistant(ONA):
+class Viewer(ONA):
     def __init__(self, code):
         self.code = code
 
