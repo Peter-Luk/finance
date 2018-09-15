@@ -40,6 +40,31 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
 
+    def bbw(self, raw=None, period=20, req_field='close', programmatic=False):
+        if not raw: raw = self.data
+        mres = []
+        def process(raw, period, req_field):
+            res, i = [], 0
+            while i < len(raw):
+                if i < period - 1: res.append(np.nan)
+                else:
+                    if req_field.lower() in ['close', 'c']: rdata = raw[i - period + 1: i + 1, -2]
+                    if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[i - period + 1: i + 1, :-1].mean(axis=1)
+                    if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[i - period + 1: i + 1, 1:3].mean(axis=1)
+                    res.append(2 * rdata.std())
+                i += 1
+            return res
+        rflag = np.isnan(raw['Data']).any(axis=1)
+        if rflag.any():
+            i = 0
+            while i < len(raw['Data'][rflag]):
+                mres.append(np.nan)
+                i += 1
+            mres.extend(process(raw['Data'][~rflag], period, req_field))
+        else: mres.extend(process(raw['Data'], period, req_field))
+        if programmatic: return mres
+        return pd.DataFrame({'BBW': mres}, index=raw['Date'])
+
     def kama(self, raw=None, period={'er':10, 'fast':2, 'slow':30}, programmatic=False):
         if not raw: raw = self.data
         mres, sma = [], self.ma(raw, period['slow'], 'e', 'c', True)
@@ -261,6 +286,24 @@ class ONA(object):
             if not np.isnan([kma[i], ar[i]]).any():
                 uhdr = kma[i] + ratio * ar[i]
                 lhdr = kma[i] - ratio * ar[i]
+            upper.append(uhdr)
+            lower.append(lhdr)
+            i += 1
+        if programmatic: return {'Upper':upper, 'Lower':lower}
+        res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
+        res.index = raw['Date']
+        return res
+
+    def bb(self, raw=None, period=20, req_field='c', programmatic=False):
+        upper, lower = [], []
+        if not raw: raw = self.data
+        sma, bw = self.ma(raw=raw, period=period, req_field=req_field, programmatic=True), self.bbw(raw=raw, period=period, req_field=req_field, programmatic=True)
+        i = 0
+        while i < len(sma):
+            uhdr, lhdr = np.nan, np.nan
+            if not np.isnan([sma[i], bw[i]]).any():
+                uhdr = sma[i] + bw[i] / 2
+                lhdr = sma[i] - bw[i] / 2
             upper.append(uhdr)
             lower.append(lhdr)
             i += 1
