@@ -317,22 +317,22 @@ class ONA(object):
         if not raw: raw = self.data
         def volitality(raw, period=5):
             res, ehl = [], self.ma(raw=raw, period=5, favour='e', req_field='hl', programmatic=True)
-            i, j = 0, 0
+            i = 0
             while i < len(ehl):
-                if np.isnan(ehl[i]): res.append(np.nan)
+                if np.isnan(ehl[i]): hdr = np.nan
                 else:
-                    if j == 0: j = i
-                    if i < j + period: res.append(np.nan)
-                    if i == j + period: res.append(np.mean(ehl[i - j - period:i - j]))
-                    if i > j + period: res.append((res[-1] * (period - 1) + ehl[i]) / period)
+                    if i < 2 * period: hdr = np.nan
+                    elif i == 2 * period: hdr = np.mean(ehl[i - period:i])
+                    else: hdr = (res[-1] * (period - 1) + ehl[i]) / period
+                res.append(hdr)
                 i += 1
             return res
         i, vol = 0, volitality(raw, period)
         while i < len(vol):
             uhdr, lhdr = np.nan, np.nan
             if not np.isnan(vol[i]):
-                uhdr = vol[i] * (df + 1)
-                lhdr = vol[i] * (df - 1)
+                uhdr = vol[i] * (df / 2 + 1)
+                lhdr = vol[i] * (df / 2 - 1)
             upper.append(uhdr)
             lower.append(lhdr)
             i += 1
