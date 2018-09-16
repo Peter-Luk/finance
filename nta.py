@@ -331,8 +331,8 @@ class ONA(object):
         while i < len(vol):
             uhdr, lhdr = np.nan, np.nan
             if not np.isnan(vol[i]):
-                uhdr = vol[i] * (df / 2 + 1)
-                lhdr = vol[i] * (df / 2 - 1)
+                uhdr = vol[i] * (1 + df / 2)
+                lhdr = vol[i] * (1 - df / 2)
             upper.append(uhdr)
             lower.append(lhdr)
             i += 1
