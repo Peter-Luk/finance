@@ -312,6 +312,35 @@ class ONA(object):
         res.index = raw['Date']
         return res
 
+    def apz(self, raw=None, period=5, df=gr, programmatic=False):
+        upper, lower = [], []
+        if not raw: raw = self.data
+        def volitality(raw, period=5):
+            res, ehl = [], self.ma(raw=raw, period=5, favour='e', req_field='hl', programmatic=True)
+            i, j = 0, 0
+            while i < len(ehl):
+                if np.isnan(ehl[i]): res.append(np.nan)
+                else:
+                    if j == 0: j = i
+                    if i < j + period: res.append(np.nan)
+                    if i == j + period: res.append(np.mean(ehl[i - j - period:i - j]))
+                    if i > j + period: res.append((res[-1] * (period - 1) + ehl[i]) / period)
+                i += 1
+            return res
+        i, vol = 0, volitality(raw, period)
+        while i < len(vol):
+            uhdr, lhdr = np.nan, np.nan
+            if not np.isnan(vol[i]):
+                uhdr = vol[i] * (df + 1)
+                lhdr = vol[i] * (df - 1)
+            upper.append(uhdr)
+            lower.append(lhdr)
+            i += 1
+        if programmatic: return {'Upper':upper, 'Lower':lower}
+        res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
+        res.index = raw['Date']
+        return res
+
 class Viewer(ONA):
     def __init__(self, code):
         self.code = code
