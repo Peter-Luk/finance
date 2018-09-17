@@ -312,7 +312,7 @@ class ONA(object):
         res.index = raw['Date']
         return res
 
-    def apz(self, raw=None, period=5, df=.09, programmatic=False):
+    def apz(self, raw=None, period=5, df=.092, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
         def volitality(raw, period=5):
