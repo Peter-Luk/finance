@@ -8,7 +8,6 @@ from time import sleep
 import sqlite3 as lite
 import fix_yahoo_finance as yf
 from scipy.constants import golden_ratio as gr
-# gr = 1.61803399
 
 today = datetime.today()
 year, month, month_string = today.year, today.month, today.strftime('%B')
@@ -148,8 +147,8 @@ def web_collect(*args, **kwargs):
             dp = yf.download(code, start, end, group_by='ticker')
             if len(dp): process = not process
             else:
-                print('Retry in 10 seconds')
-                sleep(10)
+                print('Retry in 25 seconds')
+                sleep(25)
 #        dp = data.DataReader(code, src, start, end)
         for c in code:
 #            res[c] = dp.minor_xs(c).transpose().to_dict()
