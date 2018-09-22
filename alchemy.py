@@ -6,10 +6,7 @@ from sys import platform
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
 if platform in ['linux', 'linux2']:
     subpath = 'shared'
-    try:
-        ext = environ['EXTERNAL_STORAGE']
-        subpath = 'external-1'
-    except: pass
+    if environ['EXTERNAL_STORAGE']: subpath = 'external-1'
     home = sep.join([environ['HOME'], 'storage', subpath])
 
 def get_db(*args, **kwargs):
