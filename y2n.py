@@ -45,10 +45,13 @@ def convert(code=None, start=None, table='Securities', exclude=[805], years=None
         if isinstance(code, [int, float]): aid = [int(code)]
     else: aid = stored_eid(table=table)
     res = {}
-    for ai in aid:
-        qstr = "SELECT date, open, high, low, close, volume FROM records WHERE eid={:d}".format(ai)
+    for _ in aid:
+        hdr, qstr = {}, "SELECT date, open, high, low, close, volume FROM records WHERE eid={:d}".format(_)
         if start: qstr += " AND date > '{:%Y-%m-%d}'".format(start)
         q = conn.execute(qstr)
         cols = [c[0].capitalize() for c in q.description]
-        res[ai] = pd.DataFrame.from_records(data=q.fetchall(), index='Date', columns=cols)
-    return res
+        rd = pd.DataFrame.from_records(data=q.fetchall(), index='Date', columns=cols)
+        hdr['Date'] = [__.to_pydatetime() for __ in rd.index]
+        hdr['Data'] = np.asarray(rd)
+        res[_] = hdr
+    return pd.Series(res)
