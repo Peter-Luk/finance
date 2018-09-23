@@ -51,7 +51,7 @@ def convert(code=None, start=None, table='Securities', exclude=[805], years=None
         q = conn.execute(qstr)
         cols = [c[0].capitalize() for c in q.description]
         rd = pd.DataFrame.from_records(data=q.fetchall(), index='Date', columns=cols)
-        hdr['Date'] = [__.to_pydatetime() for __ in rd.index]
+        hdr['Date'] = [datetime.strptime(__, '%Y-%m-%d') for __ in rd.index]
         hdr['Data'] = np.asarray(rd)
         res[_] = hdr
     return pd.Series(res)
