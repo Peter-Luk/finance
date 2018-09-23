@@ -47,7 +47,7 @@ def convert(code=None, start=None, table='Securities', exclude=[805], years=None
     res = {}
     for ai in aid:
         qstr = "SELECT date, open, high, low, close, volume FROM records WHERE eid={:d}".format(ai)
-        if start: qstr += " AND '{:%Y-%m-%d}'".format(start)
+        if start: qstr += " AND date > '{:%Y-%m-%d}'".format(start)
         q = conn.execute(qstr)
         cols = [c[0].capitalize() for c in q.description]
         res[ai] = pd.DataFrame.from_records(data=q.fetchall(), index='Date', columns=cols)
