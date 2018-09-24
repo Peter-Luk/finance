@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import fix_yahoo_finance as yf
 from utilities import filepath
-from datetime import datetime
+# from datetime import datetime
 from time import sleep
 
 def fetch(code=None, start=None, table='Securities', exclude=[805], years=4):
@@ -13,7 +13,7 @@ def fetch(code=None, start=None, table='Securities', exclude=[805], years=4):
         return [_ for _ in [__[0] for __ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if _ not in exclude]
 
     if not start:
-        start = datetime(datetime.now().year - years, 1, 1)
+        start = pd.datetime(pd.datetime.now().year - years, 1, 1)
     if code:
         if isinstance(code, [int, float]): aid = [int(code)]
     else: aid = stored_eid(table=table)
@@ -40,7 +40,7 @@ def convert(code=None, start=None, table='Securities', exclude=[805], years=None
         return [_ for _ in [__[0] for __ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if _ not in exclude]
 
     if not start:
-        if years: start = datetime(datetime.now().year - years, 1, 1)
+        if years: start = pd.datetime(pd.datetime.now().year - years, 1, 1)
     if code:
         if isinstance(code, [int, float]): aid = [int(code)]
     else: aid = stored_eid(table=table)
@@ -51,7 +51,7 @@ def convert(code=None, start=None, table='Securities', exclude=[805], years=None
         q = conn.execute(qstr)
         cols = [c[0].capitalize() for c in q.description]
         rd = pd.DataFrame.from_records(data=q.fetchall(), index='Date', columns=cols)
-        hdr['Date'] = [datetime.strptime(__, '%Y-%m-%d') for __ in rd.index]
+        hdr['Date'] = [pd.datetime.strptime(__, '%Y-%m-%d') for __ in rd.index]
         hdr['Data'] = np.asarray(rd)
         res[_] = hdr
     return pd.Series(res)
