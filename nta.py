@@ -72,23 +72,25 @@ class ONA(object):
         def er(raw, period):
             res, i = [], 0
             while i < len(raw):
-                if i < period['er']: res.append(np.nan)
+                if i < period['er']: hdr = np.nan
                 else:
                     j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period['er'] + 1, -2])
                     while j < period['er']:
                         delta += abs(raw[i - period['er'] + 1 + j, -2] - raw[i - period['er'] + j, -2])
                         j += 1
-                    res.append(d_close / delta)
+                    hdr = d_close / delta
+                res.append(hdr)
                 i += 1
             return res
 
         def sc(raw, period):
             res, i, ver = [], 0, er(raw, period)
             while i < len(raw):
-                if i < period['slow']: res.append(np.nan)
+                if i < period['slow']: hdr = np.nan
                 else:
                     fsc, ssc = 2 / (period['fast'] + 1), 2 / (period['slow'] + 1)
-                    res.append((ver[i] * (fsc - ssc) + ssc) ** 2)
+                    hdr = (ver[i] * (fsc - ssc) + ssc) ** 2
+                res.append(hdr)
                 i += 1
             return res
 
