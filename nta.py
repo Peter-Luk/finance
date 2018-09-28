@@ -89,7 +89,8 @@ class ONA(object):
                     while j < period['er']:
                         delta += abs(raw[i - period['er'] + 1 + j, -2] - raw[i - period['er'] + j, -2])
                         j += 1
-                    hdr = d_close[i] / delta
+                    hdr = 0
+                    if delta: hdr = d_close[i] / delta
                     # hdr = d_close / delta
                 res.append(hdr)
                 i += 1
