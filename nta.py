@@ -79,16 +79,18 @@ class ONA(object):
                     _ += 1
                 return res
 
-            res, i = [], 0
+            res, i, d_close = [], 0, dc(raw)
+            # res, i = [], 0
             while i < len(raw):
                 if i < period['er']: hdr = np.nan
                 else:
-                    j, delta, d_close = 1, 0, dc(raw)
+                    j, delta = 1, 0
                     # j, delta, d_close = 1, 0, abs(raw[i, -2] - raw[i - period['er'] + 1, -2])
                     while j < period['er']:
                         delta += abs(raw[i - period['er'] + 1 + j, -2] - raw[i - period['er'] + j, -2])
                         j += 1
-                    hdr = d_close / delta
+                    hdr = d_close[i] / delta
+                    # hdr = d_close / delta
                 res.append(hdr)
                 i += 1
             return res
