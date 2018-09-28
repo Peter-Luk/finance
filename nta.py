@@ -94,33 +94,32 @@ class ONA(object):
             return res
 
         def sc(raw, period):
-            res, i, ver = [], 0, er(raw, period)
-            while i < len(raw):
-                if i < period['slow']: hdr = np.nan
-                else:
+            res, _, ver = [], 0, er(raw, period)
+            while _ < len(raw):
+                hdr = np.nan
+                if not _ < period['slow']:
                     fsc, ssc = 2 / (period['fast'] + 1), 2 / (period['slow'] + 1)
-                    hdr = (ver[i] * (fsc - ssc) + ssc) ** 2
+                    hdr = (ver[_] * (fsc - ssc) + ssc) ** 2
                 res.append(hdr)
-                i += 1
+                _ += 1
             return res
 
         def process(raw, period):
-            res, i, vsc = [], 0, sc(raw, period)
-            while i < len(raw):
-                if i < period['slow']: res.append(np.nan)
-                else:
-                    if i == period['slow']: hdr = sma[i]
-                    else: hdr = res[-1] + vsc[i] * (raw[i, -2] - res[-1])
-                    res.append(hdr)
-                i += 1
+            res, _, vsc = [], 0, sc(raw, period)
+            while _ < len(raw):
+                hdr = np.nan
+                if _ == period['slow']: hdr = sma[_]
+                if _ > period['slow']: hdr = res[-1] + vsc[_] * (raw[_, -2] - res[-1])
+                res.append(hdr)
+                _ += 1
             return res
 
         rflag = np.isnan(raw['Data']).any(axis=1)
         if rflag.any():
-            i = 0
-            while i < len(raw['Data'][rflag]):
+            _ = 0
+            while _ < len(raw['Data'][rflag]):
                 mres.append(np.nan)
-                i += 1
+                _ += 1
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         if programmatic: return mres
