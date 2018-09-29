@@ -14,27 +14,27 @@ class ONA(object):
         if not raw: raw = self.data
         mres = []
         def process(raw, period, favour, req_field):
-            res, i = [], 0
-            while i < len(raw):
-                if i < period - 1: res.append(np.nan)
+            res, _ = [], 0
+            while _ < len(raw):
+                if _ < period - 1: res.append(np.nan)
                 else:
-                    if req_field.lower() in ['close', 'c']: rdata = raw[i - period + 1: i + 1, -2]
-                    if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[i - period + 1: i + 1, :-1].mean(axis=1)
-                    if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[i - period + 1: i + 1, 1:3].mean(axis=1)
+                    if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
+                    if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
+                    if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
                     if favour[0].lower() == 's': res.append(rdata.sum() / period)
-                    if favour[0].lower() == 'w': res.append((rdata * raw[i - period + 1: i + 1, -1]).sum() / raw[i - period + 1: i + 1, -1].sum())
+                    if favour[0].lower() == 'w': res.append((rdata * raw[_ - period + 1: _ + 1, -1]).sum() / raw[_ - period + 1: _ + 1, -1].sum())
                     if favour[0].lower() == 'e':
-                        if i == period: hdr = rdata.sum() / period
+                        if _ == period: hdr = rdata.sum() / period
                         else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
                         res.append(hdr)
-                i += 1
+                _ += 1
             return res
         rflag = np.isnan(raw['Data']).any(axis=1)
         if rflag.any():
-            i = 0
-            while i < len(raw['Data'][rflag]):
+            _ = 0
+            while _ < len(raw['Data'][rflag]):
                 mres.append(np.nan)
-                i += 1
+                _ += 1
             mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
         else: mres.extend(process(raw['Data'], period, favour, req_field))
         if programmatic: return mres
@@ -44,22 +44,22 @@ class ONA(object):
         if not raw: raw = self.data
         mres = []
         def process(raw, period, req_field):
-            res, i = [], 0
-            while i < len(raw):
-                if i < period - 1: res.append(np.nan)
+            res, _ = [], 0
+            while _ < len(raw):
+                if _ < period - 1: res.append(np.nan)
                 else:
-                    if req_field.lower() in ['close', 'c']: rdata = raw[i - period + 1: i + 1, -2]
-                    if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[i - period + 1: i + 1, :-1].mean(axis=1)
-                    if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[i - period + 1: i + 1, 1:3].mean(axis=1)
+                    if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
+                    if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
+                    if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
                     res.append(2 * rdata.std())
-                i += 1
+                _ += 1
             return res
         rflag = np.isnan(raw['Data']).any(axis=1)
         if rflag.any():
-            i = 0
-            while i < len(raw['Data'][rflag]):
+            _ = 0
+            while _ < len(raw['Data'][rflag]):
                 mres.append(np.nan)
-                i += 1
+                _ += 1
             mres.extend(process(raw['Data'][~rflag], period, req_field))
         else: mres.extend(process(raw['Data'], period, req_field))
         if programmatic: return mres
@@ -128,37 +128,37 @@ class ONA(object):
     def atr(self, raw=None, period=14, programmatic=False):
         if not raw: raw = self.data
         mres = []
-        def tr(data):
-            nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
-            while i < len(data):
-                if i == 0: res.append(nr[i])
+        def __tr(data):
+            nr, res, _ = data[:,:-1].ptp(axis=1).tolist(), [], 0
+            while _ < len(data):
+                if _ == 0: res.append(nr[_])
                 else:
-                    hmpc, lmpc = abs(data[i, 1] - data[i - 1, -2]), abs(data[i, 2] - data[i - 1, -2])
+                    hmpc, lmpc = abs(data[_, 1] - data[_ - 1, -2]), abs(data[_, 2] - data[_ - 1, -2])
                     hdr = hmpc
-                    if lmpc > nr[i]:
+                    if lmpc > nr[_]:
                         if lmpc > hmpc: hdr = lmpc
-                    elif hmpc < nr[i]: hdr = nr[i]
+                    elif hmpc < nr[_]: hdr = nr[_]
                     res.append(hdr)
-                i += 1
+                _ += 1
             return res
 
         def process(data, period):
-            res, i, truerange = [], 0, tr(data)
-            while i < len(data):
-                if i < period: hdr = np.nan
+            res, _, truerange = [], 0, __tr(data)
+            while _ < len(data):
+                if _ < period: hdr = np.nan
                 else:
-                    if i == period: hdr = np.mean(truerange[:i])
-                    else: hdr = (res[-1] * (period - 1) + truerange[i]) / period
+                    if _ == period: hdr = np.mean(truerange[:_])
+                    else: hdr = (res[-1] * (period - 1) + truerange[_]) / period
                 res.append(hdr)
-                i += 1
+                _ += 1
             return res
 
         rflag = np.isnan(raw['Data']).any(axis=1)
         if rflag.any():
-            i = 0
-            while i < len(raw['Data'][rflag]):
+            _ = 0
+            while _ < len(raw['Data'][rflag]):
                 mres.append(np.nan)
-                i += 1
+                _ += 1
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         if programmatic: return mres
@@ -245,44 +245,44 @@ class ONA(object):
         if not raw: raw = self.data
         mres = []
         def process(raw, period):
-            i, gain, loss, res = 0, [], [], []
-            while i < len(raw):
-                if i == 0:
-                    if raw[i, -2] > raw[i, 0]:
-                        gain.append(raw[i, -2] - raw[i, 0])
+            _, gain, loss, res = 0, [], [], []
+            while _ < len(raw):
+                if _ == 0:
+                    if raw[_, -2] > raw[_, 0]:
+                        gain.append(raw[_, -2] - raw[_, 0])
                         loss.append(0)
-                    elif raw[i, -2] == raw[i, 0]:
+                    elif raw[_, -2] == raw[_, 0]:
                         gain.append(0)
                         loss.append(0)
                     else:
                         gain.append(0)
-                        loss.append(raw[i, 0] - raw[i, -2])
+                        loss.append(raw[_, 0] - raw[_, -2])
                 else:
-                    if raw[i, -2] > raw[i - 1, -2]:
-                        gain.append(raw[i, -2] - raw[i - 1, -2])
+                    if raw[_, -2] > raw[_ - 1, -2]:
+                        gain.append(raw[_, -2] - raw[_ - 1, -2])
                         loss.append(0)
-                    elif raw[i, -2] == raw[i - 1, -2]:
+                    elif raw[_, -2] == raw[_ - 1, -2]:
                         gain.append(0)
                         loss.append(0)
                     else:
                         gain.append(0)
-                        loss.append(raw[i -1, -2] - raw[i, -2])
-                i += 1
-            i = 0
-            while i < len(raw):
-                if i < period: res.append(np.nan)
-                elif i == period: res.append(100 - 100 / ((1 + np.mean(gain[:i]) / np.mean(loss[:i]))))
-                else:
-                    res.append(100 - 100 / (( 1 + np.mean(gain[i - period:i]) / np.mean(loss[i - period:i]))))
-                i += 1
+                        loss.append(raw[_ -1, -2] - raw[_, -2])
+                _ += 1
+            _ = 0
+            while _ < len(raw):
+                hdr = np.nan
+                if _ == period: hdr = 100 - 100 / ((1 + np.mean(gain[:_]) / np.mean(loss[:_])))
+                if _ > period: hdr = 100 - 100 / (( 1 + np.mean(gain[_ - period:_]) / np.mean(loss[_ - period:_])))
+                res.append(hdr)
+                _ += 1
             return res
 
         rflag = np.isnan(raw['Data']).any(axis=1)
         if rflag.any():
-            i = 0
-            while i < len(raw['Data'][rflag]):
+            _ = 0
+            while _ < len(raw['Data'][rflag]):
                 mres.append(np.nan)
-                i += 1
+                _ += 1
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'RSI': mres}, index=raw['Date'])
@@ -290,16 +290,15 @@ class ONA(object):
     def kc(self, raw=None, period={'atr':14, 'er':10, 'fast':2, 'slow':30}, ratio=gr, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
-        kma, ar = self.kama(raw=raw, period={'er':period['er'], 'fast':period['fast'], 'slow':period['slow']}, programmatic=True), self.atr(raw=raw, period=period['atr'], programmatic=True)
-        i = 0
-        while i < len(kma):
+        _, kma, ar = 0, self.kama(raw=raw, period={'er':period['er'], 'fast':period['fast'], 'slow':period['slow']}, programmatic=True), self.atr(raw=raw, period=period['atr'], programmatic=True)
+        while _ < len(kma):
             uhdr, lhdr = np.nan, np.nan
-            if not np.isnan([kma[i], ar[i]]).any():
-                uhdr = kma[i] + ratio * ar[i]
-                lhdr = kma[i] - ratio * ar[i]
+            if not np.isnan([kma[_], ar[_]]).any():
+                uhdr = kma[_] + ratio * ar[_]
+                lhdr = kma[_] - ratio * ar[_]
             upper.append(uhdr)
             lower.append(lhdr)
-            i += 1
+            _ += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
         res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
         res.index = raw['Date']
@@ -309,15 +308,15 @@ class ONA(object):
         upper, lower = [], []
         if not raw: raw = self.data
         sma, bw = self.ma(raw=raw, period=period, req_field=req_field, programmatic=True), self.bbw(raw=raw, period=period, req_field=req_field, programmatic=True)
-        i = 0
-        while i < len(sma):
+        _ = 0
+        while _ < len(sma):
             uhdr, lhdr = np.nan, np.nan
-            if not np.isnan([sma[i], bw[i]]).any():
-                uhdr = sma[i] + bw[i] / 2
-                lhdr = sma[i] - bw[i] / 2
+            if not np.isnan([sma[_], bw[_]]).any():
+                uhdr = sma[_] + bw[_] / 2
+                lhdr = sma[_] - bw[_] / 2
             upper.append(uhdr)
             lower.append(lhdr)
-            i += 1
+            _ += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
         res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
         res.index = raw['Date']
@@ -326,27 +325,26 @@ class ONA(object):
     def apz(self, raw=None, period=5, df=.092, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
-        def volitality(raw, period=5):
-            res, ehl = [], self.ma(raw=raw, period=5, favour='e', req_field='hl', programmatic=True)
-            i = 0
-            while i < len(ehl):
-                if np.isnan(ehl[i]): hdr = np.nan
+        def __volitality(raw, period=5):
+            _, res, ehl = 0, [], self.ma(raw=raw, period=5, favour='e', req_field='hl', programmatic=True)
+            while _ < len(ehl):
+                if np.isnan(ehl[_]): hdr = np.nan
                 else:
-                    if i < 2 * period: hdr = np.nan
-                    elif i == 2 * period: hdr = np.mean(ehl[i - period:i])
-                    else: hdr = (res[-1] * (period - 1) + ehl[i]) / period
+                    hdr = np.nan
+                    if _ == 2 * period: hdr = np.mean(ehl[_ - period:_])
+                    if _ > 2 * period: hdr = (res[-1] * (period - 1) + ehl[_]) / period
                 res.append(hdr)
-                i += 1
+                _ += 1
             return res
-        i, vol = 0, volitality(raw, period)
-        while i < len(vol):
+        _, vol = 0, __volitality(raw, period)
+        while _ < len(vol):
             uhdr, lhdr = np.nan, np.nan
-            if not np.isnan(vol[i]):
-                uhdr = vol[i] * (1 + df / 2)
-                lhdr = vol[i] * (1 - df / 2)
+            if not np.isnan(vol[_]):
+                uhdr = vol[_] * (1 + df / 2)
+                lhdr = vol[_] * (1 - df / 2)
             upper.append(uhdr)
             lower.append(lhdr)
-            i += 1
+            _ += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
         res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
         res.index = raw['Date']
