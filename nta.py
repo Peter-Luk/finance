@@ -167,21 +167,21 @@ class ONA(object):
     def adx(self, raw=None, period=14):
         if not raw: raw = self.data
         mres = []
-        def tr(data):
-            nr, res, i = data[:,:-1].ptp(axis=1).tolist(), [], 0
-            while i < len(data):
-                if i == 0: res.append(nr[i])
+        def __tr(data):
+            nr, res, _ = data[:,:-1].ptp(axis=1).tolist(), [], 0
+            while _ < len(data):
+                if _ == 0: hdr = nr[_]
                 else:
-                    hmpc, lmpc = abs(data[i, 1] - data[i - 1, -2]), abs(data[i, 2] - data[i - 1, -2])
+                    hmpc, lmpc = abs(data[_, 1] - data[_ - 1, -2]), abs(data[_, 2] - data[_ - 1, -2])
                     hdr = hmpc
-                    if lmpc > nr[i]:
+                    if lmpc > nr[_]:
                         if lmpc > hmpc: hdr = lmpc
-                    elif hmpc < nr[i]: hdr = nr[i]
-                    res.append(hdr)
-                i += 1
+                    elif hmpc < nr[_]: hdr = nr[_]
+                res.append(hdr)
+                _ += 1
             return res
 
-        def dm(data):
+        def __dm(data):
             i, res = 1, {'+':[0], '-':[0]}
             while i < len(data):
                 dh, dl = data[i][1] - data[i - 1][1], data[i - 1][2] - data[i][2]
@@ -192,51 +192,51 @@ class ONA(object):
                 i += 1
             return res
 
-        def di(data, period=period):
-            res, i, dir_mov, true_range = {'+':[np.nan], '-':[np.nan]}, 0, dm(data), tr(data)
-            while i < len(dir_mov['+']):
-                if i < period:
+        def __di(data, period=period):
+            res, _, dir_mov, true_range = {'+':[np.nan], '-':[np.nan]}, 0, __dm(data), __tr(data)
+            while _ < len(dir_mov['+']):
+                if _ < period:
                     phdr = np.nan
                     mhdr = np.nan
                 else:
-                    phdr = sum(dir_mov['+'][i - period:i]) / sum(true_range[i - period + 1:i + 1])
-                    mhdr = sum(dir_mov['-'][i - period:i]) / sum(true_range[i - period + 1:i + 1])
+                    phdr = sum(dir_mov['+'][_ - period:_]) / sum(true_range[_ - period + 1:_ + 1])
+                    mhdr = sum(dir_mov['-'][_ - period:_]) / sum(true_range[_ - period + 1:_ + 1])
                 res['+'].append(phdr)
                 res['-'].append(mhdr)
-                i += 1
+                _ += 1
             return res
 
-        def dx(raw, period):
-            i, res, dip = 0, [], di(raw, period)
-            while i < len(raw):
-                if np.isnan(dip['+'][i]) or np.isnan(dip['-'][i]): hdr = np.nan
+        def __dx(raw, period):
+            _, res, dip = 0, [], __di(raw, period)
+            while _ < len(raw):
+                if np.isnan(dip['+'][_]) or np.isnan(dip['-'][_]): hdr = np.nan
                 else:
-                    hdr = abs(dip['+'][i] - dip['-'][i]) / (dip['+'][i] + dip['-'][i]) * 100
+                    hdr = abs(dip['+'][_] - dip['-'][_]) / (dip['+'][_] + dip['-'][_]) * 100
                 res.append(hdr)
-                i += 1
+                _ += 1
             return res
 
         def process(data, period):
-            res, nc, i, vdx = [], 0, 0, dx(data, period)
-            while i < len(data):
-                if np.isnan(vdx[i]):
+            res, nc, _, vdx = [], 0, 0, __dx(data, period)
+            while _ < len(data):
+                if np.isnan(vdx[_]):
                     hdr = np.nan
                     nc += 1
                 else:
-                    if i < period + nc: hdr = np.nan
+                    if _ < period + nc: hdr = np.nan
                     else:
-                        if i == period + nc: hdr = np.mean(vdx[nc:i])
-                        else: hdr = (res[-1] * (period - 1) + vdx[i]) / period
+                        if _ == period + nc: hdr = np.mean(vdx[nc:_])
+                        else: hdr = (res[-1] * (period - 1) + vdx[_]) / period
                 res.append(hdr)
-                i += 1
+                _ += 1
             return res
 
         rflag = np.isnan(raw['Data']).any(axis=1)
         if rflag.any():
-            i = 0
-            while i < len(raw['Data'][rflag]):
+            _ = 0
+            while _ < len(raw['Data'][rflag]):
                 mres.append(np.nan)
-                i += 1
+                _ += 1
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'ADX': mres}, index=raw['Date'])
