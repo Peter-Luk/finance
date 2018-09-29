@@ -7,8 +7,8 @@ from utilities import filepath
 from time import sleep
 
 def fetch(code=None, start=None, table='Securities', exclude=[805], years=4, adhoc=True):
+    conn = lite.connect(filepath(table))
     def stored_eid(table):
-        conn = lite.connect(filepath(table))
         cur = conn.cursor()
         return [_ for _ in [__[0] for __ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if _ not in exclude]
 
