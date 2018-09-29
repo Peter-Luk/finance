@@ -70,7 +70,7 @@ class ONA(object):
         mres, sma = [], self.ma(raw, period['slow'], 'e', 'c', True)
 
         def er(raw, period):
-            def dc(raw, lapse=period['er']):
+            def __dc(raw, lapse=period['er']):
                 res, _ = [], 0
                 while _ < len(raw):
                     hdr = np.nan
@@ -79,7 +79,7 @@ class ONA(object):
                     _ += 1
                 return res
 
-            res, _, d_close = [], 0, dc(raw)
+            res, _, d_close = [], 0, __dc(raw)
             while _ < len(raw):
                 if _ < period['er']: hdr = np.nan
                 else:
