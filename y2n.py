@@ -6,7 +6,7 @@ from utilities import filepath
 from time import sleep
 
 def fetch(code=None, start=None, table='Securities', exclude=[805], years=4, adhoc=True):
-    conn = lite.connect(filepath(table))
+    res, conn = {}, lite.connect(filepath(table))
     def stored_eid(table):
         cur = conn.cursor()
         return [_ for _ in [__[0] for __ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if _ not in exclude]
@@ -16,7 +16,6 @@ def fetch(code=None, start=None, table='Securities', exclude=[805], years=4, adh
     if code:
         if isinstance(code, [int, float]): aid = [int(code)]
     else: aid = stored_eid(table=table)
-    res = {}
     if adhoc:
         while adhoc:
             ar = yf.download(['{:04d}.HK'.format(_) for _ in aid], start, group_by='ticker')
