@@ -16,17 +16,19 @@ class ONA(object):
         def process(raw, period, favour, req_field):
             res, _ = [], 0
             while _ < len(raw):
-                if _ < period - 1: res.append(np.nan)
-                else:
+                hdr = np.nan
+                if not _ < period - 1:
+                # else:
                     if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
                     if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
                     if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
-                    if favour[0].lower() == 's': res.append(rdata.sum() / period)
-                    if favour[0].lower() == 'w': res.append((rdata * raw[_ - period + 1: _ + 1, -1]).sum() / raw[_ - period + 1: _ + 1, -1].sum())
+                    # if favour[0].lower() == 's': res.append(rdata.sum() / period)
+                    if favour[0].lower() == 's': hdr = rdata.mean()
+                    if favour[0].lower() == 'w': hdr = (rdata * raw[_ - period + 1: _ + 1, -1]).sum() / raw[_ - period + 1: _ + 1, -1].sum()
                     if favour[0].lower() == 'e':
-                        if _ == period: hdr = rdata.sum() / period
-                        else: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
-                        res.append(hdr)
+                        if _ == period: hdr = rdata.mean()
+                        if _ > period: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
+                res.append(hdr)
                 _ += 1
             return res
         rflag = np.isnan(raw['Data']).any(axis=1)
@@ -46,12 +48,14 @@ class ONA(object):
         def process(raw, period, req_field):
             res, _ = [], 0
             while _ < len(raw):
-                if _ < period - 1: res.append(np.nan)
-                else:
+                # if _ < period - 1: res.append(np.nan)
+                hdr = np.nan
+                if not _ < period - 1:
                     if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
                     if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
                     if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
-                    res.append(2 * rdata.std())
+                    hdr = 2 * rdata.std()
+                res.append(hdr)
                 _ += 1
             return res
         rflag = np.isnan(raw['Data']).any(axis=1)
