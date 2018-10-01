@@ -85,8 +85,8 @@ class ONA(object):
 
             res, _, d_close = [], 0, __dc(raw)
             while _ < len(raw):
-                if _ < period['er']: hdr = np.nan
-                else:
+                hdr = np.nan
+                if not _ < period['er']:
                     __, delta = 1, 0
                     while __ < period['er']:
                         delta += abs(raw[_ - period['er'] + 1 + __, -2] - raw[_ - period['er'] + __, -2])
