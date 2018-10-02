@@ -5,7 +5,7 @@ import fix_yahoo_finance as yf
 from utilities import filepath
 from time import sleep
 
-def fetch(code=None, start=None, table='Securities', exclude=[805], years=4, adhoc=True):
+def fetch(code=None, start=None, table='Securities', exclude=[805], years=4, adhoc=False):
     res, conn = {}, lite.connect(filepath(table))
     def stored_eid(table):
         cur = conn.cursor()
