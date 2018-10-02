@@ -174,8 +174,9 @@ class ONA(object):
         def __tr(data):
             nr, res, _ = data[:,:-1].ptp(axis=1).tolist(), [], 0
             while _ < len(data):
-                if _ == 0: hdr = nr[_]
-                else:
+                hdr = nr[_]
+                # if _ == 0: hdr = nr[_]
+                if not _ == 0:
                     hmpc, lmpc = abs(data[_, 1] - data[_ - 1, -2]), abs(data[_, 2] - data[_ - 1, -2])
                     hdr = hmpc
                     if lmpc > nr[_]:
