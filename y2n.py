@@ -7,16 +7,16 @@ from time import sleep
 
 class Equities(object):
     def __init__(self, db='Securities'):
-        self.__db = db
+        self.__conn = lite.connect(filepath(db))
 
     def __del__(self):
-        self.__db = None
-        del(self.__db)
+        self.__conn = None
+        del(self.__conn)
 
     def fetch(self, code=None, start=None, table='records', exclude=[805], years=4, adhoc=False):
-        res, conn = {}, lite.connect(filepath(self.__db))
+        res = {}
         def stored_eid(table):
-            cur = conn.cursor()
+            cur = self.__conn.cursor()
             return [_ for _ in [__[0] for __ in cur.execute("SELECT DISTINCT eid FROM {} ORDER BY eid ASC".format(table)).fetchall()] if _ not in exclude]
 
         if not start:
@@ -42,7 +42,7 @@ class Equities(object):
             for _ in aid:
                 hdr, qstr = {}, "SELECT date, open, high, low, close, volume FROM {} WHERE eid={:d}".format(table, _)
                 if start: qstr += " AND date > '{:%Y-%m-%d}'".format(start)
-                q = conn.execute(qstr)
+                q = self.__conn.execute(qstr)
                 cols = [c[0].capitalize() for c in q.description]
                 rd = pd.DataFrame.from_records(data=q.fetchall(), index='Date', columns=cols)
                 hdr['Date'] = [pd.datetime.strptime(__, '%Y-%m-%d') for __ in rd.index]
