@@ -366,7 +366,7 @@ class Viewer(ONA):
     def mas(self, code=None):
         if not code: code = self.code
         dcode = ONA(code)
-        return dcode.kama().merge(dcode.ma(favour='e'), left_index=True, right_index=True).merge(dcode.ma(), left_index=True, right_index=True)
+        return dcode.kama().merge(dcode.ma(favour='e'), left_index=True, right_index=True).merge(dcode.ma(), left_index=True, right_index=True).merge(dcode.ma(favour='w'), left_index=True, right_index=True)
 
     def idrs(self, code=None):
         if not code: code = self.code
