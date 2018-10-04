@@ -23,6 +23,7 @@ class Equities(object):
             start = pd.datetime(pd.datetime.now().year - years, 1, 1)
         if code:
             if isinstance(code, (tuple, list)): aid = list(code)
+            if isinstance(code, (int, float)) and not adhoc: aid = [int(code)]
         else: aid = stored_eid(table=table)
         if adhoc:
             while adhoc:
