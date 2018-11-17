@@ -372,3 +372,12 @@ class Viewer(ONA):
         if not code: code = self.code
         dcode = ONA(code)
         return dcode.adx().merge(dcode.rsi(), left_index=True, right_index=True).merge(dcode.atr(), left_index=True, right_index=True)
+
+def hsi_round(value, digit):
+    _, n = np.floor(np.log10(value)), 1
+    if int(_) == 0: return np.round(value, digit)
+    __ = np.divmod(value, 10 ** _)[0]
+    digit -= int(_)
+    if __ > 1: n = 5
+    if __ > 4: n = 2
+    return np.round(value * n, digit) / n
