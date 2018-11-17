@@ -373,7 +373,7 @@ class Viewer(ONA):
         dcode = ONA(code)
         return dcode.adx().merge(dcode.rsi(), left_index=True, right_index=True).merge(dcode.atr(), left_index=True, right_index=True)
 
-def hsi_round(value, digit):
+def hsi_round(value, digit=2):
     _, n = np.floor(np.log10(value)), 1
     if int(_) == 0: return np.round(value, digit)
     __ = np.divmod(value, 10 ** _)[0]
