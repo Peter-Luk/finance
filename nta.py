@@ -379,5 +379,5 @@ def hsi_round(value, digit=2):
     __ = np.divmod(value, 10 ** _)[0]
     digit -= int(_)
     if __ > 1: n = 5
-    if __ > 4: n = 2
+    if __ > 2: n = 2
     return np.round(value * n, digit) / n
