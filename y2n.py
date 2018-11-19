@@ -27,8 +27,6 @@ class Equities(object):
             if isinstance(code, (int, float)):
                 if int(code) == 5: aid = [11, int(code)]
                 else: aid = [5, int(code)]
-            # if isinstance(code, (int, float)) and not adhoc: aid = [int(code)]
-        # else: aid = stored_eid(table=table)
         if adhoc:
             while adhoc:
                 ar = yf.download(['{:04d}.HK'.format(_) for _ in aid], start, group_by='ticker')
