@@ -374,10 +374,17 @@ class Viewer(ONA):
         return dcode.adx().merge(dcode.rsi(), left_index=True, right_index=True).merge(dcode.atr(), left_index=True, right_index=True)
 
 def hsi_round(value, digit=2):
-    _, n = np.floor(np.log10(value)), 10
-    if int(_) == 0: return np.round(value, digit)
-    __ = np.divmod(value, 10 ** _)[0]
-    digit -= int(_)
-    if __ > 1: n = 5
-    if __ > 2: n = 2
-    return np.round(value * n, digit) / n
+    _ = np.floor(np.log10(value))
+    __ = np.divmod(value, 10 ** (_ - 1))[0]
+    if int(_) < 0:
+        if __ < 25: return np.round(value, 3)
+        if __ < 50: return np.round(value * 2, 2) / 2
+        return np.round(value, 2)
+    if int(_) == 0: return np.round(value, 2)
+    if int(_) > 1:
+        if __ < 20: return np.round(value, 1)
+        return np.round(value * 5, 0) / 5
+    if int(_) > 0:
+        if __ < 10: return np.round(value, 2)
+        if __ < 20: return np.round(value * 5, 1) / 5
+        return np.round(value * 2, 1) / 2
