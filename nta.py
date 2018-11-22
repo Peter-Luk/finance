@@ -1,10 +1,13 @@
 import numpy as np
 import pandas as pd
+from y2n import Equities
 from utilities import gslice, gr, lique
 
 class ONA(object):
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, data, realtime=False):
+        if data:
+            if isinstance(data, int): self.data = Equities().fetch(data, adhoc=realtime).to_dict()[data]
+            else: self.data = data
 
     def __del__(self):
         self.data = None
