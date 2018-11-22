@@ -382,8 +382,10 @@ class ONA(object):
         return pd.Series([hsirnd(_) for _ in lique(hdr)])
 
 class Viewer(ONA):
-    def __init__(self, code):
-        self.code = code
+    def __init__(self, code, realtime=False):
+        if code:
+            if isinstance(code, int): self.code = Equities().fetch(code, adhoc=realtime).to_dict()[code]
+            else: self.code = code
 
     def __del__(self):
         self.code = None
