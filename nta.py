@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from utilities import gr
+from utilities import gslice, gr, lique
 
 class ONA(object):
     def __init__(self, data):
@@ -354,6 +354,29 @@ class ONA(object):
         res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
         res.index = raw['Date']
         return res
+
+    def _patr(self, raw=None):
+        if not raw: raw = self.data
+        lc, lr = raw['Data'][-1, -2], self.atr(raw=raw).values[-1][0]
+        _ = [lc + lr, lc, lc - lr]
+        _.extend(gslice([lc + lr, lc]))
+        _.extend(gslice([lc, lc - lr]))
+        _.sort()
+        return _
+
+    def _pgap(self, pivot, raw=None):
+        if not raw: raw = self.data
+        gap = pivot - raw['Data'][-1, -2]
+        _ = gslice([pivot + gap, pivot])
+        _.extend(gslice([pivot, pivot - gap]))
+        _.sort()
+        return _
+
+    def ratr(self, raw=None):
+        hdr = []
+        if not raw: raw = self.data
+        [hdr.extend(self._pgap(__, raw)) for __ in self._patr(raw)]
+        return pd.Series([hsirnd(_) for _ in lique(hdr)])
 
 class Viewer(ONA):
     def __init__(self, code):

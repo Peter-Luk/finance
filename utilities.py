@@ -26,8 +26,7 @@ def nitem(*args):
     return hdr.index(min(hdr))
 
 def gslice(*args):
-    if isinstance(args[0], list): lag = args[0]
-    if isinstance(args[0], tuple): lag = list(args[0])
+    if isinstance(args[0], (list, tuple)): lag = list(args[0])
     try:
         lag.sort()
         diff = lag[-1] - lag[0]
