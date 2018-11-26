@@ -1,17 +1,19 @@
 import numpy as np
 import pandas as pd
 from y2n import Equities
+from datetime import datetime
 from utilities import gslice, gr, lique
 
 class ONA(object):
-    def __init__(self, data, realtime=False):
+    def __init__(self, data, realtime=False, date=datetime.today().date()):
         if data:
             if isinstance(data, int): self.data = Equities().fetch(data, adhoc=realtime).to_dict()[data]
             else: self.data = data
+        if date not in self.data['Date']: self.date = self.data['Date'][-1]
 
     def __del__(self):
-        self.data = None
-        del(self.data)
+        self.data = self.date = None
+        del(self.data, self.date)
 
     def ma(self, raw=None, period=20, favour='s', req_field='close', programmatic=False):
         if not raw: raw = self.data
@@ -381,13 +383,13 @@ class ONA(object):
         [hdr.extend(self._pgap(__, raw)) for __ in self._patr(raw)]
         return pd.Series([hsirnd(_) for _ in lique(hdr)])
 
-    def ovr(self, raw=None):
+    def ovr(self, raw=None, date=datetime.today().date()):
         res = {}
         if not raw: raw = self.data
-        td = raw['Date'][-1]
-        akc = self.kc(raw).transpose()[td]
-        aapz = self.apz(raw).transpose()[td]
-        abb = self.bb(raw).transpose()[td]
+        if date not in raw['Date']: date = self.date
+        akc = self.kc(raw).transpose()[date]
+        aapz = self.apz(raw).transpose()[date]
+        abb = self.bb(raw).transpose()[date]
         ami, amx = np.min([akc['Lower'], aapz['Lower'], abb['Lower']]), np.max([akc['Upper'], aapz['Upper'], abb['Upper']])
         if akc['Lower'] == ami: res['min'] = {'KC': hsirnd(ami)}
         if aapz['Lower'] == ami: res['min'] = {'APZ': hsirnd(ami)}
