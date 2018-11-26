@@ -381,6 +381,22 @@ class ONA(object):
         [hdr.extend(self._pgap(__, raw)) for __ in self._patr(raw)]
         return pd.Series([hsirnd(_) for _ in lique(hdr)])
 
+    def ovr(self, raw=None):
+        res = {}
+        if not raw: raw = self.data
+        td = raw['Date'][-1]
+        akc = self.kc(raw).transpose()[td]
+        aapz = self.apz(raw).transpose()[td]
+        abb = self.bb(raw).transpose()[td]
+        ami, amx = np.min([akc['Lower'], aapz['Lower'], abb['Lower']]), np.max([akc['Upper'], aapz['Upper'], abb['Upper']])
+        if akc['Lower'] == ami: res['min'] = {'KC': hsirnd(ami)}
+        if aapz['Lower'] == ami: res['min'] = {'APZ': hsirnd(ami)}
+        if abb['Lower'] == ami: res['min'] = {'BB': hsirnd(ami)}
+        if akc['Upper'] == amx: res['max'] = {'KC': hsirnd(amx)}
+        if aapz['Upper'] == amx: res['max'] = {'APZ': hsirnd(amx)}
+        if abb['Upper'] == amx: res['max'] = {'BB': hsirnd(amx)}
+        return pd.DataFrame(res)
+
 class Viewer(ONA):
     def __init__(self, code, realtime=False):
         if code:
