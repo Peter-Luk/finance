@@ -387,6 +387,7 @@ class ONA(object):
         res = {}
         if not raw: raw = self.data
         if date not in raw['Date']: date = self.date
+        raw = self.data['Data'][:self.data['Date'].index(date) + 1]
         akc = self.kc(raw).transpose()[date]
         aapz = self.apz(raw).transpose()[date]
         abb = self.bb(raw).transpose()[date]
