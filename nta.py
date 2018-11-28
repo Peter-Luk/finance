@@ -9,6 +9,8 @@ class ONA(object):
         if data:
             if isinstance(data, int): self.data = Equities().fetch(data, adhoc=realtime).to_dict()[data]
             else: self.data = data
+        self.date = date
+        if date not in self.data['Date']: self.date = self.data['Date'][-1]
 
     def __del__(self):
         self.data = self.date = None
