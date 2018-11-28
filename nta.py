@@ -11,8 +11,9 @@ class ONA(object):
             else: self.data = data
         self.date = date
         if date not in self.data['Date']: self.date = self.data['Date'][-1]
-        rdx = self.data['Date'].index(self.date) + 1
-        self.data = {'Date': self.data['Date'][:rdx], 'Data': self.data['Data'][:rdx]}
+        self.data = self.construct(self.data, self.date)
+        # rdx = self.data['Date'].index(self.date) + 1
+        # self.data = {'Date': self.data['Date'][:rdx], 'Data': self.data['Data'][:rdx]}
 
     def __del__(self):
         self.data = self.date = None
@@ -388,10 +389,8 @@ class ONA(object):
 
     def ovr(self, raw=None, date=datetime.today().date()):
         if not raw: raw = self.data
-        # raw = self.data
         if date not in raw['Date']: date = self.data['Date'][-1]
         res = {}
-        # raw = self.data['Data'][:self.data['Date'].index(date) + 1]
         akc = self.kc(raw).transpose()[date]
         aapz = self.apz(raw).transpose()[date]
         abb = self.bb(raw).transpose()[date]
@@ -403,6 +402,10 @@ class ONA(object):
         if aapz['Upper'] == amx: res['max'] = {'APZ': hsirnd(amx)}
         if abb['Upper'] == amx: res['max'] = {'BB': hsirnd(amx)}
         return pd.DataFrame(res)
+
+    def construct(self, data, date):
+        rdx = data['Date'].index(date) + 1
+        return {'Date': data['Date'][:rdx], 'Data': data['Data'][:rdx]}
 
 class Viewer(ONA):
     def __init__(self, code, realtime=False):
