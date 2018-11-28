@@ -11,6 +11,8 @@ class ONA(object):
             else: self.data = data
         self.date = date
         if date not in self.data['Date']: self.date = self.data['Date'][-1]
+        rdx = self.data['Date'].index(self.date) + 1
+        self.data = {'Date': self.data['Date'][:rdx], 'Data': self.data['Data'][:rdx]}
 
     def __del__(self):
         self.data = self.date = None
