@@ -9,7 +9,6 @@ class ONA(object):
         if data:
             if isinstance(data, int): self.data = Equities().fetch(data, adhoc=realtime).to_dict()[data]
             else: self.data = data
-        if date not in self.data['Date']: self.date = self.data['Date'][-1]
 
     def __del__(self):
         self.data = self.date = None
@@ -384,10 +383,11 @@ class ONA(object):
         return pd.Series([hsirnd(_) for _ in lique(hdr)])
 
     def ovr(self, raw=None, date=datetime.today().date()):
-        res = {}
         if not raw: raw = self.data
-        if date not in raw['Date']: date = self.date
-        raw = self.data['Data'][:self.data['Date'].index(date) + 1]
+        # raw = self.data
+        if date not in raw['Date']: date = self.data['Date'][-1]
+        res = {}
+        # raw = self.data['Data'][:self.data['Date'].index(date) + 1]
         akc = self.kc(raw).transpose()[date]
         aapz = self.apz(raw).transpose()[date]
         abb = self.bb(raw).transpose()[date]
