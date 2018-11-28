@@ -12,8 +12,6 @@ class ONA(object):
         self.date = date
         if date not in self.data['Date']: self.date = self.data['Date'][-1]
         self.data = self.construct(self.data, self.date)
-        # rdx = self.data['Date'].index(self.date) + 1
-        # self.data = {'Date': self.data['Date'][:rdx], 'Data': self.data['Data'][:rdx]}
 
     def __del__(self):
         self.data = self.date = None
@@ -27,11 +25,9 @@ class ONA(object):
             while _ < len(raw):
                 hdr = np.nan
                 if not _ < period - 1:
-                # else:
                     if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
                     if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
                     if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
-                    # if favour[0].lower() == 's': res.append(rdata.sum() / period)
                     if favour[0].lower() == 's': hdr = rdata.mean()
                     if favour[0].lower() == 'w': hdr = (rdata * raw[_ - period + 1: _ + 1, -1]).sum() / raw[_ - period + 1: _ + 1, -1].sum()
                     if favour[0].lower() == 'e':
@@ -57,7 +53,6 @@ class ONA(object):
         def process(raw, period, req_field):
             res, _ = [], 0
             while _ < len(raw):
-                # if _ < period - 1: res.append(np.nan)
                 hdr = np.nan
                 if not _ < period - 1:
                     if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
@@ -184,7 +179,6 @@ class ONA(object):
             nr, res, _ = data[:,:-1].ptp(axis=1).tolist(), [], 0
             while _ < len(data):
                 hdr = nr[_]
-                # if _ == 0: hdr = nr[_]
                 if not _ == 0:
                     hmpc, lmpc = abs(data[_, 1] - data[_ - 1, -2]), abs(data[_, 2] - data[_ - 1, -2])
                     hdr = hmpc
