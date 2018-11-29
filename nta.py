@@ -7,7 +7,7 @@ from utilities import gslice, gr, lique
 class ONA(object):
     def __init__(self, data, realtime=False, date=datetime.today().date()):
         if data:
-            if isinstance(data, int): self.data = Equities().fetch(data, adhoc=realtime).to_dict()[data]
+            if isinstance(data, (float, int)): self.data = Equities().fetch(int(data), adhoc=realtime).to_dict()[int(data)]
             else: self.data = data
         self.date = date
         if date not in self.data['Date']: self.date = self.data['Date'][-1]
