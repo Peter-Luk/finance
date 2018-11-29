@@ -383,7 +383,6 @@ class ONA(object):
 
     def ovr(self, raw=None, date=datetime.today().date()):
         if not raw: raw = self.data
-        # if date not in raw['Date']: date = self.data['Date'][-1]
         if date not in raw['Date']: date = raw['Date'][-1]
         res = {}
         akc = self.kc(raw).transpose()[date]
