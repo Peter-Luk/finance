@@ -404,7 +404,7 @@ class ONA(object):
 class Viewer(ONA):
     def __init__(self, code, realtime=False):
         if code:
-            if isinstance(code, int): self.code = Equities().fetch(code, adhoc=realtime).to_dict()[code]
+            if isinstance(code, (int, float)): self.code = Equities().fetch(int(code), adhoc=realtime).to_dict()[int(code)]
             else: self.code = code
 
     def __del__(self):
