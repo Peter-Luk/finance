@@ -433,6 +433,7 @@ def hsirnd(value):
         if __ < 50: return np.round(value * 2, 2) / 2
         return np.round(value, 2)
     if _ == 0: return np.round(value, 2)
+    if _ > 3: return np.round(value, 0)
     if _ > 1:
         if __ < 20: return np.round(value, 1)
         return np.round(value * 5, 0) / 5
