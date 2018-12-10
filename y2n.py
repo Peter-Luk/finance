@@ -2,8 +2,36 @@ import sqlite3 as lite
 import numpy as np
 import pandas as pd
 import fix_yahoo_finance as yf
-from utilities import filepath
+from utilities import filepath, datetime
 from time import sleep
+
+class Futures(object):
+    def __init__(self, db='Futures'):
+        self.__conn = lite.connect(filepath(db))
+        self.__conn.row_factory = lite.Row
+
+    def __del__(self):
+        self.__conn = None
+        del(self.__conn)
+
+    def combine(self, code, type='daily'):
+        res = {}
+        for __ in [_['date'] for _ in self.__conn.execute("SELECT DISTINCT date FROM records WHERE code='{}'".format(code)).fetchall()]:
+            _ = self.__conn.execute("SELECT session, open, high, low, close, volume FROM records WHERE code='{}' AND date='{}'".format(code, __)).fetchall()
+            if _:
+                tmp = {'open': _[0]['open'], 'high': _[0]['high'], 'low': _[0]['low'], 'close': _[0]['close'], 'volume': _[0]['volume']}
+                if len(_) > 1:
+                    for ___ in _:
+                        if ___['session'] == 'a':
+                            if ___['high'] > tmp['high']: tmp['high'] = ___['high']
+                            if ___['low'] < tmp['low']: tmp['low'] = ___['low']
+                            tmp['close'] = ___['close']
+                            tmp['volume'] += ___['volume']
+            res[datetime.strptime(__, '%Y-%m-%d')] = [tmp['open'], tmp['high'], tmp['low'], tmp['close'], tmp['volume']]
+        hdr = {}
+        hdr['Date'] = [_.date() for _ in res.keys()]
+        hdr['Data'] = np.array(list(res.values()))
+        return hdr
 
 class Equities(object):
     def __init__(self, db='Securities'):
