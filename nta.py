@@ -106,7 +106,8 @@ class ONA(object):
             while _ < len(raw):
                 hdr = np.nan
                 if not _ < period['slow']:
-                    fsc, ssc = 2 / (period['fast'] + 1), 2 / (period['slow'] + 1)
+                    fsc = 2 / (self.ma(self.data, favour='e',  period=period['fast'], programmatic=True)[-1] + 1)
+                    ssc = 2 / (self.ma(self.data, favour='e', period=period['slow'], programmatic=True)[-1] + 1)
                     hdr = (ver[_] * (fsc - ssc) + ssc) ** 2
                 res.append(hdr)
                 _ += 1
