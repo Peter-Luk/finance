@@ -400,8 +400,11 @@ class ONA(object):
         if abb['Upper'] == amx: res['max'] = {'BB': hsirnd(amx)}
         return pd.DataFrame(res)
 
-    def construct(self, raw=None, date=datetime.today().date()):
+    def construct(self, raw=None, date=None):
         if not raw: raw = self.data
+        if isinstance(date, str): date = datetime.strptime(date, '%Y-%m-%d').date()
+        if not date: date = raw['Date'][-1]
+        if date not in raw['Date']: date = raw['Date'][-1]
         rdx = raw['Date'].index(date) + 1
         return {'Date': raw['Date'][:rdx], 'Data': raw['Data'][:rdx]}
 
