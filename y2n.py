@@ -30,10 +30,13 @@ class Futures(object):
                             if ___['low'] < tmp['low']: tmp['low'] = ___['low']
                             tmp['close'] = ___['close']
                             tmp['volume'] += ___['volume']
-            res[datetime.strptime(__, '%Y-%m-%d')] = [tmp['open'], tmp['high'], tmp['low'], tmp['close'], tmp['volume']]
+            res[datetime.strptime(__, '%Y-%m-%d').date()] = [tmp['open'], tmp['high'], tmp['low'], tmp['close'], tmp['volume']]
         hdr = {}
-        hdr['Date'] = [_.date() for _ in res.keys()]
-        hdr['Data'] = np.array(list(res.values()))
+        hdr['Date'] = list(res.keys())
+        hdr['Date'].sort()
+        tp = []
+        tp.extend([res[_] for _ in hdr['Date']])
+        hdr['Data'] = np.array(tp)
         return hdr
 
 class Equities(object):
