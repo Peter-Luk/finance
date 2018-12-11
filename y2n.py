@@ -14,30 +14,31 @@ class Futures(object):
         self.__conn = None
         del(self.__conn)
 
-    def __call__(self, code, freq='daily'):
+    def __call__(self, code, freq='bi-daily'):
         return self.combine(code, freq)
 
-    def combine(self, code, freq='daily'):
-        res = {}
-        for __ in [_['date'] for _ in self.__conn.execute("SELECT DISTINCT date FROM records WHERE code='{}' ORDER BY date ASC".format(code)).fetchall()]:
-            _ = self.__conn.execute("SELECT session, open, high, low, close, volume FROM records WHERE code='{}' AND date='{}'".format(code, __)).fetchall()
-            if _:
-                tmp = {'open': _[0]['open'], 'high': _[0]['high'], 'low': _[0]['low'], 'close': _[0]['close'], 'volume': _[0]['volume']}
-                if len(_) > 1:
-                    for ___ in _:
-                        if ___['session'] == 'a':
-                            if ___['high'] > tmp['high']: tmp['high'] = ___['high']
-                            if ___['low'] < tmp['low']: tmp['low'] = ___['low']
-                            tmp['close'] = ___['close']
-                            tmp['volume'] += ___['volume']
-            res[datetime.strptime(__, '%Y-%m-%d').date()] = [tmp['open'], tmp['high'], tmp['low'], tmp['close'], tmp['volume']]
-        hdr = {}
-        hdr['Date'] = list(res.keys())
-        hdr['Date'].sort()
-        tp = []
-        tp.extend([res[_] for _ in hdr['Date']])
-        hdr['Data'] = np.array(tp)
-        return hdr
+    def combine(self, code, freq='bi-daily'):
+        if freq.lower() == 'bi-daily':
+            res = {}
+            for __ in [_['date'] for _ in self.__conn.execute("SELECT DISTINCT date FROM records WHERE code='{}' ORDER BY date ASC".format(code)).fetchall()]:
+                _ = self.__conn.execute("SELECT session, open, high, low, close, volume FROM records WHERE code='{}' AND date='{}' ORDER BY session ASC".format(code, __)).fetchall()
+                if _:
+                    tmp = {'open': _[0]['open'], 'high': _[0]['high'], 'low': _[0]['low'], 'close': _[0]['close'], 'volume': _[0]['volume']}
+                    if len(_) > 1:
+                        for ___ in _:
+                            if ___['session'] == 'a':
+                                if ___['high'] > tmp['high']: tmp['high'] = ___['high']
+                                if ___['low'] < tmp['low']: tmp['low'] = ___['low']
+                                tmp['close'] = ___['close']
+                                tmp['volume'] += ___['volume']
+                res[datetime.strptime(__, '%Y-%m-%d').date()] = [tmp['open'], tmp['high'], tmp['low'], tmp['close'], tmp['volume']]
+            hdr = {}
+            hdr['Date'] = list(res.keys())
+            hdr['Date'].sort()
+            tp = []
+            tp.extend([res[_] for _ in hdr['Date']])
+            hdr['Data'] = np.array(tp)
+            return hdr
 
 class Equities(object):
     def __init__(self, db='Securities'):
