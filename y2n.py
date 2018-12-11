@@ -19,7 +19,7 @@ class Futures(object):
 
     def combine(self, code, freq='daily'):
         res = {}
-        for __ in [_['date'] for _ in self.__conn.execute("SELECT DISTINCT date FROM records WHERE code='{}'".format(code)).fetchall()]:
+        for __ in [_['date'] for _ in self.__conn.execute("SELECT DISTINCT date FROM records WHERE code='{}' ORDER BY date ASC".format(code)).fetchall()]:
             _ = self.__conn.execute("SELECT session, open, high, low, close, volume FROM records WHERE code='{}' AND date='{}'".format(code, __)).fetchall()
             if _:
                 tmp = {'open': _[0]['open'], 'high': _[0]['high'], 'low': _[0]['low'], 'close': _[0]['close'], 'volume': _[0]['volume']}
