@@ -400,9 +400,10 @@ class ONA(object):
         if abb['Upper'] == amx: res['max'] = {'BB': hsirnd(amx)}
         return pd.DataFrame(res)
 
-    def construct(self, data, date):
-        rdx = data['Date'].index(date) + 1
-        return {'Date': data['Date'][:rdx], 'Data': data['Data'][:rdx]}
+    def construct(self, raw=None, date=datetime.today().date()):
+        if not raw: raw = self.data
+        rdx = raw['Date'].index(date) + 1
+        return {'Date': raw['Date'][:rdx], 'Data': raw['Data'][:rdx]}
 
 class Viewer(ONA):
     def __init__(self, code, realtime=False):
