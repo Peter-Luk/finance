@@ -6,9 +6,9 @@ from utilities import gslice, gr, lique
 
 class ONA(object):
     def __init__(self, data, realtime=False, date=datetime.today().date()):
-#        if data:
-#            if isinstance(data, (float, int)): self.data = Equities().fetch(int(data), adhoc=realtime).to_dict()[int(data)]
-#            else: self.data = data
+#         if data:
+#             if isinstance(data, (float, int)): self.data = Equities().fetch(int(data), adhoc=realtime).to_dict()[int(data)]
+#             else: self.data = data
         self.data = data
         self.date = date
         if date not in self.data['Date']: self.date = self.data['Date'][-1]
@@ -108,9 +108,7 @@ class ONA(object):
                 hdr = np.nan
                 if not _ < period['slow']:
                     fsc = 2 / (period['fast'] + 1)
-                    # fsc = 2 / (period['fast'] + 1) * self.ma(self.data, favour='e',  period=period['fast'], programmatic=True)[-1]
                     ssc = 2 / (period['slow'] + 1)
-                    # ssc = 2 / (period['slow'] + 1) * self.ma(self.data, favour='e', period=period['slow'], programmatic=True)[-1]
                     hdr = (ver[_] * (fsc - ssc) + ssc) ** 2
                 res.append(hdr)
                 _ += 1
@@ -410,28 +408,25 @@ class ONA(object):
         return {'Date': raw['Date'][:rdx], 'Data': raw['Data'][:rdx]}
 
 class Viewer(ONA):
-    def __init__(self, code, realtime=False):
-#         if code:
-#             if isinstance(code, (int, float)): self.code = Equities().fetch(int(code), adhoc=realtime).to_dict()[int(code)]
-#             else: self.code = code
-        self.code = code
+    def __init__(self, data, realtime=False):
+        self.data = data
 
     def __del__(self):
-        self.code = None
-        del(self.code)
+        self.data = None
+        del(self.data)
 
-    def mas(self, code=None):
-        if not code: code = self.code
-        dcode = ONA(code)
+    def mas(self, data=None):
+        if not data: data = self.data
+        dcode = ONA(data)
         return dcode.kama().merge(dcode.ma(favour='e'), left_index=True, right_index=True).merge(dcode.ma(), left_index=True, right_index=True).merge(dcode.ma(favour='w'), left_index=True, right_index=True)
 
-    def mapc(self, code=None):
-        if not code: code = self.code
-        return self.mas(code).pct_change()
+    def mapc(self, data=None):
+        if not data: data = self.data
+        return self.mas(data).pct_change()
 
-    def idrs(self, code=None):
-        if not code: code = self.code
-        dcode = ONA(code)
+    def idrs(self, data=None):
+        if not data: data = self.data
+        dcode = ONA(data)
         return dcode.adx().merge(dcode.rsi(), left_index=True, right_index=True).merge(dcode.atr(), left_index=True, right_index=True)
 
 def hsirnd(value):
