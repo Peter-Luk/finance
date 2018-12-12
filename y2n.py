@@ -90,3 +90,7 @@ class Equities(object):
                 hdr['Data'] = np.asarray(rd)
                 res[_] = hdr
         return pd.Series(res)
+
+def rmi(el):
+    __ = Equities().fetch(el)
+    return [ONA(__[_]).ratr().min() for _ in el]
