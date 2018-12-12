@@ -1,14 +1,15 @@
 import numpy as np
 import pandas as pd
-from y2n import Equities
+# from y2n import Equities
 from datetime import datetime
 from utilities import gslice, gr, lique
 
 class ONA(object):
     def __init__(self, data, realtime=False, date=datetime.today().date()):
-        if data:
-            if isinstance(data, (float, int)): self.data = Equities().fetch(int(data), adhoc=realtime).to_dict()[int(data)]
-            else: self.data = data
+#        if data:
+#            if isinstance(data, (float, int)): self.data = Equities().fetch(int(data), adhoc=realtime).to_dict()[int(data)]
+#            else: self.data = data
+        self.data = data
         self.date = date
         if date not in self.data['Date']: self.date = self.data['Date'][-1]
         self.data = self.construct(self.data, self.date)
@@ -410,9 +411,10 @@ class ONA(object):
 
 class Viewer(ONA):
     def __init__(self, code, realtime=False):
-        if code:
-            if isinstance(code, (int, float)): self.code = Equities().fetch(int(code), adhoc=realtime).to_dict()[int(code)]
-            else: self.code = code
+#         if code:
+#             if isinstance(code, (int, float)): self.code = Equities().fetch(int(code), adhoc=realtime).to_dict()[int(code)]
+#             else: self.code = code
+        self.code = code
 
     def __del__(self):
         self.code = None
