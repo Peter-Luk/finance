@@ -20,6 +20,10 @@ class Futures(ONA):
         self.__conn = self.data = self._o = self.date = self.close = None
         del(self.__conn, self.data, self._o, self.date, self.close)
 
+    def kc(self, data=None, period=k_period):
+        if not data: data = self.data
+        return self._o.kc(data, period=period)
+
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
             res = {}
