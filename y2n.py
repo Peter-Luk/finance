@@ -7,18 +7,18 @@ from utilities import filepath, datetime
 from time import sleep
 
 class Futures(ONA):
+    k_period = {'atr':14, 'er':7, 'fast':2, 'slow':14}
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
         self.__conn.row_factory = lite.Row
-        self.kp = {'atr':14, 'er':7, 'fast':2, 'slow':14}
         self.data = self.combine(code)
         self._o = ONA(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self.__conn = self.kp = self.data = self._o = self.date = self.close = None
-        del(self.__conn, self.kp, self.data, self._o, self.date, self.close)
+        self.__conn = self.data = self._o = self.date = self.close = None
+        del(self.__conn, self.data, self._o, self.date, self.close)
 
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
