@@ -8,6 +8,7 @@ from time import sleep
 
 class Futures(ONA):
     k_period = {'atr':14, 'er':7, 'fast':2, 'slow':14}
+    x_period = 7
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
         self.__conn.row_factory = lite.Row
@@ -20,9 +21,17 @@ class Futures(ONA):
         self.__conn = self.data = self._o = self.date = self.close = None
         del(self.__conn, self.data, self._o, self.date, self.close)
 
+    def kama(self, data=None, period=k_period):
+        if not data: data = self.data
+        return self._o.kama(data, period=period)
+
     def kc(self, data=None, period=k_period):
         if not data: data = self.data
         return self._o.kc(data, period=period)
+
+    def adx(self, data=None, period=x_period):
+        if not data: data = self.data
+        return self._o.adx(data, period=period)
 
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
