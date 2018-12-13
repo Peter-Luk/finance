@@ -2,36 +2,36 @@ import sqlite3 as lite
 import numpy as np
 import pandas as pd
 import fix_yahoo_finance as yf
-from nta import ONA
+from nta import Viewer
 from utilities import filepath, datetime
 from time import sleep
 
-class Futures(ONA):
+class Futures(Viewer):
     k_period = {'atr':14, 'er':7, 'fast':2, 'slow':14}
     x_period = 7
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
         self.__conn.row_factory = lite.Row
         self.data = self.combine(code)
-        self._o = ONA(self.data)
+        self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self.__conn = self.data = self._o = self.date = self.close = None
-        del(self.__conn, self.data, self._o, self.date, self.close)
+        self.__conn = self.data = self._v = self.date = self.close = None
+        del(self.__conn, self.data, self._v, self.date, self.close)
 
     def kama(self, data=None, period=k_period):
         if not data: data = self.data
-        return self._o.kama(data, period=period)
+        return self._v.kama(data, period=period)
 
     def kc(self, data=None, period=k_period):
         if not data: data = self.data
-        return self._o.kc(data, period=period)
+        return self._v.kc(data, period=period)
 
     def adx(self, data=None, period=x_period):
         if not data: data = self.data
-        return self._o.adx(data, period=period)
+        return self._v.adx(data, period=period)
 
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
