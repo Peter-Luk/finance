@@ -5,6 +5,7 @@ from datetime import datetime
 from utilities import gslice, gr, lique
 
 class ONA(object):
+    k_period={'atr':14, 'er':10, 'fast':2, 'slow':30}
     def __init__(self, data, realtime=False, date=datetime.today().date()):
 #         if data:
 #             if isinstance(data, (float, int)): self.data = Equities().fetch(int(data), adhoc=realtime).to_dict()[int(data)]
@@ -74,7 +75,7 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'BBW': mres}, index=raw['Date'])
 
-    def kama(self, raw=None, period={'er':10, 'fast':2, 'slow':30}, programmatic=False):
+    def kama(self, raw=None, period=k_period, programmatic=False):
         if not raw: raw = self.data
         mres, sma = [], self.ma(raw, period['slow'], 'e', 'c', True)
 
@@ -297,7 +298,7 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'RSI': mres}, index=raw['Date'])
 
-    def kc(self, raw=None, period={'atr':14, 'er':10, 'fast':2, 'slow':30}, ratio=gr, programmatic=False):
+    def kc(self, raw=None, period=k_period, ratio=gr, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
         _, kma, ar = 0, self.kama(raw=raw, period={'er':period['er'], 'fast':period['fast'], 'slow':period['slow']}, programmatic=True), self.atr(raw=raw, period=period['atr'], programmatic=True)
@@ -408,6 +409,7 @@ class ONA(object):
         return {'Date': raw['Date'][:rdx], 'Data': raw['Data'][:rdx]}
 
 class Viewer(ONA):
+    k_period={'atr':14, 'er':10, 'fast':2, 'slow':30}
     def __init__(self, data, realtime=False):
         self.data = data
 
@@ -415,10 +417,10 @@ class Viewer(ONA):
         self.data = None
         del(self.data)
 
-    def mas(self, data=None):
+    def mas(self, period=k_period, data=None):
         if not data: data = self.data
-        dcode = ONA(data)
-        return dcode.kama().merge(dcode.ma(favour='e'), left_index=True, right_index=True).merge(dcode.ma(), left_index=True, right_index=True).merge(dcode.ma(favour='w'), left_index=True, right_index=True)
+        _o = ONA(data)
+        return _o.kama(period=period).merge(_o.ma(favour='e'), left_index=True, right_index=True).merge(_o.ma(), left_index=True, right_index=True).merge(_o.ma(favour='w'), left_index=True, right_index=True)
 
     def mapc(self, data=None):
         if not data: data = self.data
@@ -426,8 +428,8 @@ class Viewer(ONA):
 
     def idrs(self, data=None):
         if not data: data = self.data
-        dcode = ONA(data)
-        return dcode.adx().merge(dcode.rsi(), left_index=True, right_index=True).merge(dcode.atr(), left_index=True, right_index=True)
+        _o = ONA(data)
+        return _o.adx().merge(_o.rsi(), left_index=True, right_index=True).merge(_o.atr(), left_index=True, right_index=True)
 
 def hsirnd(value):
     _ = int(np.floor(np.log10(value)))
