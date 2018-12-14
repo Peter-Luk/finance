@@ -417,7 +417,7 @@ class Viewer(ONA):
         self.data = None
         del(self.data)
 
-    def mas(self, period=k_period, data=None):
+    def mas(self, data=None, period=k_period):
         if not data: data = self.data
         _o = ONA(data)
         return _o.kama(period=period).merge(_o.ma(favour='e'), left_index=True, right_index=True).merge(_o.ma(), left_index=True, right_index=True).merge(_o.ma(favour='w'), left_index=True, right_index=True)

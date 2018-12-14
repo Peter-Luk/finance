@@ -32,6 +32,9 @@ class Futures(Viewer):
     def adx(self, data=None, period=x_period):
         if not data: data = self.data
         return self._v.adx(data, period=period)
+    def mas(self, data=None, period=k_period):
+        if not data: data = self.data
+        return self._v.mas(data, period=period)
 
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
