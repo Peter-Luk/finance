@@ -1,15 +1,11 @@
 import numpy as np
 import pandas as pd
-# from y2n import Equities
 from datetime import datetime
 from utilities import gslice, gr, lique
 
 class ONA(object):
     k_period={'atr':14, 'er':10, 'fast':2, 'slow':30}
-    def __init__(self, data, realtime=False, date=datetime.today().date()):
-#         if data:
-#             if isinstance(data, (float, int)): self.data = Equities().fetch(int(data), adhoc=realtime).to_dict()[int(data)]
-#             else: self.data = data
+    def __init__(self, data, date=datetime.today().date()):
         self.data = data
         self.date = date
         if date not in self.data['Date']: self.date = self.data['Date'][-1]
@@ -410,7 +406,7 @@ class ONA(object):
 
 class Viewer(ONA):
     k_period={'atr':14, 'er':10, 'fast':2, 'slow':30}
-    def __init__(self, data, realtime=False):
+    def __init__(self, data):
         self.data = data
 
     def __del__(self):
