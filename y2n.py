@@ -56,13 +56,17 @@ class Futures(Viewer):
             hdr['Data'] = np.array(tp)
             return hdr
 
-class Equities(object):
-    def __init__(self, db='Securities'):
+class Equities(Viewer):
+    def __init__(self, code, db='Securities'):
         self.__conn = lite.connect(filepath(db))
+        self.data = self.fetch(code).to_dict()[code]
+        self._v = Viewer(self.data)
+        self.date = self.data['Date'][-1]
+        self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self.__conn = None
-        del(self.__conn)
+        self.__conn = self.data = self._v = self.date = self.close = None
+        del(self.__conn, self.data, self._v, self.date, self.close)
 
     def fetch(self, code=None, start=None, table='records', exclude=[805], years=4, adhoc=False):
         res = {}
@@ -105,5 +109,4 @@ class Equities(object):
         return pd.Series(res)
 
 def rmi(el):
-    __ = Equities().fetch(el)
-    return [ONA(__[_]).ratr().min() for _ in el]
+    return [Equities(_).ratr().min() for _ in el]
