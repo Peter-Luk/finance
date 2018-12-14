@@ -57,9 +57,9 @@ class Futures(Viewer):
             return hdr
 
 class Equities(Viewer):
-    def __init__(self, code, db='Securities'):
+    def __init__(self, code, adhoc=False, db='Securities'):
         self.__conn = lite.connect(filepath(db))
-        self.data = self.fetch(code).to_dict()[code]
+        self.data = self.fetch(code, adhoc=adhoc).to_dict()[code]
         self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
@@ -108,5 +108,5 @@ class Equities(Viewer):
                 res[_] = hdr
         return pd.Series(res)
 
-def rmi(el):
-    return [Equities(_).ratr().min() for _ in el]
+def rmi(el, adhoc=False):
+    return [Equities(_, adhoc).ratr().min() for _ in el]
