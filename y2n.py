@@ -32,6 +32,7 @@ class Futures(Viewer):
     def adx(self, data=None, period=x_period):
         if not data: data = self.data
         return self._v.adx(data, period=period)
+
     def mas(self, data=None, period=k_period):
         if not data: data = self.data
         return self._v.mas(data, period=period)
@@ -118,3 +119,8 @@ def rmi(el, adhoc=False):
         er, eo = e.ratr(), e.ovr()
         res.append(er[(er > eo['min'].min()) & (er < eo['max'].max())].min())
     return res
+
+def recorded_code(db='Futures'):
+    conn = lite.connect(filepath(db))
+    conn.row_factory = lite.Row
+    return pd.Series([_['code'] for _ in conn.execute("SELECT DISTINCT code FROM records ORDER BY code ASC").fetchall()])
