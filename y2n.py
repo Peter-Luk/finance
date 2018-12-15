@@ -12,6 +12,8 @@ class Futures(Viewer):
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
         self.__conn.row_factory = lite.Row
+        rc = recorded_code().tolist()
+        if code.upper() not in rc: code = rc[-1]
         self.data = self.combine(code)
         self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
