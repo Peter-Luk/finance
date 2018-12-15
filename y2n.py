@@ -112,4 +112,9 @@ class Equities(Viewer):
         return pd.Series(res)
 
 def rmi(el, adhoc=False):
-    return [Equities(_, adhoc).ratr().min() for _ in el]
+    res = []
+    for _ in el:
+        e = Equities(_, adhoc)
+        er, eo = e.ratr(), e.ovr()
+        res.append(er[(er > eo['min'].min()) & (er < eo['max'].max())].min())
+    return res
