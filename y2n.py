@@ -127,13 +127,13 @@ def rmi(el, adhoc=False):
     res = []
     if isinstance(el, (list, tuple)):
         for _ in el:
+            hdr = np.nan
             if isinstance (_, str):
                 if _.upper() in entities('Futures').tolist():
-                    res.append(__process(Futures(_.upper())))
-                else: res.append(np.nan)
+                    hdr = __process(Futures(_.upper()))
             elif isinstance(_, int):
-                res.append(__process(Equities(_, adhoc)))
-            else: res.append(np.nan)
+                hdr = __process(Equities(_, adhoc))
+            res.append(hdr)
         return res
 
 def entities(db='Futures'):
