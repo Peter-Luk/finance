@@ -12,7 +12,7 @@ class Futures(Viewer):
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
         self.__conn.row_factory = lite.Row
-        rc = recorded_code().tolist()
+        rc = entities(db).tolist()
         if code.upper() not in rc: code = rc[-1]
         self.data = self.combine(code)
         self._v = Viewer(self.data)
@@ -65,6 +65,8 @@ class Futures(Viewer):
 class Equities(Viewer):
     def __init__(self, code, adhoc=False, db='Securities'):
         self.__conn = lite.connect(filepath(db))
+        rc = entities(db).tolist()
+        if code not in rc: code = rc[0]
         self.data = self.fetch(code, adhoc=adhoc).to_dict()[code]
         self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
