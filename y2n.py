@@ -66,7 +66,7 @@ class Equities(Viewer):
     def __init__(self, code, adhoc=False, db='Securities'):
         self.__conn = lite.connect(filepath(db))
         rc = entities(db).tolist()
-        if code not in rc: code = rc[0]
+        if code not in rc: adhoc = True
         self.data = self.fetch(code, adhoc=adhoc).to_dict()[code]
         self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
@@ -117,12 +117,24 @@ class Equities(Viewer):
         return pd.Series(res)
 
 def rmi(el, adhoc=False):
-    res = []
-    for _ in el:
-        e = Equities(_, adhoc)
+    def __process(e):
         er, eo = e.ratr(), e.ovr()
-        res.append(er[(er > eo['min'].min()) & (er < eo['max'].max())].min())
-    return res
+        return er[(er > eo['min'].min()) & (er < eo['max'].max())].min()
+    if isinstance(el, str) and el.upper() in entities('Futures').tolist():
+        return __process(Futures(el.upper()))
+    if isinstance(el, int):
+        return __process(Equities(el, adhoc))
+    res = []
+    if isinstance(el, (list, tuple)):
+        for _ in el:
+            if isinstance (_, str):
+                if _.upper() in entities('Futures').tolist():
+                    res.append(__process(Futures(_.upper())))
+                else: res.append(np.nan)
+            elif isinstance(_, int):
+                res.append(__process(Equities(_, adhoc)))
+            else: res.append(np.nan)
+        return res
 
 def entities(db='Futures'):
     conn = lite.connect(filepath(db))
