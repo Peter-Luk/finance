@@ -122,7 +122,9 @@ def rmi(el, adhoc=False):
         res.append(er[(er > eo['min'].min()) & (er < eo['max'].max())].min())
     return res
 
-def recorded_code(db='Futures'):
+def entities(db='Futures'):
     conn = lite.connect(filepath(db))
     conn.row_factory = lite.Row
-    return pd.Series([_['code'] for _ in conn.execute("SELECT DISTINCT code FROM records ORDER BY code ASC").fetchall()])
+    fin = 'code'
+    if db == 'Securities': fin = 'eid'
+    return pd.Series([_[fin] for _ in conn.execute(f"SELECT DISTINCT {fin} FROM records ORDER BY {fin} ASC").fetchall()])
