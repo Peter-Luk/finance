@@ -346,8 +346,9 @@ class ONA(object):
                 _ += 1
             return res
         _, vol = 0, __volitality(raw, period)
-        ev = self.ma(favour='e')['EMA'][self.date]
+        # ev = self.ma(favour='e')['EMA'][self.date]
         while _ < len(vol):
+            ev = self.ma(favour='e')['EMA'][self.data['Date'][_]]
             uhdr, lhdr = np.nan, np.nan
             if not np.isnan(vol[_]):
                 # uhdr = vol[_] * (1 + df / 2)

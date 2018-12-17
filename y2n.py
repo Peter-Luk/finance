@@ -43,16 +43,21 @@ class Futures(Viewer):
         if freq.lower() == 'bi-daily':
             res = {}
             for __ in [_['date'] for _ in self.__conn.execute("SELECT DISTINCT date FROM records WHERE code='{}' ORDER BY date ASC".format(code)).fetchall()]:
-                _ = self.__conn.execute("SELECT session, open, high, low, close, volume FROM records WHERE code='{}' AND date='{}' ORDER BY session ASC".format(code, __)).fetchall()
+                _ = self.__conn.execute("SELECT session, open, high, low, close, volume FROM records WHERE code='{}' AND date='{}' ORDER BY session DESC".format(code, __)).fetchall()
                 if _:
                     tmp = {'open': _[0]['open'], 'high': _[0]['high'], 'low': _[0]['low'], 'close': _[0]['close'], 'volume': _[0]['volume']}
                     if len(_) > 1:
-                        for ___ in _:
-                            if ___['session'] == 'a':
-                                if ___['high'] > tmp['high']: tmp['high'] = ___['high']
-                                if ___['low'] < tmp['low']: tmp['low'] = ___['low']
-                                tmp['close'] = ___['close']
-                                tmp['volume'] += ___['volume']
+                        if _[-1]['session'] == 'A':
+                            if tmp['high'] < _[-1]['high']: tmp['high'] = _[-1]['high']
+                            if tmp['low'] > _[-1]['low']: tmp['low'] = _[-1]['low']
+                            tmp['close'] = _[-1]['close']
+                            tmp['volume'] += _[-1]['volume']
+#                         for ___ in _:
+#                             if ___['session'] == 'A':
+#                                 if ___['high'] > tmp['high']: tmp['high'] = ___['high']
+#                                 if ___['low'] < tmp['low']: tmp['low'] = ___['low']
+#                                 tmp['close'] = ___['close']
+#                                 tmp['volume'] += ___['volume']
                 res[datetime.strptime(__, '%Y-%m-%d').date()] = [tmp['open'], tmp['high'], tmp['low'], tmp['close'], tmp['volume']]
             hdr = {}
             hdr['Date'] = list(res.keys())
