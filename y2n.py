@@ -7,7 +7,7 @@ from utilities import filepath, datetime
 from time import sleep
 
 class Futures(Viewer):
-    k_period = {'atr':14, 'er':7, 'fast':2, 'slow':14}
+    k_period = {'atr':12, 'er':7, 'fast':2, 'slow':12}
     x_period = 7
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
