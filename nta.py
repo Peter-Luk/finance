@@ -329,11 +329,13 @@ class ONA(object):
         res.index = raw['Date']
         return res
 
-    def apz(self, raw=None, period=5, df=.092, programmatic=False):
+    # def apz(self, raw=None, period=5, df=.092, programmatic=False):
+    def apz(self, raw=None, period=5, df=None, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
-        def __volitality(raw, period=5):
-            _, res, ehl = 0, [], self.ma(raw=raw, period=5, favour='e', req_field='hl', programmatic=True)
+        if not df: df = self.atr(raw)['ATR'][self.date] / self.close
+        def __volitality(raw, period=period):
+            _, res, ehl = 0, [], self.ma(raw=raw, period=period, favour='e', req_field='hl', programmatic=True)
             while _ < len(ehl):
                 if np.isnan(ehl[_]): hdr = np.nan
                 else:
@@ -344,11 +346,14 @@ class ONA(object):
                 _ += 1
             return res
         _, vol = 0, __volitality(raw, period)
+        ev = self.ma(favour='e')['EMA'][self.date]
         while _ < len(vol):
             uhdr, lhdr = np.nan, np.nan
             if not np.isnan(vol[_]):
-                uhdr = vol[_] * (1 + df / 2)
-                lhdr = vol[_] * (1 - df / 2)
+                # uhdr = vol[_] * (1 + df / 2)
+                uhdr = ev + vol[_] * df
+                lhdr = ev - vol[_] * df
+                # lhdr = vol[_] * (1 - df / 2)
             upper.append(uhdr)
             lower.append(lhdr)
             _ += 1
