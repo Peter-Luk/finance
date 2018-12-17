@@ -52,12 +52,6 @@ class Futures(Viewer):
                             if tmp['low'] > _[-1]['low']: tmp['low'] = _[-1]['low']
                             tmp['close'] = _[-1]['close']
                             tmp['volume'] += _[-1]['volume']
-#                         for ___ in _:
-#                             if ___['session'] == 'A':
-#                                 if ___['high'] > tmp['high']: tmp['high'] = ___['high']
-#                                 if ___['low'] < tmp['low']: tmp['low'] = ___['low']
-#                                 tmp['close'] = ___['close']
-#                                 tmp['volume'] += ___['volume']
                 res[datetime.strptime(__, '%Y-%m-%d').date()] = [tmp['open'], tmp['high'], tmp['low'], tmp['close'], tmp['volume']]
             hdr = {}
             hdr['Date'] = list(res.keys())
