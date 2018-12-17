@@ -141,4 +141,4 @@ def entities(db='Futures'):
     conn.row_factory = lite.Row
     fin = 'code'
     if db == 'Securities': fin = 'eid'
-    return pd.Series([_[fin] for _ in conn.execute(f"SELECT DISTINCT {fin} FROM records ORDER BY {fin} ASC").fetchall()])
+    return pd.Series([_[fin] for _ in conn.execute("SELECT DISTINCT {} FROM records ORDER BY {} ASC".format(fin, fin)).fetchall()])
