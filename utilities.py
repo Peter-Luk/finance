@@ -7,9 +7,8 @@ from time import sleep
 #from pandas_datareader import data
 import sqlite3 as lite
 import fix_yahoo_finance as yf
-# from scipy.constants import golden_ratio as gr
+from scipy.constants import golden_ratio as gr
 
-gr = 1.61803399
 today = datetime.today()
 year, month, month_string = today.year, today.month, today.strftime('%B')
 
