@@ -348,14 +348,11 @@ class ONA(object):
         _, vol = 0, __volitality(raw, period)
         em5 = self.ma(period=5, favour='e')
         while _ < len(vol):
-            # ev = self.ma(favour='e')['EMA'][self.data['Date'][_]]
             ev = em5['EMA'][self.data['Date'][_]]
             uhdr, lhdr = np.nan, np.nan
             if not np.isnan(vol[_]):
-                # uhdr = vol[_] * (1 + df / 2)
                 uhdr = ev + vol[_] * df
                 lhdr = ev - vol[_] * df
-                # lhdr = vol[_] * (1 - df / 2)
             upper.append(uhdr)
             lower.append(lhdr)
             _ += 1
