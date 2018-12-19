@@ -115,7 +115,7 @@ class Equities(Viewer):
                 res[_] = hdr
         return pd.Series(res)
 
-def best_quote(el, action='buy', adhoc=False, bound=True):
+def bqo(el, action='buy', adhoc=False, bound=True):
     def __process(e, action, bound):
         er, eo = e.ratr(), e.ovr()
         _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
