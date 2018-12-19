@@ -10,7 +10,6 @@ class ONA(object):
         self.date = date
         if date not in self.data['Date']: self.date = self.data['Date'][-1]
         self.data = self.construct(self.data, self.date)
-        self._e5 = self.ma(period=5, favour='e')
 
     def __del__(self):
         self.data = self.date = None
@@ -347,10 +346,10 @@ class ONA(object):
                 _ += 1
             return res
         _, vol = 0, __volitality(raw, period)
-        # ev = self.ma(favour='e')['EMA'][self.date]
+        em5 = self.ma(period=5, favour='e')
         while _ < len(vol):
             # ev = self.ma(favour='e')['EMA'][self.data['Date'][_]]
-            ev = self._e5['EMA'][self.data['Date'][_]]
+            ev = em5['EMA'][self.data['Date'][_]]
             uhdr, lhdr = np.nan, np.nan
             if not np.isnan(vol[_]):
                 # uhdr = vol[_] * (1 + df / 2)
