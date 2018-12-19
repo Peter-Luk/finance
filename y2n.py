@@ -115,23 +115,29 @@ class Equities(Viewer):
                 res[_] = hdr
         return pd.Series(res)
 
-def rmi(el, adhoc=False):
-    def __process(e):
+def best_quote(el, action='buy', adhoc=False, bound=True):
+    def __process(e, action, bound):
         er, eo = e.ratr(), e.ovr()
-        return er[(er > eo['min'].min()) & (er < eo['max'].max())].min()
+        _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
+        if action == 'buy':
+            if bound: return _.min()
+            return er.min()
+        if action == 'sell':
+            if bound: return _.max()
+            return er.max()
     if isinstance(el, str) and el.upper() in entities('Futures').tolist():
-        return __process(Futures(el.upper()))
+        return __process(Futures(el.upper()), action, bound)
     if isinstance(el, int):
-        return __process(Equities(el, adhoc))
+        return __process(Equities(el, adhoc), action, bound)
     res = []
     if isinstance(el, (list, tuple)):
         for _ in el:
             hdr = np.nan
             if isinstance (_, str):
                 if _.upper() in entities('Futures').tolist():
-                    hdr = __process(Futures(_.upper()))
+                    hdr = __process(Futures(_.upper()), action, bound)
             elif isinstance(_, int):
-                hdr = __process(Equities(_, adhoc))
+                hdr = __process(Equities(_, adhoc), action, bound)
             res.append(hdr)
         return res
 
