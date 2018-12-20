@@ -120,10 +120,14 @@ def bqo(el, action='buy', adhoc=False, bound=True):
         er, eo = e.ratr(), e.ovr()
         _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
         if action == 'buy':
-            if bound: return _.min()
+            if bound:
+                if e.close > _.min(): return _.min()
+                return np.nan
             return er.min()
         if action == 'sell':
-            if bound: return _.max()
+            if bound:
+                if e.close < _.max(): return _.max()
+                return np.nan
             return er.max()
     if isinstance(el, str) and el.upper() in entities('Futures').tolist():
         return __process(Futures(el.upper()), action, bound)
