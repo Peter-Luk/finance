@@ -153,16 +153,3 @@ def entities(db='Futures'):
     fin = 'code'
     if db == 'Securities': fin = 'eid'
     return pd.Series([_[fin] for _ in conn.execute("SELECT DISTINCT {} FROM records ORDER BY {} ASC".format(fin, fin)).fetchall()])
-
-def ema(data, period):
-    res, c = [], 0
-    for i in range(len(data)):
-        hdr = np.nan
-        if not np.isnan(data[i]):
-            if c == period:
-                hdr = np.array(data[i - period: i]).mean()
-            if c > period:
-                hdr = (res[-1] * (period - 1) + data[i]) / period
-            c += 1
-        res.append(hdr)
-    return res

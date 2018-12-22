@@ -334,6 +334,20 @@ class ONA(object):
         upper, lower = [], []
         if not raw: raw = self.data
         if not df: df = self.atr(raw)['ATR'][self.date] / self.close
+
+        def __pema(pd_data, period):
+            data, res, c = [_[0] for _ in pd_data.values], [], 0
+            for i in range(len(data)):
+                hdr = np.nan
+                if not np.isnan(data[i]):
+                    if c == period:
+                        hdr = np.array(data[i - period: i]).mean()
+                    if c > period:
+                        hdr = (res[-1] * (period - 1) + data[i]) / period
+                    c += 1
+                res.append(hdr)
+            return pd.Series(res, index=pd_data.index)
+
         def __volitality(raw, period=period):
             _, res, ehl = 0, [], self.ma(raw=raw, period=period, favour='e', req_field='hl', programmatic=True)
             while _ < len(ehl):
@@ -346,9 +360,9 @@ class ONA(object):
                 _ += 1
             return res
         _, vol = 0, __volitality(raw, period)
-        em5 = self.ma(period=5, favour='e')
+        em5 = __pema(self.ma(period=5, favour='e'), 5)
         while _ < len(vol):
-            ev = em5['EMA'][self.data['Date'][_]]
+            ev = em5[self.data['Date'][_]]
             uhdr, lhdr = np.nan, np.nan
             if not np.isnan(vol[_]):
                 uhdr = ev + vol[_] * df
