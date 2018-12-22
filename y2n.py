@@ -61,6 +61,20 @@ class Futures(Viewer):
             hdr['Data'] = np.array(tp)
             return hdr
 
+    def best_quote(self, action='buy', bound=True):
+        er, eo = self.ratr(), self.ovr()
+        _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
+        if action == 'buy':
+            if bound:
+                if self.close > _.min(): return pd.Series([__ for __ in er if __ < self.close])
+                return np.nan
+            return er.min()
+        if action == 'sell':
+            if bound:
+                if self.close < _.max(): return pd.Series([__ for __ in er if __ > self.close])
+                return np.nan
+            return er.max()
+
 class Equities(Viewer):
     def __init__(self, code, adhoc=False, db='Securities'):
         self.__conn = lite.connect(filepath(db))
