@@ -155,14 +155,14 @@ def entities(db='Futures'):
     return pd.Series([_[fin] for _ in conn.execute("SELECT DISTINCT {} FROM records ORDER BY {} ASC".format(fin, fin)).fetchall()])
 
 def ema(data, period):
-    res, i, c = [], 0, 0
-    lk = len(data.keys())
-    while i < lk:
-        if pd.isna(data[i]): res.append(np.nan)
-        else:
+    res, c = [], 0
+    for i in range(len(data)):
+        hdr = np.nan
+        if not np.isnan(data[i]):
+            if c == period:
+                hdr = np.array(data[i - period: i]).mean()
+            if c > period:
+                hdr = (res[-1] * (period - 1) + data[i]) / period
             c += 1
-            if c == period: res.append(np.array(data[i - period: i]).mean())
-            elif c > period: res.append((res[-1] * (period - 1) + data[i]) / period)
-            else: res.append(np.nan)
-        i += 1
+        res.append(hdr)
     return res
