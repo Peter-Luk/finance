@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import fix_yahoo_finance as yf
 from nta import Viewer
-from utilities import filepath, datetime
+from utilities import filepath, datetime, mtf
 from time import sleep
 
 class Futures(Viewer):
@@ -22,6 +22,10 @@ class Futures(Viewer):
     def __del__(self):
         self.__conn = self.data = self._v = self.date = self.close = None
         del(self.__conn, self.data, self._v, self.date, self.close)
+
+    def __call__(self, enhanced=False):
+        if enhanced: return "Suggest buy @ {}, sell @ {}".format(self.best_quote(), self.best_quote('sell'))
+        return self.close
 
     def kama(self, data=None, period=k_period):
         if not data: data = self.data
@@ -90,6 +94,10 @@ class Equities(Viewer):
     def __del__(self):
         self.__conn = self.data = self._v = self.date = self.close = None
         del(self.__conn, self.data, self._v, self.date, self.close)
+
+    def __call__(self, enhanced=False):
+        if enhanced: return "Suggest buy @ {}, sell @ {}".format(self.best_quote(), self.best_quote('sell'))
+        return self.close
 
     def fetch(self, code=None, start=None, table='records', exclude=[805], years=4, adhoc=False):
         res = {}
