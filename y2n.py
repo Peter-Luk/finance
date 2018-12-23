@@ -24,7 +24,7 @@ class Futures(Viewer):
         del(self.__conn, self.data, self._v, self.date, self.close)
 
     def __call__(self, enhanced=False):
-        if enhanced: return "Suggest buy @ {}, sell @ {}".format(self.best_quote(), self.best_quote('sell'))
+        if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
     def kama(self, data=None, period=k_period):
@@ -96,7 +96,7 @@ class Equities(Viewer):
         del(self.__conn, self.data, self._v, self.date, self.close)
 
     def __call__(self, enhanced=False):
-        if enhanced: return "Suggest buy @ {}, sell @ {}".format(self.best_quote(), self.best_quote('sell'))
+        if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
     def fetch(self, code=None, start=None, table='records', exclude=[805], years=4, adhoc=False):
