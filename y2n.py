@@ -66,12 +66,14 @@ class Futures(Viewer):
         _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
         if action == 'buy':
             if bound:
-                if self.close > _.min(): return pd.Series([__ for __ in er if __ < self.close])
+                # if self.close > _.min(): return pd.Series([__ for __ in er if __ < self.close])
+                if self.close > _.min(): return pd.Series([__ for __ in er if __ > _.min()]).min()
                 return np.nan
             return er.min()
         if action == 'sell':
             if bound:
-                if self.close < _.max(): return pd.Series([__ for __ in er if __ > self.close])
+                # if self.close < _.max(): return pd.Series([__ for __ in er if __ > self.close])
+                if self.close < _.max(): return pd.Series([__ for __ in er if __ < _.max()]).max()
                 return np.nan
             return er.max()
 
@@ -134,12 +136,12 @@ class Equities(Viewer):
         _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
         if action == 'buy':
             if bound:
-                if self.close > _.min(): return pd.Series([__ for __ in er if __ < self.close])
+                if self.close > _.min(): return pd.Series([__ for __ in er if __ > _.min()]).min()
                 return np.nan
             return er.min()
         if action == 'sell':
             if bound:
-                if self.close < _.max(): return pd.Series([__ for __ in er if __ > self.close])
+                if self.close < _.max(): return pd.Series([__ for __ in er if __ < _.max()]).max()
                 return np.nan
             return er.max()
 
