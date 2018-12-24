@@ -159,13 +159,11 @@ def bqo(el, action='buy', adhoc=False, bound=True):
         _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
         if action == 'buy':
             if bound:
-                # if e.close < _.min(): return er.min()
                 if e.close < _.min(): return pd.Series([__ for __ in er if __ < _.min()])
                 return np.nan
             return er.min()
         if action == 'sell':
             if bound:
-                # if e.close > _.max(): return er.max()
                 if e.close > _.max(): return pd.Series([__ for __ in er if __ > _.max()])
                 return np.nan
             return er.max()
