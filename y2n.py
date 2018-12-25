@@ -46,8 +46,8 @@ class Futures(Viewer):
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
             res = {}
-            for __ in [_['date'] for _ in self.__conn.execute("SELECT DISTINCT date FROM records WHERE code='{}' ORDER BY date ASC".format(code)).fetchall()]:
-                _ = self.__conn.execute("SELECT session, open, high, low, close, volume FROM records WHERE code='{}' AND date='{}' ORDER BY session DESC".format(code, __)).fetchall()
+            for __ in [_['date'] for _ in self.__conn.execute(f"SELECT DISTINCT date FROM records WHERE code='{code}' ORDER BY date ASC").fetchall()]:
+                _ = self.__conn.execute(f"SELECT session, open, high, low, close, volume FROM records WHERE code='{code}' AND date='{__}' ORDER BY session DESC").fetchall()
                 if _:
                     tmp = {'open': _[0]['open'], 'high': _[0]['high'], 'low': _[0]['low'], 'close': _[0]['close'], 'volume': _[0]['volume']}
                     if len(_) > 1:
@@ -70,13 +70,11 @@ class Futures(Viewer):
         _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
         if action == 'buy':
             if bound:
-                # if self.close > _.min(): return pd.Series([__ for __ in er if __ < self.close])
                 if self.close > _.min(): return pd.Series([__ for __ in er if __ > _.min()]).min()
                 return np.nan
             return er.min()
         if action == 'sell':
             if bound:
-                # if self.close < _.max(): return pd.Series([__ for __ in er if __ > self.close])
                 if self.close < _.max(): return pd.Series([__ for __ in er if __ < _.max()]).max()
                 return np.nan
             return er.max()
@@ -103,7 +101,7 @@ class Equities(Viewer):
         res = {}
         def stored_eid(table):
             cur = self.__conn.cursor()
-            return [_ for _ in [__[0] for __ in cur.execute("SELECT DISTINCT eid FROM {} ORDER BY eid ASC".format(table)).fetchall()] if _ not in exclude]
+            return [_ for _ in [__[0] for __ in cur.execute(f"SELECT DISTINCT eid FROM {table} ORDER BY eid ASC").fetchall()] if _ not in exclude]
 
         if not start:
             start = pd.datetime(pd.datetime.now().year - years, 1, 1)
@@ -188,4 +186,4 @@ def entities(db='Futures'):
     conn.row_factory = lite.Row
     fin = 'code'
     if db == 'Securities': fin = 'eid'
-    return pd.Series([_[fin] for _ in conn.execute("SELECT DISTINCT {} FROM records ORDER BY {} ASC".format(fin, fin)).fetchall()])
+    return pd.Series([_[fin] for _ in conn.execute(f"SELECT DISTINCT {fin} FROM records ORDER BY {fin} ASC").fetchall()])
