@@ -23,7 +23,7 @@ class Futures(Viewer):
         self.__conn = self.data = self._v = self.date = self.close = None
         del(self.__conn, self.data, self._v, self.date, self.close)
 
-    def __call__(self, enhanced=False):
+    def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
@@ -95,7 +95,7 @@ class Equities(Viewer):
         self.__conn = self.data = self._v = self.date = self.close = None
         del(self.__conn, self.data, self._v, self.date, self.close)
 
-    def __call__(self, enhanced=False):
+    def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
