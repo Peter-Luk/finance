@@ -43,6 +43,12 @@ class Futures(Viewer):
         if not data: data = self.data
         return self._v.mas(data, period=period)
 
+    def trp(self, data=None):
+        if not data: data = self.data
+        _atr = self.atr(data)
+        hdr = [_atr['ATR'][_] / self.data['Data'][self.data['Date'].index(_), -2] * 100 for _ in _atr.index]
+        return pd.DataFrame({'TRP':hdr}, index=_atr.index)
+
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
             res = {}
