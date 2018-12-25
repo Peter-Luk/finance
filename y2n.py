@@ -143,6 +143,12 @@ class Equities(Viewer):
                 res[_] = hdr
         return pd.Series(res)
 
+    def trp(self, data=None):
+        if not data: data = self.data
+        _atr = self.atr(data)
+        hdr = [_atr['ATR'][_] / self.data['Data'][self.data['Date'].index(_), -2] * 100 for _ in _atr.index]
+        return pd.DataFrame({'TRP':hdr}, index=_atr.index)
+
     def best_quote(self, action='buy', bound=True):
         er, eo = self.ratr(), self.ovr()
         _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
