@@ -195,7 +195,9 @@ def bqo(el, action='buy', adhoc=False, bound=True):
             if action == 'sell':
                 try: res[_] = hdr.tail()
                 except: pass
-        return pd.DataFrame(res)
+        hdr = pd.DataFrame(res)
+        if hdr.empty: return None
+        return hdr
 
 def entities(db='Futures'):
     conn = lite.connect(filepath(db))
