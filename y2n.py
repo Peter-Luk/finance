@@ -181,7 +181,7 @@ def bqo(el, action='buy', adhoc=False, bound=True):
         return __process(Futures(el.upper()), action, bound)
     if isinstance(el, int):
         return __process(Equities(el, adhoc), action, bound)
-    res = []
+    res = {}
     if isinstance(el, (list, tuple)):
         for _ in el:
             hdr = np.nan
@@ -190,8 +190,12 @@ def bqo(el, action='buy', adhoc=False, bound=True):
                     hdr = __process(Futures(_.upper()), action, bound)
             elif isinstance(_, int):
                 hdr = __process(Equities(_, adhoc), action, bound)
-            res.append(hdr)
-        return res
+            try: res[_] = hdr.head()
+            except: pass
+            if action == 'sell':
+                try: res[_] = hdr.tail()
+                except: pass
+        return pd.DataFrame(res)
 
 def entities(db='Futures'):
     conn = lite.connect(filepath(db))
