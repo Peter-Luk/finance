@@ -177,15 +177,16 @@ def bqo(el, action='buy', adhoc=False, bound=True):
                 if e.close > _.max(): return pd.Series([__ for __ in er if __ > _.max()])
                 return np.nan
             return er.max()
+
     if isinstance(el, str) and el.upper() in entities('Futures').tolist():
         hdr = __process(Futures(el.upper()), action, bound)
-        if np.isnan(hdr): return hdr
+        if np.isnan(hdr) or isinstance(hdr, (float, int)): return hdr
         if action == 'sell': return hdr.tail()
         return  hdr.head()
 
     if isinstance(el, int):
         hdr = __process(Equities(el, adhoc), action, bound)
-        if np.isnan(hdr): return hdr
+        if np.isnan(hdr) or isinstance(hdr, (float, int)): return hdr
         if action == 'sell': return hdr.tail()
         return  hdr.head()
 
