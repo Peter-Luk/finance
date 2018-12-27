@@ -184,18 +184,24 @@ def filepath(*args, **kwargs):
     if 'type' in list(kwargs.keys()): file_type = kwargs['type']
     if 'subpath' in list(kwargs.keys()): data_path = kwargs['subpath']
     if platform == 'win32':
-        file_drive, file_path = environ['HOMEDRIVE'], environ['HOMEPATH']
-#         reqval = ('drive', 'path')
-#         for i in reqval:
-#             if i in args.keys():exec("file_%s = '%s'" % (i, args[i]))
-        file_path = sep.join((file_drive, file_path, file_type, data_path))
+        if version_info.major > 2 and version_info.minor > 3:
+            from pathlib import Path
+            return Path.home()/file_type/data_path/name
+        else:
+            file_drive, file_path = environ['HOMEDRIVE'], environ['HOMEPATH']
+            file_path = sep.join((file_drive, file_path, file_type, data_path))
     if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
     if platform in ('linux', 'linux2'):
-        place = 'shared'
-        if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((environ['HOME'], file_type, data_path))
-        elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
-            place = 'external-1'
-            file_path = sep.join((environ['HOME'], 'storage', place, file_type, data_path))
+        if version_info.major > 2 and version_info.minor > 3:
+            from pathlib import os, Path
+            if 'EXTERNAL_STORAGE' in os.environ.keys(): return Path.home()/'storage'/'external-1'/file_type/data_path/name
+            return Path.home()/file_type/data_path/name
+        else:
+            place = 'shared'
+            if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((environ['HOME'], file_type, data_path))
+            elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
+                place = 'external-1'
+                file_path = sep.join((environ['HOME'], 'storage', place, file_type, data_path))
     return sep.join((file_path, name))
 
 def mtf(*args, **kwargs):
