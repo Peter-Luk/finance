@@ -192,19 +192,30 @@ def bqo(el, action='buy', adhoc=False, bound=True):
 
     res = {}
     if isinstance(el, (list, tuple)):
-        for _ in el:
-            hdr = np.nan
-            if isinstance (_, str):
-                if _.upper() in entities('Futures').tolist():
-                    hdr = __process(Futures(_.upper()), action, bound)
-            elif isinstance(_, int):
-                hdr = __process(Equities(_, adhoc), action, bound)
-            try: res[_] = hdr.head()
-            except: pass
-            if action == 'sell':
-                try: res[_] = hdr.tail()
+        if bound:
+            for _ in el:
+                hdr = np.nan
+                if isinstance (_, str):
+                    if _.upper() in entities('Futures').tolist():
+                        hdr = __process(Futures(_.upper()), action, bound)
+                elif isinstance(_, int):
+                    hdr = __process(Equities(_, adhoc), action, bound)
+                try: res[_] = hdr.head()
                 except: pass
-        hdr = pd.DataFrame(res)
+                if action == 'sell':
+                    try: res[_] = hdr.tail()
+                    except: pass
+            hdr = pd.DataFrame(res)
+        else:
+            __ = []
+            for _ in el:
+                if isinstance (_, str):
+                    if _.upper() in entities('Futures').tolist():
+                        __.append(__process(Futures(_.upper()), action, bound))
+                elif isinstance(_, int):
+                    __.append(__process(Equities(_, adhoc), action, bound))
+            hdr = pd.DataFrame({action:__}, index=el)
+
         if hdr.empty: return None
         return hdr
 
