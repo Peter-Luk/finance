@@ -212,6 +212,7 @@ def bqo(el, action='buy', adhoc=False, bound=True):
                 if isinstance (_, str):
                     if _.upper() in entities('Futures').tolist():
                         __.append(__process(Futures(_.upper()), action, bound))
+                        il.append(_)
                 elif isinstance(_, int):
                     try:
                         __.append(__process(Equities(_, adhoc), action, bound))
