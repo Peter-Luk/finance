@@ -207,14 +207,17 @@ def bqo(el, action='buy', adhoc=False, bound=True):
                     except: pass
             hdr = pd.DataFrame(res)
         else:
-            __ = []
+            il, __ = [], []
             for _ in el:
                 if isinstance (_, str):
                     if _.upper() in entities('Futures').tolist():
                         __.append(__process(Futures(_.upper()), action, bound))
                 elif isinstance(_, int):
-                    __.append(__process(Equities(_, adhoc), action, bound))
-            hdr = pd.DataFrame({action:__}, index=el)
+                    try:
+                        __.append(__process(Equities(_, adhoc), action, bound))
+                        il.append(_)
+                    except: pass
+            hdr = pd.DataFrame({action:__}, index=il)
 
         if hdr.empty: return None
         return hdr
