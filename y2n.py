@@ -27,6 +27,10 @@ class Futures(Viewer):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
+    def ma(self, raw=None, period=k_period['slow'], favour='s', req_field='close', programmatic=False):
+        if not raw: raw = self.data
+        return self._v.ma(raw, period=period, req_field=req_field, programmatic=programmatic)
+
     def kama(self, data=None, period=k_period):
         if not data: data = self.data
         return self._v.kama(data, period=period)
@@ -46,6 +50,10 @@ class Futures(Viewer):
     def mas(self, data=None, period=k_period):
         if not data: data = self.data
         return self._v.mas(data, period=period)
+
+    def idrs(self, data=None, period=k_period):
+        if not data: data = self.data
+        return self._v.idrs(data, period=period)
 
     def trp(self, data=None):
         if not data: data = self.data

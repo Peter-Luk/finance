@@ -434,16 +434,16 @@ class Viewer(ONA):
     def mas(self, data=None, period=k_period):
         if not data: data = self.data
         _o = ONA(data)
-        return _o.kama(period=period).merge(_o.ma(favour='e'), left_index=True, right_index=True).merge(_o.ma(), left_index=True, right_index=True).merge(_o.ma(favour='w'), left_index=True, right_index=True)
+        return _o.kama(period=period).merge(_o.ma(favour='e', period=period['slow']), left_index=True, right_index=True).merge(_o.ma(period=period['slow']), left_index=True, right_index=True).merge(_o.ma(favour='w', period=period['slow']), left_index=True, right_index=True)
 
     def mapc(self, data=None):
         if not data: data = self.data
         return self.mas(data).pct_change()
 
-    def idrs(self, data=None):
+    def idrs(self, data=None, period=k_period):
         if not data: data = self.data
         _o = ONA(data)
-        return _o.adx().merge(_o.rsi(), left_index=True, right_index=True).merge(_o.atr(), left_index=True, right_index=True)
+        return _o.adx().merge(_o.rsi(period['slow']), left_index=True, right_index=True).merge(_o.atr(period=period['slow']), left_index=True, right_index=True)
 
 def hsirnd(value):
     _ = int(np.floor(np.log10(value)))
