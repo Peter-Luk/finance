@@ -294,7 +294,7 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'RSI': mres}, index=raw['Date'])
 
-    def kc(self, raw=None, period=k_period, ratio=gr, programmatic=False):
+    def kc(self, raw=None, period=k_period, ratio=gr/2, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
         _, kma, ar = 0, self.kama(raw=raw, period={'er':period['er'], 'fast':period['fast'], 'slow':period['slow']}, programmatic=True), self.atr(raw=raw, period=period['atr'], programmatic=True)
