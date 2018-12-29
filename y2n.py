@@ -2,13 +2,14 @@ import sqlite3 as lite
 import numpy as np
 import pandas as pd
 import fix_yahoo_finance as yf
-from nta import Viewer
+from nta import Viewer, hsirnd
 from utilities import filepath, datetime, mtf
 from time import sleep
+from datetime import datetime
 
 class Futures(Viewer):
-    k_period = {'atr':12, 'er':7, 'fast':2, 'slow':12}
-    x_period = 7
+    periods = {'atr':12, 'er':7, 'fast':2, 'slow':12, 'adx':7, 'simple':12, 'apz':5}
+    # x_period, s_period = 7, 12
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
         self.__conn.row_factory = lite.Row
@@ -27,33 +28,58 @@ class Futures(Viewer):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
-    def ma(self, raw=None, period=k_period['slow'], favour='s', req_field='close', programmatic=False):
+    def ma(self, raw=None, period=periods['simple'], favour='s', req_field='close', programmatic=False):
         if not raw: raw = self.data
         return self._v.ma(raw, period=period, req_field=req_field, programmatic=programmatic)
 
-    def kama(self, data=None, period=k_period):
+    def kama(self, data=None, period=periods):
         if not data: data = self.data
         return self._v.kama(data, period=period)
 
-    def bb(self, raw=None, period=k_period['slow'], req_field='c', programmatic=False):
+    def bb(self, raw=None, period=periods['simple'], req_field='c', programmatic=False):
         if not raw: raw = self.data
         return self._v.bb(raw, period=period, req_field=req_field, programmatic=programmatic)
 
-    def kc(self, data=None, period=k_period):
+    def kc(self, data=None, period=periods):
         if not data: data = self.data
         return self._v.kc(data, period=period)
 
-    def adx(self, data=None, period=x_period):
+    def atr(self, raw=None, period=periods['atr'], programmatic=False):
+        if not raw: raw = self.data
+        return self._v.atr(raw, period=period, programmatic=programmatic)
+
+    def adx(self, data=None, period=periods['adx']):
         if not data: data = self.data
         return self._v.adx(data, period=period)
 
-    def mas(self, data=None, period=k_period):
+    def mas(self, data=None, period=periods):
         if not data: data = self.data
         return self._v.mas(data, period=period)
 
-    def idrs(self, data=None, period=k_period):
+    def idrs(self, data=None, period=periods):
         if not data: data = self.data
         return self._v.idrs(data, period=period)
+
+    def apz(self, raw=None, period=periods, df=None, programmatic=False):
+        if not raw: raw = self.data
+        if not df: df = self.atr(raw, period['atr'])['ATR'][self.date] / self.close
+        return self._v.apz(raw, period=period, df=df, programmatic=programmatic)
+
+    def ovr(self, raw=None, period=periods,date=datetime.today().date()):
+        if not raw: raw = self.data
+        if date not in raw['Date']: date = raw['Date'][-1]
+        res = {}
+        akc = self.kc(raw, period=period).transpose()[date]
+        aapz = self.apz(raw, period=period).transpose()[date]
+        abb = self.bb(raw, period=period['simple']).transpose()[date]
+        ami, amx = np.min([akc['Lower'], aapz['Lower'], abb['Lower']]), np.max([akc['Upper'], aapz['Upper'], abb['Upper']])
+        if akc['Lower'] == ami: res['min'] = {'KC': hsirnd(ami)}
+        if aapz['Lower'] == ami: res['min'] = {'APZ': hsirnd(ami)}
+        if abb['Lower'] == ami: res['min'] = {'BB': hsirnd(ami)}
+        if akc['Upper'] == amx: res['max'] = {'KC': hsirnd(amx)}
+        if aapz['Upper'] == amx: res['max'] = {'APZ': hsirnd(amx)}
+        if abb['Upper'] == amx: res['max'] = {'BB': hsirnd(amx)}
+        return pd.DataFrame(res)
 
     def trp(self, data=None):
         if not data: data = self.data

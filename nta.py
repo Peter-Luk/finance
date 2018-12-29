@@ -4,7 +4,8 @@ from datetime import datetime
 from utilities import gslice, gr, lique
 
 class ONA(object):
-    k_period={'atr':14, 'er':10, 'fast':2, 'slow':30}
+    periods = {'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
+    # x_period, s_period = 14, 20
     def __init__(self, data, date=datetime.today().date()):
         self.data = data
         self.date = date
@@ -15,7 +16,7 @@ class ONA(object):
         self.data = self.date = None
         del(self.data, self.date)
 
-    def ma(self, raw=None, period=20, favour='s', req_field='close', programmatic=False):
+    def ma(self, raw=None, period=periods['simple'], favour='s', req_field='close', programmatic=False):
         if not raw: raw = self.data
         mres = []
         def process(raw, period, favour, req_field):
@@ -45,7 +46,7 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'{}ma'.format(favour).upper(): mres}, index=raw['Date'])
 
-    def bbw(self, raw=None, period=20, req_field='close', programmatic=False):
+    def bbw(self, raw=None, period=periods['simple'], req_field='close', programmatic=False):
         if not raw: raw = self.data
         mres = []
         def process(raw, period, req_field):
@@ -71,9 +72,9 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'BBW': mres}, index=raw['Date'])
 
-    def kama(self, raw=None, period=k_period, programmatic=False):
+    def kama(self, raw=None, period=periods, programmatic=False):
         if not raw: raw = self.data
-        mres, sma = [], self.ma(raw, period['slow'], 'e', 'c', True)
+        mres, sma = [], self.ma(raw, period=period['simple'], favour='e', req_field='close', programmatic=True)
 
         def er(raw, period):
             def __dc(raw, lapse=period['er']):
@@ -132,7 +133,7 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
 
-    def atr(self, raw=None, period=14, programmatic=False):
+    def atr(self, raw=None, period=periods['atr'], programmatic=False):
         if not raw: raw = self.data
         mres = []
         def __tr(data):
@@ -171,7 +172,7 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({'ATR': mres}, index=raw['Date'])
 
-    def adx(self, raw=None, period=14):
+    def adx(self, raw=None, period=periods['adx']):
         if not raw: raw = self.data
         mres = []
         def __tr(data):
@@ -248,7 +249,7 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'ADX': mres}, index=raw['Date'])
 
-    def rsi(self, raw=None, period=14):
+    def rsi(self, raw=None, period=periods['simple']):
         if not raw: raw = self.data
         mres = []
         def process(raw, period):
@@ -294,10 +295,10 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'RSI': mres}, index=raw['Date'])
 
-    def kc(self, raw=None, period=k_period, ratio=gr/2, programmatic=False):
+    def kc(self, raw=None, period=periods, ratio=gr/2, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
-        _, kma, ar = 0, self.kama(raw=raw, period={'er':period['er'], 'fast':period['fast'], 'slow':period['slow']}, programmatic=True), self.atr(raw=raw, period=period['atr'], programmatic=True)
+        _, kma, ar = 0, self.kama(raw=raw, period=period, programmatic=True), self.atr(raw=raw, period=period['atr'], programmatic=True)
         while _ < len(kma):
             uhdr, lhdr = np.nan, np.nan
             if not np.isnan([kma[_], ar[_]]).any():
@@ -311,7 +312,7 @@ class ONA(object):
         res.index = raw['Date']
         return res
 
-    def bb(self, raw=None, period=20, req_field='c', programmatic=False):
+    def bb(self, raw=None, period=periods['simple'], req_field='c', programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
         sma, bw = self.ma(raw=raw, period=period, req_field=req_field, programmatic=True), self.bbw(raw=raw, period=period, req_field=req_field, programmatic=True)
@@ -330,12 +331,12 @@ class ONA(object):
         return res
 
     # def apz(self, raw=None, period=5, df=.092, programmatic=False):
-    def apz(self, raw=None, period=5, df=None, programmatic=False):
+    def apz(self, raw=None, period=periods, df=None, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
-        if not df: df = self.atr(raw)['ATR'][self.date] / self.close
+        if not df: df = self.atr(raw, period['atr'])['ATR'][self.date] / self.close
 
-        def __pema(pd_data, period):
+        def __pema(pd_data, period=period['apz']):
             data, res, c = [_[0] for _ in pd_data.values], [], 0
             for i in range(len(data)):
                 hdr = np.nan
@@ -348,7 +349,7 @@ class ONA(object):
                 res.append(hdr)
             return pd.Series(res, index=pd_data.index)
 
-        def __volitality(raw, period=period):
+        def __volitality(raw, period=period['apz']):
             _, res, ehl = 0, [], self.ma(raw=raw, period=period, favour='e', req_field='hl', programmatic=True)
             while _ < len(ehl):
                 if np.isnan(ehl[_]): hdr = np.nan
@@ -359,8 +360,8 @@ class ONA(object):
                 res.append(hdr)
                 _ += 1
             return res
-        _, vol = 0, __volitality(raw, period)
-        em5 = __pema(self.ma(period=5, favour='e'), 5)
+        _, vol = 0, __volitality(raw, period=period['apz'])
+        em5 = __pema(self.ma(period=period['apz'], favour='e'), period=period['apz'])
         while _ < len(vol):
             ev = em5[self.data['Date'][_]]
             uhdr, lhdr = np.nan, np.nan
@@ -398,13 +399,13 @@ class ONA(object):
         [hdr.extend(self._pgap(__, raw)) for __ in self._patr(raw)]
         return pd.Series([hsirnd(_) for _ in lique(hdr)])
 
-    def ovr(self, raw=None, date=datetime.today().date()):
+    def ovr(self, raw=None, period=periods,date=datetime.today().date()):
         if not raw: raw = self.data
         if date not in raw['Date']: date = raw['Date'][-1]
         res = {}
-        akc = self.kc(raw).transpose()[date]
-        aapz = self.apz(raw).transpose()[date]
-        abb = self.bb(raw).transpose()[date]
+        akc = self.kc(raw, period=period).transpose()[date]
+        aapz = self.apz(raw, period=period).transpose()[date]
+        abb = self.bb(raw, period=period['simple']).transpose()[date]
         ami, amx = np.min([akc['Lower'], aapz['Lower'], abb['Lower']]), np.max([akc['Upper'], aapz['Upper'], abb['Upper']])
         if akc['Lower'] == ami: res['min'] = {'KC': hsirnd(ami)}
         if aapz['Lower'] == ami: res['min'] = {'APZ': hsirnd(ami)}
@@ -423,7 +424,8 @@ class ONA(object):
         return {'Date': raw['Date'][:rdx], 'Data': raw['Data'][:rdx]}
 
 class Viewer(ONA):
-    k_period={'atr':14, 'er':10, 'fast':2, 'slow':30}
+    periods={'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
+    # x_period, s_period = 14, 20
     def __init__(self, data):
         self.data = data
 
@@ -431,19 +433,19 @@ class Viewer(ONA):
         self.data = None
         del(self.data)
 
-    def mas(self, data=None, period=k_period):
+    def mas(self, data=None, period=periods):
         if not data: data = self.data
         _o = ONA(data)
-        return _o.kama(period=period).merge(_o.ma(favour='e', period=period['slow']), left_index=True, right_index=True).merge(_o.ma(period=period['slow']), left_index=True, right_index=True).merge(_o.ma(favour='w', period=period['slow']), left_index=True, right_index=True)
+        return _o.kama(period=period).merge(_o.ma(favour='e', period=period['simple']), left_index=True, right_index=True).merge(_o.ma(period=period['simple']), left_index=True, right_index=True).merge(_o.ma(favour='w', period=period['simple']), left_index=True, right_index=True)
 
     def mapc(self, data=None):
         if not data: data = self.data
         return self.mas(data).pct_change()
 
-    def idrs(self, data=None, period=k_period):
+    def idrs(self, data=None, period=periods):
         if not data: data = self.data
         _o = ONA(data)
-        return _o.adx().merge(_o.rsi(period['slow']), left_index=True, right_index=True).merge(_o.atr(period=period['slow']), left_index=True, right_index=True)
+        return _o.adx(period=period['adx']).merge(_o.rsi(period=period['simple']), left_index=True, right_index=True).merge(_o.atr(period=period['atr']), left_index=True, right_index=True)
 
 def hsirnd(value):
     _ = int(np.floor(np.log10(value)))
