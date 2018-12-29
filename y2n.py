@@ -31,6 +31,10 @@ class Futures(Viewer):
         if not data: data = self.data
         return self._v.kama(data, period=period)
 
+    def bb(self, raw=None, period=k_period['slow'], req_field='c', programmatic=False):
+        if not raw: raw = self.data
+        return self._v.bb(raw, period=period, req_field=req_field, programmatic=programmatic)
+
     def kc(self, data=None, period=k_period):
         if not data: data = self.data
         return self._v.kc(data, period=period)
