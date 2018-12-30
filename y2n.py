@@ -9,7 +9,6 @@ from datetime import datetime
 
 class Futures(Viewer):
     periods = {'atr':12, 'er':7, 'fast':2, 'slow':12, 'adx':7, 'simple':12, 'apz':5}
-    # x_period, s_period = 7, 12
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
         self.__conn.row_factory = lite.Row
@@ -62,24 +61,11 @@ class Futures(Viewer):
 
     def apz(self, raw=None, period=periods, df=None, programmatic=False):
         if not raw: raw = self.data
-        if not df: df = self.atr(raw, period['atr'])['ATR'][self.date] / self.close
         return self._v.apz(raw, period=period, df=df, programmatic=programmatic)
 
     def ovr(self, raw=None, period=periods,date=datetime.today().date()):
         if not raw: raw = self.data
-        if date not in raw['Date']: date = raw['Date'][-1]
-        res = {}
-        akc = self.kc(raw, period=period).transpose()[date]
-        aapz = self.apz(raw, period=period).transpose()[date]
-        abb = self.bb(raw, period=period['simple']).transpose()[date]
-        ami, amx = np.min([akc['Lower'], aapz['Lower'], abb['Lower']]), np.max([akc['Upper'], aapz['Upper'], abb['Upper']])
-        if akc['Lower'] == ami: res['min'] = {'KC': hsirnd(ami)}
-        if aapz['Lower'] == ami: res['min'] = {'APZ': hsirnd(ami)}
-        if abb['Lower'] == ami: res['min'] = {'BB': hsirnd(ami)}
-        if akc['Upper'] == amx: res['max'] = {'KC': hsirnd(amx)}
-        if aapz['Upper'] == amx: res['max'] = {'APZ': hsirnd(amx)}
-        if abb['Upper'] == amx: res['max'] = {'BB': hsirnd(amx)}
-        return pd.DataFrame(res)
+        return self._v.ovr(raw, period=period, date=date)
 
     def trp(self, data=None):
         if not data: data = self.data

@@ -5,7 +5,6 @@ from utilities import gslice, gr, lique
 
 class ONA(object):
     periods = {'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
-    # x_period, s_period = 14, 20
     def __init__(self, data, date=datetime.today().date()):
         self.data = data
         self.date = date
@@ -330,11 +329,12 @@ class ONA(object):
         res.index = raw['Date']
         return res
 
-    # def apz(self, raw=None, period=5, df=.092, programmatic=False):
     def apz(self, raw=None, period=periods, df=None, programmatic=False):
         upper, lower = [], []
         if not raw: raw = self.data
-        if not df: df = self.atr(raw, period['atr'])['ATR'][self.date] / self.close
+        if not df:
+            date = raw['Date'][-1]
+            df = self.atr(raw, period['atr'])['ATR'][date] / raw['Data'][raw['Date'].index(date), -2]
 
         def __pema(pd_data, period=period['apz']):
             data, res, c = [_[0] for _ in pd_data.values], [], 0
@@ -425,7 +425,6 @@ class ONA(object):
 
 class Viewer(ONA):
     periods={'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
-    # x_period, s_period = 14, 20
     def __init__(self, data):
         self.data = data
 
