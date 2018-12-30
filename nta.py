@@ -424,6 +424,12 @@ class ONA(object):
         rdx = raw['Date'].index(date) + 1
         return {'Date': raw['Date'][:rdx], 'Data': raw['Data'][:rdx]}
 
+    def trp(self, data=None, period=periods['atr']):
+        if not data: data = self.data
+        _atr = self.atr(data, period=period)
+        hdr = [_atr['ATR'][_] / self.data['Data'][self.data['Date'].index(_), -2] * 100 for _ in _atr.index]
+        return pd.DataFrame({'TRP':hdr}, index=_atr.index)
+
 class Viewer(ONA):
     def __init__(self, data):
         self.data = data
@@ -444,7 +450,7 @@ class Viewer(ONA):
     def idrs(self, data=None, period=periods):
         if not data: data = self.data
         _o = ONA(data)
-        return _o.adx(period=period['adx']).merge(_o.rsi(period=period['simple']), left_index=True, right_index=True).merge(_o.atr(period=period['atr']), left_index=True, right_index=True)
+        return _o.adx(period=period['adx']).merge(_o.rsi(period=period['simple']), left_index=True, right_index=True).merge(_o.atr(period=period['atr']), left_index=True, right_index=True).merge(_o.trp(period=period['atr']), left_index=True, right_index=True)
 
 def hsirnd(value):
     _ = int(np.floor(np.log10(value)))

@@ -67,12 +67,6 @@ class Futures(Viewer):
         if not raw: raw = self.data
         return self._v.ovr(raw, period=period, date=date)
 
-    def trp(self, data=None, period=periods['atr']):
-        if not data: data = self.data
-        _atr = self.atr(data, period=period)
-        hdr = [_atr['ATR'][_] / self.data['Data'][self.data['Date'].index(_), -2] * 100 for _ in _atr.index]
-        return pd.DataFrame({'TRP':hdr}, index=_atr.index)
-
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
             res = {}
@@ -110,7 +104,6 @@ class Futures(Viewer):
             return er.max()
 
 class Equities(Viewer):
-    periods = {'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
     def __init__(self, code, adhoc=False, db='Securities'):
         self.__conn = lite.connect(filepath(db))
         rc = entities(db).tolist()
@@ -167,12 +160,6 @@ class Equities(Viewer):
                 hdr['Data'] = np.asarray(rd)
                 res[_] = hdr
         return pd.Series(res)
-
-    def trp(self, data=None, period=periods['atr']):
-        if not data: data = self.data
-        _atr = self.atr(data, period=period)
-        hdr = [_atr['ATR'][_] / self.data['Data'][self.data['Date'].index(_), -2] * 100 for _ in _atr.index]
-        return pd.DataFrame({'TRP':hdr}, index=_atr.index)
 
     def best_quote(self, action='buy', bound=True):
         er, eo = self.ratr(), self.ovr()
