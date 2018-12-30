@@ -3,8 +3,9 @@ import pandas as pd
 from datetime import datetime
 from utilities import gslice, gr, lique
 
+periods = {'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
+
 class ONA(object):
-    periods = {'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
     def __init__(self, data, date=datetime.today().date()):
         self.data = data
         self.date = date
@@ -424,7 +425,6 @@ class ONA(object):
         return {'Date': raw['Date'][:rdx], 'Data': raw['Data'][:rdx]}
 
 class Viewer(ONA):
-    periods={'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
     def __init__(self, data):
         self.data = data
 
