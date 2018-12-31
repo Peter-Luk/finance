@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from utilities import gslice, gr, lique
+import pref
 
-periods = {'atr':14, 'er':10, 'fast':2, 'slow':30, 'adx':14, 'simple':20, 'apz':5}
+periods = pref.periods['Equities']
 
 class ONA(object):
     def __init__(self, data, date=datetime.today().date()):

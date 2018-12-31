@@ -6,9 +6,10 @@ from nta import Viewer, hsirnd
 from utilities import filepath, datetime, mtf
 from time import sleep
 from datetime import datetime
+import pref
 
 class Futures(Viewer):
-    periods = {'atr':12, 'er':7, 'fast':2, 'slow':12, 'adx':7, 'simple':12, 'apz':5}
+    periods = pref.periods['Futures']
     def __init__(self, code, db='Futures'):
         self.__conn = lite.connect(filepath(db))
         self.__conn.row_factory = lite.Row
