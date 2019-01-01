@@ -430,9 +430,6 @@ class Viewer(ONA):
         _o = ONA(data)
         return pd.DataFrame([_o.kama(data, period)['KAMA'].map(hsirnd), _o.ma(data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(data, period['simple'])['SMA'].map(hsirnd), _o.ma(data, period['simple'], favour='w')['WMA'].map(hsirnd)]).T
 
-    def mapc(self, data=None):
-        return self.mas(data).pct_change()
-
     def idrs(self, data, period):
         _o = ONA(data)
         return _o.adx(data, period['adx']).merge(_o.rsi(data, period['simple']), left_index=True, right_index=True).merge(_o.atr(data, period['atr']), left_index=True, right_index=True).merge(_o.trp(data, period['atr']), left_index=True, right_index=True)
