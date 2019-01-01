@@ -15,7 +15,6 @@ class ONA(object):
         del(self.data, self.date)
 
     def ma(self, raw, period, favour='s', req_field='close', programmatic=False):
-        if not raw: raw = self.data
         mres = []
         def process(raw, period, favour, req_field):
             res, _ = [], 0
@@ -45,7 +44,6 @@ class ONA(object):
         return pd.DataFrame({f'{favour}ma'.upper(): mres}, index=raw['Date'])
 
     def bbw(self, raw, period, req_field='close', programmatic=False):
-        if not raw: raw = self.data
         mres = []
         def process(raw, period, req_field):
             res, _ = [], 0
@@ -71,7 +69,6 @@ class ONA(object):
         return pd.DataFrame({'BBW': mres}, index=raw['Date'])
 
     def kama(self, raw, period, programmatic=False):
-        if not raw: raw = self.data
         mres, sma = [], self.ma(raw, period['simple'], favour='e', req_field='close', programmatic=True)
 
         def er(raw, period):
@@ -132,7 +129,6 @@ class ONA(object):
         return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
 
     def atr(self, raw, period, programmatic=False):
-        if not raw: raw = self.data
         mres = []
         def __tr(data):
             nr, res, _ = data[:,:-1].ptp(axis=1).tolist(), [], 0
@@ -171,7 +167,6 @@ class ONA(object):
         return pd.DataFrame({'ATR': mres}, index=raw['Date'])
 
     def adx(self, raw, period):
-        if not raw: raw = self.data
         mres = []
         def __tr(data):
             nr, res, _ = data[:,:-1].ptp(axis=1).tolist(), [], 0
@@ -248,7 +243,6 @@ class ONA(object):
         return pd.DataFrame({'ADX': mres}, index=raw['Date'])
 
     def rsi(self, raw, period):
-        if not raw: raw = self.data
         mres = []
         def process(raw, period):
             _, gain, loss, res = 0, [], [], []
@@ -295,7 +289,6 @@ class ONA(object):
 
     def kc(self, raw, period, ratio=gr/2, programmatic=False):
         upper, lower = [], []
-        if not raw: raw = self.data
         _, kma, ar = 0, self.kama(raw, period, programmatic=True), self.atr(raw, period['atr'], programmatic=True)
         while _ < len(kma):
             uhdr, lhdr = np.nan, np.nan
@@ -312,7 +305,6 @@ class ONA(object):
 
     def bb(self, raw, period, req_field='c', programmatic=False):
         upper, lower = [], []
-        if not raw: raw = self.data
         sma, bw = self.ma(raw, period, req_field=req_field, programmatic=True), self.bbw(raw, period, req_field, programmatic=True)
         _ = 0
         while _ < len(sma):
@@ -330,7 +322,6 @@ class ONA(object):
 
     def apz(self, raw, period, df=None, programmatic=False):
         upper, lower = [], []
-        if not raw: raw = self.data
         if not df:
             date = raw['Date'][-1]
             df = self.atr(raw, period['atr'])['ATR'][date] / raw['Data'][raw['Date'].index(date), -2]
@@ -397,7 +388,6 @@ class ONA(object):
         return pd.Series(lique([hsirnd(_) for _ in hdr]))
 
     def ovr(self, raw, period, date=datetime.today().date()):
-        if not raw: raw = self.data
         if date not in raw['Date']: date = raw['Date'][-1]
         res = {}
         akc = self.kc(raw, period).transpose()[date]
@@ -435,16 +425,13 @@ class Viewer(ONA):
         del(self.data)
 
     def mas(self, data, period):
-        if not data: data = self.data
         _o = ONA(data)
         return _o.kama(data, period).merge(_o.ma(data, period['simple'], favour='e'), left_index=True, right_index=True).merge(_o.ma(data, period['simple']), left_index=True, right_index=True).merge(_o.ma(data, period['simple'], favour='w'), left_index=True, right_index=True)
 
     def mapc(self, data=None):
-        if not data: data = self.data
         return self.mas(data).pct_change()
 
     def idrs(self, data, period):
-        if not data: data = self.data
         _o = ONA(data)
         return _o.adx(data, period['adx']).merge(_o.rsi(data, period['simple']), left_index=True, right_index=True).merge(_o.atr(data, period['atr']), left_index=True, right_index=True).merge(_o.trp(data, period['atr']), left_index=True, right_index=True)
 
@@ -463,6 +450,7 @@ class Viewer(ONA):
             return er.max()
 
 def hsirnd(value):
+    if np.isnan(value): return np.nan
     _ = int(np.floor(np.log10(value)))
     __ = np.divmod(value, 10 ** (_ - 1))[0]
     if _ < 0:
