@@ -428,7 +428,7 @@ class Viewer(ONA):
 
     def mas(self, data, period):
         _o = ONA(data)
-        return _o.kama(data, period).merge(_o.ma(data, period['simple'], favour='e'), left_index=True, right_index=True).merge(_o.ma(data, period['simple']), left_index=True, right_index=True).merge(_o.ma(data, period['simple'], favour='w'), left_index=True, right_index=True)
+        return pd.DataFrame([_o.kama(data, period)['KAMA'].map(hsirnd), _o.ma(data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(data, period['simple'])['SMA'].map(hsirnd), _o.ma(data, period['simple'], favour='w')['WMA'].map(hsirnd)]).T
 
     def mapc(self, data=None):
         return self.mas(data).pct_change()
