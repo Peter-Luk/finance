@@ -5,7 +5,6 @@ import fix_yahoo_finance as yf
 from nta import Viewer, hsirnd
 from utilities import filepath, datetime, mtf
 from time import sleep
-from datetime import datetime
 import pref
 
 class Futures(Viewer):
