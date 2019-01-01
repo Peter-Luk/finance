@@ -299,7 +299,8 @@ class ONA(object):
             lower.append(lhdr)
             _ += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
-        res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
+        # res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
+        res = pd.DataFrame.from_dict({'Upper':[hsirnd(_) for _ in upper], 'Lower':[hsirnd(_) for _ in lower]})
         res.index = raw['Date']
         return res
 
@@ -316,7 +317,8 @@ class ONA(object):
             lower.append(lhdr)
             _ += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
-        res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
+        # res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
+        res = pd.DataFrame.from_dict({'Upper':[hsirnd(_) for _ in upper], 'Lower':[hsirnd(_) for _ in lower]})
         res.index = raw['Date']
         return res
 
@@ -362,7 +364,7 @@ class ONA(object):
             lower.append(lhdr)
             _ += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
-        res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
+        res = pd.DataFrame.from_dict({'Upper':[hsirnd(_) for _ in upper], 'Lower':[hsirnd(_) for _ in lower]})
         res.index = raw['Date']
         return res
 
@@ -394,12 +396,12 @@ class ONA(object):
         aapz = self.apz(raw, period).transpose()[date]
         abb = self.bb(raw, period['simple']).transpose()[date]
         ami, amx = np.min([akc['Lower'], aapz['Lower'], abb['Lower']]), np.max([akc['Upper'], aapz['Upper'], abb['Upper']])
-        if akc['Lower'] == ami: res['min'] = {'KC': hsirnd(ami)}
-        if aapz['Lower'] == ami: res['min'] = {'APZ': hsirnd(ami)}
-        if abb['Lower'] == ami: res['min'] = {'BB': hsirnd(ami)}
-        if akc['Upper'] == amx: res['max'] = {'KC': hsirnd(amx)}
-        if aapz['Upper'] == amx: res['max'] = {'APZ': hsirnd(amx)}
-        if abb['Upper'] == amx: res['max'] = {'BB': hsirnd(amx)}
+        if akc['Lower'] == ami: res['min'] = {'KC': ami}
+        if aapz['Lower'] == ami: res['min'] = {'APZ': ami}
+        if abb['Lower'] == ami: res['min'] = {'BB': ami}
+        if akc['Upper'] == amx: res['max'] = {'KC': amx}
+        if aapz['Upper'] == amx: res['max'] = {'APZ': amx}
+        if abb['Upper'] == amx: res['max'] = {'BB': amx}
         return pd.DataFrame(res)
 
     def construct(self, raw, date=None):
