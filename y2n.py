@@ -80,6 +80,10 @@ class Futures(Viewer):
         if not raw: raw = self.data
         return self._v.ovr(raw, period, date)
 
+    def ratr(self, raw=None, period=periods['atr']):
+        if not raw: raw = self.data
+        return self._v.ratr(raw, period)
+
     def combine(self, code, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
             res = {}
@@ -101,20 +105,6 @@ class Futures(Viewer):
             tp.extend([res[_] for _ in hdr['Date']])
             hdr['Data'] = np.array(tp)
             return hdr
-
-    def best_quote(self, action='buy', bound=True):
-        er, eo = self.ratr(), self.ovr()
-        _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
-        if action == 'buy':
-            if bound:
-                if self.close > _.min(): return pd.Series([__ for __ in er if __ > _.min()]).min()
-                return np.nan
-            return er.min()
-        if action == 'sell':
-            if bound:
-                if self.close < _.max(): return pd.Series([__ for __ in er if __ < _.max()]).max()
-                return np.nan
-            return er.max()
 
 class Equities(Viewer):
     periods = pref.periods['Equities']
@@ -227,19 +217,9 @@ class Equities(Viewer):
         if not raw: raw = self.data
         return self._v.ovr(raw, period, date)
 
-    def best_quote(self, action='buy', bound=True):
-        er, eo = self.ratr(), self.ovr()
-        _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
-        if action == 'buy':
-            if bound:
-                if self.close > _.min(): return pd.Series([__ for __ in er if __ > _.min()]).min()
-                return np.nan
-            return er.min()
-        if action == 'sell':
-            if bound:
-                if self.close < _.max(): return pd.Series([__ for __ in er if __ < _.max()]).max()
-                return np.nan
-            return er.max()
+    def ratr(self, raw=None, period=periods['atr']):
+        if not raw: raw = self.data
+        return self._v.ratr(raw, period)
 
 def bqo(el, action='buy', adhoc=False, bound=True):
     def __process(e, action, bound):

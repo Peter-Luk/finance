@@ -376,28 +376,26 @@ class ONA(object):
         res.index = raw['Date']
         return res
 
-    def _patr(self, raw=None):
-        if not raw: raw = self.data
-        lc, lr = raw['Data'][-1, -2], self.atr(raw=raw).values[-1][0]
-        _ = [lc + lr, lc, lc - lr]
-        _.extend(gslice([lc + lr, lc]))
-        _.extend(gslice([lc, lc - lr]))
-        _.sort()
-        return _
+    def ratr(self, raw, period):
+        def _patr(raw, period):
+            lc, lr = raw['Data'][-1, -2], self.atr(raw, period).values[-1][0]
+            _ = [lc + lr, lc, lc - lr]
+            _.extend(gslice([lc + lr, lc]))
+            _.extend(gslice([lc, lc - lr]))
+            _.sort()
+            return _
 
-    def _pgap(self, pivot, raw=None):
-        if not raw: raw = self.data
-        gap = pivot - raw['Data'][-1, -2]
-        _ = gslice([pivot + gap, pivot])
-        _.extend(gslice([pivot, pivot - gap]))
-        _.sort()
-        return _
+        def _pgap(pivot, raw):
+            gap = pivot - raw['Data'][-1, -2]
+            _ = gslice([pivot + gap, pivot])
+            _.extend(gslice([pivot, pivot - gap]))
+            _.sort()
+            return _
 
-    def ratr(self, raw=None):
         hdr = []
         if not raw: raw = self.data
-        [hdr.extend(self._pgap(__, raw)) for __ in self._patr(raw)]
-        return pd.Series([hsirnd(_) for _ in lique(hdr)])
+        [hdr.extend(_pgap(__, raw)) for __ in _patr(raw, period)]
+        return pd.Series(lique([hsirnd(_) for _ in hdr]))
 
     def ovr(self, raw, period, date=datetime.today().date()):
         if not raw: raw = self.data
@@ -450,6 +448,20 @@ class Viewer(ONA):
         if not data: data = self.data
         _o = ONA(data)
         return _o.adx(data, period['adx']).merge(_o.rsi(data, period['simple']), left_index=True, right_index=True).merge(_o.atr(data, period['atr']), left_index=True, right_index=True).merge(_o.trp(data, period['atr']), left_index=True, right_index=True)
+
+    def best_quote(self, action='buy', bound=True):
+        er, eo = self.ratr(), self.ovr()
+        _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
+        if action == 'buy':
+            if bound:
+                if self.close > _.min(): return pd.Series([__ for __ in er if __ > _.min()]).min()
+                return np.nan
+            return er.min()
+        if action == 'sell':
+            if bound:
+                if self.close < _.max(): return pd.Series([__ for __ in er if __ < _.max()]).max()
+                return np.nan
+            return er.max()
 
 def hsirnd(value):
     _ = int(np.floor(np.log10(value)))
