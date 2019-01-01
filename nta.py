@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
-from datetime import datetime
-from utilities import gslice, gr, lique
+from utilities import datetime, gslice, gr, lique
 
 
 class ONA(object):
