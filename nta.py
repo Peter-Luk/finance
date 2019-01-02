@@ -21,14 +21,12 @@ class ONA(object):
             while _ < len(raw):
                 hdr = np.nan
                 if not _ < period - 1:
-                    if req_field.lower() in ['close', 'c']:
-                        rdata = raw[_ - period + 1: _ + 1, -2]
-                        pdata = raw[_ - period + 1: _ + 1, -2:].prod(axis=1)
-                        wdata = raw[_ - period + 1: _ + 1, -1]
+                    if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
                     if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
                     if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
+                    wdata = raw[_ - period + 1: _ + 1, -1]
+                    pdata = rdata * wdata
                     if favour[0].lower() == 's': hdr = rdata.mean()
-                    # if favour[0].lower() == 'w': hdr = (rdata * raw[_ - period + 1: _ + 1, -1]).sum() / raw[_ - period + 1: _ + 1, -1].sum()
                     if favour[0].lower() == 'w': hdr = pdata.sum() / wdata.sum()
                     if favour[0].lower() == 'e':
                         if _ == period: hdr = rdata.mean()
