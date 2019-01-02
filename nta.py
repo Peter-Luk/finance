@@ -299,7 +299,6 @@ class ONA(object):
             lower.append(lhdr)
             _ += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
-        # res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
         res = pd.DataFrame.from_dict({'Upper':[hsirnd(_) for _ in upper], 'Lower':[hsirnd(_) for _ in lower]})
         res.index = raw['Date']
         return res
@@ -317,7 +316,6 @@ class ONA(object):
             lower.append(lhdr)
             _ += 1
         if programmatic: return {'Upper':upper, 'Lower':lower}
-        # res = pd.DataFrame.from_dict({'Upper':upper, 'Lower':lower})
         res = pd.DataFrame.from_dict({'Upper':[hsirnd(_) for _ in upper], 'Lower':[hsirnd(_) for _ in lower]})
         res.index = raw['Date']
         return res
