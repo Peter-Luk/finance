@@ -24,10 +24,10 @@ class ONA(object):
                     if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
                     if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
                     if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
-                    wdata = raw[_ - period + 1: _ + 1, -1]
-                    pdata = rdata * wdata
                     if favour[0].lower() == 's': hdr = rdata.mean()
-                    if favour[0].lower() == 'w': hdr = pdata.sum() / wdata.sum()
+                    if favour[0].lower() == 'w':
+                        wdata = raw[_ - period + 1: _ + 1, -1]
+                        hdr = (rdata * wdata).sum() / wdata.sum()
                     if favour[0].lower() == 'e':
                         if _ == period: hdr = rdata.mean()
                         if _ > period: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
