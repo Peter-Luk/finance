@@ -86,7 +86,7 @@ def find_csv_path(*args, **kwargs):
         folder = args[0]
     if 'folder' in list(kwargs.keys()):
         if isinstance(kwargs['folder'], str): folder = kwargs['folder']
-    sdl = sd.split(sep)
+    sdl = str(sd).split(sep)
     cp = sdl[:-2]
     cp.append(folder)
     if platform == 'win32':
