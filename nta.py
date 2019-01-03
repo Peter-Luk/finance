@@ -451,7 +451,7 @@ class Viewer(ONA):
             return er.max()
 
 def hsirnd(value):
-    if np.isnan(value): return np.nan
+    if np.isnan(value) or not value > 0: return np.nan
     _ = int(np.floor(np.log10(value)))
     __ = np.divmod(value, 10 ** (_ - 1))[0]
     if _ < 0:
