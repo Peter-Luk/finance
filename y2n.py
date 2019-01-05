@@ -9,12 +9,13 @@ import pref
 
 class Futures(Viewer):
     periods = pref.periods['Futures']
-    def __init__(self, code, db='Futures'):
-        self.__conn = lite.connect(filepath(db))
+    def __init__(self, code):
+        db_conf = pref.db['Futures']
+        self.__conn = lite.connect(filepath(db_conf['name']))
         self.__conn.row_factory = lite.Row
-        rc = entities(db).tolist()
+        rc = entities(db_conf['name']).tolist()
         if code.upper() not in rc: code = rc[-1]
-        self.data = self.combine(code)
+        self.data = self.combine(code, db_conf['freq'])
         self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
@@ -83,7 +84,7 @@ class Futures(Viewer):
         if not raw: raw = self.data
         return self._v.ratr(raw, period)
 
-    def combine(self, code, freq='bi-daily'):
+    def combine(self, code, freq):
         if freq.lower() == 'bi-daily':
             res = {}
             for __ in [_['date'] for _ in self.__conn.execute(f"SELECT DISTINCT date FROM records WHERE code='{code}' ORDER BY date ASC").fetchall()]:
@@ -107,9 +108,10 @@ class Futures(Viewer):
 
 class Equities(Viewer):
     periods = pref.periods['Equities']
-    def __init__(self, code, adhoc=False, db='Securities'):
-        self.__conn = lite.connect(filepath(db))
-        rc = entities(db).tolist()
+    def __init__(self, code, adhoc=False):
+        db_conf = pref.db['Equities']
+        self.__conn = lite.connect(filepath(db_conf['name']))
+        rc = entities(db_conf['name']).tolist()
         if code not in rc: adhoc = True
         self.data = self.fetch(code, adhoc=adhoc).to_dict()[code]
         self._v = Viewer(self.data)
@@ -140,22 +142,22 @@ class Equities(Viewer):
                 else: aid = [5, int(code)]
         if adhoc:
             while adhoc:
-                ar = yf.download(['{:04d}.HK'.format(_) for _ in aid], start, group_by='ticker')
+                ar = yf.download([f'{_:04d}.HK' for _ in aid], start, group_by='ticker')
                 if len(ar): adhoc = not adhoc
                 else:
                     print('Retry in 30 seconds')
                     sleep(30)
             for _ in aid:
                 hdr = {}
-                rd = ar['{:04d}.HK'.format(_)]
+                rd = ar[f'{_:04d}.HK']
                 d = rd.T
                 hdr['Date'] = [__.to_pydatetime() for __ in rd.index]
                 hdr['Data'] = np.asarray(pd.concat([rd[__] for __ in [___ for ___ in d.index if ___ not in ['Adj Close']]], axis=1, join='inner', ignore_index=False))
                 res[_] = hdr
         else:
             for _ in aid:
-                hdr, qstr = {}, "SELECT date, open, high, low, close, volume FROM {} WHERE eid={:d}".format(table, _)
-                if start: qstr += " AND date > '{:%Y-%m-%d}'".format(start)
+                hdr, qstr = {}, f"SELECT date, open, high, low, close, volume FROM {table} WHERE eid={_:d}"
+                if start: qstr += f" AND date > '{start:%Y-%m-%d}'"
                 q = self.__conn.execute(qstr)
                 cols = [c[0].capitalize() for c in q.description]
                 rd = pd.DataFrame.from_records(data=q.fetchall(), index='Date', columns=cols)
@@ -290,9 +292,25 @@ def bqo(el, action='buy', adhoc=False, bound=True):
         if hdr.empty: return None
         return hdr
 
-def entities(db='Futures'):
+def entities(db=None):
+    if not db: db = pref.db['Future']['name']
     conn = lite.connect(filepath(db))
     conn.row_factory = lite.Row
     fin = 'code'
-    if db == 'Securities': fin = 'eid'
+    if db == pref.db['Equities']['name']: fin = 'eid'
     return pd.Series([_[fin] for _ in conn.execute(f"SELECT DISTINCT {fin} FROM records ORDER BY {fin} ASC").fetchall()])
+
+
+def aef(eid, start=datetime(2014,12,31)):
+    import sqlalchemy as db
+    db_conf = pref.db['Equities']
+    engine = db.create_engine(f"sqlite:///{filepath(db_conf['name'])}")
+    meta = db.MetaData()
+    conn = engine.connect()
+    rc = db.Table(db_conf['table'], meta, autoload=True, autoload_with=engine).columns
+    query = db.select([rc.date, rc.open, rc.high, rc.low, rc.close, rc.volume]).where(db.and_(rc.eid==eid, rc.date>start))
+    res = conn.execute(query).fetchall()
+    df = pd.DataFrame(res)
+    df.columns = res[0].keys()
+    df.set_index(db_conf['index'], inplace=True)
+    return df
