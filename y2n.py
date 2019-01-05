@@ -1,4 +1,5 @@
 import sqlite3 as lite
+import sqlalchemy as db
 import numpy as np
 import pandas as pd
 import fix_yahoo_finance as yf
@@ -11,6 +12,9 @@ class Futures(Viewer):
     periods = pref.periods['Futures']
     def __init__(self, code):
         db_conf = pref.db['Futures']
+        engine = db.create_engine(f"sqlite:///{filepath(db_conf['name'])}")
+        self.rc = db.Table(db_conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        self.__ac = engine.connect()
         self.__conn = lite.connect(filepath(db_conf['name']))
         self.__conn.row_factory = lite.Row
         rc = entities(db_conf['name']).tolist()
@@ -83,6 +87,40 @@ class Futures(Viewer):
     def ratr(self, raw=None, period=periods['atr']):
         if not raw: raw = self.data
         return self._v.ratr(raw, period)
+
+    def alternate_combine(self, code, freq):
+        if freq.lower() == 'bi-daily':
+            res = []
+            for _ in [__[0] for __ in self.__ac.execute(db.select([self.rc.date.distinct()]).where(self.rc.code==code).order_by(db.asc(self.rc.date))).fetchall()]:
+                tmp = {}
+                __ = self.__ac.execute(db.select([self.rc.session, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(db.and_(self.rc.code==code, self.rc.date==_)).order_by(db.desc(self.rc.session))).fetchall()
+                p_ = pd.DataFrame(__)
+                p_.columns = __[0].keys()
+                p_.set_index('session', inplace=True)
+                if len(p_) == 1:
+                    try:
+                        tmp['open'] = p_['open']['M']
+                        tmp['high'] = p_['high']['M']
+                        tmp['low'] = p_['low']['M']
+                        tmp['close'] = p_['close']['M']
+                        tmp['volume'] = p_['volume']['M']
+                    except:
+                        tmp['open'] = p_['open']['A']
+                        tmp['high'] = p_['high']['A']
+                        tmp['low'] = p_['low']['A']
+                        tmp['close'] = p_['close']['A']
+                        tmp['volume'] = p_['volume']['A']
+                elif len(p_) == 2:
+                    tmp['open'] = p_['open']['M']
+                    tmp['high'] = p_['high'].max()
+                    tmp['low'] = p_['low'].min()
+                    tmp['close'] = p_['close']['A']
+                    tmp['volume'] = p_['volume'].sum()
+                tmp['date'] = _
+                res.append(tmp)
+            _ = pd.DataFrame(res)
+            _.set_index(pref.db['Futures']['index'], inplace=True)
+            return pd.DataFrame([_['open'], _['high'], _['low'], _['close'], _['volume']]).T
 
     def combine(self, code, freq):
         if freq.lower() == 'bi-daily':
