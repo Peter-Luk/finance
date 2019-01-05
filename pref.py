@@ -14,5 +14,17 @@ periods = dict(
         slow = 30,
         adx = 14,
         simple = 20,
-        apz = 5),
+        apz = 5)
+)
+db = dict(
+    Equities = dict(
+        name = 'Securities',
+        table = 'records',
+        index = 'date',
+        freq = 'daily'),
+    Futures = dict(
+        name = 'Futures',
+        table = 'records',
+        index = 'date',
+        freq = 'bi-daily')
 )
