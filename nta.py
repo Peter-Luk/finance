@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from utilities import platform, datetime, gslice, gr, lique
+from utilities import datetime, gslice, gr, lique
 
 
 class ONA(object):
@@ -428,9 +428,7 @@ class Viewer(ONA):
 
     def mas(self, data, period):
         _o = ONA(data)
-        if platform in ['linux', 'linux2']:
-            return pd.DataFrame([_o.kama(data, period)['KAMA'].map(hsirnd), _o.ma(data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(data, period['simple'])['SMA'].map(hsirnd), _o.ma(data, period['simple'], favour='w')['WMA'].map(hsirnd)]).T
-        return pd.DataFrame([_o.kama(data, period)['KAMA'].map(hsirnd), _o.ma(data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(data, period['simple'])['SMA'].map(hsirnd)]).T
+        return pd.DataFrame([_o.kama(data, period)['KAMA'].map(hsirnd), _o.ma(data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(data, period['simple'])['SMA'].map(hsirnd), _o.ma(data, period['simple'], favour='w')['WMA'].map(hsirnd)]).T
 
     def idrs(self, data, period):
         _o = ONA(data)
