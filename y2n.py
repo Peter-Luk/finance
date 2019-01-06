@@ -19,7 +19,8 @@ class Futures(Viewer):
         self.__conn.row_factory = lite.Row
         rc = entities(db_conf['name']).tolist()
         if code.upper() not in rc: code = rc[-1]
-        self.data = self.combine(code, db_conf['freq'])
+        # self.data = self.combine(code, db_conf['freq'])
+        self.data = self.alternate_combine(code, db_conf['freq'])
         self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
@@ -93,7 +94,7 @@ class Futures(Viewer):
             res = []
             for _ in [__[0] for __ in self.__ac.execute(db.select([self.rc.date.distinct()]).where(self.rc.code==code).order_by(db.asc(self.rc.date))).fetchall()]:
                 tmp = {}
-                __ = self.__ac.execute(db.select([self.rc.session, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(db.and_(self.rc.code==code, self.rc.date==_)).order_by(db.desc(self.rc.session))).fetchall()
+                __ = self.__ac.execute(db.select([self.rc.session, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(db.and_(self.rc.code==code, self.rc.date==_))).fetchall()
                 p_ = pd.DataFrame(__)
                 p_.columns = __[0].keys()
                 p_.set_index('session', inplace=True)
@@ -120,7 +121,8 @@ class Futures(Viewer):
                 res.append(tmp)
             _ = pd.DataFrame(res)
             _.set_index(pref.db['Futures']['index'], inplace=True)
-            return pd.DataFrame([_['open'], _['high'], _['low'], _['close'], _['volume']]).T
+            p_ = pd.DataFrame([_['open'], _['high'], _['low'], _['close'], _['volume']]).T
+            return {'Date': list(p_.index), 'Data': p_.values}
 
     def combine(self, code, freq):
         if freq.lower() == 'bi-daily':
