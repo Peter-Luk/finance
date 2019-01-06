@@ -142,7 +142,7 @@ class Equities(Viewer):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
-    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=[805], years=4, adhoc=False, series=False):
+    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False, series=False):
         res = {}
         if not start:
             start = pd.datetime(pd.datetime.now().year - years, 1, 1)
