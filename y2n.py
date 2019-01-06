@@ -1,4 +1,4 @@
-import sqlite3 as lite
+# import sqlite3 as lite
 import sqlalchemy as db
 import numpy as np
 import pandas as pd
@@ -11,23 +11,20 @@ import pref
 class Futures(Viewer):
     periods = pref.periods['Futures']
     def __init__(self, code):
-        db_conf = pref.db['Futures']
-        engine = db.create_engine(f"sqlite:///{filepath(db_conf['name'])}")
-        self.rc = db.Table(db_conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
-        self.__ac = engine.connect()
-        self.__conn = lite.connect(filepath(db_conf['name']))
-        self.__conn.row_factory = lite.Row
-        rc = entities(db_conf['name']).tolist()
+        self._conf = pref.db['Futures']
+        engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
+        self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        self.__conn = engine.connect()
+        rc = entities(self._conf['name']).tolist()
         if code.upper() not in rc: code = rc[-1]
-        # self.data = self.combine(code, db_conf['freq'])
-        self.data = self.alternate_combine(code, db_conf['freq'])
+        self.data = self.combine(code, self._conf['freq'])
         self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self.__conn = self.data = self._v = self.date = self.close = None
-        del(self.__conn, self.data, self._v, self.date, self.close)
+        self._conf = self.rc = self.__conn = self.data = self._v = self.date = self.close = None
+        del(self._conf, self.rc, self.__conn, self.data, self._v, self.date, self.close)
 
     def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
@@ -89,12 +86,12 @@ class Futures(Viewer):
         if not raw: raw = self.data
         return self._v.ratr(raw, period)
 
-    def alternate_combine(self, code, freq):
+    def combine(self, code, freq, dataframe=False):
         if freq.lower() == 'bi-daily':
             res = []
-            for _ in [__[0] for __ in self.__ac.execute(db.select([self.rc.date.distinct()]).where(self.rc.code==code).order_by(db.asc(self.rc.date))).fetchall()]:
+            for _ in [__[0] for __ in self.__conn.execute(db.select([self.rc.date.distinct()]).where(self.rc.code==code).order_by(db.asc(self.rc.date))).fetchall()]:
                 tmp = {}
-                __ = self.__ac.execute(db.select([self.rc.session, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(db.and_(self.rc.code==code, self.rc.date==_))).fetchall()
+                __ = self.__conn.execute(db.select([self.rc.session, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(db.and_(self.rc.code==code, self.rc.date==_))).fetchall()
                 p_ = pd.DataFrame(__)
                 p_.columns = __[0].keys()
                 p_.set_index('session', inplace=True)
@@ -120,38 +117,19 @@ class Futures(Viewer):
                 tmp['date'] = _
                 res.append(tmp)
             _ = pd.DataFrame(res)
-            _.set_index(pref.db['Futures']['index'], inplace=True)
+            _.set_index(self._conf['index'], inplace=True)
             p_ = pd.DataFrame([_['open'], _['high'], _['low'], _['close'], _['volume']]).T
+            if dataframe: return p_
             return {'Date': list(p_.index), 'Data': p_.values}
-
-    def combine(self, code, freq):
-        if freq.lower() == 'bi-daily':
-            res = {}
-            for __ in [_['date'] for _ in self.__conn.execute(f"SELECT DISTINCT date FROM records WHERE code='{code}' ORDER BY date ASC").fetchall()]:
-                _ = self.__conn.execute(f"SELECT session, open, high, low, close, volume FROM records WHERE code='{code}' AND date='{__}' ORDER BY session DESC").fetchall()
-                if _:
-                    tmp = {'open': _[0]['open'], 'high': _[0]['high'], 'low': _[0]['low'], 'close': _[0]['close'], 'volume': _[0]['volume']}
-                    if len(_) > 1:
-                        if _[-1]['session'] == 'A':
-                            if tmp['high'] < _[-1]['high']: tmp['high'] = _[-1]['high']
-                            if tmp['low'] > _[-1]['low']: tmp['low'] = _[-1]['low']
-                            tmp['close'] = _[-1]['close']
-                            tmp['volume'] += _[-1]['volume']
-                res[datetime.strptime(__, '%Y-%m-%d').date()] = [tmp['open'], tmp['high'], tmp['low'], tmp['close'], tmp['volume']]
-            hdr = {}
-            hdr['Date'] = list(res.keys())
-            hdr['Date'].sort()
-            tp = []
-            tp.extend([res[_] for _ in hdr['Date']])
-            hdr['Data'] = np.array(tp)
-            return hdr
 
 class Equities(Viewer):
     periods = pref.periods['Equities']
     def __init__(self, code, adhoc=False):
-        db_conf = pref.db['Equities']
-        self.__conn = lite.connect(filepath(db_conf['name']))
-        rc = entities(db_conf['name']).tolist()
+        self._conf = pref.db['Equities']
+        engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
+        self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        self.__conn = engine.connect()
+        rc = entities(self._conf['name']).tolist()
         if code not in rc: adhoc = True
         self.data = self.fetch(code, adhoc=adhoc).to_dict()[code]
         self._v = Viewer(self.data)
@@ -159,22 +137,18 @@ class Equities(Viewer):
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self.__conn = self.data = self._v = self.date = self.close = None
-        del(self.__conn, self.data, self._v, self.date, self.close)
+        self._conf = self.rc = self.__conn = self.data = self._v = self.date = self.close = None
+        del(self._conf, self.rc, self.__conn, self.data, self._v, self.date, self.close)
 
     def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
-    def fetch(self, code=None, start=None, table='records', exclude=[805], years=4, adhoc=False):
+    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=[805], years=4, adhoc=False):
         res = {}
-        def stored_eid(table):
-            cur = self.__conn.cursor()
-            return [_ for _ in [__[0] for __ in cur.execute(f"SELECT DISTINCT eid FROM {table} ORDER BY eid ASC").fetchall()] if _ not in exclude]
-
         if not start:
             start = pd.datetime(pd.datetime.now().year - years, 1, 1)
-        aid = stored_eid(table=table)
+        aid = [_ for _ in entities(self._conf['name']) if _ not in exclude]
         if code:
             if isinstance(code, (tuple, list)): aid = list(code)
             if isinstance(code, (int, float)):
@@ -196,14 +170,15 @@ class Equities(Viewer):
                 res[_] = hdr
         else:
             for _ in aid:
-                hdr, qstr = {}, f"SELECT date, open, high, low, close, volume FROM {table} WHERE eid={_:d}"
-                if start: qstr += f" AND date > '{start:%Y-%m-%d}'"
-                q = self.__conn.execute(qstr)
-                cols = [c[0].capitalize() for c in q.description]
-                rd = pd.DataFrame.from_records(data=q.fetchall(), index='Date', columns=cols)
-                hdr['Date'] = [pd.datetime.strptime(__, '%Y-%m-%d') for __ in rd.index]
-                hdr['Data'] = np.asarray(rd)
-                res[_] = hdr
+                query = db.select([self.rc.date, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(self.rc.eid==_)
+                if start:
+                    query = db.select([self.rc.date, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(db.and_(self.rc.eid==_, self.rc.date > start))
+                hdr = self.__conn.execute(query).fetchall()
+                p_ = pd.DataFrame(hdr)
+                p_.columns = hdr[0].keys()
+                p_.set_index(self._conf['index'], inplace=True)
+                pp_ = pd.DataFrame([p_['open'], p_['high'], p_['low'], p_['close'], p_['volume']]).T
+                res[_] = {'Date': list(pp_.index), 'Data': pp_.values}
         return pd.Series(res)
 
     def ma(self, raw=None, period=periods['simple'], favour='s', req_field='close', programmatic=False):
@@ -332,25 +307,14 @@ def bqo(el, action='buy', adhoc=False, bound=True):
         if hdr.empty: return None
         return hdr
 
-def entities(db=None):
-    if not db: db = pref.db['Future']['name']
-    conn = lite.connect(filepath(db))
-    conn.row_factory = lite.Row
-    fin = 'code'
-    if db == pref.db['Equities']['name']: fin = 'eid'
-    return pd.Series([_[fin] for _ in conn.execute(f"SELECT DISTINCT {fin} FROM records ORDER BY {fin} ASC").fetchall()])
-
-
-def aef(eid, start=datetime(2014,12,31)):
-    import sqlalchemy as db
-    db_conf = pref.db['Equities']
-    engine = db.create_engine(f"sqlite:///{filepath(db_conf['name'])}")
-    meta = db.MetaData()
+def entities(dbname=None):
+    if not dbname: dbname = pref.db['Equities']['name']
+    engine = db.create_engine(f'sqlite:///{filepath(dbname)}')
     conn = engine.connect()
-    rc = db.Table(db_conf['table'], meta, autoload=True, autoload_with=engine).columns
-    query = db.select([rc.date, rc.open, rc.high, rc.low, rc.close, rc.volume]).where(db.and_(rc.eid==eid, rc.date>start))
-    res = conn.execute(query).fetchall()
-    df = pd.DataFrame(res)
-    df.columns = res[0].keys()
-    df.set_index(db_conf['index'], inplace=True)
-    return df
+    if dbname == pref.db['Futures']['name']:
+        rc = db.Table(pref.db['Futures']['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        query = db.select([rc.code.distinct()]).order_by(db.asc(rc.code))
+    if dbname == pref.db['Equities']['name']:
+        rc = db.Table(pref.db['Equities']['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
+    return pd.Series([_[0] for _ in conn.execute(query).fetchall()])
