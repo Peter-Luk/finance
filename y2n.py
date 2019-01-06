@@ -15,7 +15,7 @@ class Futures(Viewer):
         engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
         self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
         self.__conn = engine.connect()
-        rc = entities(self._conf['name']).tolist()
+        rc = entities(self._conf['name'])
         if code.upper() not in rc: code = rc[-1]
         self.data = self.combine(code, self._conf['freq'])
         self._v = Viewer(self.data)
@@ -129,9 +129,8 @@ class Equities(Viewer):
         engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
         self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
         self.__conn = engine.connect()
-        rc = entities(self._conf['name']).tolist()
-        if code not in rc: adhoc = True
-        self.data = self.fetch(code, adhoc=adhoc).to_dict()[code]
+        if code not in entities(self._conf['name']): adhoc = True
+        self.data = self.fetch(code, adhoc=adhoc)[code]
         self._v = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
@@ -144,7 +143,7 @@ class Equities(Viewer):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
-    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=[805], years=4, adhoc=False):
+    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=[805], years=4, adhoc=False, series=False):
         res = {}
         if not start:
             start = pd.datetime(pd.datetime.now().year - years, 1, 1)
@@ -179,7 +178,8 @@ class Equities(Viewer):
                 p_.set_index(self._conf['index'], inplace=True)
                 pp_ = pd.DataFrame([p_['open'], p_['high'], p_['low'], p_['close'], p_['volume']]).T
                 res[_] = {'Date': list(pp_.index), 'Data': pp_.values}
-        return pd.Series(res)
+        if series: return pd.Series(res)
+        return res
 
     def ma(self, raw=None, period=periods['simple'], favour='s', req_field='close', programmatic=False):
         if not raw: raw = self.data
@@ -252,7 +252,8 @@ def bqo(el, action='buy', adhoc=False, bound=True):
                 return np.nan
             return er.max()
 
-    if isinstance(el, str) and el.upper() in entities('Futures').tolist():
+    pF = pref.db['Futures']
+    if isinstance(el, str) and el.upper() in entities(pF['name']):
         hdr = __process(Futures(el.upper()), action, bound)
         if action == 'buy':
             if isinstance(hdr, (float, int)): return hdr
@@ -280,7 +281,7 @@ def bqo(el, action='buy', adhoc=False, bound=True):
             for _ in el:
                 hdr = np.nan
                 if isinstance (_, str):
-                    if _.upper() in entities('Futures').tolist():
+                    if _.upper() in entities(pF['name']):
                         hdr = __process(Futures(_.upper()), action, bound)
                 elif isinstance(_, int):
                     hdr = __process(Equities(_, adhoc), action, bound)
@@ -294,7 +295,7 @@ def bqo(el, action='buy', adhoc=False, bound=True):
             il, __ = [], []
             for _ in el:
                 if isinstance (_, str):
-                    if _.upper() in entities('Futures').tolist():
+                    if _.upper() in entities(pF['name']):
                         __.append(__process(Futures(_.upper()), action, bound))
                         il.append(_)
                 elif isinstance(_, int):
@@ -307,14 +308,17 @@ def bqo(el, action='buy', adhoc=False, bound=True):
         if hdr.empty: return None
         return hdr
 
-def entities(dbname=None):
-    if not dbname: dbname = pref.db['Equities']['name']
+def entities(dbname=None, series=False):
+    pF, pE = pref.db['Futures'], pref.db['Equities']
+    if not dbname: dbname = pE['name']
     engine = db.create_engine(f'sqlite:///{filepath(dbname)}')
     conn = engine.connect()
-    if dbname == pref.db['Futures']['name']:
-        rc = db.Table(pref.db['Futures']['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+    if dbname == pF['name']:
+        rc = db.Table(pF['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
         query = db.select([rc.code.distinct()]).order_by(db.asc(rc.code))
-    if dbname == pref.db['Equities']['name']:
-        rc = db.Table(pref.db['Equities']['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+    if dbname == pE['name']:
+        rc = db.Table(pE['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
-    return pd.Series([_[0] for _ in conn.execute(query).fetchall()])
+    __ = [_[0] for _ in conn.execute(query).fetchall()]
+    if series: return pd.Series(__)
+    return __
