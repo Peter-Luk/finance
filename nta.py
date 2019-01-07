@@ -245,7 +245,7 @@ class ONA(object):
     def rsi(self, raw, period):
         mres = []
         def process(raw, period):
-            _, gain, loss, res = 0, [], [], []
+            _, gain, loss, res, ag, al = 0, [], [], [], [], []
             while _ < len(raw):
                 if _ == 0:
                     if raw[_, -2] > raw[_, 0]:
@@ -270,9 +270,16 @@ class ONA(object):
                 _ += 1
             _ = 0
             while _ < len(raw):
-                hdr = np.nan
-                if _ == period: hdr = 100 - 100 / ((1 + np.mean(gain[:_]) / np.mean(loss[:_])))
-                if _ > period: hdr = 100 - 100 / (( 1 + np.mean(gain[_ - period:_]) / np.mean(loss[_ - period:_])))
+                hdr, tg, tl = np.nan, 0, 0
+                if _ == period:
+                    tg, tl = np.mean(gain[:_]), np.mean(loss[:_])
+                    hdr = 100 - 100 / (1 + tg / tl)
+                if _ > period:
+                    tg = (ag[-1] * (period - 1) + gain[_]) / period
+                    tl = (al[-1] * (period - 1) + loss[_]) / period
+                    hdr = 100 - 100 / (1 + tg / tl)
+                ag.append(tg)
+                al.append(tl)
                 res.append(hdr)
                 _ += 1
             return res
