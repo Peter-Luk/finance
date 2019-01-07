@@ -1,13 +1,13 @@
 import socket
-from datetime import datetime
+# from datetime import datetime
 from sys import platform, version_info
 from os import linesep, sep, environ
 from functools import reduce
-from time import sleep
+# from time import sleep
 #from pandas_datareader import data
 import sqlite3 as lite
-import fix_yahoo_finance as yf
-from scipy.constants import golden_ratio as gr
+import pref
+yf, gr, sleep, datetime = pref.utils
 
 today = datetime.today()
 year, month, month_string = today.year, today.month, today.strftime('%B')

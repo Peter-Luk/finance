@@ -1,5 +1,6 @@
 import pref
-np, pd, datetime, gslice, gr, lique = pref.nta
+pd, np, datetime, gr = pref.nta
+from utilities import gslice
 
 class ONA(object):
     def __init__(self, data, date=datetime.today().date()):
@@ -392,7 +393,7 @@ class ONA(object):
         hdr = []
         if not raw: raw = self.data
         [hdr.extend(_pgap(__, raw)) for __ in _patr(raw, period)]
-        return pd.Series(lique([hsirnd(_) for _ in hdr]))
+        return pd.Series([hsirnd(_) for _ in hdr]).unique()
 
     def ovr(self, raw, period, date=datetime.today().date()):
         if date not in raw['Date']: date = raw['Date'][-1]

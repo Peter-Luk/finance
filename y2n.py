@@ -1,5 +1,6 @@
 import pref
-pd, np, db, yf, filepath, datetime, mtf, sleep = pref.y2n
+pd, np, db, yf, datetime, sleep = pref.y2n
+from utilities import filepath, mtf
 from nta import Viewer, hsirnd
 
 class Futures(Viewer):

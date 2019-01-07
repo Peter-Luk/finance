@@ -1,9 +1,11 @@
 import pandas, numpy, sqlalchemy, fix_yahoo_finance
-from utilities import filepath, datetime, mtf, gslice, gr, lique
+from scipy.constants import golden_ratio
+from datetime import datetime
 from time import sleep
 
-y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, filepath, datetime, mtf, sleep]
-nta = [numpy, pandas, datetime, gslice, gr, lique]
+y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, datetime, sleep]
+nta = [pandas, numpy, datetime, golden_ratio]
+utils = [fix_yahoo_finance, golden_ratio, sleep, datetime]
 periods = dict(
     Futures = dict(
         atr = 12,
