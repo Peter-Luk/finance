@@ -1,11 +1,6 @@
-import sqlalchemy as db
-import numpy as np
-import pandas as pd
-import fix_yahoo_finance as yf
-from nta import Viewer, hsirnd
-from utilities import filepath, datetime, mtf
-from time import sleep
 import pref
+pd, np, db, yf, filepath, datetime, mtf, sleep = pref.y2n
+from nta import Viewer, hsirnd
 
 class Futures(Viewer):
     periods = pref.periods['Futures']

@@ -1,7 +1,5 @@
-import numpy as np
-import pandas as pd
-from utilities import datetime, gslice, gr, lique
-
+import pref
+np, pd, datetime, gslice, gr, lique = pref.nta
 
 class ONA(object):
     def __init__(self, data, date=datetime.today().date()):

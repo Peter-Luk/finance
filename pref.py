@@ -1,3 +1,9 @@
+import pandas, numpy, sqlalchemy, fix_yahoo_finance
+from utilities import filepath, datetime, mtf, gslice, gr, lique
+from time import sleep
+
+y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, filepath, datetime, mtf, sleep]
+nta = [numpy, pandas, datetime, gslice, gr, lique]
 periods = dict(
     Futures = dict(
         atr = 12,
