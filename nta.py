@@ -393,7 +393,9 @@ class ONA(object):
         hdr = []
         if not raw: raw = self.data
         [hdr.extend(_pgap(__, raw)) for __ in _patr(raw, period)]
-        return pd.Series([hsirnd(_) for _ in hdr]).unique()
+        _ = pd.Series([hsirnd(_) for _ in hdr]).unique()
+        _.sort()
+        return _
 
     def ovr(self, raw, period, date=datetime.today().date()):
         if date not in raw['Date']: date = raw['Date'][-1]
