@@ -1,11 +1,7 @@
 import socket
-# from datetime import datetime
 from sys import platform, version_info
 from os import linesep, sep, environ
-# from functools import reduce
-# from time import sleep
 #from pandas_datareader import data
-import sqlite3 as lite
 import pref
 db, yf, gr, sleep, datetime, reduce = pref.utils
 ph = pref.public_holiday
@@ -84,7 +80,6 @@ def ltd(year=year, month=month, excluded={}):
     if not(year % 4):ld[1] += 1
     day = ld[month - 1]
     if excluded:
-        # if '%'%year in excluded.keys():
         if year in excluded.keys():
             if month in excluded[year].keys():
                 if day not in excluded[year][month]:t += 1
@@ -158,9 +153,6 @@ def web_collect(*args, **kwargs):
         rc = db.Table(pref.db['Equities']['table'], db.MetaData(), autoload=True, autoload_with=s_engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
         return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()] if __ not in [805]]
-        # conn = lite.connect(filepath('Securities'))
-        # cur = conn.cursor()
-        # return [__ for __ in [_[0] for _ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if __ not in [805]]
 
     try: code
     except: code = stored_eid()
@@ -218,21 +210,15 @@ def mtf(*args, **kwargs):
     f_conn = f_engine.connect()
     rc = db.Table(pref.db['Futures']['table'], db.MetaData(), autoload=True, autoload_with=f_engine).columns
     query = db.select([rc.volume]).order_by(db.desc(rc.date))
-    # conn = lite.connect(filepath('Futures'))
-    # conn.row_factory = lite.Row
-    # qstr = "SELECT volume FROM records WHERE code={} ORDER BY date DESC"
     awaf = waf()
     if today.day == ltd(today.year, today.month): awaf = waf(1)
     for _ in ftype:
         aft = []
-        # for __ in waf():
         for __ in awaf:
             if _.upper() in __: aft.append(__)
         try:
             nfv = f_conn.execute(query.where(rc.code==aft[1])).fetchall()[0]
             cfv = f_conn.execute(query.where(rc.code==aft[0])).fetchall()[0]
-            # nfv = conn.cursor().execute(qstr.format(aft[1])).fetchall()[0][0]
-            # cfv = conn.cursor().execute(qstr.format(aft[0])).fetchall()[0][0]
             if cfv > nfv: fi.append(aft[0])
             else:fi.append(aft[1])
         except:fi.append(aft[0])
