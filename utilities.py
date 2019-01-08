@@ -2,22 +2,42 @@ import socket
 # from datetime import datetime
 from sys import platform, version_info
 from os import linesep, sep, environ
-from functools import reduce
+# from functools import reduce
 # from time import sleep
 #from pandas_datareader import data
 import sqlite3 as lite
 import pref
-yf, gr, sleep, datetime = pref.utils
+db, yf, gr, sleep, datetime, reduce = pref.utils
+ph = pref.public_holiday
 
 today = datetime.today()
 year, month, month_string = today.year, today.month, today.strftime('%B')
 
-ph = {2015:{1:(1,), 2:(19, 20), 4:(3, 6, 7), 5:(25,), 7:(1,), 9:(28,), 10:(1, 21), 12:(25,)}}
-ph[2016] = {1:(1,), 2:(8, 9, 10), 3:(25, 28), 4:(4,), 5:(2,), 6:(9,), 7:(1,), 9:(16,), 10:(10,), 12:(26, 27)}
-ph[2017] = {1:(2, 30, 31), 4:(4, 14, 17), 5:(1, 3, 30), 10:(2, 5), 12:(25, 26)}
-ph[2018] = {1:(1,), 2:(16, 19), 3:(30,), 4:(2, 5), 5:(1, 22), 6:(18,), 7:(2,), 9:(25,), 10:(1, 17), 12:(25, 26)}
-ph[2019] = {1:(1,), 2:(5, 6, 7), 4:(5, 19, 20, 22), 5:(1, 12, 13), 6:(7,), 7:(1,), 9:(14,), 10:(1, 7), 12:(25, 26)}
-ph[2020] = {1:(1, 25, 27, 28), 2:(14,), 3:(20,), 4:(4, 10, 11, 12, 13, 30), 5:(1, 10), 6:(20, 21, 25), 7:(1,), 9:(22,), 10:(1, 2, 26), 12:(21, 25, 26)}
+def filepath(*args, **kwargs):
+    name, file_type, data_path = args[0], 'data', 'sqlite3'
+    if 'type' in list(kwargs.keys()): file_type = kwargs['type']
+    if 'subpath' in list(kwargs.keys()): data_path = kwargs['subpath']
+    if platform == 'win32':
+        if version_info.major > 2 and version_info.minor > 3:
+            from pathlib import Path
+            return Path.home()/file_type/data_path/name
+        else:
+            file_drive, file_path = environ['HOMEDRIVE'], environ['HOMEPATH']
+            file_path = sep.join((file_drive, file_path, file_type, data_path))
+    if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
+    if platform in ('linux', 'linux2'):
+        if version_info.major > 2 and version_info.minor > 3:
+            from pathlib import os, Path
+            if 'EXTERNAL_STORAGE' in os.environ.keys(): return Path.home()/'storage'/'external-1'/file_type/data_path/name
+            return Path.home()/file_type/data_path/name
+        else:
+            place = 'shared'
+            if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((environ['HOME'], file_type, data_path))
+            elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
+                place = 'external-1'
+                file_path = sep.join((environ['HOME'], 'storage', place, file_type, data_path))
+    return sep.join((file_path, name))
+
 def nitem(*args):
     i, hdr = 0, []
     while i < len(args[1]):
@@ -133,9 +153,15 @@ def web_collect(*args, **kwargs):
     if 'pandas' in lk:
         if isinstance(kwargs['pandas'], bool): efor = kwargs['pandas']
     def stored_eid():
-        conn = lite.connect(filepath('Securities'))
-        cur = conn.cursor()
-        return [__ for __ in [_[0] for _ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if __ not in [805]]
+        s_engine = db.create_engine(f"sqlite:///{filepath(pref.db['Equities']['name'])}")
+        s_conn = s_engine.connect()
+        rc = db.Table(pref.db['Equities']['table'], db.MetaData(), autoload=True, autoload_with=s_engine).columns
+        query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
+        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()] if __ not in [805]]
+        # conn = lite.connect(filepath('Securities'))
+        # cur = conn.cursor()
+        # return [__ for __ in [_[0] for _ in cur.execute("SELECT DISTINCT eid FROM records ORDER BY eid ASC").fetchall()] if __ not in [805]]
+
     try: code
     except: code = stored_eid()
     if src == 'yahoo':
@@ -179,31 +205,6 @@ def waf(delta=0):
     futures += [''.join((f,dex(delta+1))) for f in futures_type[:-2]]
     return tuple(futures)
 
-def filepath(*args, **kwargs):
-    name, file_type, data_path = args[0], 'data', 'sqlite3'
-    if 'type' in list(kwargs.keys()): file_type = kwargs['type']
-    if 'subpath' in list(kwargs.keys()): data_path = kwargs['subpath']
-    if platform == 'win32':
-        if version_info.major > 2 and version_info.minor > 3:
-            from pathlib import Path
-            return Path.home()/file_type/data_path/name
-        else:
-            file_drive, file_path = environ['HOMEDRIVE'], environ['HOMEPATH']
-            file_path = sep.join((file_drive, file_path, file_type, data_path))
-    if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
-    if platform in ('linux', 'linux2'):
-        if version_info.major > 2 and version_info.minor > 3:
-            from pathlib import os, Path
-            if 'EXTERNAL_STORAGE' in os.environ.keys(): return Path.home()/'storage'/'external-1'/file_type/data_path/name
-            return Path.home()/file_type/data_path/name
-        else:
-            place = 'shared'
-            if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((environ['HOME'], file_type, data_path))
-            elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
-                place = 'external-1'
-                file_path = sep.join((environ['HOME'], 'storage', place, file_type, data_path))
-    return sep.join((file_path, name))
-
 def mtf(*args, **kwargs):
     ftype = futures_type[:2]
     if args:
@@ -212,9 +213,14 @@ def mtf(*args, **kwargs):
     if 'type' in list(kwargs.keys()):
         if isinstance(kwargs['type'], str): ftype = [kwargs['type']]
         else: ftype = list(kwargs['type'])
-    fi, conn = [], lite.connect(filepath('Futures'))
-    conn.row_factory = lite.Row
-    qstr = "SELECT volume FROM records WHERE code={} ORDER BY date DESC"
+    fi = []
+    f_engine = db.create_engine(f"sqlite:///{filepath(pref.db['Futures']['name'])}")
+    f_conn = f_engine.connect()
+    rc = db.Table(pref.db['Futures']['table'], db.MetaData(), autoload=True, autoload_with=f_engine).columns
+    query = db.select([rc.volume]).order_by(db.desc(rc.date))
+    # conn = lite.connect(filepath('Futures'))
+    # conn.row_factory = lite.Row
+    # qstr = "SELECT volume FROM records WHERE code={} ORDER BY date DESC"
     awaf = waf()
     if today.day == ltd(today.year, today.month): awaf = waf(1)
     for _ in ftype:
@@ -223,8 +229,10 @@ def mtf(*args, **kwargs):
         for __ in awaf:
             if _.upper() in __: aft.append(__)
         try:
-            nfv = conn.cursor().execute(qstr.format(aft[1])).fetchall()[0][0]
-            cfv = conn.cursor().execute(qstr.format(aft[0])).fetchall()[0][0]
+            nfv = f_conn.execute(query.where(rc.code==aft[1])).fetchall()[0]
+            cfv = f_conn.execute(query.where(rc.code==aft[0])).fetchall()[0]
+            # nfv = conn.cursor().execute(qstr.format(aft[1])).fetchall()[0][0]
+            # cfv = conn.cursor().execute(qstr.format(aft[0])).fetchall()[0][0]
             if cfv > nfv: fi.append(aft[0])
             else:fi.append(aft[1])
         except:fi.append(aft[0])
