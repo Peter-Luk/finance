@@ -447,12 +447,14 @@ class Viewer(ONA):
         _ = er[(er > eo['min'].min()) & (er < eo['max'].max())]
         if action == 'buy':
             if bound:
-                if self.close > _.min(): return pd.Series([__ for __ in er if __ > _.min()]).min()
+                if _.size > 0:
+                    if self.close > _.min(): return _.min()
                 return np.nan
             return er.min()
         if action == 'sell':
             if bound:
-                if self.close < _.max(): return pd.Series([__ for __ in er if __ < _.max()]).max()
+                if _.size > 0:
+                    if self.close < _.max(): return _.max()
                 return np.nan
             return er.max()
 
