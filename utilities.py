@@ -188,7 +188,7 @@ def dex(n=0):
     if n in range(12):
         n_month, n_year = month + n, today.year
         if n_month > 12 and n_month != n_month % 12:n_month, n_year = n_month % 12, n_year + 1
-        return f"{month_initial[datetime(n_year, n_month, 1).strftime('%B')]}" + f'{n_year:d}'[-1]
+        return f"{month_initial[datetime(n_year, n_month, 1).strftime('%B')]}{f'{n_year}'[-1]}"
     else:print("Out of range (0 - 11)")
 
 def waf(delta=0):
