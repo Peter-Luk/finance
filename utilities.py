@@ -126,7 +126,8 @@ def get_start(*args, **kwargs):
             y -= 1
             m += 12
         m -= period
-        return datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
+        # return datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
+        return datetime(y, m, 1)
     if mode == 'd':
         eo = end.toordinal()
         return datetime.fromordinal(eo - period)
@@ -157,7 +158,7 @@ def web_collect(*args, **kwargs):
     try: code
     except: code = stored_eid()
     if src == 'yahoo':
-        code = ['{:04d}.HK'.format(_) for _ in code]
+        code = [f'{_:04d}.HK' for _ in code]
     process, start = True, get_start(period)
     if start:
         while process:
@@ -189,7 +190,7 @@ def dex(n=0):
         n_month, n_year = month + n, today.year
         if n_month > 12 and n_month != n_month % 12:n_month, n_year = n_month % 12, n_year + 1
         # return month_initial[datetime(n_year, n_month, 1).strftime('%B')] + ('%i' % n_year)[-1]
-        return month_initial[datetime(n_year, n_month, 1).strftime('%B')] + '{:d}'.format(n_year)[-1]
+        return f"{month_initial[datetime(n_year, n_month, 1).strftime('%B')]}" + f'{n_year:d}'[-1]
     else:print("Out of range (0 - 11)")
 
 def waf(delta=0):
