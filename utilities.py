@@ -126,7 +126,6 @@ def get_start(*args, **kwargs):
             y -= 1
             m += 12
         m -= period
-        # return datetime.strptime('{}-{}-01'.format(y, m), '%Y-%m-%d')
         return datetime(y, m, 1)
     if mode == 'd':
         eo = end.toordinal()
@@ -189,7 +188,6 @@ def dex(n=0):
     if n in range(12):
         n_month, n_year = month + n, today.year
         if n_month > 12 and n_month != n_month % 12:n_month, n_year = n_month % 12, n_year + 1
-        # return month_initial[datetime(n_year, n_month, 1).strftime('%B')] + ('%i' % n_year)[-1]
         return f"{month_initial[datetime(n_year, n_month, 1).strftime('%B')]}" + f'{n_year:d}'[-1]
     else:print("Out of range (0 - 11)")
 
