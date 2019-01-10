@@ -1,5 +1,6 @@
-from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, linesep, sep, web_collect, lite
+from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, linesep, sep, web_collect
 from os import path, listdir, remove
+import sqlite3 as lite
 import pandas as pd
 
 db_name, db_table, datafields = 'Securities', 'records', ['open', 'high', 'low', 'close', 'volume']
