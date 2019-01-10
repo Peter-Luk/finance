@@ -1,11 +1,5 @@
 from alchemy import mapper, load
 from datetime import datetime
-# from sqlalchemy import create_engine, MetaData, Table, select, and_
-# from utilities import filepath, datetime
-# he = create_engine(f"sqlite:///{filepath('Health')}")
-# ht = Table('records', MetaData(), autoload=True, autoload_with=he)
-# hc = ht.columns
-# hco = he.connect()
 
 import pandas as pd
 
