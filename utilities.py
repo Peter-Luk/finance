@@ -152,7 +152,7 @@ def web_collect(*args, **kwargs):
         s_conn = s_engine.connect()
         rc = db.Table(pref.db['Equities']['table'], db.MetaData(), autoload=True, autoload_with=s_engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
-        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()] if __ not in [805]]
+        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()] if __ not in pref.db['Equities']['exclude']]
 
     try: code
     except: code = stored_eid()
@@ -175,7 +175,7 @@ def web_collect(*args, **kwargs):
             for _ in list(tmp.keys()):
                 hdr[_.to_pydatetime().date()] = tmp[_]
             res[c] = hdr
-            if efor: res[c] = dp[c].transpose()
+            if efor: res[c] = dp[c]
 #            if efor: res[c] = dp.minor_xs(c)
         return res
 
