@@ -148,11 +148,12 @@ def web_collect(*args, **kwargs):
     if 'pandas' in lk:
         if isinstance(kwargs['pandas'], bool): efor = kwargs['pandas']
     def stored_eid():
-        s_engine = db.create_engine(f"sqlite:///{filepath(pref.db['Equities']['name'])}")
+        pE = pref.db['Equities']
+        s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
         s_conn = s_engine.connect()
-        rc = db.Table(pref.db['Equities']['table'], db.MetaData(), autoload=True, autoload_with=s_engine).columns
+        rc = db.Table(pE['table'], db.MetaData(), autoload=True, autoload_with=s_engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
-        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()] if __ not in pref.db['Equities']['exclude']]
+        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()] if __ not in pE['exclude']]
 
     try: code
     except: code = stored_eid()
