@@ -1,9 +1,56 @@
 from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, linesep, sep, web_collect
 from os import path, listdir, remove
 import sqlite3 as lite
+import pref
 import pandas as pd
 
-db_name, db_table, datafields = 'Securities', 'records', ['open', 'high', 'low', 'close', 'volume']
+db = pref.sqlalchemy
+
+db_name, db_table, datafields = pref.db['Equities']['name'], pref.db['Equities']['table'], ['open', 'high', 'low', 'close', 'volume']
+
+class AS(object):
+    def __init__(self, code, name=db_name, table=db_table):
+        self.code, self._name = code, name
+        engine = db.create_engine(f"sqlite:///{filepath(self._name)}")
+        self.__table = db.Table(table, db.MetaData(), autoload=True, autoload_with=engine)
+        self.__columns = self.__table.columns
+        self.__connect = engine.connect()
+
+    def __del__(self):
+        self.__table = self.__columns = self.__connect = None
+        del(self.__table, self.__columns, self.__connect)
+
+    def append(self, values):
+        if isinstance(values, dict):
+            if self._name == pref.db['Equities']['name']: hdr = {'eid':self.code}
+            elif self._name == pref.db['Futures']['name']: hdr = {'code':self.code}
+            for _ in values.keys():
+                if _.lower() in self.__columns.keys(): hdr[_.lower()] = values[_]
+            query = db.insert(self.__table)
+            self.__connect.execute(query, [hdr])
+
+    def update(self, values, condition):
+        def obtain_id(condition):
+            if isinstance(condition, dict):
+                condition['eid'] = self.code
+                lckeys = list(condition.keys()).lower()
+                hdr = []
+                for _ in lckeys:
+                    if lckeys[_] == 'date':
+                        hdr.append(f"self.__columns.{_}==datetime.strptime('{condition[_]}', '%Y-%m-%d').date()")
+                    else:
+                        hdr.append(f"self.__columns.{_}=={condition[_]}")
+                query = db.select([self.__columns.id]).where(db.and_(', '.join(hdr)))
+            return self.__connect.execute(query).scalar()
+
+        if isinstance(values, dict):
+            if self._name == pref.db['Equities']['name']: hdr = {'eid':self.code}
+            elif self._name == pref.db['Futures']['name']: hdr = {'code':self.code}
+            for _ in values.keys():
+                if _.lower() in self.__columns.keys(): hdr[_.lower()] = values[_]
+            query = db.update(self.__table)
+            return str(query)
+            # self.__connect.execute(query, [hdr])
 
 def u2lite(*args, **kwargs):
     """
