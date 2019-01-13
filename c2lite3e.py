@@ -48,9 +48,10 @@ class AS(object):
             elif self._name == pref.db['Futures']['name']: hdr = {'code':self.code}
             for _ in values.keys():
                 if _.lower() in self.__columns.keys(): hdr[_.lower()] = values[_]
-            query = db.update(self.__table)
-            return str(query)
-            # self.__connect.execute(query, [hdr])
+            try:
+                query = db.update(self.__table).where(self.__columns.id==obtain_id(condition))
+                self.__connect.execute(query, [hdr])
+            except: pass
 
 def u2lite(*args, **kwargs):
     """
