@@ -1,8 +1,12 @@
-from sqlalchemy import create_engine, MetaData, Table
+# from sqlalchemy import create_engine, MetaData, Table
+import pref
+db = pref.sqlalchemy
 from sqlalchemy.orm import mapper, sessionmaker
+from utilities import filepath, datetime
 from os import sep, environ, listdir
 from sys import platform
 
+eb, fb = pref.db['Equities'], pref.db['Futures']
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
 if platform in ['linux', 'linux2']:
     subpath = 'shared'
@@ -33,9 +37,9 @@ def load(*args):
         if isinstance(args[0], tuple): db_name = list(args[0])
     for dbn in db_name:
         exec('class {}(object): pass'.format(dbn))
-        engine = create_engine('sqlite:///{}'.format(sep.join((home,) + db_path + (dbn,))))
-        metadata = MetaData(engine)
-        records = Table('records', metadata, autoload=True)
+        engine = db.create_engine('sqlite:///{}'.format(sep.join((home,) + db_path + (dbn,))))
+        metadata = db.MetaData(engine)
+        records = db.Table('records', metadata, autoload=True)
         eval('mapper({}, records)'.format(dbn))
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -50,3 +54,125 @@ def load(*args):
         data = eval("session.query({}).all()".format(','.join(ifs)))
         res[dbn] = {'engine':engine, 'table':records, 'session':session, 'data':data}
     return res
+
+class AS(object):
+    def __init__(self, name):
+        self.db = name
+        engine = db.create_engine(f"sqlite:///{filepath(self.db)}")
+        self.__meta = db.MetaData()
+        if self.db == fb['name']:
+            self.__table = db.Table(fb['table'], self.__meta, autoload=True, autoload_with=engine)
+        else:
+            self.__table = db.Table(eb['table'], self.__meta, autoload=True, autoload_with=engine)
+        self.columns = self.__table.columns
+        self.connect = engine.connect()
+
+    def __del__(self):
+        self.__meta = self.__table = self.columns = self.connect = None
+        del(self.__meta, self.__table, self.columns, self.connect)
+
+class AE(AS):
+    def __init__(self, eid):
+        ae = AS(pref.db['Equities']['name'])
+        self.columns = ae.columns
+        self.connect = ae.connect
+        self.code = eid
+
+    def __del__(self):
+        self.columns = self.connect = self.code = None
+        del(self.columns, self.connect, self.code)
+
+    def append(self, values, conditions):
+        hdr = {'eid':self.code}
+        for _ in values.keys():
+            if _ in [str(__).split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
+        query = db.insert(self.table)
+        self.connect.execute(query, [hdr])
+
+    def remove(self, conditions):
+        def obtain_id(conditions=None):
+            if not conditions: conditions = {'date':datetime.today().date()}
+            if isinstance(conditions, dict):
+                conditions['eid'] = self.code
+            hdr = []
+            for _ in conditions.keys():
+                if _ in [str(__).split('.')[-1] for __ in self.columns]:
+                    if _ == 'date': hdr.append(f"self.columns.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
+            query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.connect.execute(query).scalar()
+            except: pass
+        query = db.delete(self.table).where(self.columns.id==obtain_ip(conditions))
+        self.connect.execute(query)
+
+    def update(self, values, conditions):
+        def obtain_id(conditions=None):
+            if not conditions: conditions = {'date':datetime.today().date()}
+            if isinstance(conditions, dict):
+                conditions['eid'] = self.code
+            hdr = []
+            for _ in conditions.keys():
+                if _ in [str(__).split('.')[-1] for __ in self.columns]:
+                    if _ == 'date': hdr.append(f"self.columns.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
+            query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.connect.execute(query).scalar()
+            except: pass
+        hdr = {}
+        for _ in values.keys():
+            if _ in [str(__).split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
+        query = db.update(self.table).where(self.columns.id==obtain_ip(conditions))
+        self.connect.execute(query, [hdr])
+
+class AF(AS):
+    def __init__(self, code):
+        ae = AS(pref.db['Futures']['name'])
+        self.columns = ae.columns
+        self.connect = ae.connect
+        self.code = code
+
+    def __del__(self):
+        self.columns = self.connect = self.code = None
+        del(self.columns, self.connect, self.code)
+
+    def append(self, values, conditions):
+        hdr = {'code':self.code}
+        for _ in values.keys():
+            if _ in [str(__).split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
+        query = db.insert(self.table)
+        self.connect.execute(query, [hdr])
+
+    def remove(self, conditions):
+        def obtain_id(conditions=None):
+            if not conditions: conditions = {'date':datetime.today().date()}
+            if isinstance(conditions, dict):
+                conditions['code'] = self.code
+            hdr = []
+            for _ in conditions.keys():
+                if _ in [str(__).split('.')[-1] for __ in self.columns]:
+                    if _ == 'date': hdr.append(f"self.columns.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
+            query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.connect.execute(query).scalar()
+            except: pass
+        query = db.delete(self.table).where(self.columns.id==obtain_ip(conditions))
+        self.connect.execute(query)
+
+    def update(self, values, conditions):
+        def obtain_id(self, conditions=None):
+            if not conditions: conditions = {'date':datetime.today().date()}
+            if isinstance(conditions, dict):
+                conditions['code'] = self.code
+            hdr = []
+            for _ in conditions.keys():
+                if _ in [str(__).split('.')[-1] for __ in self.columns]:
+                    if _ in ['date', 'code', 'session']: hdr.append(f"self.columns.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
+            query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.connect.execute(query).scalar()
+            except: pass
+        hdr = {}
+        for _ in values.keys():
+            if _ in [str(__).split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
+        query = db.update(self.table).where(self.columns.id==obtain_ip(conditions))
+        self.connect.execute(query, [hdr])
