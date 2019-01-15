@@ -88,7 +88,9 @@ class AE(AS):
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
         query = db.insert(self.table)
+        trans = self.connect.begin()
         self.connect.execute(query, [hdr])
+        trans.commit()
 
     def remove(self, conditions):
         def obtain_id(conditions=None):
@@ -104,7 +106,9 @@ class AE(AS):
             try: return self.connect.execute(query).scalar()
             except: pass
         query = db.delete(self.table).where(self.columns.id==obtain_id(conditions))
+        trans = self.connect.begin()
         self.connect.execute(query)
+        trans.commit()
 
     def update(self, values, conditions):
         def obtain_id(conditions=None):
@@ -122,8 +126,10 @@ class AE(AS):
         hdr = {}
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
-        query = db.update(self.table).where(self.columns.id==obtain_id(conditions))
-        self.connect.execute(query, [hdr])
+        query = db.update(self.table).values(hdr).where(self.columns.id==obtain_id(conditions))
+        trans = self.connect.begin()
+        self.connect.execute(query)
+        trans.commit()
 
 class AF(AS):
     def __init__(self, code):
@@ -142,7 +148,9 @@ class AF(AS):
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
         query = db.insert(self.table)
+        trans = self.connect.begin()
         self.connect.execute(query, [hdr])
+        trans.commit()
 
     def remove(self, conditions):
         def obtain_id(conditions=None):
@@ -158,7 +166,9 @@ class AF(AS):
             try: return self.connect.execute(query).scalar()
             except: pass
         query = db.delete(self.table).where(self.columns.id==obtain_id(conditions))
+        trans = self.connect.begin()
         self.connect.execute(query)
+        trans.commit()
 
     def update(self, values, conditions):
         def obtain_id(conditions=None):
@@ -177,4 +187,6 @@ class AF(AS):
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
         query = db.update(self.table).values(hdr).where(self.columns.id==obtain_id(conditions))
+        trans = self.connect.begin()
         self.connect.execute(query)
+        trans.commit()
