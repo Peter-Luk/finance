@@ -64,30 +64,30 @@ class AS(object):
             self.__table = db.Table(fb['table'], self.__meta, autoload=True, autoload_with=engine)
         else:
             self.__table = db.Table(eb['table'], self.__meta, autoload=True, autoload_with=engine)
-        self.columns = self.__table.columns
-        self.connect = engine.connect()
+        self.__columns = self.__table.columns
+        self.__connect = engine.connect()
 
     def __del__(self):
-        self.__meta = self.__table = self.columns = self.connect = None
-        del(self.__meta, self.__table, self.columns, self.connect)
+        self.__meta = self.__table = self.__columns = self.__connect = None
+        del(self.__meta, self.__table, self.__columns, self.__connect)
 
 class AE(AS):
     def __init__(self, eid):
         ae = AS(pref.db['Equities']['name'])
-        self.columns = ae.columns
-        self.connect = ae.connect
+        self.__columns = ae._AS__columns
+        self.__connect = ae._AS__connect
         self.code = eid
 
     def __del__(self):
-        self.columns = self.connect = self.code = None
-        del(self.columns, self.connect, self.code)
+        self.__columns = self.__connect = self.code = None
+        del(self.__columns, self.__connect, self.code)
 
     def append(self, values, conditions):
         hdr = {'eid':self.code}
         for _ in values.keys():
-            if _ in [str(__).split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
+            if _ in [str(__).split('.')[-1] for __ in self.__columns]: hdr[_] = values[_]
         query = db.insert(self.table)
-        self.connect.execute(query, [hdr])
+        self.__connect.execute(query, [hdr])
 
     def remove(self, conditions):
         def obtain_id(conditions=None):
@@ -96,14 +96,14 @@ class AE(AS):
                 conditions['eid'] = self.code
             hdr = []
             for _ in conditions.keys():
-                if _ in [str(__).split('.')[-1] for __ in self.columns]:
-                    if _ == 'date': hdr.append(f"self.columns.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
-            query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
-            try: return self.connect.execute(query).scalar()
+                if _ in [str(__).split('.')[-1] for __ in self.__columns]:
+                    if _ == 'date': hdr.append(f"self.__columns.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.__columns.{_}=={conditions[_]}")
+            query = db.select([self.__columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.__connect.execute(query).scalar()
             except: pass
-        query = db.delete(self.table).where(self.columns.id==obtain_ip(conditions))
-        self.connect.execute(query)
+        query = db.delete(self.table).where(self.__columns.id==obtain_ip(conditions))
+        self.__connect.execute(query)
 
     def update(self, values, conditions):
         def obtain_id(conditions=None):
@@ -112,35 +112,35 @@ class AE(AS):
                 conditions['eid'] = self.code
             hdr = []
             for _ in conditions.keys():
-                if _ in [str(__).split('.')[-1] for __ in self.columns]:
-                    if _ == 'date': hdr.append(f"self.columns.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
-            query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
-            try: return self.connect.execute(query).scalar()
+                if _ in [str(__).split('.')[-1] for __ in self.__columns]:
+                    if _ == 'date': hdr.append(f"self.__columns.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.__columns.{_}=={conditions[_]}")
+            query = db.select([self.__columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.__connect.execute(query).scalar()
             except: pass
         hdr = {}
         for _ in values.keys():
-            if _ in [str(__).split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
-        query = db.update(self.table).where(self.columns.id==obtain_ip(conditions))
-        self.connect.execute(query, [hdr])
+            if _ in [str(__).split('.')[-1] for __ in self.__columns]: hdr[_] = values[_]
+        query = db.update(self.table).where(self.__columns.id==obtain_ip(conditions))
+        self.__connect.execute(query, [hdr])
 
 class AF(AS):
     def __init__(self, code):
         ae = AS(pref.db['Futures']['name'])
-        self.columns = ae.columns
-        self.connect = ae.connect
+        self.__columns = ae._AS__columns
+        self.__connect = ae._AS__connect
         self.code = code
 
     def __del__(self):
-        self.columns = self.connect = self.code = None
-        del(self.columns, self.connect, self.code)
+        self.__columns = self.__connect = self.code = None
+        del(self.__columns, self.__connect, self.code)
 
     def append(self, values, conditions):
         hdr = {'code':self.code}
         for _ in values.keys():
-            if _ in [str(__).split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
+            if _ in [str(__).split('.')[-1] for __ in self.__columns]: hdr[_] = values[_]
         query = db.insert(self.table)
-        self.connect.execute(query, [hdr])
+        self.__connect.execute(query, [hdr])
 
     def remove(self, conditions):
         def obtain_id(conditions=None):
@@ -149,14 +149,14 @@ class AF(AS):
                 conditions['code'] = self.code
             hdr = []
             for _ in conditions.keys():
-                if _ in [str(__).split('.')[-1] for __ in self.columns]:
-                    if _ == 'date': hdr.append(f"self.columns.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
-            query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
-            try: return self.connect.execute(query).scalar()
+                if _ in [str(__).split('.')[-1] for __ in self.__columns]:
+                    if _ == 'date': hdr.append(f"self.__columns.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.__columns.{_}=={conditions[_]}")
+            query = db.select([self.__columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.__connect.execute(query).scalar()
             except: pass
-        query = db.delete(self.table).where(self.columns.id==obtain_ip(conditions))
-        self.connect.execute(query)
+        query = db.delete(self.table).where(self.__columns.id==obtain_ip(conditions))
+        self.__connect.execute(query)
 
     def update(self, values, conditions):
         def obtain_id(self, conditions=None):
@@ -165,14 +165,14 @@ class AF(AS):
                 conditions['code'] = self.code
             hdr = []
             for _ in conditions.keys():
-                if _ in [str(__).split('.')[-1] for __ in self.columns]:
-                    if _ in ['date', 'code', 'session']: hdr.append(f"self.columns.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
-            query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
-            try: return self.connect.execute(query).scalar()
+                if _ in [str(__).split('.')[-1] for __ in self.__columns]:
+                    if _ in ['date', 'code', 'session']: hdr.append(f"self.__columns.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.__columns.{_}=={conditions[_]}")
+            query = db.select([self.__columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.__connect.execute(query).scalar()
             except: pass
         hdr = {}
         for _ in values.keys():
-            if _ in [str(__).split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
-        query = db.update(self.table).where(self.columns.id==obtain_ip(conditions))
-        self.connect.execute(query, [hdr])
+            if _ in [str(__).split('.')[-1] for __ in self.__columns]: hdr[_] = values[_]
+        query = db.update(self.table).where(self.__columns.id==obtain_ip(conditions))
+        self.__connect.execute(query, [hdr])
