@@ -79,6 +79,7 @@ class AE(AS):
         self.connect = ae.connect
         self.table = ae.table
         self.code = eid
+        self.yahoo_code = f'{eid:04d}.HK'
 
     def __del__(self):
         self.columns = self.connect = self.table = self.code = None
