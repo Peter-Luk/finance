@@ -87,7 +87,7 @@ class AE(AS):
         hdr = {self.columns.eid:self.code}
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
-        query = db.insert(self.table)
+        query = self.table.insert()
         trans = self.connect.begin()
         self.connect.execute(query, [hdr])
         trans.commit()
@@ -126,7 +126,7 @@ class AE(AS):
         hdr = {}
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
-        query = db.update(self.table).values(hdr).where(self.columns.id==obtain_id(conditions))
+        query = self.table.update().values(hdr).where(self.columns.id==obtain_id(conditions))
         trans = self.connect.begin()
         self.connect.execute(query)
         trans.commit()
@@ -148,7 +148,7 @@ class AF(AS):
         hdr = {self.columns.code:self.code}
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
-        query = db.insert(self.table)
+        query = self.table.insert()
         trans = self.connect.begin()
         self.connect.execute(query, [hdr])
         trans.commit()
