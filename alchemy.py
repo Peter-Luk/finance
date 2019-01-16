@@ -86,7 +86,7 @@ class AE(AS):
     def append(self, values, conditions):
         hdr = {self.columns.eid:self.code}
         for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[self.columns._] = values[_]
+            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[f'self.columns.{_}'] = values[_]
         query = db.insert(self.table)
         trans = self.connect.begin()
         self.connect.execute(query, [hdr])
@@ -125,7 +125,7 @@ class AE(AS):
             except: pass
         hdr = {}
         for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[self.columns._] = values[_]
+            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[f'self.columns.{_}'] = values[_]
         query = db.update(self.table).values(hdr).where(self.columns.id==obtain_id(conditions))
         trans = self.connect.begin()
         self.connect.execute(query)
@@ -146,7 +146,7 @@ class AF(AS):
     def append(self, values, conditions):
         hdr = {self.columns.code:self.code}
         for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[self.columns._] = values[_]
+            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[f'self.columns.{_}'] = values[_]
         query = db.insert(self.table)
         trans = self.connect.begin()
         self.connect.execute(query, [hdr])
@@ -185,8 +185,9 @@ class AF(AS):
             except: pass
         hdr = {}
         for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[self.columns._] = values[_]
+            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
         query = db.update(self.table).values(hdr).where(self.columns.id==obtain_id(conditions))
+        # return query
         trans = self.connect.begin()
         self.connect.execute(query)
         trans.commit()
