@@ -86,7 +86,7 @@ class AE(AS):
     def append(self, values, conditions):
         hdr = {self.columns.eid:self.code}
         for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[f'self.columns.{_}'] = values[_]
+            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
         query = db.insert(self.table)
         trans = self.connect.begin()
         self.connect.execute(query, [hdr])
@@ -125,7 +125,7 @@ class AE(AS):
             except: pass
         hdr = {}
         for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[f'self.columns.{_}'] = values[_]
+            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
         query = db.update(self.table).values(hdr).where(self.columns.id==obtain_id(conditions))
         trans = self.connect.begin()
         self.connect.execute(query)
@@ -133,7 +133,8 @@ class AE(AS):
 
 class AF(AS):
     def __init__(self, code):
-        ae = AS(pref.db['Futures']['name'])
+        pF = pref.db['Futures']
+        ae = AS(pF['name'])
         self.columns = ae.columns
         self.connect = ae.connect
         self.table = ae.table
@@ -146,7 +147,7 @@ class AF(AS):
     def append(self, values, conditions):
         hdr = {self.columns.code:self.code}
         for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[f'self.columns.{_}'] = values[_]
+            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
         query = db.insert(self.table)
         trans = self.connect.begin()
         self.connect.execute(query, [hdr])
@@ -186,8 +187,8 @@ class AF(AS):
         hdr = {}
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
-        query = db.update(self.table).values(hdr).where(self.columns.id==obtain_id(conditions))
-        # return query
+        query = self.table.update().values(hdr)
+        query = query.where(self.columns.id==obtain_id(conditions))
         trans = self.connect.begin()
         self.connect.execute(query)
         trans.commit()
