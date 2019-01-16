@@ -73,7 +73,8 @@ class AS(object):
 
 class AE(AS):
     def __init__(self, eid):
-        ae = AS(pref.db['Equities']['name'])
+        pE = pref.db['Equities']
+        ae = AS(pE['name'])
         self.columns = ae.columns
         self.connect = ae.connect
         self.table = ae.table
@@ -105,7 +106,7 @@ class AE(AS):
             query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
             try: return self.connect.execute(query).scalar()
             except: pass
-        query = db.delete(self.table).where(self.columns.id==obtain_id(conditions))
+        query = self.table.delete().where(self.columns.id==obtain_id(conditions))
         trans = self.connect.begin()
         self.connect.execute(query)
         trans.commit()
@@ -166,7 +167,7 @@ class AF(AS):
             query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
             try: return self.connect.execute(query).scalar()
             except: pass
-        query = db.delete(self.table).where(self.columns.id==obtain_id(conditions))
+        query = self.table.delete().where(self.columns.id==obtain_id(conditions))
         trans = self.connect.begin()
         self.connect.execute(query)
         trans.commit()
@@ -187,8 +188,7 @@ class AF(AS):
         hdr = {}
         for _ in values.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = values[_]
-        query = self.table.update().values(hdr)
-        query = query.where(self.columns.id==obtain_id(conditions))
+        query = self.table.update().values(hdr).where(self.columns.id==obtain_id(conditions))
         trans = self.connect.begin()
         self.connect.execute(query)
         trans.commit()
