@@ -1,6 +1,6 @@
 # from sqlalchemy import create_engine, MetaData, Table
 import pref
-db = pref.sqlalchemy
+db, pd = pref.sqlalchemy, pref.pandas
 from sqlalchemy.orm import mapper, sessionmaker
 from utilities import filepath, datetime
 from os import sep, environ, listdir
@@ -112,7 +112,7 @@ class AE(AS):
         self.connect.execute(query)
         trans.commit()
 
-    def update(self, values, conditions):
+    def amend(self, values, conditions):
         def obtain_id(conditions=None):
             if not conditions: conditions = {'date':datetime.today().date()}
             if isinstance(conditions, dict):
@@ -132,6 +132,16 @@ class AE(AS):
         trans = self.connect.begin()
         self.connect.execute(query)
         trans.commit()
+
+    def get(self, conditions):
+        hdr = {'eid':f'=={self.code}'}
+        for _ in conditions.keys():
+            if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = conditions[_]
+        query = self.table.select().values(hdr).where(eval('db.and_('+ ', '.join([f"self.columns.{_}{hdr[_]}" for _ in hdr.keys()]) + ')'))
+        # trans = self.connect.begin()
+        res = pd.DataFrame(self.connect.execute(query).fetchall(), columns=[_.capitalize() for _ in self.columns if _ not in ['eid', 'id']])
+        return res.set_index('Date', inplace=True)
+        # trans.commit()
 
 class AF(AS):
     def __init__(self, code):
@@ -173,7 +183,7 @@ class AF(AS):
         self.connect.execute(query)
         trans.commit()
 
-    def update(self, values, conditions):
+    def amend(self, values, conditions):
         def obtain_id(conditions=None):
             if not conditions: conditions = {'date':datetime.today().date()}
             if isinstance(conditions, dict):
