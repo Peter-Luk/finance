@@ -1,8 +1,8 @@
 # from sqlalchemy import create_engine, MetaData, Table
 import pref
-db, pd = pref.sqlalchemy, pref.pandas
+db, pd, datetime = pref.sqlalchemy, pref.pandas, pref.datetime
 from sqlalchemy.orm import mapper, sessionmaker
-from utilities import filepath, datetime
+from utilities import filepath
 from os import sep, environ, listdir
 from sys import platform
 
@@ -133,14 +133,15 @@ class AE(AS):
         self.connect.execute(query)
         trans.commit()
 
-    def acquire(self, conditions):
+    def acquire(self, conditions, dataframe=False):
         hdr = {'eid':f'=={self.code}'}
         for _ in conditions.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = conditions[_]
         query = db.select([self.columns.date, self.columns.open, self.columns.high, self.columns.low, self.columns.close, self.columns.volume]).where(eval('db.and_(' + ', '.join([f"self.columns.{_}{hdr[_]}" for _ in hdr.keys()]) + ')'))
         res = pd.DataFrame(self.connect.execute(query).fetchall(), columns=[__.capitalize() for __ in [f'{_}'.split('.')[-1] for _ in self.columns] if __ not in ['eid', 'id']])
         res.set_index('Date', inplace=True)
-        return res
+        if dataframe: return res
+        return {'Date': list(res.index), 'Data': res.values}
 
 class AF(AS):
     def __init__(self, code):
