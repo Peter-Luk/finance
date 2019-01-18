@@ -133,15 +133,14 @@ class AE(AS):
         self.connect.execute(query)
         trans.commit()
 
-    def get(self, conditions):
+    def acquire(self, conditions):
         hdr = {'eid':f'=={self.code}'}
         for _ in conditions.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = conditions[_]
-        query = self.table.select().values(hdr).where(eval('db.and_('+ ', '.join([f"self.columns.{_}{hdr[_]}" for _ in hdr.keys()]) + ')'))
-        # trans = self.connect.begin()
-        res = pd.DataFrame(self.connect.execute(query).fetchall(), columns=[_.capitalize() for _ in self.columns if _ not in ['eid', 'id']])
-        return res.set_index('Date', inplace=True)
-        # trans.commit()
+        query = db.select([self.columns.date, self.columns.open, self.columns.high, self.columns.low, self.columns.close, self.columns.volume]).where(eval('db.and_(' + ', '.join([f"self.columns.{_}{hdr[_]}" for _ in hdr.keys()]) + ')'))
+        res = pd.DataFrame(self.connect.execute(query).fetchall(), columns=[__.capitalize() for __ in [f'{_}'.split('.')[-1] for _ in self.columns] if __ not in ['eid', 'id']])
+        res.set_index('Date', inplace=True)
+        return res
 
 class AF(AS):
     def __init__(self, code):
