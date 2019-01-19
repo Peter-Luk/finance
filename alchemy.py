@@ -80,7 +80,7 @@ class AE(Viewer, AS):
         self.connect = ae.connect
         self.table = ae.table
         self.code = eid
-        self.data = self.acquire({'date':'>datetime(datetime.today().year - 3,12,31).date()'})
+        self.data = self.acquire({'date':'>datetime(datetime.today().year - 4, 12, 31).date()'})
         self.close = self.data['Data'][-1, -2]
         self.view = Viewer(self.data)
         self.yahoo_code = f'{eid:04d}.HK'
