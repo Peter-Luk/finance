@@ -2,86 +2,147 @@ import pref
 pd, np, db, yf, datetime, sleep = pref.y2n
 from utilities import filepath, mtf
 from nta import Viewer, hsirnd
+from alchemy import AS
 
-class Futures(Viewer):
+class Futures(AS, Viewer):
     periods = pref.periods['Futures']
     def __init__(self, code):
+        # pF = pref.db['Futures']
+        # ae = AS(pF['name'])
+        # self.columns = ae.columns
+        # self.connect = ae.connect
+        # self.table = ae.table
+        # self.code = code
         self._conf = pref.db['Futures']
-        engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
-        self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
-        self.__conn = engine.connect()
+        # engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
+        ae = AS(self._conf['name'])
+        self.table = ae.table
+        # self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        self.rc = ae.columns
+        # self.__conn = engine.connect()
+        self.__conn = ae.connect
         rc = entities(self._conf['name'])
         if code.upper() not in rc: code = rc[-1]
+        self.code = code
         self.data = self.combine(code, self._conf['freq'])
-        self._v = Viewer(self.data)
+        self.view = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self._conf = self.rc = self.__conn = self.data = self._v = self.date = self.close = None
-        del(self._conf, self.rc, self.__conn, self.data, self._v, self.date, self.close)
+        self._conf = self.rc = self.__conn = self.data = self.view = self.date = self.close = None
+        del(self._conf, self.rc, self.__conn, self.data, self.view, self.date, self.close)
 
     def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
+    def append(self, values, conditions):
+        hdr = {self.rc.code:self.code}
+        for _ in values.keys():
+            if _ in [f'{__}'.split('.')[-1] for __ in self.rc]: hdr[_] = values[_]
+        query = self.table.insert()
+        trans = self.__conn.begin()
+        self.__conn.execute(query, [hdr])
+        trans.commit()
+
+    def remove(self, conditions):
+        def obtain_id(conditions=None):
+            if not conditions: conditions = {'date':datetime.today().date()}
+            if isinstance(conditions, dict):
+                conditions['code'] = self.code
+            hdr = []
+            for _ in conditions.keys():
+                if _ in [f'{__}'.split('.')[-1] for __ in self.rc]:
+                    if _ == 'date': hdr.append(f"self.rc.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.rc.{_}=={conditions[_]}")
+            query = db.select([self.rc.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.__conn.execute(query).scalar()
+            except: pass
+        query = self.table.delete().where(self.rc.id==obtain_id(conditions))
+        trans = self.__conn.begin()
+        self.__conn.execute(query)
+        trans.commit()
+
+    def amend(self, values, conditions):
+        def obtain_id(conditions=None):
+            if not conditions: conditions = {'date':datetime.today().date()}
+            if isinstance(conditions, dict):
+                conditions['code'] = self.code
+            hdr = []
+            for _ in conditions.keys():
+                if _ in [f'{__}'.split('.')[-1] for __ in self.rc]:
+                    if _ in ['date', 'code', 'session']: hdr.append(f"self.rc.{_}=='{conditions[_]}'")
+                    else: hdr.append(f"self.rc.{_}=={conditions[_]}")
+            query = db.select([self.rc.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
+            try: return self.__conn.execute(query).scalar()
+            except: pass
+        hdr = {}
+        for _ in values.keys():
+            if _ in [f'{__}'.split('.')[-1] for __ in self.rc]: hdr[_] = values[_]
+        query = self.table.update().values(hdr).where(self.rc.id==obtain_id(conditions))
+        trans = self.__conn.begin()
+        self.__conn.execute(query)
+        trans.commit()
+
     def ma(self, raw=None, period=periods['simple'], favour='s', req_field='close', programmatic=False):
         if not raw: raw = self.data
-        return self._v.ma(raw, period, favour, req_field, programmatic)
+        return self.view.ma(raw, period, favour, req_field, programmatic)
 
     def kama(self, data=None, period=periods):
         if not data: data = self.data
-        return self._v.kama(data, period)
+        return self.view.kama(data, period)
 
     def bbw(self, raw=None, period=periods['simple'], req_field='close', programmatic=False):
         if not raw: raw = self.data
-        return self._v.bbw(raw, period, req_field, programmatic)
+        return self.view.bbw(raw, period, req_field, programmatic)
 
     def bb(self, raw=None, period=periods['simple'], req_field='c', programmatic=False):
         if not raw: raw = self.data
-        return self._v.bb(raw, period, req_field, programmatic)
+        return self.view.bb(raw, period, req_field, programmatic)
 
     def rsi(self, raw=None, period=periods['simple']):
         if not raw: raw = self.data
-        return self._v.rsi(raw, period)
+        return self.view.rsi(raw, period)
 
     def kc(self, data=None, period=periods):
         if not data: data = self.data
-        return self._v.kc(data, period)
+        return self.view.kc(data, period)
 
     def atr(self, raw=None, period=periods['atr'], programmatic=False):
         if not raw: raw = self.data
-        return self._v.atr(raw, period, programmatic)
+        return self.view.atr(raw, period, programmatic)
 
     def trp(self, data=None, period=periods['atr']):
         if not data: data = self.data
-        return self._v.trp(data, period)
+        return self.view.trp(data, period)
 
     def adx(self, data=None, period=periods['adx']):
         if not data: data = self.data
-        return self._v.adx(data, period)
+        return self.view.adx(data, period)
 
-    def mas(self, data=None, period=periods):
-        if not data: data = self.data
-        return self._v.mas(data, period)
+    def mas(self, period=periods):
+        # if not data: data = self.data
+        return self.view.mas(period)
 
-    def idrs(self, data=None, period=periods):
-        if not data: data = self.data
-        return self._v.idrs(data, period)
+    def idrs(self, period=periods):
+        # if not data: data = self.data
+        return self.view.idrs(period)
 
     def apz(self, raw=None, period=periods, df=None, programmatic=False):
         if not raw: raw = self.data
-        return self._v.apz(raw, period, df, programmatic)
+        return self.view.apz(raw, period, df, programmatic)
 
     def ovr(self, raw=None, period=periods,date=datetime.today().date()):
         if not raw: raw = self.data
-        return self._v.ovr(raw, period, date)
+        return self.view.ovr(raw, period, date)
 
     def ratr(self, raw=None, period=periods['atr']):
         if not raw: raw = self.data
-        return self._v.ratr(raw, period)
+        return self.view.ratr(raw, period)
 
-    def combine(self, code, freq, dataframe=False):
+    def combine(self, code=None, freq='bi-daily', dataframe=False):
+        if not code: code = self.code
         if freq.lower() == 'bi-daily':
             res = []
             for _ in [__[0] for __ in self.__conn.execute(db.select([self.rc.date.distinct()]).where(self.rc.code==code).order_by(db.asc(self.rc.date))).fetchall()]:
@@ -212,13 +273,16 @@ class Equities(Viewer):
         if not data: data = self.data
         return self._v.adx(data, period)
 
-    def mas(self, data=None, period=periods):
-        if not data: data = self.data
-        return self._v.mas(data, period)
+    # def mas(self, data=None, period=periods):
+    #     if not data: data = self.data
+    #     return self._v.mas(data, period)
+    def mas(self, period=periods):
+        # if not data: data = self.data
+        return self._v.mas(period)
 
-    def idrs(self, data=None, period=periods):
-        if not data: data = self.data
-        return self._v.idrs(data, period=period)
+    def idrs(self, period=periods):
+        # if not data: data = self.data
+        return self._v.idrs(period)
 
     def apz(self, raw=None, period=periods, df=None, programmatic=False):
         if not raw: raw = self.data
