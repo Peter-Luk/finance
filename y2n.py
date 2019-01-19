@@ -7,19 +7,10 @@ from alchemy import AS
 class Futures(AS, Viewer):
     periods = pref.periods['Futures']
     def __init__(self, code):
-        # pF = pref.db['Futures']
-        # ae = AS(pF['name'])
-        # self.columns = ae.columns
-        # self.connect = ae.connect
-        # self.table = ae.table
-        # self.code = code
         self._conf = pref.db['Futures']
-        # engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
         ae = AS(self._conf['name'])
         self.table = ae.table
-        # self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
         self.rc = ae.columns
-        # self.__conn = engine.connect()
         self.__conn = ae.connect
         rc = entities(self._conf['name'])
         if code.upper() not in rc: code = rc[-1]
@@ -30,8 +21,8 @@ class Futures(AS, Viewer):
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self._conf = self.rc = self.__conn = self.data = self.view = self.date = self.close = None
-        del(self._conf, self.rc, self.__conn, self.data, self.view, self.date, self.close)
+        self._conf = self.table = self.rc = self.__conn = self.code = self.data = self.view = self.date = self.close = None
+        del(self._conf, self.table, self.rc, self.__conn, self.code, self.data, self.view, self.date, self.close)
 
     def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
