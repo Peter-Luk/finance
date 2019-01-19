@@ -89,6 +89,10 @@ class AE(Viewer, AS):
         self.columns = self.connect = self.table = self.code = self.data = self.close = self.view = self.yahoo_code = None
         del(self.columns, self.connect, self.table, self.code, self.data, self.close, self.view, self.yahoo_code)
 
+    def __call__(self, dataframe=True):
+        return self.acquire({'date':'>datetime(datetime.today().year - 4, 12, 31).date()'}, dataframe)
+
+
     def append(self, values, conditions):
         hdr = {self.columns.eid:self.code}
         for _ in values.keys():
