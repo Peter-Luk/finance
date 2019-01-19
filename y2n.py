@@ -169,22 +169,26 @@ class Futures(AS, Viewer):
             if dataframe: return p_
             return {'Date': list(p_.index), 'Data': p_.values}
 
-class Equities(Viewer):
+class Equities(AS, Viewer):
     periods = pref.periods['Equities']
     def __init__(self, code, adhoc=False):
         self._conf = pref.db['Equities']
-        engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
-        self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
-        self.__conn = engine.connect()
+        ae = AS(self._conf['name'])
+        self.table = ae.table
+        self.rc = ae.columns
+        self.__conn = ae.connect
+        # engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
+        # self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        # self.__conn = engine.connect()
         if code not in entities(self._conf['name']): adhoc = True
         self.data = self.fetch(code, adhoc=adhoc)[code]
-        self._v = Viewer(self.data)
+        self.view = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self._conf = self.rc = self.__conn = self.data = self._v = self.date = self.close = None
-        del(self._conf, self.rc, self.__conn, self.data, self._v, self.date, self.close)
+        self._conf = self.rc = self.__conn = self.data = self.view = self.date = self.close = None
+        del(self._conf, self.rc, self.__conn, self.data, self.view, self.date, self.close)
 
     def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
@@ -230,62 +234,57 @@ class Equities(Viewer):
 
     def ma(self, raw=None, period=periods['simple'], favour='s', req_field='close', programmatic=False):
         if not raw: raw = self.data
-        return self._v.ma(raw, period, favour, req_field, programmatic)
+        return self.view.ma(raw, period, favour, req_field, programmatic)
 
     def kama(self, data=None, period=periods):
         if not data: data = self.data
-        return self._v.kama(data, period)
+        return self.view.kama(data, period)
 
     def bbw(self, raw=None, period=periods['simple'], req_field='close', programmatic=False):
         if not raw: raw = self.data
-        return self._v.bbw(raw, period, req_field, programmatic)
+        return self.view.bbw(raw, period, req_field, programmatic)
 
     def bb(self, raw=None, period=periods['simple'], req_field='c', programmatic=False):
         if not raw: raw = self.data
-        return self._v.bb(raw, period, req_field, programmatic)
+        return self.view.bb(raw, period, req_field, programmatic)
 
     def rsi(self, raw=None, period=periods['simple']):
         if not raw: raw = self.data
-        return self._v.rsi(raw, period)
+        return self.view.rsi(raw, period)
 
     def kc(self, data=None, period=periods):
         if not data: data = self.data
-        return self._v.kc(data, period=period)
+        return self.view.kc(data, period=period)
 
     def atr(self, raw=None, period=periods['atr'], programmatic=False):
         if not raw: raw = self.data
-        return self._v.atr(raw, period, programmatic)
+        return self.view.atr(raw, period, programmatic)
 
     def trp(self, data=None, period=periods['atr']):
         if not data: data = self.data
-        return self._v.trp(data, period)
+        return self.view.trp(data, period)
 
     def adx(self, data=None, period=periods['adx']):
         if not data: data = self.data
-        return self._v.adx(data, period)
+        return self.view.adx(data, period)
 
-    # def mas(self, data=None, period=periods):
-    #     if not data: data = self.data
-    #     return self._v.mas(data, period)
     def mas(self, period=periods):
-        # if not data: data = self.data
-        return self._v.mas(period)
+        return self.view.mas(period)
 
     def idrs(self, period=periods):
-        # if not data: data = self.data
-        return self._v.idrs(period)
+        return self.view.idrs(period)
 
     def apz(self, raw=None, period=periods, df=None, programmatic=False):
         if not raw: raw = self.data
-        return self._v.apz(raw, period, df, programmatic)
+        return self.view.apz(raw, period, df, programmatic)
 
     def ovr(self, raw=None, period=periods,date=datetime.today().date()):
         if not raw: raw = self.data
-        return self._v.ovr(raw, period, date)
+        return self.view.ovr(raw, period, date)
 
     def ratr(self, raw=None, period=periods['atr']):
         if not raw: raw = self.data
-        return self._v.ratr(raw, period)
+        return self.view.ratr(raw, period)
 
 def bqo(el, action='buy', adhoc=False, bound=True):
     def __process(e, action, bound):
