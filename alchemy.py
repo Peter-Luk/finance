@@ -1,11 +1,9 @@
-# from sqlalchemy import create_engine, MetaData, Table
 import pref
 db, pd, datetime = pref.sqlalchemy, pref.pandas, pref.datetime
 from sqlalchemy.orm import mapper, sessionmaker
 from utilities import filepath
 from os import sep, environ, listdir
 from sys import platform
-from nta import Viewer
 
 eb, fb = pref.db['Equities'], pref.db['Futures']
 if platform == 'win32': home = (''.join([environ['HOMEDRIVE'], environ['HOMEPATH']]))
@@ -151,8 +149,8 @@ class AE(AS):
 
 class AF(AS):
     def __init__(self, code):
-        pF = pref.db['Futures']
-        ae = AS(pF['name'])
+        self._conf = pref.db['Futures']
+        ae = AS(self._conf['name'])
         self.columns = ae.columns
         self.connect = ae.connect
         self.table = ae.table
@@ -161,6 +159,9 @@ class AF(AS):
     def __del__(self):
         self.columns = self.connect = self.table = self.code = None
         del(self.columns, self.connect, self.table, self.code)
+
+    def __call__(self):
+        return self.combine()
 
     def append(self, values, conditions):
         hdr = {self.columns.code:self.code}
@@ -209,3 +210,40 @@ class AF(AS):
         trans = self.connect.begin()
         self.connect.execute(query)
         trans.commit()
+
+    def combine(self, freq='bi-daily', dataframe=True):
+        code = self.code
+        if freq.lower() == 'bi-daily':
+            res = []
+            for _ in [__[0] for __ in self.connect.execute(db.select([self.columns.date.distinct()]).where(self.columns.code==code).order_by(db.asc(self.columns.date))).fetchall()]:
+                tmp = {}
+                __ = self.connect.execute(db.select([self.columns.session, self.columns.open, self.columns.high, self.columns.low, self.columns.close, self.columns.volume]).where(db.and_(self.columns.code==code, self.columns.date==_))).fetchall()
+                p_ = pd.DataFrame(__)
+                p_.columns = __[0].keys()
+                p_.set_index('session', inplace=True)
+                if len(p_) == 1:
+                    try:
+                        tmp['open'] = p_['open']['M']
+                        tmp['high'] = p_['high']['M']
+                        tmp['low'] = p_['low']['M']
+                        tmp['close'] = p_['close']['M']
+                        tmp['volume'] = p_['volume']['M']
+                    except:
+                        tmp['open'] = p_['open']['A']
+                        tmp['high'] = p_['high']['A']
+                        tmp['low'] = p_['low']['A']
+                        tmp['close'] = p_['close']['A']
+                        tmp['volume'] = p_['volume']['A']
+                elif len(p_) == 2:
+                    tmp['open'] = p_['open']['M']
+                    tmp['high'] = p_['high'].max()
+                    tmp['low'] = p_['low'].min()
+                    tmp['close'] = p_['close']['A']
+                    tmp['volume'] = p_['volume'].sum()
+                tmp['date'] = _
+                res.append(tmp)
+            _ = pd.DataFrame(res)
+            _.set_index(self._conf['index'], inplace=True)
+            p_ = pd.DataFrame([_['open'], _['high'], _['low'], _['close'], _['volume']]).T
+            if dataframe: return p_
+            return {'Date': list(p_.index), 'Data': p_.values}

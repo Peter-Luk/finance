@@ -15,7 +15,7 @@ class Futures(AF, Viewer):
         self.table = self._af.table
         self.rc = self._af.columns
         self.__conn = self._af.connect
-        self.data = self.combine(code, self._conf['freq'])
+        self.data = self.combine(self._conf['freq'])
         self.view = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
@@ -33,8 +33,12 @@ class Futures(AF, Viewer):
 
     def delete(self, conditions):
         return self._af.remove(conditions)
+
     def update(self, values, conditions):
         return self._af.amend(values, conditions)
+
+    def combine(self, freq='bi-daily', dataframe=False):
+        return self._af.combine(freq, dataframe)
 
     def ma(self, raw=None, period=periods['simple'], favour='s', req_field='close', programmatic=False):
         if not raw: raw = self.data
@@ -91,43 +95,6 @@ class Futures(AF, Viewer):
     def ratr(self, raw=None, period=periods['atr']):
         if not raw: raw = self.data
         return self.view.ratr(raw, period)
-
-    def combine(self, code=None, freq='bi-daily', dataframe=False):
-        if not code: code = self.code
-        if freq.lower() == 'bi-daily':
-            res = []
-            for _ in [__[0] for __ in self.__conn.execute(db.select([self.rc.date.distinct()]).where(self.rc.code==code).order_by(db.asc(self.rc.date))).fetchall()]:
-                tmp = {}
-                __ = self.__conn.execute(db.select([self.rc.session, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(db.and_(self.rc.code==code, self.rc.date==_))).fetchall()
-                p_ = pd.DataFrame(__)
-                p_.columns = __[0].keys()
-                p_.set_index('session', inplace=True)
-                if len(p_) == 1:
-                    try:
-                        tmp['open'] = p_['open']['M']
-                        tmp['high'] = p_['high']['M']
-                        tmp['low'] = p_['low']['M']
-                        tmp['close'] = p_['close']['M']
-                        tmp['volume'] = p_['volume']['M']
-                    except:
-                        tmp['open'] = p_['open']['A']
-                        tmp['high'] = p_['high']['A']
-                        tmp['low'] = p_['low']['A']
-                        tmp['close'] = p_['close']['A']
-                        tmp['volume'] = p_['volume']['A']
-                elif len(p_) == 2:
-                    tmp['open'] = p_['open']['M']
-                    tmp['high'] = p_['high'].max()
-                    tmp['low'] = p_['low'].min()
-                    tmp['close'] = p_['close']['A']
-                    tmp['volume'] = p_['volume'].sum()
-                tmp['date'] = _
-                res.append(tmp)
-            _ = pd.DataFrame(res)
-            _.set_index(self._conf['index'], inplace=True)
-            p_ = pd.DataFrame([_['open'], _['high'], _['low'], _['close'], _['volume']]).T
-            if dataframe: return p_
-            return {'Date': list(p_.index), 'Data': p_.values}
 
 class Equities(AE, Viewer):
     periods = pref.periods['Equities']
