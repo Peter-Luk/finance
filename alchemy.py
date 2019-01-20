@@ -72,7 +72,7 @@ class AS(object):
         self.__meta = self.table = self.columns = self.connect = None
         del(self.__meta, self.table, self.columns, self.connect)
 
-class AE(Viewer, AS):
+class AE(AS):
     def __init__(self, eid):
         pE = pref.db['Equities']
         ae = AS(pE['name'])
@@ -82,12 +82,11 @@ class AE(Viewer, AS):
         self.code = eid
         self.data = self.acquire({'date':'>datetime(datetime.today().year - 4, 12, 31).date()'})
         self.close = self.data['Data'][-1, -2]
-        self.view = Viewer(self.data)
         self.yahoo_code = f'{eid:04d}.HK'
 
     def __del__(self):
-        self.columns = self.connect = self.table = self.code = self.data = self.close = self.view = self.yahoo_code = None
-        del(self.columns, self.connect, self.table, self.code, self.data, self.close, self.view, self.yahoo_code)
+        self.columns = self.connect = self.table = self.code = self.data = self.close  = self.yahoo_code = None
+        del(self.columns, self.connect, self.table, self.code, self.data, self.close, self.yahoo_code)
 
     def __call__(self, dataframe=True):
         return self.acquire({'date':'>datetime(datetime.today().year - 4, 12, 31).date()'}, dataframe)
@@ -149,14 +148,6 @@ class AE(Viewer, AS):
         res.set_index('Date', inplace=True)
         if dataframe: return res
         return {'Date': list(res.index), 'Data': res.values}
-
-    def ovr(self, raw=None, period=pref.periods['Equities'], date=datetime.today().date()):
-        if not raw: raw = self.data
-        return self.view.ovr(raw, period, date)
-
-    def ratr(self, raw=None, period=pref.periods['Equities']['atr']):
-        if not raw: raw = self.data
-        return self.view.ratr(raw, period)
 
 class AF(AS):
     def __init__(self, code):
