@@ -2,79 +2,39 @@ import pref
 pd, np, db, yf, datetime, sleep = pref.y2n
 from utilities import filepath, mtf
 from nta import Viewer, hsirnd
-from alchemy import AS
+from alchemy import AF, AE
 
-class Futures(AS, Viewer):
+class Futures(AF, Viewer):
     periods = pref.periods['Futures']
     def __init__(self, code):
         self._conf = pref.db['Futures']
-        ae = AS(self._conf['name'])
-        self.table = ae.table
-        self.rc = ae.columns
-        self.__conn = ae.connect
         rc = entities(self._conf['name'])
         if code.upper() not in rc: code = rc[-1]
         self.code = code
+        self._af = AF(self.code)
+        self.table = self._af.table
+        self.rc = self._af.columns
+        self.__conn = self._af.connect
         self.data = self.combine(code, self._conf['freq'])
         self.view = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self._conf = self.table = self.rc = self.__conn = self.code = self.data = self.view = self.date = self.close = None
-        del(self._conf, self.table, self.rc, self.__conn, self.code, self.data, self.view, self.date, self.close)
+        self._conf = self.table = self.rc = self._af = self.__conn = self.code = self.data = self.view = self.date = self.close = None
+        del(self._conf, self.table, self.rc, self._af, self.__conn, self.code, self.data, self.view, self.date, self.close)
 
     def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
-    def append(self, values, conditions):
-        hdr = {self.rc.code:self.code}
-        for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.rc]: hdr[_] = values[_]
-        query = self.table.insert()
-        trans = self.__conn.begin()
-        self.__conn.execute(query, [hdr])
-        trans.commit()
+    def insert(self, values, conditions):
+        return self._af.append(values, conditions)
 
-    def remove(self, conditions):
-        def obtain_id(conditions=None):
-            if not conditions: conditions = {'date':datetime.today().date()}
-            if isinstance(conditions, dict):
-                conditions['code'] = self.code
-            hdr = []
-            for _ in conditions.keys():
-                if _ in [f'{__}'.split('.')[-1] for __ in self.rc]:
-                    if _ == 'date': hdr.append(f"self.rc.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.rc.{_}=={conditions[_]}")
-            query = db.select([self.rc.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
-            try: return self.__conn.execute(query).scalar()
-            except: pass
-        query = self.table.delete().where(self.rc.id==obtain_id(conditions))
-        trans = self.__conn.begin()
-        self.__conn.execute(query)
-        trans.commit()
-
-    def amend(self, values, conditions):
-        def obtain_id(conditions=None):
-            if not conditions: conditions = {'date':datetime.today().date()}
-            if isinstance(conditions, dict):
-                conditions['code'] = self.code
-            hdr = []
-            for _ in conditions.keys():
-                if _ in [f'{__}'.split('.')[-1] for __ in self.rc]:
-                    if _ in ['date', 'code', 'session']: hdr.append(f"self.rc.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.rc.{_}=={conditions[_]}")
-            query = db.select([self.rc.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
-            try: return self.__conn.execute(query).scalar()
-            except: pass
-        hdr = {}
-        for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.rc]: hdr[_] = values[_]
-        query = self.table.update().values(hdr).where(self.rc.id==obtain_id(conditions))
-        trans = self.__conn.begin()
-        self.__conn.execute(query)
-        trans.commit()
+    def delete(self, conditions):
+        return self._af.remove(conditions)
+    def update(self, values, conditions):
+        return self._af.amend(values, conditions)
 
     def ma(self, raw=None, period=periods['simple'], favour='s', req_field='close', programmatic=False):
         if not raw: raw = self.data
@@ -169,89 +129,39 @@ class Futures(AS, Viewer):
             if dataframe: return p_
             return {'Date': list(p_.index), 'Data': p_.values}
 
-class Equities(AS, Viewer):
+class Equities(AE, Viewer):
     periods = pref.periods['Equities']
     def __init__(self, code, adhoc=False):
         self._conf = pref.db['Equities']
-        ae = AS(self._conf['name'])
-        self.table = ae.table
-        self.rc = ae.columns
-        self.__conn = ae.connect
-        # engine = db.create_engine(f"sqlite:///{filepath(self._conf['name'])}")
-        # self.rc = db.Table(self._conf['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
-        # self.__conn = engine.connect()
         if code not in entities(self._conf['name']): adhoc = True
         self.code = code
+        self._ae = AE(self.code)
+        self.table = self._ae.table
+        self.rc = self._ae.columns
+        self.__conn = self._ae.connect
         self.data = self.fetch(code, adhoc=adhoc)[code]
         self.view = Viewer(self.data)
         self.date = self.data['Date'][-1]
         self.close = self.data['Data'][-1, -2]
 
     def __del__(self):
-        self._conf = self.rc = self.__conn = self.data = self.view = self.date = self.close = None
-        del(self._conf, self.rc, self.__conn, self.data, self.view, self.date, self.close)
+        self._conf = self.rc = self._ae =self.__conn = self.data = self.view = self.date = self.close = None
+        del(self._conf, self.rc, self._ae, self.__conn, self.data, self.view, self.date, self.close)
 
     def __call__(self, enhanced=True):
         if enhanced: return pd.DataFrame({'proposed':[self.best_quote(), self.best_quote('sell')]}, index=['buy','sell'])
         return self.close
 
-    def append(self, values, conditions):
-        hdr = {self.rc.eid:self.code}
-        for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.rc]: hdr[_] = values[_]
-        query = self.table.insert()
-        trans = self.__conn.begin()
-        self.__conn.execute(query, [hdr])
-        trans.commit()
+    def insert(self, values, conditions):
+        return self._ae.append(values, conditions)
 
-    def remove(self, conditions):
-        def obtain_id(conditions=None):
-            if not conditions: conditions = {'date':datetime.today().date()}
-            if isinstance(conditions, dict):
-                conditions['eid'] = self.code
-            hdr = []
-            for _ in conditions.keys():
-                if _ in [f'{__}'.split('.')[-1] for __ in self.rc]:
-                    if _ == 'date': hdr.append(f"self.rc.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.rc.{_}=={conditions[_]}")
-            query = db.select([self.rc.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
-            try: return self.__conn.execute(query).scalar()
-            except: pass
-        query = self.table.delete().where(self.rc.id==obtain_id(conditions))
-        trans = self.__conn.begin()
-        self.__conn.execute(query)
-        trans.commit()
+    def delete(self, conditions):
+        return self._ae.remove(conditions)
+    def update(self, values, conditions):
+        return self._ae.amend(values, conditions)
 
-    def amend(self, values, conditions):
-        def obtain_id(conditions=None):
-            if not conditions: conditions = {'date':datetime.today().date()}
-            if isinstance(conditions, dict):
-                conditions['eid'] = self.code
-            hdr = []
-            for _ in conditions.keys():
-                if _ in [f'{__}'.split('.')[-1] for __ in self.rc]:
-                    if _ == 'date': hdr.append(f"self.rc.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.rc.{_}=={conditions[_]}")
-            query = db.select([self.rc.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
-            try: return self.__conn.execute(query).scalar()
-            except: pass
-        hdr = {}
-        for _ in values.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.rc]: hdr[_] = values[_]
-        query = self.table.update().values(hdr).where(self.rc.id==obtain_id(conditions))
-        trans = self.__conn.begin()
-        self.__conn.execute(query)
-        trans.commit()
-
-    def acquire(self, conditions, dataframe=False):
-        hdr = {'eid':f'=={self.code}'}
-        for _ in conditions.keys():
-            if _ in [f'{__}'.split('.')[-1] for __ in self.rc]: hdr[_] = conditions[_]
-        query = db.select([self.rc.date, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(eval('db.and_(' + ', '.join([f"self.rc.{_}{hdr[_]}" for _ in hdr.keys()]) + ')'))
-        res = pd.DataFrame(self.__conn.execute(query).fetchall(), columns=[__.capitalize() for __ in [f'{_}'.split('.')[-1] for _ in self.rc] if __ not in ['eid', 'id']])
-        res.set_index('Date', inplace=True)
-        if dataframe: return res
-        return {'Date': list(res.index), 'Data': res.values}
+    def acquire(self, conditions, dataframe=True):
+        return self._ae.acquire(conditions, dataframe)
 
     def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False, series=False):
         res = {}
