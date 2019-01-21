@@ -434,13 +434,13 @@ class Viewer(ONA):
         self.data = None
         del(self.data)
 
-    def mas(self, data, period):
-        _o = ONA(data)
-        return pd.DataFrame([_o.kama(data, period)['KAMA'].map(hsirnd), _o.ma(data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(data, period['simple'])['SMA'].map(hsirnd), _o.ma(data, period['simple'], favour='w')['WMA'].map(hsirnd)]).T
+    def mas(self, period):
+        _o = ONA(self.data)
+        return pd.DataFrame([_o.kama(self.data, period)['KAMA'].map(hsirnd), _o.ma(self.data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(self.data, period['simple'])['SMA'].map(hsirnd), _o.ma(self.data, period['simple'], favour='w')['WMA'].map(hsirnd)]).T
 
-    def idrs(self, data, period):
-        _o = ONA(data)
-        return _o.adx(data, period['adx']).merge(_o.rsi(data, period['simple']), left_index=True, right_index=True).merge(_o.atr(data, period['atr']), left_index=True, right_index=True).merge(_o.trp(data, period['atr']), left_index=True, right_index=True)
+    def idrs(self, period):
+        _o = ONA(self.data)
+        return _o.adx(self.data, period['adx']).merge(_o.rsi(self.data, period['simple']), left_index=True, right_index=True).merge(_o.atr(self.data, period['atr']), left_index=True, right_index=True).merge(_o.trp(self.data, period['atr']), left_index=True, right_index=True)
 
     def best_quote(self, action='buy', bound=True):
         er, eo = self.ratr(), self.ovr()
