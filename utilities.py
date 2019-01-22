@@ -1,8 +1,6 @@
 import socket
 from sys import platform, version_info
 from os import linesep, sep, environ
-import pandas as pd
-import numpy as np
 #from pandas_datareader import data
 import pref
 db, yf, gr, sleep, datetime, reduce = pref.utils
