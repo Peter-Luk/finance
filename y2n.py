@@ -190,11 +190,12 @@ class Equities(AE, Viewer):
         e_slow = self.ma(raw, period['slow'], favour='e')
         e_fast = self.ma(raw, period['fast'], favour='e')
         tmp = pd.DataFrame([e_fast['EMA'], e_slow['EMA']]).T
-        tmp.columns = ['E12', 'E26']
+        tmp.columns = ['EFast', 'ESlow']
         tdiff = tmp.diff(axis=1)
-        m_line = tdiff['E26']
+        m_line = tdiff['ESlow']
         s_line = __pema(m_line, period['signal'])
-        hdr = pd.DataFrame([m_line, s_line], index=m_line.index, columns=['M Line', 'Signal Line'])
+        hdr = pd.DataFrame([m_line, s_line]).T
+        hdr.columns = ['M Line', 'Signal Line']
         return hdr
 
     def kama(self, data=None, period=periods):
