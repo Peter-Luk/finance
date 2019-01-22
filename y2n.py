@@ -172,6 +172,31 @@ class Equities(AE, Viewer):
         if not raw: raw = self.data
         return self.view.ma(raw, period, favour, req_field, programmatic)
 
+    def macd(self, raw=None, period=periods['macd']):
+        def __pema(pd_data, period):
+            data, res, c = [_ for _ in pd_data.values], [], 0
+            for i in range(len(data)):
+                hdr = np.nan
+                if not np.isnan(data[i]):
+                    if c == period:
+                        hdr = np.array(data[i - period: i]).mean()
+                    if c > period:
+                        hdr = (res[-1] * (period - 1) + data[i]) / period
+                    c += 1
+                res.append(hdr)
+            return pd.Series(res, index=pd_data.index)
+
+        if not raw: raw = self.data
+        e_slow = self.ma(raw, period['slow'], favour='e')
+        e_fast = self.ma(raw, period['fast'], favour='e')
+        tmp = pd.DataFrame([e_fast['EMA'], e_slow['EMA']]).T
+        tmp.columns = ['E12', 'E26']
+        tdiff = tmp.diff(axis=1)
+        m_line = tdiff['E26']
+        s_line = __pema(m_line, period['signal'])
+        hdr = pd.DataFrame([m_line, s_line], index=m_line.index, columns=['M Line', 'Signal Line'])
+        return hdr
+
     def kama(self, data=None, period=periods):
         if not data: data = self.data
         return self.view.kama(data, period)
