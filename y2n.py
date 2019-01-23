@@ -44,6 +44,10 @@ class Futures(AF, Viewer):
         if not raw: raw = self.data
         return self.view.ma(raw, period, favour, req_field, programmatic)
 
+    def macd(self, raw=None, period=periods['macd'], dataframe=True):
+        if not raw: raw = self.data
+        return self.view.macd(raw, period, dataframe)
+
     def kama(self, data=None, period=periods):
         if not data: data = self.data
         return self.view.kama(data, period)
