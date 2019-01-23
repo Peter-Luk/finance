@@ -180,6 +180,10 @@ class Equities(AE, Viewer):
         if not raw: raw = self.data
         return self.view.macd(raw, period, dataframe)
 
+    def sco(self, raw=None, period=periods['sco'], dataframe=True):
+        if not raw: raw = self.data
+        return self.view.sco(raw, period, dataframe)
+
     def kama(self, data=None, period=periods):
         if not data: data = self.data
         return self.view.kama(data, period)
