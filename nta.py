@@ -44,6 +44,36 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({f'{favour}ma'.upper(): mres}, index=raw['Date'])
 
+    def macd(self, raw, period, dataframe=False):
+        def __pema(pd_data, period):
+            data, res, c = pd_data.values, [], 0
+            for i in range(len(data)):
+                hdr = np.nan
+                if not np.isnan(data[i]):
+                    if c == period:
+                        hdr = np.array(data[i - period: i]).mean()
+                    if c > period:
+                        hdr = (res[-1] * (period - 1) + data[i]) / period
+                    c += 1
+                res.append(hdr)
+            return pd.Series(res, index=pd_data.index)
+
+        e_slow = self.ma(raw, period['slow'], favour='e')
+        e_fast = self.ma(raw, period['fast'], favour='e')
+        tmp = pd.DataFrame([e_fast['EMA'], e_slow['EMA']]).T
+        tmp.columns = ['Fast', 'Slow']
+        tdiff = tmp.diff(axis=1)
+        m_line = tdiff['Slow']
+        s_line = __pema(m_line, period['signal'])
+        hdr = pd.DataFrame([m_line, s_line]).T
+        hdr.columns = ['M Line', 'Signal Line']
+        tdiff = hdr.diff(axis=1)
+        m_hist = tdiff['Signal Line']
+        hdr = pd.DataFrame([m_line, s_line, m_hist]).T
+        hdr.columns = ['M Line', 'Signal Line', 'M Histogram']
+        if dataframe: return hdr
+        return hdr.to_dict()
+
     def bbw(self, raw, period, req_field='close', programmatic=False):
         mres = []
         def process(raw, period, req_field):
