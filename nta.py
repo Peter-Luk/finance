@@ -79,19 +79,15 @@ class ONA(object):
             _raw = pd.DataFrame(raw['Data'], index=raw['Date'])
             _raw.columns = ['Open', 'High', 'Low', 'Close', 'Volume']
         except: pass
-        hdr = []
-        lr = len(_raw)
+        hdr, lr = [], lem(_raw)
         for i in range(lr):
-        # while i < lr:
             if i < period['K'] - 1: val = np.nan
             else:
-                ml = _raw['Low'][i - period['K']:i + 1].min()
-                mh = _raw['High'][i - period['K']:i + 1].max()
+                ml = _raw['Low'][i - period['K'] + 1:i + 1].min()
+                mh = _raw['High'][i - period['K'] + 1:i + 1].max()
                 cl = _raw['Close'][i]
                 val = (cl - ml) / (mh - ml) * 100
             hdr.append(val)
-            # i += 1
-        # kseries = pd.Series(hdr)
         kseries = pd.Series(hdr, index=_raw.index)
         kseries.name = '%K'
         res = pd.DataFrame([_raw['Low'], _raw['High'], _raw['Close'], kseries]).T
