@@ -79,7 +79,7 @@ class ONA(object):
             _raw = pd.DataFrame(raw['Data'], index=raw['Date'])
             _raw.columns = ['Open', 'High', 'Low', 'Close', 'Volume']
         except: pass
-        hdr, lr = [], lem(_raw)
+        hdr, lr = [], len(_raw)
         for i in range(lr):
             if i < period['K'] - 1: val = np.nan
             else:
