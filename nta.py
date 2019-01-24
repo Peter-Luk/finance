@@ -90,7 +90,14 @@ class ONA(object):
             hdr.append(val)
         kseries = pd.Series(hdr, index=_raw.index)
         kseries.name = '%K'
-        res = pd.DataFrame([_raw['Low'], _raw['High'], _raw['Close'], kseries]).T
+        hdr = []
+        for i in range(lr):
+            if i < period['K'] + period['D'] - 2: val = np.nan
+            else: val = kseries[i - period['D'] + 1: i + 1].mean()
+            hdr.append(val)
+        dseries = pd.Series(hdr, index=_raw.index)
+        dseries.name = '%D'
+        res = pd.DataFrame([kseries, dseries]).T
         return res
 
     def bbw(self, raw, period, req_field='close', programmatic=False):
