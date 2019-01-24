@@ -181,7 +181,11 @@ class Equities(AE, Viewer):
         return self.view.macd(raw, period, dataframe)
 
     def sco(self, raw=None, period=periods['sco'], dataframe=True):
-        if not raw: raw = self.data
+        if not raw:
+            if isinstance(self.data, dict):
+                raw = self.data
+                try: raw = self._ae()
+                except: pass
         return self.view.sco(raw, period, dataframe)
 
     def kama(self, data=None, period=periods):
