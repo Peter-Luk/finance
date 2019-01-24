@@ -74,7 +74,7 @@ class ONA(object):
         if dataframe: return hdr
         return hdr.to_dict()
 
-    def sco(self, raw, period, dataframe=False):
+    def soc(self, raw, period, dataframe=False):
         if isinstance(raw, dict):
             try:
                 _raw = pd.DataFrame(raw['Data'], index=raw['Date'])
