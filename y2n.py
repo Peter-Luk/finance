@@ -44,6 +44,14 @@ class Futures(AF, Viewer):
         if not raw: raw = self.data
         return self.view.ma(raw, period, favour, req_field, programmatic)
 
+    def sco(self, raw=None, period=periods['sco'], dataframe=True):
+        if not raw:
+            if isinstance(self.data, dict):
+                raw = self.data
+                try: raw = self._ae()
+                except: pass
+        return self.view.sco(raw, period, dataframe)
+
     def macd(self, raw=None, period=periods['macd'], dataframe=True):
         if not raw: raw = self.data
         return self.view.macd(raw, period, dataframe)
