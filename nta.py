@@ -79,21 +79,23 @@ class ONA(object):
             _raw = pd.DataFrame(raw['Data'], index=raw['Date'])
             _raw.columns = ['Open', 'High', 'Low', 'Close', 'Volume']
         except: pass
-        i, hdr = 0, []
+        hdr = []
         lr = len(_raw)
-        while i < lr:
-            if i < period['K']: val = np.nan
+        for i in range(lr):
+        # while i < lr:
+            if i < period['K'] - 1: val = np.nan
             else:
-                ml = _raw['Low'][i - period['K']:i].min()
-                mh = _raw['High'][i - period['K']:i].max()
-                cl = _raw['Close'][i - 1]
+                ml = _raw['Low'][i - period['K']:i + 1].min()
+                mh = _raw['High'][i - period['K']:i + 1].max()
+                cl = _raw['Close'][i]
                 val = (cl - ml) / (mh - ml) * 100
             hdr.append(val)
-            i += 1
+            # i += 1
         # kseries = pd.Series(hdr)
         kseries = pd.Series(hdr, index=_raw.index)
         kseries.name = '%K'
-        return kseries
+        res = pd.DataFrame([_raw['Low'], _raw['High'], _raw['Close'], kseries]).T
+        return res
 
     def bbw(self, raw, period, req_field='close', programmatic=False):
         mres = []
