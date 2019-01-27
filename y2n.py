@@ -196,6 +196,10 @@ class Equities(AE, Viewer):
                 except: pass
         return self.view.soc(raw, period, dataframe)
 
+    def stc(self, raw=None, period=periods['stc'], dataframe=True):
+        if not raw: raw = self.data
+        return self.view.stc(raw, period, dataframe)
+
     def kama(self, data=None, period=periods):
         if not data: data = self.data
         return self.view.kama(data, period)
