@@ -100,7 +100,39 @@ class ONA(object):
         dseries = pd.Series(hdr, index=_raw.index)
         dseries.name = '%D'
         res = pd.DataFrame([kseries, dseries]).T
-        return res
+        if dataframe: return res
+        return res.to_dict()
+
+    def stc(self, raw, period, dataframe=False):
+        hdr, lr = [], len(_raw)
+        e_slow = self.ma(raw, period['slow'], favour='e')
+        e_fast = self.ma(raw, period['fast'], favour='e')
+        tmp = pd.DataFrame([e_fast['EMA'], e_slow['EMA']]).T
+        tmp.columns = ['Fast', 'Slow']
+        tdiff = tmp.diff(axis=1)
+        m_line = tdiff['Slow']
+        for i in range(m_line):
+            if i < period['K'] - 1: val = np.nan
+            else:
+                ml = m_line[i - period['K'] + 1:i + 1].min()
+                mh = m_line[i - period['K'] + 1:i + 1].max()
+                cl = raw['Close'][i]
+                val = (cl - ml) / (mh - ml) * 100
+            hdr.append(val)
+        kseries = pd.Series(hdr, index=_raw.index)
+        kseries.name = '%K'
+        hdr = []
+        for i in range(m_line):
+            if i < period['K'] + period['D'] - 2: val = np.nan
+            else: val = kseries[i - period['D'] + 1: i + 1].mean()
+            hdr.append(val)
+        dseries = pd.Series(hdr, index=_raw.index)
+        dseries.name = '%D'
+        res = pd.DataFrame([m_line, kseries, dseries]).T
+        hdr = [(res['M Line'][i] - res['%K'][i]) / (res['%D'][i] - res['%K'][i]) * 100 for i in range(res)]
+        res = pd.Series(hdr, index=res.index)
+        if dataframe: return res
+        return res.to_dict()
 
     def bbw(self, raw, period, req_field='close', programmatic=False):
         mres = []
