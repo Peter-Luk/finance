@@ -113,12 +113,12 @@ class ONA(object):
         tdiff = tmp.diff(axis=1)
         m_line = tdiff['Slow']
         for i in range(len(m_line)):
-            if i < period['K'] - 1: val = np.nan
+            if i < period['K']: val = np.nan
             else:
-                ml = m_line[i - period['K'] + 1:i + 1].min()
-                mh = m_line[i - period['K'] + 1:i + 1].max()
-                # cl = raw['Close'][i]
-                cl = raw['Data'][i, -2]
+                ml = m_line[i - period['K']:i].min()
+                mh = m_line[i - period['K']:i].max()
+                cl = m_line[i]
+                # cl = raw['Data'][i, -2]
                 if mh == ml: val = np.nan
                 else: val = (cl - ml) / (mh - ml)
             hdr.append(val)
@@ -132,8 +132,10 @@ class ONA(object):
         dseries = pd.Series(hdr, index=raw['Date'])
         dseries.name = '%D'
         res = pd.DataFrame([m_line, kseries, dseries]).T
-        # hdr = [(res['Slow'][i] - res['%K'][i]) / (res['%D'][i] - res['%K'][i]) * 100 for i in range(res)]
-        # res = pd.Series(hdr, index=res['Date'])
+        rd = res.values
+        hdr = [(rd[i, 0] - rd[i, 1]) / (rd[i, -1] - rd[i, 1]) * 100 for i in range(len(res))]
+        res = pd.Series(hdr, index=res['Date'])
+        res.name = 'STC'
         if dataframe: return res
         return res.to_dict()
 
