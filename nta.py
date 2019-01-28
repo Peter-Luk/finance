@@ -133,8 +133,10 @@ class ONA(object):
         dseries.name = '%D'
         res = pd.DataFrame([m_line, kseries, dseries]).T
         rd = res.values
-        hdr = [(rd[i, 0] - rd[i, 1]) / (rd[i, -1] - rd[i, 1]) * 100 for i in range(len(res))]
-        res = pd.Series(hdr, index=res['Date'])
+        for i in range(len(res)):
+            if rd[i, -1] == rd[i, 1]: hdr.append(np.nan)
+            else: hdr.append((rd[i, 0] - rd[i, 1]) / (rd[i, -1] - rd[i, 1]) * 100)
+        res = pd.Series(hdr, index=raw['Date'])
         res.name = 'STC'
         if dataframe: return res
         return res.to_dict()
