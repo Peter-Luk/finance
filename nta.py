@@ -126,8 +126,10 @@ class ONA(object):
         kseries.name = '%K'
         hdr = []
         for i in range(len(m_line)):
-            if i < period['K'] + period['D'] - 2: val = np.nan
-            else: val = kseries[i - period['D'] + 1: i + 1].mean()
+            # if i < period['K'] + period['D'] - 2: val = np.nan
+            # else: val = kseries[i - period['D'] + 1: i + 1].mean()
+            if i < period['K'] + period['D']: val = np.nan
+            else: val = kseries[i - period['D']: i].mean()
             hdr.append(val)
         dseries = pd.Series(hdr, index=raw['Date'])
         dseries.name = '%D'
