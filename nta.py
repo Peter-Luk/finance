@@ -132,7 +132,7 @@ class ONA(object):
         dseries = pd.Series(hdr, index=raw['Date'])
         dseries.name = '%D'
         res = pd.DataFrame([m_line, kseries, dseries]).T
-        rd = res.values
+        hdr, rd = [], res.values
         for i in range(len(res)):
             if rd[i, -1] == rd[i, 1]: hdr.append(np.nan)
             else: hdr.append((rd[i, 0] - rd[i, 1]) / (rd[i, -1] - rd[i, 1]) * 100)
