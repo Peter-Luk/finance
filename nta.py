@@ -135,7 +135,7 @@ class ONA(object):
         hdr, rd = [], res.values
         for i in range(len(res)):
             if rd[i, -1] == rd[i, 1]: hdr.append(np.nan)
-            else: hdr.append((rd[i, 0] - rd[i, 1]) / (rd[i, -1] - rd[i, 1]) * 100)
+            else: hdr.append((rd[i, 0] - rd[i, 1]) / (rd[i, -1] - rd[i, 1]))
         res = pd.Series(hdr, index=raw['Date'])
         res.name = 'STC'
         if dataframe: return res
