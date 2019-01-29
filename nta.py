@@ -60,10 +60,7 @@ class ONA(object):
 
         e_slow = self.ma(raw, period['slow'], favour='e')
         e_fast = self.ma(raw, period['fast'], favour='e')
-        tmp = pd.DataFrame([e_fast['EMA'], e_slow['EMA']]).T
-        tmp.columns = ['Fast', 'Slow']
-        tdiff = tmp.diff(axis=1)
-        m_line = tdiff['Slow']
+        m_line = e_fast['EMA'] - e_slow['EMA']
         s_line = __pema(m_line, period['signal'])
         hdr = pd.DataFrame([m_line, s_line]).T
         hdr.columns = ['M Line', 'Signal Line']
@@ -109,17 +106,13 @@ class ONA(object):
         hdr = []
         e_slow = self.ma(raw, period['slow'], favour='e')
         e_fast = self.ma(raw, period['fast'], favour='e')
-        tmp = pd.DataFrame([e_fast['EMA'], e_slow['EMA']]).T
-        tmp.columns = ['Fast', 'Slow']
-        tdiff = tmp.diff(axis=1)
-        m_line = tdiff['Slow']
+        m_line = e_fast['EMA'] - e_slow['EMA']
         for i in range(len(m_line)):
             if i < period['K']: val = np.nan
             else:
                 ml = m_line[i - period['K']:i].min()
                 mh = m_line[i - period['K']:i].max()
                 cl = m_line[i]
-                # cl = raw['Data'][i, -2]
                 if mh == ml: val = np.nan
                 else: val = (cl - ml) / (mh - ml)
             hdr.append(val)
@@ -127,14 +120,6 @@ class ONA(object):
         k = kseries.rolling(period['D']).mean()
         k.name = '%K'
         d = k.rolling(period['D']).mean()
-        # hdr = []
-        # for i in range(len(m_line)):
-        #     # if i < period['K'] + period['D'] - 2: val = np.nan
-        #     # else: val = kseries[i - period['D'] + 1: i + 1].mean()
-        #     if i < period['K'] + period['D']: val = np.nan
-        #     else: val = kseries[i - period['D']: i].mean()
-        #     hdr.append(val)
-        # dseries = pd.Series(hdr, index=raw['Date'])
         d.name = '%D'
         res = pd.DataFrame([m_line, k, d]).T
         hdr, rd = [], res.values
