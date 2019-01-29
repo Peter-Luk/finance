@@ -92,12 +92,13 @@ class ONA(object):
             hdr.append(val)
         kseries = pd.Series(hdr, index=_raw.index)
         kseries.name = '%K'
-        hdr = []
-        for i in range(lr):
-            if i < period['K'] + period['D'] - 2: val = np.nan
-            else: val = kseries[i - period['D'] + 1: i + 1].mean()
-            hdr.append(val)
-        dseries = pd.Series(hdr, index=_raw.index)
+        dseries = kseries.rolling(period['D']).mean()
+        # hdr = []
+        # for i in range(lr):
+        #     if i < period['K'] + period['D'] - 2: val = np.nan
+        #     else: val = kseries[i - period['D'] + 1: i + 1].mean()
+        #     hdr.append(val)
+        # dseries = pd.Series(hdr, index=_raw.index)
         dseries.name = '%D'
         res = pd.DataFrame([kseries, dseries]).T
         if dataframe: return res
@@ -123,17 +124,19 @@ class ONA(object):
                 else: val = (cl - ml) / (mh - ml)
             hdr.append(val)
         kseries = pd.Series(hdr, index=raw['Date'])
-        kseries.name = '%K'
-        hdr = []
-        for i in range(len(m_line)):
-            # if i < period['K'] + period['D'] - 2: val = np.nan
-            # else: val = kseries[i - period['D'] + 1: i + 1].mean()
-            if i < period['K'] + period['D']: val = np.nan
-            else: val = kseries[i - period['D']: i].mean()
-            hdr.append(val)
-        dseries = pd.Series(hdr, index=raw['Date'])
-        dseries.name = '%D'
-        res = pd.DataFrame([m_line, kseries, dseries]).T
+        k = kseries.rolling(period['D']).mean()
+        k.name = '%K'
+        d = k.rolling(period['D']).mean()
+        # hdr = []
+        # for i in range(len(m_line)):
+        #     # if i < period['K'] + period['D'] - 2: val = np.nan
+        #     # else: val = kseries[i - period['D'] + 1: i + 1].mean()
+        #     if i < period['K'] + period['D']: val = np.nan
+        #     else: val = kseries[i - period['D']: i].mean()
+        #     hdr.append(val)
+        # dseries = pd.Series(hdr, index=raw['Date'])
+        d.name = '%D'
+        res = pd.DataFrame([m_line, k, d]).T
         hdr, rd = [], res.values
         for i in range(len(res)):
             if rd[i, -1] == rd[i, 1]: hdr.append(np.nan)
