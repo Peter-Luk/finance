@@ -44,7 +44,7 @@ class ONA(object):
         if programmatic: return mres
         return pd.DataFrame({f'{favour}ma'.upper(): mres}, index=raw['Date'])
         # __ = pd.Series(mres, index=raw['Date'])
-        # __.name = f'{favour}ma{period}'
+        # __.name = f'{favour}ma{period:d}'
         # return __
 
     def macd(self, raw, period, dataframe=False):
@@ -106,6 +106,7 @@ class ONA(object):
         e_slow = self.ma(raw, period['slow'], favour='e')
         e_fast = self.ma(raw, period['fast'], favour='e')
         m_line = e_fast['EMA'] - e_slow['EMA']
+        # m_line = e_fast - e_slow
         for i in range(len(m_line)):
             if i < period['K']: val = np.nan
             else:
@@ -214,6 +215,9 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period))
         if programmatic: return mres
         return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
+        # __ = pd.Series(mres, index=raw['Date'])
+        # __.name = f'KAMA{period:d}'
+        # return __
 
     def atr(self, raw, period, programmatic=False):
         mres = []
@@ -252,6 +256,9 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period))
         if programmatic: return mres
         return pd.DataFrame({'ATR': mres}, index=raw['Date'])
+        # __ = pd.Series(mres, index=raw['Date'])
+        # __.name = f'ATR{period:d}'
+        # return __
 
     def adx(self, raw, period):
         mres = []
@@ -328,6 +335,9 @@ class ONA(object):
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'ADX': mres}, index=raw['Date'])
+        # __ = pd.Series(mres, index=raw['Date'])
+        # __.name = f'ADX{period:d}'
+        # return __
 
     def rsi(self, raw, period):
         mres = []
@@ -380,6 +390,9 @@ class ONA(object):
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         return pd.DataFrame({'RSI': mres}, index=raw['Date'])
+        # __ = pd.Series(mres, index=raw['Date'])
+        # __.name = f'RSI{period:d}'
+        # return __
 
     def kc(self, raw, period, ratio=gr/2, programmatic=False):
         upper, lower = [], []
