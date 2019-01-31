@@ -42,10 +42,10 @@ class ONA(object):
             mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
         else: mres.extend(process(raw['Data'], period, favour, req_field))
         if programmatic: return mres
-        return pd.DataFrame({f'{favour}ma'.upper(): mres}, index=raw['Date'])
-        # __ = pd.Series(mres, index=raw['Date'])
-        # __.name = f'{favour}ma{period:d}'
-        # return __
+        # return pd.DataFrame({f'{favour}ma'.upper(): mres}, index=raw['Date'])
+        __ = pd.Series(mres, index=raw['Date'])
+        __.name = f'{favour}ma{period:d}'.upper()
+        return __
 
     def macd(self, raw, period, dataframe=False):
         def __pema(pd_data, period):
@@ -214,10 +214,10 @@ class ONA(object):
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         if programmatic: return mres
-        return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
-        # __ = pd.Series(mres, index=raw['Date'])
-        # __.name = f'KAMA{period:d}'
-        # return __
+        # return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
+        __ = pd.Series(mres, index=raw['Date'])
+        __.name = f"KAMA{period['simple']:d}"
+        return __
 
     def atr(self, raw, period, programmatic=False):
         mres = []
@@ -255,10 +255,10 @@ class ONA(object):
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
         if programmatic: return mres
-        return pd.DataFrame({'ATR': mres}, index=raw['Date'])
-        # __ = pd.Series(mres, index=raw['Date'])
-        # __.name = f'ATR{period:d}'
-        # return __
+        # return pd.DataFrame({'ATR': mres}, index=raw['Date'])
+        __ = pd.Series(mres, index=raw['Date'])
+        __.name = f'ATR{period:d}'
+        return __
 
     def adx(self, raw, period):
         mres = []
@@ -334,10 +334,10 @@ class ONA(object):
                 _ += 1
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
-        return pd.DataFrame({'ADX': mres}, index=raw['Date'])
-        # __ = pd.Series(mres, index=raw['Date'])
-        # __.name = f'ADX{period:d}'
-        # return __
+        # return pd.DataFrame({'ADX': mres}, index=raw['Date'])
+        __ = pd.Series(mres, index=raw['Date'])
+        __.name = f'ADX{period:d}'
+        return __
 
     def rsi(self, raw, period):
         mres = []
@@ -389,10 +389,10 @@ class ONA(object):
                 _ += 1
             mres.extend(process(raw['Data'][~rflag], period))
         else: mres.extend(process(raw['Data'], period))
-        return pd.DataFrame({'RSI': mres}, index=raw['Date'])
-        # __ = pd.Series(mres, index=raw['Date'])
-        # __.name = f'RSI{period:d}'
-        # return __
+        # return pd.DataFrame({'RSI': mres}, index=raw['Date'])
+        __ = pd.Series(mres, index=raw['Date'])
+        __.name = f'RSI{period:d}'
+        return __
 
     def kc(self, raw, period, ratio=gr/2, programmatic=False):
         upper, lower = [], []
@@ -431,10 +431,12 @@ class ONA(object):
         upper, lower = [], []
         if not df:
             date = raw['Date'][-1]
-            df = self.atr(raw, period['atr'])['ATR'][date] / raw['Data'][raw['Date'].index(date), -2]
+            # df = self.atr(raw, period['atr'])['ATR'][date] / raw['Data'][raw['Date'].index(date), -2]
+            df = self.atr(raw, period['atr'])[date] / raw['Data'][raw['Date'].index(date), -2]
 
         def __pema(pd_data, period):
-            data, res, c = [_[0] for _ in pd_data.values], [], 0
+            # data, res, c = [_[0] for _ in pd_data.values], [], 0
+            data, res, c = pd_data.values, [], 0
             for i in range(len(data)):
                 hdr = np.nan
                 if not np.isnan(data[i]):
@@ -475,7 +477,8 @@ class ONA(object):
 
     def ratr(self, raw, period):
         def _patr(raw, period):
-            lc, lr = raw['Data'][-1, -2], self.atr(raw, period).values[-1][0]
+            # lc, lr = raw['Data'][-1, -2], self.atr(raw, period).values[-1][0]
+            lc, lr = raw['Data'][-1, -2], self.atr(raw, period).values[-1]
             _ = [lc + lr, lc, lc - lr]
             _.extend(gslice([lc + lr, lc]))
             _.extend(gslice([lc, lc - lr]))
@@ -523,7 +526,10 @@ class ONA(object):
         if not data: data = self.data
         _atr = self.atr(data, period)
         hdr = [_atr['ATR'][_] / self.data['Data'][self.data['Date'].index(_), -2] * 100 for _ in _atr.index]
-        return pd.DataFrame({'TRP':hdr}, index=_atr.index)
+        # return pd.DataFrame({'TRP':hdr}, index=_atr.index)
+        __ = pd.Series(hdr, index=_atr.index)
+        __.name = f'TRP{period:d}'
+        return __
 
 class Viewer(ONA):
     def __init__(self, data):
@@ -535,11 +541,13 @@ class Viewer(ONA):
 
     def mas(self, period):
         _o = ONA(self.data)
-        return pd.DataFrame([_o.kama(self.data, period)['KAMA'].map(hsirnd), _o.ma(self.data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(self.data, period['simple'])['SMA'].map(hsirnd), _o.ma(self.data, period['simple'], favour='w')['WMA'].map(hsirnd)]).T
+        # return pd.DataFrame([_o.kama(self.data, period)['KAMA'].map(hsirnd), _o.ma(self.data, period['simple'], favour='e')['EMA'].map(hsirnd), _o.ma(self.data, period['simple'])['SMA'].map(hsirnd), _o.ma(self.data, period['simple'], favour='w')['WMA'].map(hsirnd)]).T
+        return pd.DataFrame([_o.kama(self.data, period).map(hsirnd), _o.ma(self.data, period['simple'], favour='e').map(hsirnd), _o.ma(self.data, period['simple']).map(hsirnd), _o.ma(self.data, period['simple'], favour='w').map(hsirnd)]).T
 
     def idrs(self, period):
         _o = ONA(self.data)
-        return _o.adx(self.data, period['adx']).merge(_o.rsi(self.data, period['simple']), left_index=True, right_index=True).merge(_o.atr(self.data, period['atr']), left_index=True, right_index=True).merge(_o.trp(self.data, period['atr']), left_index=True, right_index=True)
+        # return _o.adx(self.data, period['adx']).merge(_o.rsi(self.data, period['simple']), left_index=True, right_index=True).merge(_o.atr(self.data, period['atr']), left_index=True, right_index=True).merge(_o.trp(self.data, period['atr']), left_index=True, right_index=True)
+        return pd.DataFrame([_o.adx(self.data, period['adx']), _o.rsi(self.data, period['simple']), _o.atr(self.data, period['atr']), _o.trp(self.data, period['atr'])]).T
 
     def best_quote(self, action='buy', bound=True):
         er, eo = self.ratr(), self.ovr()
