@@ -43,6 +43,9 @@ class ONA(object):
         else: mres.extend(process(raw['Data'], period, favour, req_field))
         if programmatic: return mres
         return pd.DataFrame({f'{favour}ma'.upper(): mres}, index=raw['Date'])
+        # __ = pd.Series(mres, index=raw['Date'])
+        # __.name = f'{favour}ma{period}'
+        # return __
 
     def macd(self, raw, period, dataframe=False):
         def __pema(pd_data, period):
