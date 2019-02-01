@@ -122,18 +122,7 @@ class ONA(object):
         m_line = e_fast - e_slow
         mh = m_line.rolling(period['K']).max()
         ml = m_line.rolling(period['K']).min()
-        kseries = (mh  - ml)
-        # hdr = []
-        # for i in range(len(m_line)):
-        #     if i < period['K']: val = np.nan
-        #     else:
-        #         ml = m_line[i - period['K']:i].min()
-        #         mh = m_line[i - period['K']:i].max()
-        #         cl = m_line[i]
-        #         val = np.nan
-        #         if mh != ml: val = (cl - ml) / (mh - ml) * 100
-        #     hdr.append(val)
-        # kseries = pd.Series(hdr, index=raw['Date'])
+        kseries = (m_line - ml) / (mh  - ml)
         k = kseries.rolling(period['D']).mean()
         k.name = '%K'
         d = k.rolling(period['D']).mean()
@@ -558,8 +547,8 @@ class Viewer(ONA):
 
     def idrs(self, period):
         _o = ONA(self.data)
-        # return _o.adx(self.data, period['adx']).merge(_o.rsi(self.data, period['simple']), left_index=True, right_index=True).merge(_o.atr(self.data, period['atr']), left_index=True, right_index=True).merge(_o.trp(self.data, period['atr']), left_index=True, right_index=True)
-        return pd.DataFrame([_o.adx(self.data, period['adx']), _o.rsi(self.data, period['simple']), _o.atr(self.data, period['atr']), _o.trp(self.data, period['atr'])]).T
+        return _o.adx(self.data, period['adx']).merge(_o.rsi(self.data, period['simple']), left_index=True, right_index=True).merge(_o.atr(self.data, period['atr']), left_index=True, right_index=True).merge(_o.trp(self.data, period['atr']), left_index=True, right_index=True)
+        # return pd.DataFrame([_o.adx(self.data, period['adx']), _o.rsi(self.data, period['simple']), _o.atr(self.data, period['atr']), _o.trp(self.data, period['atr'])]).T
 
     def best_quote(self, action='buy', bound=True):
         er, eo = self.ratr(), self.ovr()
