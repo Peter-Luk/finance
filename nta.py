@@ -83,14 +83,9 @@ class ONA(object):
 
         e_slow = self.ma(raw, period['slow'], favour='e')
         e_fast = self.ma(raw, period['fast'], favour='e')
-        # m_line = e_fast['EMA'] - e_slow['EMA']
         m_line = e_fast - e_slow
         s_line = __pema(m_line, period['signal'])
         m_hist = m_line - s_line
-        # hdr = pd.DataFrame([m_line, s_line]).T
-        # hdr.columns = ['M Line', 'Signal Line']
-        # tdiff = hdr.diff(axis=1)
-        # m_hist = tdiff['Signal Line']
         hdr = pd.DataFrame([m_line, s_line, m_hist]).T
         hdr.columns = ['M Line', 'Signal Line', 'M Histogram']
         if dataframe: return hdr
