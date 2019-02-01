@@ -14,38 +14,58 @@ class ONA(object):
         del(self.data, self.date)
 
     def ma(self, raw, period, favour='s', req_field='close', programmatic=False):
-        mres = []
-        def process(raw, period, favour, req_field):
-            res, _ = [], 0
-            while _ < len(raw):
-                hdr = np.nan
-                if not _ < period - 1:
-                    if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
-                    if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
-                    if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
-                    if favour[0].lower() == 's': hdr = rdata.mean()
-                    if favour[0].lower() == 'w':
-                        wdata = raw[_ - period + 1: _ + 1, -1]
-                        hdr = (rdata * wdata).sum() / wdata.sum()
-                    if favour[0].lower() == 'e':
-                        if _ == period: hdr = rdata.mean()
-                        if _ > period: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
-                res.append(hdr)
+        hdr, _data = [], pd.DataFrame(raw['Data'], raw['Date'], ['Open', 'High', 'Low', 'Close', 'Volume'])
+        if req_field.lower() in ['c', 'close']: data = _data['Close']
+        if req_field.lower() in ['hl', 'lh', 'range']: data = pd.DataFrame([_data['High'], _data['Low']]).mean().T
+        if req_field.lower() in ['ohlc', 'all', 'full']: data = pd.DataFrame([_data['Open'], _data['High'], _data['Low'], _data['Close']]).mean().T
+        if favour.lower() in ['s', 'simple']: hdr = data.rolling(period).mean()
+        if favour.lower() in ['w', 'weighted']:
+            _ = data * _data['Volume']
+            hdr = _.rolling(period).sum() / _data['Volume'].rolling(period).sum()
+        if favour.lower() in ['e', 'exponential']:
+            _, val = 0, np.nan
+            while _ < len(data):
+                if _ == period: val = data[:period].mean()
+                if _ > period: val = (hdr[-1] * (period - 1) + data[_]) / period
+                hdr.append(val)
                 _ += 1
-            return res
-        rflag = np.isnan(raw['Data']).any(axis=1)
-        if rflag.any():
-            _ = 0
-            while _ < len(raw['Data'][rflag]):
-                mres.append(np.nan)
-                _ += 1
-            mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
-        else: mres.extend(process(raw['Data'], period, favour, req_field))
-        if programmatic: return mres
-        # return pd.DataFrame({f'{favour}ma'.upper(): mres}, index=raw['Date'])
-        __ = pd.Series(mres, index=raw['Date'])
+        if programmatic: return hdr
+        __ = pd.Series(hdr, index=data.index)
         __.name = f'{favour}ma{period:d}'.upper()
         return __
+
+        # mres = []
+        # def process(raw, period, favour, req_field):
+        #     res, _ = [], 0
+        #     while _ < len(raw):
+        #         hdr = np.nan
+        #         if not _ < period - 1:
+        #             if req_field.lower() in ['close', 'c']: rdata = raw[_ - period + 1: _ + 1, -2]
+        #             if req_field.lower() in ['full', 'f', 'ohlc', 'all']: rdata = raw[_ - period + 1: _ + 1, :-1].mean(axis=1)
+        #             if req_field.lower() in ['range', 'hl', 'lh']: rdata = raw[_ - period + 1: _ + 1, 1:3].mean(axis=1)
+        #             if favour[0].lower() == 's': hdr = rdata.mean()
+        #             if favour[0].lower() == 'w':
+        #                 wdata = raw[_ - period + 1: _ + 1, -1]
+        #                 hdr = (rdata * wdata).sum() / wdata.sum()
+        #             if favour[0].lower() == 'e':
+        #                 if _ == period: hdr = rdata.mean()
+        #                 if _ > period: hdr = (res[-1] * (period - 1) + rdata[-1]) / period
+        #         res.append(hdr)
+        #         _ += 1
+        #     return res
+        # rflag = np.isnan(raw['Data']).any(axis=1)
+        # if rflag.any():
+        #     _ = 0
+        #     while _ < len(raw['Data'][rflag]):
+        #         mres.append(np.nan)
+        #         _ += 1
+        #     mres.extend(process(raw['Data'][~rflag], period, favour, req_field))
+        # else: mres.extend(process(raw['Data'], period, favour, req_field))
+        # if programmatic: return mres
+        # # return pd.DataFrame({f'{favour}ma'.upper(): mres}, index=raw['Date'])
+        # __ = pd.Series(mres, index=raw['Date'])
+        # __.name = f'{favour}ma{period:d}'.upper()
+        # return __
 
     def macd(self, raw, period, dataframe=False):
         def __pema(pd_data, period):
@@ -102,34 +122,31 @@ class ONA(object):
         return res.to_dict()
 
     def stc(self, raw, period, dataframe=False):
-        hdr = []
         e_slow = self.ma(raw, period['slow'], favour='e')
         e_fast = self.ma(raw, period['fast'], favour='e')
-        # m_line = e_fast['EMA'] - e_slow['EMA']
         m_line = e_fast - e_slow
-        for i in range(len(m_line)):
-            if i < period['K']: val = np.nan
-            else:
-                ml = m_line[i - period['K']:i].min()
-                mh = m_line[i - period['K']:i].max()
-                cl = m_line[i]
-                if mh == ml: val = np.nan
-                else: val = (cl - ml) / (mh - ml)
-            hdr.append(val)
-        kseries = pd.Series(hdr, index=raw['Date'])
+        mh = m_line.rolling(period['K']).max()
+        ml = m_line.rolling(period['K']).min()
+        kseries = (mh  - ml)
+        # hdr = []
+        # for i in range(len(m_line)):
+        #     if i < period['K']: val = np.nan
+        #     else:
+        #         ml = m_line[i - period['K']:i].min()
+        #         mh = m_line[i - period['K']:i].max()
+        #         cl = m_line[i]
+        #         val = np.nan
+        #         if mh != ml: val = (cl - ml) / (mh - ml) * 100
+        #     hdr.append(val)
+        # kseries = pd.Series(hdr, index=raw['Date'])
         k = kseries.rolling(period['D']).mean()
         k.name = '%K'
         d = k.rolling(period['D']).mean()
         d.name = '%D'
-        res = pd.DataFrame([m_line, k, d]).T
-        hdr, rd = [], res.values
-        for i in range(len(res)):
-            if rd[i, -1] == rd[i, 1]: hdr.append(np.nan)
-            else: hdr.append((rd[i, 0] - rd[i, 1]) / (rd[i, -1] - rd[i, 1]))
-        res = pd.Series(hdr, index=raw['Date'])
-        res.name = 'STC'
-        if dataframe: return res
-        return res.to_dict()
+        __ = (m_line - k) / (d - k)
+        __.name = 'STC'
+        if dataframe: return __
+        return __.to_dict()
 
     def bbw(self, raw, period, req_field='close', programmatic=False):
         mres = []
