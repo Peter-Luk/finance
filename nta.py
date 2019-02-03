@@ -158,7 +158,7 @@ class ONA(object):
         return pd.DataFrame({'BBW': mres}, index=raw['Date'])
 
     def kama(self, raw, period, programmatic=False):
-        mres, sma = [], self.ma(raw, period['simple'], favour='e', req_field='close', programmatic=True)
+        mres, sma = [], self.ma(raw, period['slow'], favour='s', req_field='close', programmatic=True)
 
         def er(raw, period):
             def __dc(raw, lapse=period['er']):
@@ -217,7 +217,7 @@ class ONA(object):
         if programmatic: return mres
         # return pd.DataFrame({'KAMA': mres}, index=raw['Date'])
         __ = pd.Series(mres, index=raw['Date'])
-        __.name = f"KAMA{period['simple']:d}"
+        __.name = f"KAMA{period['slow']:d}"
         return __
 
     def atr(self, raw, period, programmatic=False):

@@ -56,7 +56,7 @@ class Futures(AF, Viewer):
         if not raw: raw = self.data
         return self.view.macd(raw, period, dataframe)
 
-    def kama(self, data=None, period=periods):
+    def kama(self, data=None, period=periods['kama']):
         if not data: data = self.data
         return self.view.kama(data, period)
 
@@ -200,7 +200,7 @@ class Equities(AE, Viewer):
         if not raw: raw = self.data
         return self.view.stc(raw, period, dataframe)
 
-    def kama(self, data=None, period=periods):
+    def kama(self, data=None, period=periods['kama']):
         if not data: data = self.data
         return self.view.kama(data, period)
 
