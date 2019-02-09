@@ -1,7 +1,7 @@
 import pref
 pd, np, db, yf, datetime, sleep = pref.y2n
 from utilities import filepath, mtf
-from ntaa import Viewer, hsirnd
+from nta import Viewer, hsirnd
 from alchemy import AF, AE
 
 class Futures(AF, Viewer):
