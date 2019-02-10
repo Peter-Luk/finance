@@ -161,11 +161,11 @@ def bqo(entities_list, trade_type='buy', bound=True, dataframe=True):
     dl, il = [], []
     for _ in entities_list:
         e_ = Equities(_)
-        val = e_.best_quote(unbound=True)
-        if bound: val = e_()
-        dl.append(val[:trade_type][e_.date])
+        val = e_.best_quote(unbound=True).T[trade_type][e_.date]
+        if bound: val = e_().T[trade_type][e_.date]
+        dl.append(val)
         il.append(e_.code)
-    _ = pd.DataFrame(dl, index=il)
+    _ = pd.DataFrame({trade_type:dl}, index=il)
     if dataframe: return _.T
     return _.to_dict()
 
