@@ -157,11 +157,11 @@ class Equities(AE, Viewer):
         if date == None: date = raw.index[-1]
         return self.view.best_quote(raw, period, date, unbound, exclusive,  dataframe)
 
-def bqo(el, action='buy', bound=True, dataframe=True):
+def bqo(el, action='buy', bound=True, adhoc=True, dataframe=True):
     dl, il = [], []
     if isinstance(el, (int, str)): el = list(el)
     for _ in el:
-        if isinstance(_, int): o_ = Equities(_)
+        if isinstance(_, int): o_ = Equities(_, adhoc)
         if isinstance(_, str):
             pF = pref.db['Futures']
             if _.upper() in entities(pF['name']):
