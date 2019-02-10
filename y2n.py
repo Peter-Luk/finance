@@ -26,7 +26,9 @@ class Futures(AF, Viewer):
 
     def __call__(self, date=None):
         if date == None: date = self.date
-        return self.best_quote(date=date)
+        _ = self.best_quote(date=date)
+        _.name = self.code
+        return _
 
     def insert(self, values, conditions):
         return self._af.append(values, conditions)
@@ -154,6 +156,18 @@ class Equities(AE, Viewer):
         if raw == None: raw = self.data
         if date == None: date = raw.index[-1]
         return self.view.best_quote(raw, period, date, unbound, exclusive,  dataframe)
+
+def bqo(entities_list, trade_type='buy', bound=True, dataframe=True):
+    dl, il = [], []
+    for _ in entities_list:
+        e_ = Equities(_)
+        val = e_.best_quote(unbound=True)
+        if bound: val = e_()
+        dl.append(val[:trade_type][e_.date])
+        il.append(e_.code)
+    _ = pd.DataFrame(dl, index=il)
+    if dataframe: return _.T
+    return _.to_dict()
 
 def entities(dbname=None, series=False):
     pF, pE = pref.db['Futures'], pref.db['Equities']
