@@ -160,11 +160,12 @@ class Equities(AE, Viewer):
 def bqo(entities_list, trade_type='buy', bound=True, dataframe=True):
     dl, il = [], []
     for _ in entities_list:
-        e_ = Equities(_)
-        val = e_.best_quote(unbound=True).T[trade_type][e_.date]
-        if bound: val = e_().T[trade_type][e_.date]
+        if isinstance(_, int): o_ = Equities(_)
+        if isinstance(_, str): o_ = Futures(_.upper())
+        val = o_.best_quote(unbound=True).T[trade_type][o_.date]
+        if bound: val = o_().T[trade_type][o_.date]
         dl.append(val)
-        il.append(e_.code)
+        il.append(o_.code)
     _ = pd.DataFrame({trade_type:dl}, index=il)
     if dataframe: return _.T
     return _.to_dict()
