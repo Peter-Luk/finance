@@ -28,6 +28,15 @@ class Futures(AF, Viewer):
         if date == None: date = self.date
         return self.best_quote(date=date)
 
+    def insert(self, values, conditions):
+        return self._af.append(values, conditions)
+
+    def delete(self, conditions):
+        return self._af.remove(conditions)
+
+    def update(self, values, conditions):
+        return self._af.amend(values, conditions)
+
     def combine(self, freq='bi-daily', dataframe=False):
         return self._af.combine(freq, dataframe)
 
@@ -75,6 +84,17 @@ class Equities(AE, Viewer):
     def __call__(self, date=None):
         if date == None: date = self.date
         return self.best_quote(date=date)
+
+    def insert(self, values, conditions):
+        return self._ae.append(values, conditions)
+
+    def delete(self, conditions):
+        return self._ae.remove(conditions)
+    def update(self, values, conditions):
+        return self._ae.amend(values, conditions)
+
+    def acquire(self, conditions, dataframe=True):
+        return self._ae.acquire(conditions, dataframe)
 
     def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False, series=False):
         res = {}
