@@ -157,16 +157,20 @@ class Equities(AE, Viewer):
         if date == None: date = raw.index[-1]
         return self.view.best_quote(raw, period, date, unbound, exclusive,  dataframe)
 
-def bqo(entities_list, trade_type='buy', bound=True, dataframe=True):
+def bqo(el, action='buy', bound=True, dataframe=True):
     dl, il = [], []
-    for _ in entities_list:
+    if isinstance(el, (int, str)): el = list(el)
+    for _ in el:
         if isinstance(_, int): o_ = Equities(_)
-        if isinstance(_, str): o_ = Futures(_.upper())
-        val = o_.best_quote(unbound=True).T[trade_type][o_.date]
-        if bound: val = o_().T[trade_type][o_.date]
+        if isinstance(_, str):
+            pF = pref.db['Futures']
+            if _.upper() in entities(pF['name']):
+                o_ = Futures(_.upper())
+        val = o_.best_quote(unbound=True).T[action][o_.date]
+        if bound: val = o_().T[action][o_.date]
         dl.append(val)
         il.append(o_.code)
-    _ = pd.DataFrame({trade_type:dl}, index=il)
+    _ = pd.DataFrame({action:dl}, index=il)
     if dataframe: return _.T
     return _.to_dict()
 
