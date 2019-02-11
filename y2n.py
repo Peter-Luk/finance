@@ -161,11 +161,12 @@ def bqo(el, action='buy', bound=True, adhoc=False, dataframe=True):
     dl, il = [], []
     if isinstance(el, (int, str)): el = list(el)
     for _ in el:
-        if isinstance(_, int): o_ = Equities(_, adhoc)
+        if isinstance(_, int):
+            pE = pref.db['Equities']
+            if _ in [__ for __ in entities(pE['name']) if __ not in pE['exclude']]: o_ = Equities(_, adhoc)
         if isinstance(_, str):
             pF = pref.db['Futures']
-            if _.upper() in entities(pF['name']):
-                o_ = Futures(_.upper())
+            if _.upper() in entities(pF['name']): o_ = Futures(_.upper())
         val = o_.best_quote(unbound=True).T[action][o_.date]
         if bound: val = o_().T[action][o_.date]
         dl.append(val)
