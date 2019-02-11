@@ -324,8 +324,9 @@ class Viewer(ONA):
         if close < max(inside): hdr['sell'] = max(inside)
         if unbound:
             if exclusive: hdr = {'buy':np.nan, 'sell':np.nan}
-            if close > min(outside): hdr['buy'] = min(outside)
-            if close < max(outside): hdr['sell'] = max(outside)
+            if outside != []:
+                if close > min(outside): hdr['buy'] = min(outside)
+                if close < max(outside): hdr['sell'] = max(outside)
         _ = pd.DataFrame({date:hdr})
         if dataframe: return _
         return _.to_dict()
