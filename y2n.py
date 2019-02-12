@@ -31,7 +31,8 @@ class Futures(AF, Viewer):
         return _
 
     def __str__(self):
-        return f"{self.code} close @ {self._close} on {self._date:'%Y-%m-%d'}"
+        delta = round(self.data['Close'].diff()[-1] / self.data['Close'][-2] * 100, 3)
+        return f"{self.code} close @ {self._close} ({delta}%) on {self._date:'%Y-%m-%d'}"
 
     def insert(self, values, conditions):
         return self._af.append(values, conditions)
@@ -91,7 +92,8 @@ class Equities(AE, Viewer):
         return self.best_quote(date=date)
 
     def __str__(self):
-        return f"{self.code} close @ {self._close} on {self._date:'%Y-%m-%d'}"
+        delta = round(self.data['Close'].diff()[-1] / self.data['Close'][-2] * 100, 3)
+        return f"{self.code} close @ {self._close} ({delta}%) on {self._date:'%Y-%m-%d'}"
 
     def insert(self, values, conditions):
         return self._ae.append(values, conditions)
