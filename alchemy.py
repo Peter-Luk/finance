@@ -1,5 +1,5 @@
 import pref
-db, pd, datetime = pref.sqlalchemy, pref.pandas, pref.datetime
+db, pd, datetime = pref.alchemy
 from sqlalchemy.orm import mapper, sessionmaker
 from utilities import filepath
 from os import sep, environ, listdir
