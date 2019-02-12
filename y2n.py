@@ -17,18 +17,21 @@ class Futures(AF, Viewer):
         self.__conn = self._af.connect
         self.data = self.combine(self._conf['freq'], True)
         self.view = Viewer(self.data)
-        self.date = self.data.index[-1]
-        self.close = self.data['Close'][-1]
+        self._date = self.data.index[-1]
+        self._close = self.data['Close'][-1]
 
     def __del__(self):
-        self._conf = self.table = self.rc = self._af = self.__conn = self.code = self.data = self.view = self.date = self.close = None
-        del(self._conf, self.table, self.rc, self._af, self.__conn, self.code, self.data, self.view, self.date, self.close)
+        self._conf = self.table = self.rc = self._af = self.__conn = self.code = self.data = self.view = self._date = self._close = None
+        del(self._conf, self.table, self.rc, self._af, self.__conn, self.code, self.data, self.view, self._date, self._close)
 
     def __call__(self, date=None):
-        if date == None: date = self.date
+        if date == None: date = self._date
         _ = self.best_quote(date=date)
         _.name = self.code
         return _
+
+    def __str__(self):
+        return f"{self.code} close @ {self._close} on {self._date:'%Y-%m-%d'}"
 
     def insert(self, values, conditions):
         return self._af.append(values, conditions)
@@ -76,16 +79,19 @@ class Equities(AE, Viewer):
         _raw = self.fetch(code, adhoc=adhoc)[code]
         self.data = pd.DataFrame(_raw['Data'], index=_raw['Date'], columns = ['Open', 'High', 'Low', 'Close', 'Volume'])
         self.view = Viewer(self.data)
-        self.date = self.data.index[-1]
-        self.close = hsirnd(self.data['Close'][-1])
+        self._date = self.data.index[-1]
+        self._close = hsirnd(self.data['Close'][-1])
 
     def __del__(self):
-        self._conf = self.rc = self._ae =self.__conn = self.data = self.view = self.date = self.close = None
-        del(self._conf, self.rc, self._ae, self.__conn, self.data, self.view, self.date, self.close)
+        self._conf = self.rc = self._ae =self.__conn = self.data = self.view = self._date = self._close = None
+        del(self._conf, self.rc, self._ae, self.__conn, self.data, self.view, self._date, self._close)
 
     def __call__(self, date=None):
-        if date == None: date = self.date
+        if date == None: date = self._date
         return self.best_quote(date=date)
+
+    def __str__(self):
+        return f"{self.code} close @ {self._close} on {self._date:'%Y-%m-%d'}"
 
     def insert(self, values, conditions):
         return self._ae.append(values, conditions)
