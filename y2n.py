@@ -100,6 +100,7 @@ class Equities(AE, Viewer):
 
     def delete(self, conditions):
         return self._ae.remove(conditions)
+
     def update(self, values, conditions):
         return self._ae.amend(values, conditions)
 
