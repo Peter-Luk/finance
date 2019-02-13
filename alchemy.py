@@ -106,8 +106,11 @@ class AE(AS):
             hdr = []
             for _ in conditions.keys():
                 if _ in [f'{__}'.split('.')[-1] for __ in self.columns]:
-                    if _ == 'date': hdr.append(f"self.columns.{_}=='{conditions[_]}'")
-                    else: hdr.append(f"self.columns.{_}=={conditions[_]}")
+                    cs = f"self.columns.{_}=={conditions[_]}"
+                    if _ == 'date': cs = f"self.columns.{_}=='{conditions[_]}'"
+                    hdr.append(cs)
+                    # if _ == 'date': hdr.append(f"self.columns.{_}=='{conditions[_]}'")
+                    # else: hdr.append(f"self.columns.{_}=={conditions[_]}")
             query = db.select([self.columns.id]).where(eval('db.and_(' + ', '.join(hdr) +')'))
             try: return self.connect.execute(query).scalar()
             except: pass
