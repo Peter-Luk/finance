@@ -77,8 +77,7 @@ class Equities(AE, Viewer):
         self.table = self._ae.table
         self.rc = self._ae.columns
         self.__conn = self._ae.connect
-        _raw = self.fetch(code, adhoc=adhoc)[code]
-        self.data = pd.DataFrame(_raw['Data'], index=_raw['Date'], columns = ['Open', 'High', 'Low', 'Close', 'Volume'])
+        self.data = self.fetch(self.code, adhoc=adhoc)
         self.view = Viewer(self.data)
         self._date = self.data.index[-1]
         self._close = hsirnd(self.data['Close'][-1])
@@ -107,43 +106,27 @@ class Equities(AE, Viewer):
     def acquire(self, conditions, dataframe=True):
         return self._ae.acquire(conditions, dataframe)
 
-    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False, series=False):
-        res = {}
+    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False, dataframe=True):
         if not start:
             start = pd.datetime(pd.datetime.now().year - years, 1, 1)
         aid = [_ for _ in entities(self._conf['name']) if _ not in exclude]
         if code:
-            if isinstance(code, (tuple, list)): aid = list(code)
-            if isinstance(code, (int, float)):
-                if int(code) == 5: aid = [11, int(code)]
-                else: aid = [5, int(code)]
+            if isinstance(code, (int, float)): code = int(code)
         if adhoc:
             while adhoc:
-                ar = yf.download([f'{_:04d}.HK' for _ in aid], start, group_by='ticker')
-                if len(ar): adhoc = not adhoc
+                res = yf.download(f'{code:04d}.HK', start, group_by='ticker')
+                if len(res): adhoc = not adhoc
                 else:
                     print('Retry in 30 seconds')
                     sleep(30)
-            for _ in aid:
-                hdr = {}
-                rd = ar[f'{_:04d}.HK']
-                d = rd.T
-                hdr['Date'] = [__.to_pydatetime() for __ in rd.index]
-                hdr['Data'] = np.asarray(pd.concat([rd[__] for __ in [___ for ___ in d.index if ___ not in ['Adj Close']]], axis=1, join='inner', ignore_index=False))
-                res[_] = hdr
+            res.drop('Adj Close', 1, inplace=True)
         else:
-            for _ in aid:
-                query = db.select([self.rc.date, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(self.rc.eid==_)
-                if start:
-                    query = db.select([self.rc.date, self.rc.open, self.rc.high, self.rc.low, self.rc.close, self.rc.volume]).where(db.and_(self.rc.eid==_, self.rc.date > start))
-                hdr = self.__conn.execute(query).fetchall()
-                p_ = pd.DataFrame(hdr)
-                p_.columns = hdr[0].keys()
-                p_.set_index(self._conf['index'], inplace=True)
-                pp_ = pd.DataFrame([p_['open'], p_['high'], p_['low'], p_['close'], p_['volume']]).T
-                res[_] = {'Date': list(pp_.index), 'Data': pp_.values}
-        if series: return pd.Series(res)
-        return res
+            qtext = f"SELECT date, open, high, low, close, volume FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
+            res = pd.read_sql(qtext, self.__conn, index_col='date', parse_dates=['date'])
+            res.columns = [_.capitalize() for _ in res.columns]
+            res.index.name = res.index.name.capitalize()
+        if dataframe: return res
+        return {'Date':res.index, 'Data':res.values}
 
     def mas(self, raw=None, period=periods, dataframe=True):
         if raw == None: raw = self.data
