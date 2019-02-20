@@ -114,19 +114,19 @@ class Equities(AE, Viewer):
             if isinstance(code, (int, float)): code = int(code)
         if adhoc:
             while adhoc:
-                res = yf.download(f'{code:04d}.HK', start, group_by='ticker')
-                if len(res): adhoc = not adhoc
+                __ = yf.download(f'{code:04d}.HK', start, group_by='ticker')
+                if len(__): adhoc = not adhoc
                 else:
                     print('Retry in 30 seconds')
                     sleep(30)
-            res.drop('Adj Close', 1, inplace=True)
+            __.drop('Adj Close', 1, inplace=True)
         else:
             qtext = f"SELECT date, open, high, low, close, volume FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
-            res = pd.read_sql(qtext, self.__conn, index_col='date', parse_dates=['date'])
-            res.columns = [_.capitalize() for _ in res.columns]
-            res.index.name = res.index.name.capitalize()
-        if dataframe: return res
-        return {'Date':res.index, 'Data':res.values}
+            __ = pd.read_sql(qtext, self.__conn, index_col='date', parse_dates=['date'])
+            __.columns = [_.capitalize() for _ in __.columns]
+            __.index.name = __.index.name.capitalize()
+        if dataframe: return __
+        return {'Date':list(__.index), 'Data':__.values}
 
     def mas(self, raw=None, period=periods, dataframe=True):
         if raw == None: raw = self.data
