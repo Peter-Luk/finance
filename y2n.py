@@ -73,11 +73,11 @@ class Equities(AE, Viewer):
         self._conf = pref.db['Equities']
         if code not in entities(self._conf['name']): adhoc = True
         self.code = code
+        self.data = self.fetch(self.code, adhoc=adhoc)
         self._ae = AE(self.code)
         self.table = self._ae.table
         self.rc = self._ae.columns
         self.__conn = self._ae.connect
-        self.data = self.fetch(self.code, adhoc=adhoc)
         self.view = Viewer(self.data)
         self._date = self.data.index[-1]
         self._close = hsirnd(self.data['Close'][-1])
