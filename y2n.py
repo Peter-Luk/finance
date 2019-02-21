@@ -121,8 +121,10 @@ class Equities(AE, Viewer):
                     sleep(30)
             __.drop('Adj Close', 1, inplace=True)
         else:
+            from alchemy import AS
             qtext = f"SELECT date, open, high, low, close, volume FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
-            __ = pd.read_sql(qtext, self.__conn, index_col='date', parse_dates=['date'])
+            conn = AS(self._conf['name']).connect
+            __ = pd.read_sql(qtext, conn, index_col='date', parse_dates=['date'])
             __.columns = [_.capitalize() for _ in __.columns]
             __.index.name = __.index.name.capitalize()
         if dataframe: return __
