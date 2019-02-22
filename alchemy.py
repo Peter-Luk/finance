@@ -1,29 +1,29 @@
 import pref
-Path, os, sys, db, pd, datetime = pref.alchemy
+platform, environ, sep, listdir, Path, db, pd, datetime = pref.alchemy
 from sqlalchemy.orm import mapper, sessionmaker
 from utilities import filepath
 
 eb, fb = pref.db['Equities'], pref.db['Futures']
-if sys.platform == 'win32': home = str(Path.home())
-if sys.platform in ['linux', 'linux2']:
+if platform == 'win32': home = str(Path.home())
+if platform in ['linux', 'linux2']:
     subpath = 'shared'
-    if os.environ['EXTERNAL_STORAGE']: subpath = 'external-1'
-    home = os.sep.join([str(Path.home()), 'storage', subpath])
+    if environ['EXTERNAL_STORAGE']: subpath = 'external-1'
+    home = sep.join([str(Path.home()), 'storage', subpath])
 
 def get_db(*args, **kwargs):
-    if isinstance(args[0], str): db_path = os.sep.join([home, args[0]])
-    if isinstance(args[0], tuple): db_path = os.sep.join((home,) + args[0])
+    if isinstance(args[0], str): db_path = sep.join([home, args[0]])
+    if isinstance(args[0], tuple): db_path = sep.join((home,) + args[0])
     if isinstance(args[0], list):
         args[0].insert(0, home)
-        db_path = os.sep.join(args[0])
+        db_path = sep.join(args[0])
     if kwargs:
         try:
             if isinstance(kwargs['exclude'], str): exclude = [kwargs['exclude']]
             if isinstance(kwargs['exclude'], tuple): exclude = list(kwargs['exclude'])
             if isinstance(kwargs['exclude'], list): exclude = kwargs['exclude']
-            if exclude: return [f for f in os.listdir(db_path) if not ('.git' in f or f in exclude)]
+            if exclude: return [f for f in listdir(db_path) if not ('.git' in f or f in exclude)]
         except: pass
-    return [f for f in os.listdir(db_path) if '.git' not in f]
+    return [f for f in listdir(db_path) if '.git' not in f]
 
 def load(*args):
     res, db_path, exclude = {}, ('data','sqlite3'), 'Sec12'
@@ -34,7 +34,7 @@ def load(*args):
         if isinstance(args[0], tuple): db_name = list(args[0])
     for dbn in db_name:
         exec('class {}(object): pass'.format(dbn))
-        engine = db.create_engine('sqlite:///{}'.format(os.sep.join((home,) + db_path + (dbn,))))
+        engine = db.create_engine('sqlite:///{}'.format(sep.join((home,) + db_path + (dbn,))))
         metadata = db.MetaData(engine)
         records = db.Table('records', metadata, autoload=True)
         eval('mapper({}, records)'.format(dbn))

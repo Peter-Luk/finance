@@ -1,7 +1,7 @@
 import socket
 #from pandas_datareader import data
 import pref
-sep, linesep, platform, Path, os, sys, db, yf, gr, sleep, datetime, reduce = pref.utils
+sep, environ, linesep, platform, version, Path, db, yf, gr, sleep, datetime, reduce = pref.utils
 ph = pref.public_holiday
 
 today = datetime.today()
@@ -11,23 +11,23 @@ def filepath(*args, **kwargs):
     name, file_type, data_path = args[0], 'data', 'sqlite3'
     if 'type' in list(kwargs.keys()): file_type = kwargs['type']
     if 'subpath' in list(kwargs.keys()): data_path = kwargs['subpath']
-    if sys.platform == 'win32':
-        if sys.version_info.major > 2 and sys.version_info.minor > 3:
-            return os.sep.join((str(Path.home()), file_type, data_path, name))
+    if platform == 'win32':
+        if version_info.major > 2 and version_info.minor > 3:
+            return sep.join((str(Path.home()), file_type, data_path, name))
         else:
-            file_path = os.sep.join((str(Path.home()), file_type, data_path))
-    # if sys.platform == 'linux-armv7l':file_drive, file_path = '', os.sep.join(('mnt', 'sdcard', file_type, data_path))
-    if sys.platform in ('linux', 'linux2'):
-        if sys.version_info.major > 2 and sys.version_info.minor > 3:
-            if 'EXTERNAL_STORAGE' in os.environ.keys(): return os.sep.join((str(Path.home()), 'storage', 'external-1', file_type, data_path, name))
-            return os.sep.join((str(Path.home()), file_type, data_path, name))
+            file_path = sep.join((str(Path.home()), file_type, data_path))
+    # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
+    if platform in ('linux', 'linux2'):
+        if version_info.major > 2 and version_info.minor > 3:
+            if 'EXTERNAL_STORAGE' in environ.keys(): return sep.join((str(Path.home()), 'storage', 'external-1', file_type, data_path, name))
+            return sep.join((str(Path.home()), file_type, data_path, name))
         else:
             place = 'shared'
-            if 'ACTUAL_HOME' in os.environ.keys():file_path = os.sep.join((str(Path.home()), file_type, data_path))
-            elif ('EXTERNAL_STORAGE' in os.environ.keys()) and ('/' in os.environ['EXTERNAL_STORAGE']):
+            if 'ACTUAL_HOME' in environ.keys():file_path = sep.join((str(Path.home()), file_type, data_path))
+            elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
                 place = 'external-1'
-                file_path = os.sep.join((str(Path.home()), 'storage', place, file_type, data_path))
-    return os.sep.join((file_path, name))
+                file_path = sep.join((str(Path.home()), 'storage', place, file_type, data_path))
+    return sep.join((file_path, name))
 
 def nitem(*args):
     i, hdr = 0, []
@@ -223,7 +223,7 @@ def mtf(*args, **kwargs):
 def rnd(n, decimal_place=0):
     try:
         if decimal_place:return round(n, decimal_place)
-        elif sys.version_info.major > 2:return round(n)
+        elif version_info.major > 2:return round(n)
         else:return int(round(n))
     except:pass
 
