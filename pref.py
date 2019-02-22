@@ -7,7 +7,7 @@ from time import sleep
 y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, datetime, sleep]
 nta = [pandas, numpy, datetime, golden_ratio]
 alchemy = [sys.platform, os.environ, os.sep, os.listdir, Path, sqlalchemy, pandas, datetime]
-utils = [os.sep, os.environ, os.linesep, sys.platform, sys.version, Path, sqlalchemy, fix_yahoo_finance, golden_ratio, sleep, datetime, functools.reduce]
+utils = [os.sep, os.environ, os.linesep, sys.platform, sys.version_info, Path, sqlalchemy, fix_yahoo_finance, golden_ratio, sleep, datetime, functools.reduce]
 public_holiday = {2015:{1:(1,), 2:(19, 20), 4:(3, 6, 7), 5:(25,), 7:(1,), 9:(28,), 10:(1, 21), 12:(25,)}}
 periods = dict(
     Futures = dict(
