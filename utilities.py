@@ -1,7 +1,7 @@
 import socket
 #from pandas_datareader import data
 import pref
-linesep, platform, Path, os, sys, db, yf, gr, sleep, datetime, reduce = pref.utils
+sep, linesep, platform, Path, os, sys, db, yf, gr, sleep, datetime, reduce = pref.utils
 ph = pref.public_holiday
 
 today = datetime.today()
