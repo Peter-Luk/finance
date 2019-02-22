@@ -1,13 +1,13 @@
 import pandas, numpy, sqlalchemy, fix_yahoo_finance
 from scipy.constants import golden_ratio
 from datetime import datetime
-from functools import reduce
+from pathlib import Path, os, sys, functools
 from time import sleep
 
 y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, datetime, sleep]
 nta = [pandas, numpy, datetime, golden_ratio]
-alchemy = [sqlalchemy, pandas, datetime]
-utils = [sqlalchemy, fix_yahoo_finance, golden_ratio, sleep, datetime, reduce]
+alchemy = [Path, os, sys, sqlalchemy, pandas, datetime]
+utils = [Path, os, sys, sqlalchemy, fix_yahoo_finance, golden_ratio, sleep, datetime, functools.reduce]
 public_holiday = {2015:{1:(1,), 2:(19, 20), 4:(3, 6, 7), 5:(25,), 7:(1,), 9:(28,), 10:(1, 21), 12:(25,)}}
 periods = dict(
     Futures = dict(
