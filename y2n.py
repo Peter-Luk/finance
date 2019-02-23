@@ -113,6 +113,7 @@ class Equities(AE, Viewer):
         aid = [_ for _ in entities(self._conf['name']) if _ not in exclude]
         if code:
             if isinstance(code, (int, float)): code = int(code)
+        if code not in aid: adhoc = True
         if adhoc:
             while adhoc:
                 __ = yf.download(f'{code:04d}.HK', start, group_by='ticker')
