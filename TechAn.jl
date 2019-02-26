@@ -13,38 +13,91 @@ if platform in ['linux']:
     dir_ = 'storage/shared'
     if 'EXTERNAL_STORAGE' in pathlib.os.environ.keys():
         dir_ = 'storage/external-1'
-d_loc = f"sqlite:///{pathlib.Path.home()}"
-if dir_: d_loc += f"/{dir_}"
-d_loc += "/data/sqlite3/Securities"
+d_loc = f'sqlite:///{pathlib.Path.home()}'
+if dir_: d_loc += f'/{dir_}'
+d_loc += '/data/sqlite3/Securities'
 engine = sqa.create_engine(d_loc)
 """
 sma(x, period=20) = py"$x['Close'].rolling($period).mean()"
+
 function wma(x, period=20)
 py"""
-iS = $x
+raw = $x
 period = $period
-d = (iS['Close'] * iS['Volume']).rolling(period).sum() / iS['Volume'].rolling(period).sum()
-d.name = f'WMA{period:02d}'
+_ = (raw['Close'] * raw['Volume']).rolling(period).sum() / raw['Volume'].rolling(period).sum()
+_.name = f'WMA{period:02d}'
 """
-py"d"
+py"_"
 end
+
 function ema(x, period=20)
 py"""
-iS = $x['Close']
+raw = $x
 period = $period
-tl = []
-i = 0
-while i < iS.size:
+tl, _ = [], 0
+while _ < raw['Close'].size:
     hdr = nan
-    if i == period: hdr = iS[:period].mean()
-    if i > period: hdr = (tl[-1] * (period - 1) + iS[i]) / period
+    if _ == period: hdr = raw['Close'][:period].mean()
+    if _ > period: hdr = (tl[-1] * (period - 1) + raw['Close'][_]) / period
     tl.append(hdr)
-    i += 1
-s = pd.Series(tl, index=$x.index)
-s.name = f"EMA{period:02d}"
+    _ += 1
+_ = pd.Series(tl, index=raw.index)
+_.name = f'EMA{period:02d}'
 """
-py"s"
+py"_"
 end
+
+function atr(x, period=14)
+py"""
+raw = $x
+period = $period
+tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+_, hdr, __ = 0, [], nan
+while _ < len(raw):
+    if _ == period: __ = tr[:_].mean()
+    if _ > period: __ = (hdr[-1] * (period - 1) + tr[_]) / period
+    hdr.append(__)
+    _ += 1
+_ = pd.Series(hdr, index=raw.index)
+_.name = f'ATR{period:d}'
+"""
+py"_"
+end
+
+function rsi(x, period=14)
+py"""
+raw = $x
+period = $period
+def _gz(_):
+    if _ > 0: return _
+    return 0
+def _lz(_):
+    if _ < 0: return abs(_)
+    return 0
+delta = raw['Close'] - raw['Close'].shift(1)
+gain = delta.apply(_gz)
+loss = delta.apply(_lz)
+_, hdr, __ = 0, [], nan
+while _ < len(gain):
+    if _ == period: __ = gain[:_].mean()
+    if _ > period: __ = (hdr[-1] * (period - 1) + gain[_]) / period
+    hdr.append(__)
+    _ += 1
+ag = pd.Series(hdr, index=gain.index)
+_, hdr, __ = 0, [], nan
+while _ < len(loss):
+    if _ == period: __ = loss[:_].mean()
+    if _ > period: __ = (hdr[-1] * (period - 1) + loss[_]) / period
+    hdr.append(__)
+    _ += 1
+al = pd.Series(hdr, index=loss.index)
+rs = ag / al
+_ = 100 - 100 / (1 + rs)
+_.name = f'RSI{period:d}'
+"""
+py"_"
+end
+
 function fetch(c)
 py"""
 code = $c
@@ -59,11 +112,12 @@ if exist:
     d.index.name = d.index.name.capitalize()
 else:
     if platform in ['linux']:
-        d = yf.download(f"{code:04d}.HK", start, group_by='ticker')
-        d.drop("Adj Close", 1, inplace=True)
+        d = yf.download(f'{code:04d}.HK', start, group_by='ticker')
+        d.drop('Adj Close', 1, inplace=True)
 """
 py"d"
 end
+
 function exist(c)
 py"""
 bool = False
