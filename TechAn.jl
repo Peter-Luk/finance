@@ -3,7 +3,7 @@ py"""
 import pandas as pd
 import sqlalchemy as sqa
 import pathlib
-from numpy import nan
+from numpy import nan, isnan
 from datetime import datetime
 start = datetime(datetime.today().year - 4, 12, 31).date()
 dir_ = ''
@@ -94,6 +94,51 @@ al = pd.Series(hdr, index=loss.index)
 rs = ag / al
 _ = 100 - 100 / (1 + rs)
 _.name = f'RSI{period:d}'
+"""
+py"_"
+end
+
+function adx(x, period=14)
+py"""
+raw = $x
+period = $period
+atr_ = atr(raw, period)
+hcp, lpc = raw['High'] - raw['High'].shift(1), raw['Low'].shift(1) - raw['Low']
+def _hgl(_):
+    if _[0] > _[-1] and _[0] > 0: return _[0]
+    return 0
+dm_plus = pd.DataFrame([hcp, lpc]).T.apply(_hgl, axis=1)
+dm_minus = pd.DataFrame([lpc, hcp]).T.apply(_hgl, axis=1)
+_, iph, __ = 0, [], nan
+while _ < len(dm_plus):
+    if _ == period: __ = dm_plus[:_].mean()
+    if _ > period: __ = (iph[-1] * (period - 1) + dm_plus[_]) / period
+    iph.append(__)
+    _ += 1
+di_plus = pd.Series(iph, index=dm_plus.index) / atr_ * 100
+di_plus.name = f'+DI{period:d}'
+
+_, imh, __ = 0, [], nan
+while _ < len(dm_minus):
+    if _ == period: __ = dm_minus[:_].mean()
+    if _ > period: __ = (imh[-1] * (period - 1) + dm_minus[_]) / period
+    imh.append(__)
+    _ += 1
+di_minus = pd.Series(imh, index=dm_minus.index) / atr_ * 100
+di_minus.name = f'-DI{period:d}'
+
+dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
+_, hdr, __, val = 0, [], 0, nan
+while _ < len(dx):
+    if not isnan(dx[_]):
+        if __ == period: val = dx[_ - __:_].mean()
+        if __ > period: val = (hdr[-1] * (period - 1) + dx[__]) / period
+        __ += 1
+    hdr.append(val)
+    _ += 1
+__ = pd.Series(hdr, index=dx.index)
+__.name = f'ADX{period:d}'
+_ = pd.DataFrame([di_plus, di_minus, __]).T
 """
 py"_"
 end
