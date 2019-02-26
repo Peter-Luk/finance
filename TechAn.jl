@@ -47,6 +47,26 @@ _.name = f'EMA{period:02d}'
 py"_"
 end
 
+function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30))
+py"""
+raw = $x
+period = $period
+change = (raw['Close'] - raw['Close'].shift(period['er'])).abs()
+volatility = (raw['Close'] - raw['Close'].shift(1)).abs().rolling(period['er']).sum()
+er = change / volatility
+sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
+_, hdr, __ = 0, [], nan
+while _ < len(raw):
+    if _ == period['slow']: __ = raw['Close'][:_].mean()
+    if _ > period['slow']: __ = hdr[-1] + sc[_] * (raw['Close'][_] - hdr[-1])
+    hdr.append(__)
+    _ += 1
+_ = pd.Series(hdr, index=raw.index)
+_.name = f'KAMA{period["er"]:d}'
+"""
+py"_"
+end
+
 function atr(x, period=14)
 py"""
 raw = $x
