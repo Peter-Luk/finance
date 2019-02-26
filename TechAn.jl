@@ -17,6 +17,20 @@ d_loc = f'sqlite:///{pathlib.Path.home()}'
 if dir_: d_loc += f'/{dir_}'
 d_loc += '/data/sqlite3/Securities'
 engine = sqa.create_engine(d_loc)
+def ema(raw, period, req_field='c'):
+    if req_field.lower() in ['c', 'close']: _data = raw['Close']
+    if req_field.lower() in ['hl', 'lh', 'range']:
+        _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
+    tl, _ = [], 0
+    while _ < _data.size:
+        hdr = nan
+        if _ == period: hdr = _data[:period].mean()
+        if _ > period: hdr = (tl[-1] * (period - 1) + _data[_]) / period
+        tl.append(hdr)
+        _ += 1
+    _ = pd.Series(tl, index=raw.index)
+    _.name = f'EMA{period:02d}'
+    return _
 """
 sma(x, period=20) = py"$x['Close'].rolling($period).mean()"
 
@@ -30,23 +44,9 @@ _.name = f'WMA{period:02d}'
 py"_"
 end
 
-function ema(x, period=20, reqfield="c")
+function ema(x, period=20, req_field="c")
 py"""
-raw = $x
-period = $period
-req_field = $reqfield
-if req_field.lower() in ['c', 'close']: _data = raw['Close']
-if req_field.lower() in ['hl', 'lh', 'range']:
-    _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
-tl, _ = [], 0
-while _ < _data.size:
-    hdr = nan
-    if _ == period: hdr = _data[:period].mean()
-    if _ > period: hdr = (tl[-1] * (period - 1) + _data[_]) / period
-    tl.append(hdr)
-    _ += 1
-_ = pd.Series(tl, index=raw.index)
-_.name = f'EMA{period:02d}'
+_ = ema($x, $period, $req_field)
 """
 py"_"
 end
@@ -75,20 +75,6 @@ function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" => 10))
 py"""
 raw = $x
 period = $period
-def ema(raw, period, req_field='c'):
-    if req_field.lower() in ['c', 'close']: _data = raw['Close']
-    if req_field.lower() in ['hl', 'lh', 'range']:
-        _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
-    tl, _ = [], 0
-    while _ < _data.size:
-        hdr = nan
-        if _ == period: hdr = _data[:period].mean()
-        if _ > period: hdr = (tl[-1] * (period - 1) + _data[_]) / period
-        tl.append(hdr)
-        _ += 1
-    _ = pd.Series(tl, index=raw.index)
-    _.name = f'EMA{period:02d}'
-    return _
 slow_ = ema(raw, period['slow'], 'hl')
 fast_ = ema(raw, period['fast'], 'hl')
 m_line = fast_ - slow_
