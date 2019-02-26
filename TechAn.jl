@@ -30,15 +30,19 @@ _.name = f'WMA{period:02d}'
 py"_"
 end
 
-function ema(x, period=20)
+function ema(x, period=20, reqfield="c")
 py"""
 raw = $x
 period = $period
+req_field = $reqfield
+if req_field.lower() in ['c', 'close']: _data = raw['Close']
+if req_field.lower() in ['hl', 'lh', 'range']:
+    _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
 tl, _ = [], 0
-while _ < raw['Close'].size:
+while _ < _data.size:
     hdr = nan
-    if _ == period: hdr = raw['Close'][:period].mean()
-    if _ > period: hdr = (tl[-1] * (period - 1) + raw['Close'][_]) / period
+    if _ == period: hdr = _data[:period].mean()
+    if _ > period: hdr = (tl[-1] * (period - 1) + _data[_]) / period
     tl.append(hdr)
     _ += 1
 _ = pd.Series(tl, index=raw.index)
@@ -63,6 +67,26 @@ while _ < len(raw):
     _ += 1
 _ = pd.Series(hdr, index=raw.index)
 _.name = f'KAMA{period["er"]:d}'
+"""
+py"_"
+end
+
+function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" =>10))
+py"""
+raw = $x
+period = $period
+e_slow = $ema(raw, period['slow'], 'hl')
+e_fast = $ema(raw, period['fast'], 'hl')
+m_line = e_fast - e_slow
+mh = m_line.rolling(period['K']).max()
+ml = m_line.rolling(period['K']).min()
+kseries = (m_line - ml) / (mh - ml)
+k = kseries.rolling(period['D']).mean()
+k.name = '%K'
+d = k.rolling(period['D']).mean()
+d.name = '%D'
+_ = (m_line - k) / (d - k)
+_.name = 'STC'
 """
 py"_"
 end
