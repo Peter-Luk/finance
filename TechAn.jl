@@ -3,7 +3,7 @@ py"""
 import pandas as pd
 import sqlalchemy as sqa
 import pathlib
-from numpy import nan, isnan
+from numpy import nan, isnan, array
 from datetime import datetime
 start = datetime(datetime.today().year - 4, 12, 31).date()
 dir_ = ''
@@ -67,6 +67,34 @@ while _ < len(raw):
     _ += 1
 _ = pd.Series(hdr, index=raw.index)
 _.name = f'KAMA{period["er"]:d}'
+"""
+py"_"
+end
+
+function macd(x, period=Dict("fast" => 12, "slow" => 26, "signal" => 9))
+py"""
+raw = $x
+period = $period
+def __pema(pd_data, period):
+    data, hdr, __ = pd_data.values, [], 0
+    for _ in range(len(data)):
+        val = nan
+        if not isnan(data[_]):
+            if __ == period:
+                val = array(data[_ - period: _]).mean()
+            if __ > period:
+                val = (hdr[-1] * (period - 1) + data[_]) / period
+            __ += 1
+        hdr.append(val)
+    return pd.Series(hdr, index=pd_data.index)
+
+e_slow = ema(raw, period['slow'], 'hl')
+e_fast = ema(raw, period['fast'], 'hl')
+m_line = e_fast - e_slow
+s_line = __pema(m_line, period['signal'])
+m_hist = m_line - s_line
+_ = pd.DataFrame([m_line, s_line, m_hist]).T
+_.columns = ['M Line', 'Signal Line', 'M Histogram']
 """
 py"_"
 end
