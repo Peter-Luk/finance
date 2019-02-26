@@ -71,13 +71,27 @@ _.name = f'KAMA{period["er"]:d}'
 py"_"
 end
 
-function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" =>10))
+function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" => 10))
 py"""
 raw = $x
 period = $period
-e_slow = $ema(raw, period['slow'], 'hl')
-e_fast = $ema(raw, period['fast'], 'hl')
-m_line = e_fast - e_slow
+def ema(raw, period, req_field='c'):
+    if req_field.lower() in ['c', 'close']: _data = raw['Close']
+    if req_field.lower() in ['hl', 'lh', 'range']:
+        _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
+    tl, _ = [], 0
+    while _ < _data.size:
+        hdr = nan
+        if _ == period: hdr = _data[:period].mean()
+        if _ > period: hdr = (tl[-1] * (period - 1) + _data[_]) / period
+        tl.append(hdr)
+        _ += 1
+    _ = pd.Series(tl, index=raw.index)
+    _.name = f'EMA{period:02d}'
+    return _
+slow_ = ema(raw, period['slow'], 'hl')
+fast_ = ema(raw, period['fast'], 'hl')
+m_line = fast_ - slow_
 mh = m_line.rolling(period['K']).max()
 ml = m_line.rolling(period['K']).min()
 kseries = (m_line - ml) / (mh - ml)
