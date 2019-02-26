@@ -99,6 +99,22 @@ _.columns = ['M Line', 'Signal Line', 'M Histogram']
 py"_"
 end
 
+function soc(x, period=Dict("K" => 14, "D" => 3))
+py"""
+raw = $x
+period = $period
+ml = raw['Low'].rolling(period['K']).min()
+mh = raw['High'].rolling(period['K']).max()
+kseries = pd.Series((raw['Close'] - ml) / (mh - ml) * 100, index=raw.index)
+k = kseries.rolling(period['D']).mean()
+k.name = '%K'
+d = k.rolling(period['D']).mean()
+d.name = '%D'
+_ = pd.DataFrame([k, d]).T
+"""
+py"_"
+end
+
 function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" => 10))
 py"""
 raw = $x
