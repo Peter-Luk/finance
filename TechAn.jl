@@ -102,7 +102,7 @@ function adx(x, period=14)
 py"""
 raw = $x
 period = $period
-atr_ = atr(raw, period)
+atr_ = $atr($x , period)
 hcp, lpc = raw['High'] - raw['High'].shift(1), raw['Low'].shift(1) - raw['Low']
 def _hgl(_):
     if _[0] > _[-1] and _[0] > 0: return _[0]
