@@ -293,6 +293,24 @@ _ = pd.DataFrame([di_plus, di_minus, __]).T
 py"_"
 end
 
+function obv(x)
+py"""
+raw =$x
+hdr, _ = [raw['Volume'][0]], 0
+dcp = raw['Close'] - raw['Close'].shift(1)
+while _ < len(dcp):
+    if _ > 0:
+        val = 0
+        if dcp[_] > 0: val = raw['Volume'][_]
+        if dcp[_] < 0: val = -raw['Volume'][_]
+        hdr.append(hdr[-1] + val)
+    _ += 1
+_ = pd.Series(hdr, index=dcp.index)
+_.name = 'OBV'
+"""
+py"_"
+end
+
 function fetch(c)
 py"""
 code = $c
