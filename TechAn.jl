@@ -3,6 +3,7 @@ py"""
 import pandas as pd
 import sqlalchemy as sqa
 import pathlib
+from scipy.constants import golden_ratio
 from numpy import nan, isnan, array
 from datetime import datetime
 start = datetime(datetime.today().year - 4, 12, 31).date()
@@ -31,35 +32,37 @@ def ema(raw, period, req_field='c'):
     _ = pd.Series(tl, index=raw.index)
     _.name = f'EMA{period:02d}'
     return _
-    def kama(self, raw, period, req_field='c', dataframe=True):
-        if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
-        if req_field.upper() in ['HL', 'LH', 'RANGE']:
-            _data = pd.DataFrame([raw['High'], raw['Low']]).T
-            _data = _data.mean(axis=1)
-        if req_field.upper() in ['OHLC', 'FULL', 'ALL']:
-            _data = pd.DataFrame([raw['Open'], raw['High'], raw['Low'], raw['Close']]).T
-            _data = _data.mean(axis=1)
-        change = (_data - _data.shift(period['er'])).abs()
-        volatility = (_data - _data.shift(1)).abs().rolling(period['er']).sum()
-        er = change / volatility
-        sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
-        _, hdr, __ = 0, [], np.nan
-        while _ < len(raw):
-            if _ == period['slow']: __ = _data[:_].mean()
-            if _ > period['slow']: __ = hdr[-1] + sc[_] * (_data[_] - hdr[-1])
-            hdr.append(__)
-            _ += 1
-        _ = pd.Series(hdr, index=raw.index)
-        _.name = f"KAMA{period['er']:d}"
+def kama(raw, period, req_field='c'):
+    if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
+    if req_field.upper() in ['HL', 'LH', 'RANGE']:
+        _data = pd.DataFrame([raw['High'], raw['Low']]).T
+        _data = _data.mean(axis=1)
+    if req_field.upper() in ['OHLC', 'FULL', 'ALL']:
+        _data = pd.DataFrame([raw['Open'], raw['High'], raw['Low'], raw['Close']]).T
+        _data = _data.mean(axis=1)
+    change = (_data - _data.shift(period['er'])).abs()
+    volatility = (_data - _data.shift(1)).abs().rolling(period['er']).sum()
+    er = change / volatility
+    sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
+    _, hdr, __ = 0, [], nan
+    while _ < len(raw):
+        if _ == period['slow']: __ = _data[:_].mean()
+        if _ > period['slow']: __ = hdr[-1] + sc[_] * (_data[_] - hdr[-1])
+        hdr.append(__)
+        _ += 1
+    _ = pd.Series(hdr, index=raw.index)
+    _.name = f'KAMA{period["er"]:02d}'
     return _
 """
 sma(x, period=20) = py"$x['Close'].rolling($period).mean()"
 
-function wma(x, period=20)
+function wma(x, period=20, req_field="c")
 py"""
 raw = $x
 period = $period
-_ = (raw['Close'] * raw['Volume']).rolling(period).sum() / raw['Volume'].rolling(period).sum()
+if req_field.lower() in ['c', 'close']: _data = raw['Close']
+if req_field.lower() in ['hl', 'lh', 'range']: _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
+_ = (raw[_data * raw['Volume']).rolling(period).sum() / raw['Volume'].rolling(period).sum()
 _.name = f'WMA{period:02d}'
 """
 py"_"
@@ -74,20 +77,7 @@ end
 
 function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30))
 py"""
-raw = $x
-period = $period
-change = (raw['Close'] - raw['Close'].shift(period['er'])).abs()
-volatility = (raw['Close'] - raw['Close'].shift(1)).abs().rolling(period['er']).sum()
-er = change / volatility
-sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
-_, hdr, __ = 0, [], nan
-while _ < len(raw):
-    if _ == period['slow']: __ = raw['Close'][:_].mean()
-    if _ > period['slow']: __ = hdr[-1] + sc[_] * (raw['Close'][_] - hdr[-1])
-    hdr.append(__)
-    _ += 1
-_ = pd.Series(hdr, index=raw.index)
-_.name = f'KAMA{period["er"]:d}'
+_ = kama($x, $period)
 """
 py"_"
 end
@@ -108,8 +98,35 @@ while _ < len(ehl):
 volatility = pd.Series(hdr, index=ehl.index)
 tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
 
-upper = volatility + tr * gr
-lower = volatility - tr * gr
+upper = volatility + tr * golden_ratio
+lower = volatility - tr * golden_ratio
+_ = pd.DataFrame([upper, lower]).T
+_.columns = ['Upper', 'Lower']
+"""
+py"_"
+end
+
+function kc(x, period=Dict("kama" => Dict("er" => 5, "fast" => 2, "slow" => 20), "atr" => 10))
+py"""
+period = $period
+middle_line = kama($x, period['kama'], 'hl')
+atr_ = $atr($x, period['atr'])
+upper = middle_line + (golden_ratio * atr_)
+lower = middle_line - (golden_ratio * atr_)
+_ = pd.DataFrame([upper, lower]).T
+_.columns = ['Upper', 'Lower']
+"""
+py"_"
+end
+
+function bb(x, period=20)
+py"""
+raw = $x
+period = $period
+middle_line = $sma(raw, period)
+width = raw['Close'].rolling(period).std()
+upper = middle_line + width
+lower = middle_line - width
 _ = pd.DataFrame([upper, lower]).T
 _.columns = ['Upper', 'Lower']
 """
