@@ -62,7 +62,7 @@ raw = $x
 period = $period
 if req_field.lower() in ['c', 'close']: _data = raw['Close']
 if req_field.lower() in ['hl', 'lh', 'range']: _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
-_ = (raw[_data * raw['Volume']).rolling(period).sum() / raw['Volume'].rolling(period).sum()
+_ = (_data * raw['Volume']).rolling(period).sum() / raw['Volume'].rolling(period).sum()
 _.name = f'WMA{period:02d}'
 """
 py"_"
