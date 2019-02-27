@@ -60,8 +60,9 @@ function wma(x, period=20, req_field="c")
 py"""
 raw = $x
 period = $period
-if req_field.lower() in ['c', 'close']: _data = raw['Close']
-if req_field.lower() in ['hl', 'lh', 'range']: _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
+rf = $req_field
+if rf.lower() in ['c', 'close']: _data = raw['Close']
+if rf.lower() in ['hl', 'lh', 'range']: _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
 _ = (_data * raw['Volume']).rolling(period).sum() / raw['Volume'].rolling(period).sum()
 _.name = f'WMA{period:02d}'
 """
