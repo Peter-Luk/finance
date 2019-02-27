@@ -20,8 +20,8 @@ d_loc += '/data/sqlite3/Securities'
 engine = sqa.create_engine(d_loc)
 def ema(raw, period, req_field='c'):
     if req_field.lower() in ['c', 'close']: _data = raw['Close']
-    if req_field.lower() in ['hl', 'lh', 'range']:
-        _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
+    if req_field.lower() in ['hl', 'lh', 'range']: _data = raw.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+    if req_field.lower() in ['ohlc', 'all', 'full']: _data = raw.drop('Volume', 1).mean(axis=1)
     tl, _ = [], 0
     while _ < _data.size:
         hdr = nan
@@ -34,12 +34,8 @@ def ema(raw, period, req_field='c'):
     return _
 def kama(raw, period, req_field='c'):
     if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
-    if req_field.upper() in ['HL', 'LH', 'RANGE']:
-        _data = pd.DataFrame([raw['High'], raw['Low']]).T
-        _data = _data.mean(axis=1)
-    if req_field.upper() in ['OHLC', 'FULL', 'ALL']:
-        _data = pd.DataFrame([raw['Open'], raw['High'], raw['Low'], raw['Close']]).T
-        _data = _data.mean(axis=1)
+    if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+    if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
     change = (_data - _data.shift(period['er'])).abs()
     volatility = (_data - _data.shift(1)).abs().rolling(period['er']).sum()
     er = change / volatility
@@ -62,7 +58,8 @@ raw = $x
 period = $period
 rf = $req_field
 if rf.lower() in ['c', 'close']: _data = raw['Close']
-if rf.lower() in ['hl', 'lh', 'range']: _data = pd.DataFrame([raw['High'], raw['Low']]).T.mean(axis=1)
+if rf.lower() in ['hl', 'lh', 'range']: _data = raw.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+if rf.lower() in ['ohlc', 'all', 'full']: _data = raw.drop('Volume', 1).mean(axis=1)
 _ = (_data * raw['Volume']).rolling(period).sum() / raw['Volume'].rolling(period).sum()
 _.name = f'WMA{period:02d}'
 """
@@ -76,9 +73,9 @@ _ = ema($x, $period, $req_field)
 py"_"
 end
 
-function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30))
+function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30), req_field="c")
 py"""
-_ = kama($x, $period)
+_ = kama($x, $period, $req_field)
 """
 py"_"
 end
