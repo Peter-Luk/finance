@@ -251,7 +251,7 @@ class ONA(object):
         return _.to_dict()
 
     def vwap(self, raw, dataframe=True):
-        pv = pd.DataFrame([raw['High'], raw['Low'], raw['Close']]).T.mean(axis=1) * raw['Volume']
+        pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw['Volume']
         _ = pd.Series(pv.cumsum() / raw['Volume'].cumsum(), index=raw.index)
         _.name = 'VWAP'
         if dataframe: return _

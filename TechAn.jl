@@ -311,6 +311,16 @@ _.name = 'OBV'
 py"_"
 end
 
+function vwap(x)
+py"""
+raw = $x
+pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw['Volume']
+_ = pd.Series(pv.cumsum() / raw['Volume'].cumsum(), index=raw.index)
+_.name = 'VWAP'
+"""
+py"_"
+end
+
 function fetch(c)
 py"""
 code = $c
