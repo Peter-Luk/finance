@@ -31,6 +31,27 @@ def ema(raw, period, req_field='c'):
     _ = pd.Series(tl, index=raw.index)
     _.name = f'EMA{period:02d}'
     return _
+    def kama(self, raw, period, req_field='c', dataframe=True):
+        if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
+        if req_field.upper() in ['HL', 'LH', 'RANGE']:
+            _data = pd.DataFrame([raw['High'], raw['Low']]).T
+            _data = _data.mean(axis=1)
+        if req_field.upper() in ['OHLC', 'FULL', 'ALL']:
+            _data = pd.DataFrame([raw['Open'], raw['High'], raw['Low'], raw['Close']]).T
+            _data = _data.mean(axis=1)
+        change = (_data - _data.shift(period['er'])).abs()
+        volatility = (_data - _data.shift(1)).abs().rolling(period['er']).sum()
+        er = change / volatility
+        sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
+        _, hdr, __ = 0, [], np.nan
+        while _ < len(raw):
+            if _ == period['slow']: __ = _data[:_].mean()
+            if _ > period['slow']: __ = hdr[-1] + sc[_] * (_data[_] - hdr[-1])
+            hdr.append(__)
+            _ += 1
+        _ = pd.Series(hdr, index=raw.index)
+        _.name = f"KAMA{period['er']:d}"
+    return _
 """
 sma(x, period=20) = py"$x['Close'].rolling($period).mean()"
 
@@ -67,6 +88,30 @@ while _ < len(raw):
     _ += 1
 _ = pd.Series(hdr, index=raw.index)
 _.name = f'KAMA{period["er"]:d}'
+"""
+py"_"
+end
+
+function apz(x, period=5)
+py"""
+raw = $x
+period = $period
+ehl = ema(raw, period, 'hl')
+_, hdr, __, val = 0, [], 0, nan
+while _ < len(ehl):
+    if not isnan(ehl[_]):
+        if __ == period: val = ehl[_ - __:_].mean()
+        if __ > period: val = (hdr[-1] * (period - 1) + ehl[_]) / period
+        __ += 1
+    hdr.append(val)
+    _ += 1
+volatility = pd.Series(hdr, index=ehl.index)
+tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+
+upper = volatility + tr * gr
+lower = volatility - tr * gr
+_ = pd.DataFrame([upper, lower]).T
+_.columns = ['Upper', 'Lower']
 """
 py"_"
 end
