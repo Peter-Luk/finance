@@ -14,12 +14,8 @@ class ONA(object):
 
     def ma(self, raw, period, favour='s', req_field='close', dataframe=True):
         if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
-        if req_field.upper() in ['HL', 'LH', 'RANGE']:
-            _data = pd.DataFrame([raw['High'], raw['Low']]).T
-            _data = _data.mean(axis=1)
-        if req_field.upper() in ['OHLC', 'FULL', 'ALL']:
-            _data = pd.DataFrame([raw['Open'], raw['High'], raw['Low'], raw['Close']]).T
-            _data = _data.mean(axis=1)
+        if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+        if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
         if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean()
         if favour.upper() in ['W', 'WEIGHTED']:
             _ = _data * raw['Volume']
@@ -174,12 +170,8 @@ class ONA(object):
 
     def kama(self, raw, period, req_field='c', dataframe=True):
         if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
-        if req_field.upper() in ['HL', 'LH', 'RANGE']:
-            _data = pd.DataFrame([raw['High'], raw['Low']]).T
-            _data = _data.mean(axis=1)
-        if req_field.upper() in ['OHLC', 'FULL', 'ALL']:
-            _data = pd.DataFrame([raw['Open'], raw['High'], raw['Low'], raw['Close']]).T
-            _data = _data.mean(axis=1)
+        if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+        if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
         change = (_data - _data.shift(period['er'])).abs()
         volatility = (_data - _data.shift(1)).abs().rolling(period['er']).sum()
         er = change / volatility
