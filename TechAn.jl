@@ -319,22 +319,28 @@ _.name = 'VWAP'
 py"_"
 end
 
-function fetch(c)
+function fetch(c, adhoc=false)
 py"""
 code = $c
-exist = False
-t_str = "SELECT DISTINCT eid FROM records ORDER BY eid ASC"
-uid = pd.read_sql(t_str, engine)
-if code in uid.values: exist = True
-if exist:
-    q_str = f"SELECT date, open, high, low, close, volume FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
-    d = pd.read_sql(q_str, engine, index_col='date', parse_dates=['date'])
-    d.columns = [_.capitalize() for _ in d.columns]
-    d.index.name = d.index.name.capitalize()
-else:
+adhoc =$adhoc
+if adhoc:
     if platform in ['linux']:
         d = yf.download(f'{code:04d}.HK', start, group_by='ticker')
         d.drop('Adj Close', 1, inplace=True)
+else:
+    exist = False
+    t_str = "SELECT DISTINCT eid FROM records ORDER BY eid ASC"
+    uid = pd.read_sql(t_str, engine)
+    if code in uid.values: exist = True
+    if exist:
+        q_str = f"SELECT date, open, high, low, close, volume FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
+        d = pd.read_sql(q_str, engine, index_col='date', parse_dates=['date'])
+        d.columns = [_.capitalize() for _ in d.columns]
+        d.index.name = d.index.name.capitalize()
+    else:
+        if platform in ['linux']:
+            d = yf.download(f'{code:04d}.HK', start, group_by='ticker')
+            d.drop('Adj Close', 1, inplace=True)
 """
 py"d"
 end
