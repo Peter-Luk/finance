@@ -324,6 +324,7 @@ py"""
 code = $c
 adhoc =$adhoc
 if adhoc:
+    d = pd.DataFrame()
     if platform in ['linux']:
         d = yf.download(f'{code:04d}.HK', start, group_by='ticker')
         d.drop('Adj Close', 1, inplace=True)
@@ -342,7 +343,9 @@ else:
             d = yf.download(f'{code:04d}.HK', start, group_by='ticker')
             d.drop('Adj Close', 1, inplace=True)
 """
+if ~py"d.empty"
 py"d"
+; end
 end
 
 function exist(c)
