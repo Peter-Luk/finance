@@ -209,7 +209,7 @@ class ONA(object):
 
     def kc(self, raw, period, dataframe=True):
         middle_line = self.kama(raw, period['kama'], 'hl', True)
-        atr = self.atr(raw,period['atr'], True)
+        atr = self.atr(raw, period['atr'], True)
         upper = middle_line + (gr * atr)
         lower = middle_line - (gr * atr)
         _ = pd.DataFrame([upper, lower]).T
