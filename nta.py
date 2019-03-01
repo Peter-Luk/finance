@@ -251,7 +251,7 @@ class ONA(object):
 
     def ratr(self, raw, period, date=None, dataframe=True):
         if date == None or date not in raw.index: date = raw.index[-1]
-        def _patr( period, raw):
+        def _patr(period, raw):
             lc, lr = raw['Close'][date], self.atr(raw, period, True)[date]
             _ = [lc + lr, lc, lc - lr]
             _.extend(gslice([lc + lr, lc]))
