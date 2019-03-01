@@ -52,7 +52,7 @@ def kama(raw, period, req_field='c'):
 """
 sma(x, period=20) = py"$x['Close'].rolling($period).mean()"
 
-function wma(x, period::Int32=20, req_field="c")
+function wma(x, period=20, req_field="c")
 py"""
 raw = $x
 period = $period
@@ -66,7 +66,7 @@ _.name = f'WMA{period:02d}'
 py"_"
 end
 
-function ema(x, period::Int32=20, req_field="c")
+function ema(x, period=20, req_field="c")
 py"""
 _ = ema($x, $period, $req_field)
 """
@@ -80,7 +80,7 @@ _ = kama($x, $period, $req_field)
 py"_"
 end
 
-function apz(x, period::Int32=5)
+function apz(x, period=5)
 py"""
 raw = $x
 period = $period
@@ -117,7 +117,7 @@ _.columns = ['Upper', 'Lower']
 py"_"
 end
 
-function bb(x, period::Int32=20)
+function bb(x, period=20)
 py"""
 raw = $x
 period = $period
@@ -195,7 +195,7 @@ _.name = 'STC'
 py"_"
 end
 
-function atr(x, period::Int32=14)
+function atr(x, period=14)
 py"""
 raw = $x
 period = $period
@@ -212,7 +212,7 @@ _.name = f'ATR{period:d}'
 py"_"
 end
 
-function rsi(x, period::Int32=14)
+function rsi(x, period=14)
 py"""
 raw = $x
 period = $period
@@ -246,7 +246,7 @@ _.name = f'RSI{period:d}'
 py"_"
 end
 
-function adx(x, period::Int32=14)
+function adx(x, period=14)
 py"""
 raw = $x
 period = $period
@@ -319,7 +319,7 @@ _.name = 'VWAP'
 py"_"
 end
 
-function fetch(c::Int32, adhoc=false)
+function fetch(c, adhoc=false)
 py"""
 code = $c
 adhoc =$adhoc
@@ -349,15 +349,15 @@ end
 
 end
 
-function ratr(x::Int32, adhoc=true,  ratio::Float64=py"golden_ratio")
-function delta(b::Float64, d::Float64, r::Float64)
+function ratr(x, adhoc=true,  ratio=py"golden_ratio")
+function delta(b, d, r)
 [b - d, b - d / r, b - (1 - 1 / r) * d, b, b + (1 - 1 / r) * d, b + d / r, b + d]
 end
 data = py"platform" == "linux" ? fetch(x, adhoc) : fetch(x, false)
 delta(py"$data['Close'][-1]", py"$(atr(data))[-1]", ratio)
 end
 
-function exist(c::Int32)
+function exist(c)
 py"""
 bool = False
 q_str = "SELECT DISTINCT eid FROM records ORDER BY eid ASC"
