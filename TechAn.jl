@@ -353,9 +353,8 @@ function ratr(x, adhoc=false,  ratio=py"golden_ratio")
 function delta(b, d, r)
 [b - d, b - d / r, b - (1 - 1 / r) * d, b, b + (1 - 1 / r) * d, b + d / r, b + d]
 end
-data = fetch(x, adhoc)
-ar = py"$(atr(data))[-1]"
-delta(py"$data['Close'][-1]", ar, ratio)
+data = py"platform" == "linux" ? fetch(x, adhoc) : fetch(x, false)
+delta(py"$data['Close'][-1]", py"$(atr(data))[-1]", ratio)
 end
 
 function exist(c)
