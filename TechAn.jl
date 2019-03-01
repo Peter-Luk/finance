@@ -345,7 +345,8 @@ else:
 """
 if ~py"d.empty"
 py"d"
-; end
+end
+
 end
 
 function exist(c)
