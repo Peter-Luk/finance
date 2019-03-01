@@ -349,7 +349,7 @@ end
 
 end
 
-function ratr(x, adhoc=false,  ratio=py"golden_ratio")
+function ratr(x, adhoc=true,  ratio=py"golden_ratio")
 function delta(b, d, r)
 [b - d, b - d / r, b - (1 - 1 / r) * d, b, b + (1 - 1 / r) * d, b + d / r, b + d]
 end
