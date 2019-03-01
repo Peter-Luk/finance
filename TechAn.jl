@@ -349,6 +349,15 @@ end
 
 end
 
+function ratr(x, ratio=py"golden_ratio")
+function delta(b, d, r)
+[b - d, b - d / r, b - (1 - 1 / r) * d, b, b + (1 - 1 / r) * d, b + d / r, b + d]
+end
+data = fetch(x)
+ar = py"$(atr(data))[-1]"
+delta(py"$data['Close'][-1]", ar, ratio)
+end
+
 function exist(c)
 py"""
 bool = False
