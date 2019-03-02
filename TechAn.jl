@@ -1,4 +1,4 @@
-using PyCall
+using PyCall, Pandas
 py"""
 import pandas as pd
 import sqlalchemy as sqa
@@ -7,75 +7,73 @@ from scipy.constants import golden_ratio
 from numpy import nan, isnan, array
 from datetime import datetime
 start = datetime(datetime.today().year - 4, 12, 31).date()
-dir_ = ''
+dir_ = '~'
 platform = pathlib.sys.platform
 if platform in ['linux']:
     import fix_yahoo_finance as yf
-    dir_ = 'storage/shared'
+    dir_ = '~/storage/shared'
     if 'EXTERNAL_STORAGE' in pathlib.os.environ.keys():
-        dir_ = 'storage/external-1'
-d_loc = f'sqlite:///{pathlib.Path.home()}'
-if dir_: d_loc += f'/{dir_}'
-d_loc += '/data/sqlite3/Securities'
-engine = sqa.create_engine(d_loc)
-def ema(raw, period, req_field='c'):
-    if req_field.lower() in ['c', 'close']: _data = raw['Close']
-    if req_field.lower() in ['hl', 'lh', 'range']: _data = raw.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
-    if req_field.lower() in ['ohlc', 'all', 'full']: _data = raw.drop('Volume', 1).mean(axis=1)
-    tl, _ = [], 0
-    while _ < _data.size:
-        hdr = nan
-        if _ == period: hdr = _data[:period].mean()
-        if _ > period: hdr = (tl[-1] * (period - 1) + _data[_]) / period
-        tl.append(hdr)
-        _ += 1
-    _ = pd.Series(tl, index=raw.index)
-    _.name = f'EMA{period:02d}'
-    return _
-def kama(raw, period, req_field='c'):
-    if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
-    if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
-    if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
-    change = (_data - _data.shift(period['er'])).abs()
-    volatility = (_data - _data.shift(1)).abs().rolling(period['er']).sum()
-    er = change / volatility
-    sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
-    _, hdr, __ = 0, [], nan
-    while _ < len(raw):
-        if _ == period['slow']: __ = _data[:_].mean()
-        if _ > period['slow']: __ = hdr[-1] + sc[_] * (_data[_] - hdr[-1])
-        hdr.append(__)
-        _ += 1
-    _ = pd.Series(hdr, index=raw.index)
-    _.name = f'KAMA{period["er"]:02d}'
-    return _
+        dir_ = '~/storage/external-1'
+dir_ += '/data/sqlite3/Securities'
+path = pathlib.Path(dir_)
+engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
 """
-sma(x, period=20) = py"$x['Close'].rolling($period).mean()"
+sma(x, period=20) = x."Close".rolling(period).mean()
 
 function wma(x, period=20, req_field="c")
-py"""
-raw = $x
-period = $period
-rf = $req_field
-if rf.lower() in ['c', 'close']: _data = raw['Close']
-if rf.lower() in ['hl', 'lh', 'range']: _data = raw.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
-if rf.lower() in ['ohlc', 'all', 'full']: _data = raw.drop('Volume', 1).mean(axis=1)
-_ = (_data * raw['Volume']).rolling(period).sum() / raw['Volume'].rolling(period).sum()
-_.name = f'WMA{period:02d}'
-"""
-py"_"
+_data = x."Close"
+if lowercase(req_field) in ["ohlc", "all", "full"]
+    _data = x.drop("Volume", 1).mean(axis=1)
+end
+if lowercase(req_field) in ["hl", "lh", "range"]
+    _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
+end
+(_data * x."Volume").rolling(period).sum() / x."Volume".rolling(period).sum()
 end
 
 function ema(x, period=20, req_field="c")
+_data = x."Close"
+if lowercase(req_field) in ["ohlc", "all", "full"]
+    _data = x.drop("Volume", 1).mean(axis=1)
+end
+if lowercase(req_field) in ["hl", "lh", "range"]
+    _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
+end
 py"""
-_ = ema($x, $period, $req_field)
+tl = []
+i = 0
+while i < $_data.size:
+    hdr = nan
+    if i == $period: hdr = $_data[:$period].mean()
+    if i > $period:
+        hdr = (tl[-1] * ($period - 1) + $_data[i]) / $period
+    tl.append(hdr)
+    i += 1
+_ = pd.Series(tl, index=$_data.index)
 """
 py"_"
 end
 
 function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30), req_field="c")
+_data = x."Close"
+if uppercase(req_field) in ["HL", "LH", "RANGE"]
+    _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
+end
+if uppercase(req_field) in ["OHLC", "FULL", "ALL"]
+    _data = x.drop("Volume", 1).mean(axis=1)
+end
+change = (_data - _data.shift(period["er"])).abs()
+volatility = (_data - _data.shift(1)).abs().rolling(period["er"]).sum()
+er = change / volatility
+sc = (er * (2 / (period["fast"] + 1) - 2 / (period["slow"] + 1)) + 2 / (period["slow"] + 1)) ^ 2
 py"""
-_ = kama($x, $period, $req_field)
+_, hdr, __ = 0, [], nan
+while _ < $_data.size:
+    if _ == $period['slow']: __ = $_data[:_].mean()
+    if _ > $period['slow']: __ = hdr[-1] + $sc[_] * ($_data[_] - hdr[-1])
+    hdr.append(__)
+    _ += 1
+_ = pd.Series(hdr, index=$_data.index)
 """
 py"_"
 end
@@ -84,7 +82,7 @@ function apz(x, period=5)
 py"""
 raw = $x
 period = $period
-ehl = ema(raw, period, 'hl')
+ehl = $ema(raw, period, 'hl')
 _, hdr, __, val = 0, [], 0, nan
 while _ < len(ehl):
     if not isnan(ehl[_]):
@@ -107,7 +105,7 @@ end
 function kc(x, period=Dict("kama" => Dict("er" => 5, "fast" => 2, "slow" => 20), "atr" => 10))
 py"""
 period = $period
-middle_line = kama($x, period['kama'], 'hl')
+middle_line = $kama($x, period['kama'], 'hl')
 atr_ = $atr($x, period['atr'])
 upper = middle_line + (golden_ratio * atr_)
 lower = middle_line - (golden_ratio * atr_)
@@ -148,8 +146,8 @@ def __pema(pd_data, period):
         hdr.append(val)
     return pd.Series(hdr, index=pd_data.index)
 
-e_slow = ema(raw, period['slow'], 'hl')
-e_fast = ema(raw, period['fast'], 'hl')
+e_slow = $ema(raw, period['slow'], 'hl')
+e_fast = $ema(raw, period['fast'], 'hl')
 m_line = e_fast - e_slow
 s_line = __pema(m_line, period['signal'])
 m_hist = m_line - s_line
@@ -179,8 +177,8 @@ function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" => 10))
 py"""
 raw = $x
 period = $period
-slow_ = ema(raw, period['slow'], 'hl')
-fast_ = ema(raw, period['fast'], 'hl')
+slow_ = $ema(raw, period['slow'], 'hl')
+fast_ = $ema(raw, period['fast'], 'hl')
 m_line = fast_ - slow_
 mh = m_line.rolling(period['K']).max()
 ml = m_line.rolling(period['K']).min()
@@ -310,13 +308,8 @@ py"_"
 end
 
 function vwap(x)
-py"""
-raw = $x
-pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw['Volume']
-_ = pd.Series(pv.cumsum() / raw['Volume'].cumsum(), index=raw.index)
-_.name = 'VWAP'
-"""
-py"_"
+pv = x.drop(["Open", "Volume"], 1).mean(axis=1) * x."Volume"
+Pandas.Series(pv.cumsum() / x."Volume".cumsum(), index=x.index)
 end
 
 function fetch(c, adhoc=false)
