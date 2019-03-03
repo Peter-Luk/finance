@@ -133,8 +133,6 @@ end
 
 function macd(x, period=Dict("fast" => 12, "slow" => 26, "signal" => 9))
 py"""
-raw = $x
-period = $period
 def __pema(pd_data, period):
     data, hdr, __ = pd_data.values, [], 0
     for _ in range(len(data)):
@@ -147,16 +145,13 @@ def __pema(pd_data, period):
             __ += 1
         hdr.append(val)
     return pd.Series(hdr, index=pd_data.index)
-
-e_slow = $ema(raw, period['slow'], 'hl')
-e_fast = $ema(raw, period['fast'], 'hl')
-m_line = e_fast - e_slow
-s_line = __pema(m_line, period['signal'])
-m_hist = m_line - s_line
-_ = pd.DataFrame([m_line, s_line, m_hist]).T
-_.columns = ['M Line', 'Signal Line', 'M Histogram']
 """
-py"_"
+e_slow = ema(x, period["slow"], "hl")
+e_fast = ema(x, period["fast"], "hl")
+m_line = e_fast - e_slow
+s_line = py"__pema($m_line, $period['signal'])"
+m_hist = m_line - s_line
+_ = py"pd.DataFrame([$m_line, $s_line, $m_hist]).T"
 end
 
 function soc(x, period=Dict("K" => 14, "D" => 3))
@@ -176,23 +171,15 @@ py"_"
 end
 
 function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" => 10))
-py"""
-raw = $x
-period = $period
-slow_ = $ema(raw, period['slow'], 'hl')
-fast_ = $ema(raw, period['fast'], 'hl')
+slow_ = ema(x, period["slow"], "hl")
+fast_ = ema(x, period["fast"], "hl")
 m_line = fast_ - slow_
-mh = m_line.rolling(period['K']).max()
-ml = m_line.rolling(period['K']).min()
+mh = m_line.rolling(period["K"]).max()
+ml = m_line.rolling(period["K"]).min()
 kseries = (m_line - ml) / (mh - ml)
-k = kseries.rolling(period['D']).mean()
-k.name = '%K'
-d = k.rolling(period['D']).mean()
-d.name = '%D'
+k = kseries.rolling(period["D"]).mean()
+d = k.rolling(period["D"]).mean()
 _ = (m_line - k) / (d - k)
-_.name = 'STC'
-"""
-py"_"
 end
 
 function atr(x, period=14)
