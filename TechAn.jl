@@ -40,16 +40,17 @@ if lowercase(req_field) in ["hl", "lh", "range"]
     _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
 py"""
-tl = []
-i = 0
-while i < $_data.size:
+data, period = $_data, $period
+tl, _ = [], 0
+while _ < data.size:
     hdr = nan
-    if i == $period: hdr = $_data[:$period].mean()
-    if i > $period:
-        hdr = (tl[-1] * ($period - 1) + $_data[i]) / $period
+    if _ == period: hdr = data[:period].mean()
+    if _ > period:
+        hdr = (tl[-1] * (period - 1) + data[_]) / period
     tl.append(hdr)
-    i += 1
-_ = pd.Series(tl, index=$_data.index)
+    _ += 1
+_ = pd.Series(tl, index=data.index)
+_.name = f'EMA{period:02d}'
 """
 py"_"
 end
@@ -67,13 +68,15 @@ volatility = (_data - _data.shift(1)).abs().rolling(period["er"]).sum()
 er = change / volatility
 sc = (er * (2 / (period["fast"] + 1) - 2 / (period["slow"] + 1)) + 2 / (period["slow"] + 1)) ^ 2
 py"""
+data, period = $_data, $period
 _, hdr, __ = 0, [], nan
-while _ < $_data.size:
-    if _ == $period['slow']: __ = $_data[:_].mean()
-    if _ > $period['slow']: __ = hdr[-1] + $sc[_] * ($_data[_] - hdr[-1])
+while _ < data.size:
+    if _ == period['slow']: __ = data[:_].mean()
+    if _ > period['slow']: __ = hdr[-1] + $sc[_] * (data[_] - hdr[-1])
     hdr.append(__)
     _ += 1
-_ = pd.Series(hdr, index=$_data.index)
+_ = pd.Series(hdr, index=data.index)
+_.name = f'KAMA{period["er"]:02d}'
 """
 py"_"
 end
@@ -104,9 +107,8 @@ end
 
 function kc(x, period=Dict("kama" => Dict("er" => 5, "fast" => 2, "slow" => 20), "atr" => 10))
 py"""
-period = $period
-middle_line = $kama($x, period['kama'], 'hl')
-atr_ = $atr($x, period['atr'])
+middle_line = $kama($x, $period['kama'], 'hl')
+atr_ = $atr($x, $period['atr'])
 upper = middle_line + (golden_ratio * atr_)
 lower = middle_line - (golden_ratio * atr_)
 _ = pd.DataFrame([upper, lower]).T
@@ -195,8 +197,7 @@ end
 
 function atr(x, period=14)
 py"""
-raw = $x
-period = $period
+raw, period = $x, $period
 tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
 _, hdr, __ = 0, [], nan
 while _ < len(raw):
@@ -205,7 +206,7 @@ while _ < len(raw):
     hdr.append(__)
     _ += 1
 _ = pd.Series(hdr, index=raw.index)
-_.name = f'ATR{period:d}'
+_.name = f'ATR{period:02d}'
 """
 py"_"
 end
