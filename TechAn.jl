@@ -151,7 +151,11 @@ e_fast = ema(x, period["fast"], "hl")
 m_line = e_fast - e_slow
 s_line = py"__pema($m_line, $period['signal'])"
 m_hist = m_line - s_line
-_ = py"pd.DataFrame([$m_line, $s_line, $m_hist]).T"
+py"""
+_ = pd.DataFrame([$m_line, $s_line, $m_hist]).T
+_.columns = ['M line', 'Signal', 'Histogram']
+"""
+py"_"
 end
 
 function soc(x, period=Dict("K" => 14, "D" => 3))
