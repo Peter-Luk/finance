@@ -28,7 +28,8 @@ end
 if lowercase(req_field) in ["hl", "lh", "range"]
     _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
-(_data * x."Volume").rolling(period).sum() / x."Volume".rolling(period).sum()
+d = (_data * x."Volume").rolling(period).sum() / x."Volume".rolling(period).sum()
+setproperty!(d, "name", "WMA" * string(period))
 end
 
 function ema(x, period=20, req_field="c")
@@ -49,10 +50,9 @@ while _ < data.size:
         hdr = (tl[-1] * (period - 1) + data[_]) / period
     tl.append(hdr)
     _ += 1
-_ = pd.Series(tl, index=data.index)
-_.name = f'EMA{period:02d}'
 """
-py"_"
+d = py"pd.Series(tl, index=data.index)"
+setproperty!(d, "name", "EMA"* string(period))
 end
 
 function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30), req_field="c")
@@ -75,10 +75,9 @@ while _ < data.size:
     if _ > period['slow']: __ = hdr[-1] + $sc[_] * (data[_] - hdr[-1])
     hdr.append(__)
     _ += 1
-_ = pd.Series(hdr, index=data.index)
-_.name = f'KAMA{period["er"]:02d}'
 """
-py"_"
+d = py"pd.Series(hdr, index=data.index)"
+setproperty!(d, "name", "KAMA" * string(period["er"]))
 end
 
 function apz(x, period=5)
@@ -94,14 +93,15 @@ while _ < len($ehl):
         __ += 1
     hdr.append(val)
     _ += 1
-volatility = pd.Series(hdr, index=$ehl.index)
-tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
-upper = volatility + tr * golden_ratio
-lower = volatility - tr * golden_ratio
-_ = pd.DataFrame([upper, lower]).T
-_.columns = ['Upper', 'Lower']
 """
-py"_"
+volatility = py"pd.Series(hdr, index=$ehl.index)"
+tr = py"pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()"
+gr = py"golden_ratio"
+upper = volatility + tr * gr
+lower = volatility - tr * gr
+d = py"pd.DataFrame([$upper, $lower]).T"
+setproperty!(d, "columns", ["Upper", "Lower"])
+setproperty!(d, "name", "APZ" * string(period))
 end
 
 function kc(x, period=Dict("kama" => Dict("er" => 5, "fast" => 2, "slow" => 20), "atr" => 10))
@@ -110,11 +110,8 @@ atr_ = atr(x, period["atr"])
 gr = py"golden_ratio"
 upper = middle_line + (gr * atr_)
 lower = middle_line - (gr * atr_)
-py"""
-_ = pd.DataFrame([$upper, $lower]).T
-_.columns = ['Upper', 'Lower']
-"""
-py"_"
+d = py"pd.DataFrame([$upper, $lower]).T"
+setproperty!(d, "columns", ["Upper", "Lower"])
 end
 
 function bb(x, period=20)
@@ -122,11 +119,9 @@ middle_line = sma(x, period)
 width = x."Close".rolling(period).std()
 upper = middle_line + width
 lower = middle_line - width
-py"""
-_ = pd.DataFrame([upper, lower]).T
-_.columns = ['Upper', 'Lower']
-"""
-py"_"
+d = py"pd.DataFrame([$upper, $lower]).T"
+setproperty!(d, "columns", ["Upper", "Lower"])
+setproperty!(d, "name", "BB" * string(period))
 end
 
 function macd(x, period=Dict("fast" => 12, "slow" => 26, "signal" => 9))
@@ -152,7 +147,8 @@ m_hist = m_line - s_line
 setproperty!(m_line, "name", "M Line")
 setproperty!(s_line, "name", "Signal")
 setproperty!(m_hist, "name", "Histogram")
-py"pd.DataFrame([$m_line, $s_line, $m_hist]).T"
+h = py"pd.DataFrame([$m_line, $s_line, $m_hist]).T"
+setproperty!(h, "name", "MACD")
 end
 
 function soc(x, period=Dict("K" => 14, "D" => 3))
@@ -163,7 +159,8 @@ k = kseries.rolling(period["D"]).mean()
 d = k.rolling(period["D"]).mean()
 setproperty!(k, "name", "%K")
 setproperty!(d, "name", "%D")
-py"pd.DataFrame([$k, $d]).T"
+hdr = py"pd.DataFrame([$k, $d]).T"
+setproperty!(hdr, "name", "SOC")
 end
 
 function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" => 10))
@@ -175,57 +172,60 @@ ml = m_line.rolling(period["K"]).min()
 kseries = (m_line - ml) / (mh - ml)
 k = kseries.rolling(period["D"]).mean()
 d = k.rolling(period["D"]).mean()
-_ = (m_line - k) / (d - k)
+setproperty!(k, "name", "%K")
+setproperty!(d, "name", "%D")
+hdr = (m_line - k) / (d - k)
+setproperty!(hdr, "name", "STC")
 end
 
 function atr(x, period=14)
+tr = py"pd.DataFrame([$x['High'] - $x['Low'], ($x['High'] - $x['Close'].shift(1)).abs(), ($x['Low'] - $x['Close'].shift(1)).abs()]).max()"
 py"""
-raw, period = $x, $period
-tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+period = $period
 _, hdr, __ = 0, [], nan
-while _ < len(raw):
-    if _ == period: __ = tr[:_].mean()
-    if _ > period: __ = (hdr[-1] * (period - 1) + tr[_]) / period
+while _ < len($x):
+    if _ == period: __ = $tr[:_].mean()
+    if _ > period: __ = (hdr[-1] * (period - 1) + $tr[_]) / period
     hdr.append(__)
     _ += 1
-_ = pd.Series(hdr, index=raw.index)
-_.name = f'ATR{period:02d}'
 """
-py"_"
+d = py"pd.Series(hdr, index=$x.index)"
+setproperty!(d, "name", "ATR"* string(period))
 end
 
 function rsi(x, period=14)
 py"""
-raw = $x
-period = $period
 def _gz(_):
     if _ > 0: return _
     return 0
 def _lz(_):
     if _ < 0: return abs(_)
     return 0
-delta = raw['Close'] - raw['Close'].shift(1)
-gain = delta.apply(_gz)
-loss = delta.apply(_lz)
-_, hdr, __ = 0, [], nan
-while _ < len(gain):
-    if _ == period: __ = gain[:_].mean()
-    if _ > period: __ = (hdr[-1] * (period - 1) + gain[_]) / period
-    hdr.append(__)
-    _ += 1
-ag = pd.Series(hdr, index=gain.index)
-_, hdr, __ = 0, [], nan
-while _ < len(loss):
-    if _ == period: __ = loss[:_].mean()
-    if _ > period: __ = (hdr[-1] * (period - 1) + loss[_]) / period
-    hdr.append(__)
-    _ += 1
-al = pd.Series(hdr, index=loss.index)
-rs = ag / al
-_ = 100 - 100 / (1 + rs)
-_.name = f'RSI{period:d}'
 """
-py"_"
+delta = x."Close" - x."Close".shift(1)
+gain = py"$delta.apply(_gz)"
+loss = py"$delta.apply(_lz)"
+py"""
+_, hdr, __ = 0, [], nan
+while _ < len($gain):
+    if _ == $period: __ = $gain[:_].mean()
+    if _ > $period: __ = (hdr[-1] * ($period - 1) + $gain[_]) / $period
+    hdr.append(__)
+    _ += 1
+"""
+ag = py"pd.Series(hdr, index=$gain.index)"
+py"""
+_, hdr, __ = 0, [], nan
+while _ < len($loss):
+    if _ == $period: __ = $loss[:_].mean()
+    if _ > $period: __ = (hdr[-1] * ($period - 1) + $loss[_]) / $period
+    hdr.append(__)
+    _ += 1
+"""
+al = py"pd.Series(hdr, index=$loss.index)"
+rs = ag / al
+h = 100 - 100 / (1 + rs)
+setproperty!(h, "name", "RSI" * string(period))
 end
 
 function adx(x, period=14)
