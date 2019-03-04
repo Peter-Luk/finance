@@ -82,21 +82,20 @@ py"_"
 end
 
 function apz(x, period=5)
+ehl = ema(x, period, "hl")
 py"""
 raw = $x
 period = $period
-ehl = $ema(raw, period, 'hl')
 _, hdr, __, val = 0, [], 0, nan
-while _ < len(ehl):
-    if not isnan(ehl[_]):
-        if __ == period: val = ehl[_ - __:_].mean()
-        if __ > period: val = (hdr[-1] * (period - 1) + ehl[_]) / period
+while _ < len($ehl):
+    if not isnan($ehl[_]):
+        if __ == period: val = $ehl[_ - __:_].mean()
+        if __ > period: val = (hdr[-1] * (period - 1) + $ehl[_]) / period
         __ += 1
     hdr.append(val)
     _ += 1
-volatility = pd.Series(hdr, index=ehl.index)
+volatility = pd.Series(hdr, index=$ehl.index)
 tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
-
 upper = volatility + tr * golden_ratio
 lower = volatility - tr * golden_ratio
 _ = pd.DataFrame([upper, lower]).T
@@ -106,25 +105,24 @@ py"_"
 end
 
 function kc(x, period=Dict("kama" => Dict("er" => 5, "fast" => 2, "slow" => 20), "atr" => 10))
+middle_line = kama(x, period["kama"], "hl")
+atr_ = atr(x, period["atr"])
+gr = py"golden_ratio"
+upper = middle_line + (gr * atr_)
+lower = middle_line - (gr * atr_)
 py"""
-middle_line = $kama($x, $period['kama'], 'hl')
-atr_ = $atr($x, $period['atr'])
-upper = middle_line + (golden_ratio * atr_)
-lower = middle_line - (golden_ratio * atr_)
-_ = pd.DataFrame([upper, lower]).T
+_ = pd.DataFrame([$upper, $lower]).T
 _.columns = ['Upper', 'Lower']
 """
 py"_"
 end
 
 function bb(x, period=20)
-py"""
-raw = $x
-period = $period
-middle_line = $sma(raw, period)
-width = raw['Close'].rolling(period).std()
+middle_line = sma(x, period)
+width = x."Close".rolling(period).std()
 upper = middle_line + width
 lower = middle_line - width
+py"""
 _ = pd.DataFrame([upper, lower]).T
 _.columns = ['Upper', 'Lower']
 """
@@ -151,27 +149,21 @@ e_fast = ema(x, period["fast"], "hl")
 m_line = e_fast - e_slow
 s_line = py"__pema($m_line, $period['signal'])"
 m_hist = m_line - s_line
-py"""
-_ = pd.DataFrame([$m_line, $s_line, $m_hist]).T
-_.columns = ['M line', 'Signal', 'Histogram']
-"""
-py"_"
+setproperty!(m_line, "name", "M Line")
+setproperty!(s_line, "name", "Signal")
+setproperty!(m_hist, "name", "Histogram")
+py"pd.DataFrame([$m_line, $s_line, $m_hist]).T"
 end
 
 function soc(x, period=Dict("K" => 14, "D" => 3))
-py"""
-raw = $x
-period = $period
-ml = raw['Low'].rolling(period['K']).min()
-mh = raw['High'].rolling(period['K']).max()
-kseries = pd.Series((raw['Close'] - ml) / (mh - ml) * 100, index=raw.index)
-k = kseries.rolling(period['D']).mean()
-k.name = '%K'
-d = k.rolling(period['D']).mean()
-d.name = '%D'
-_ = pd.DataFrame([k, d]).T
-"""
-py"_"
+ml = x."Low".rolling(period["K"]).min()
+mh = x."High".rolling(period["K"]).max()
+kseries = py"pd.Series(($x['Close'] - $ml) / ($mh - $ml) * 100, index=$x.index)"
+k = kseries.rolling(period["D"]).mean()
+d = k.rolling(period["D"]).mean()
+setproperty!(k, "name", "%K")
+setproperty!(d, "name", "%D")
+py"pd.DataFrame([$k, $d]).T"
 end
 
 function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" => 10))
@@ -237,35 +229,35 @@ py"_"
 end
 
 function adx(x, period=14)
+atr_ = atr(x , period)
+hcp = x."High" - x."High".shift(1)
+lpc = x."Low".shift(1) - x."Low"
 py"""
-raw = $x
 period = $period
-atr_ = $atr($x , period)
-hcp, lpc = raw['High'] - raw['High'].shift(1), raw['Low'].shift(1) - raw['Low']
 def _hgl(_):
     if _[0] > _[-1] and _[0] > 0: return _[0]
     return 0
-dm_plus = pd.DataFrame([hcp, lpc]).T.apply(_hgl, axis=1)
-dm_minus = pd.DataFrame([lpc, hcp]).T.apply(_hgl, axis=1)
+dm_plus = pd.DataFrame([$hcp, $lpc]).T.apply(_hgl, axis=1)
+dm_minus = pd.DataFrame([$lpc, $hcp]).T.apply(_hgl, axis=1)
 _, iph, __ = 0, [], nan
 while _ < len(dm_plus):
     if _ == period: __ = dm_plus[:_].mean()
     if _ > period: __ = (iph[-1] * (period - 1) + dm_plus[_]) / period
     iph.append(__)
     _ += 1
-di_plus = pd.Series(iph, index=dm_plus.index) / atr_ * 100
-di_plus.name = f'+DI{period:d}'
-
+"""
+di_plus = py"pd.Series(iph, index=dm_plus.index) / $atr_ * 100"
+py"""
 _, imh, __ = 0, [], nan
 while _ < len(dm_minus):
     if _ == period: __ = dm_minus[:_].mean()
     if _ > period: __ = (imh[-1] * (period - 1) + dm_minus[_]) / period
     imh.append(__)
     _ += 1
-di_minus = pd.Series(imh, index=dm_minus.index) / atr_ * 100
-di_minus.name = f'-DI{period:d}'
-
-dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
+"""
+di_minus = py"pd.Series(imh, index=dm_minus.index) / $atr_ * 100"
+py"""
+dx = ($di_plus - $di_minus).abs() / ($di_plus + $di_minus) * 100
 _, hdr, __, val = 0, [], 0, nan
 while _ < len(dx):
     if not isnan(dx[_]):
@@ -274,11 +266,12 @@ while _ < len(dx):
         __ += 1
     hdr.append(val)
     _ += 1
-__ = pd.Series(hdr, index=dx.index)
-__.name = f'ADX{period:d}'
-_ = pd.DataFrame([di_plus, di_minus, __]).T
 """
-py"_"
+g = py"pd.Series(hdr, index=dx.index)"
+setproperty!(di_plus, "name", "+DI" * string(period))
+setproperty!(di_minus, "name", "-DI" * string(period))
+setproperty!(g, "name", "ADX" * string(period))
+h = py"pd.DataFrame([$di_plus, $di_minus, $g]).T"
 end
 
 function obv(x)
@@ -293,15 +286,15 @@ while _ < len(dcp):
         if dcp[_] < 0: val = -raw['Volume'][_]
         hdr.append(hdr[-1] + val)
     _ += 1
-_ = pd.Series(hdr, index=dcp.index)
-_.name = 'OBV'
 """
-py"_"
+h = py"pd.Series(hdr, index=dcp.index)"
+setproperty!(h, "name", "OBV")
 end
 
 function vwap(x)
 pv = x.drop(["Open", "Volume"], 1).mean(axis=1) * x."Volume"
-Pandas.Series(pv.cumsum() / x."Volume".cumsum(), index=x.index)
+h = py"pd.Series($pv.cumsum() / $x['Volume'].cumsum(), index=$x.index)"
+setproperty!(h, "name", "VWAP")
 end
 
 function fetch(c, adhoc=false)
