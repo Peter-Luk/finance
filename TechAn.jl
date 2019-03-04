@@ -35,23 +35,27 @@ end
 function ema(x, period=20, req_field="c")
 _data = x."Close"
 if lowercase(req_field) in ["ohlc", "all", "full"]
-    _data = x.drop("Volume", 1).mean(axis=1)
+_data = x.drop("Volume", 1).mean(axis=1)
 end
 if lowercase(req_field) in ["hl", "lh", "range"]
-    _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
+_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
-py"""
-data, period = $_data, $period
-tl, _ = [], 0
-while _ < data.size:
-    hdr = nan
-    if _ == period: hdr = data[:period].mean()
-    if _ > period:
-        hdr = (tl[-1] * (period - 1) + data[_]) / period
-    tl.append(hdr)
-    _ += 1
-"""
-d = py"pd.Series(tl, index=data.index)"
+tl = []
+let i = 1
+val = _data.values
+while i <= length(val)
+hdr = py"nan"
+if i == period
+hdr = mean(val[1:period])
+end
+if i > period
+hdr = (tl[end] * (period - 1) + val[i]) / period
+end
+push!(tl, hdr)
+i += 1
+end
+end
+d = py"pd.Series($tl, index=$_data.index)"
 setproperty!(d, "name", "EMA"* string(period))
 end
 
