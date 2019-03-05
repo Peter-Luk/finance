@@ -92,20 +92,40 @@ end
 
 function apz(x, period=5)
 ehl = ema(x, period, "hl")
+#=
+hdr = []
+let i = 1
+    val = ehl.values
+    while i <= length(val)
+        j = 1
+        tmp = NaN
+        if !isnan(val[i])
+            if j == period
+                tmp = mean(val[i - j:i])
+            end
+            if i > period
+                tmp = (hdr[end] * (period - 1) + val[i]) / period
+            end
+            j += 1
+        end
+        push!(hdr, tmp)
+        i += 1
+    end
+end
+=#
 py"""
-raw = $x
-period = $period
 _, hdr, __, val = 0, [], 0, nan
 while _ < len($ehl):
     if not isnan($ehl[_]):
-        if __ == period: val = $ehl[_ - __:_].mean()
-        if __ > period: val = (hdr[-1] * (period - 1) + $ehl[_]) / period
+        if __ == $period: val = $ehl[_ - __:_].mean()
+        if __ > $period: val = (hdr[-1] * ($period - 1) + $ehl[_]) / $period
         __ += 1
     hdr.append(val)
     _ += 1
 """
+
 volatility = py"pd.Series(hdr, index=$ehl.index)"
-tr = py"pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()"
+tr = py"pd.DataFrame([$x['High'] - $x['Low'], ($x['High'] - $x['Close'].shift(1)).abs(), ($x['Low'] - $x['Close'].shift(1)).abs()]).max()"
 gr = py"golden_ratio"
 upper = volatility + tr * gr
 lower = volatility - tr * gr
