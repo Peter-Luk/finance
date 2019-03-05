@@ -23,10 +23,10 @@ sma(x, period=20) = x."Close".rolling(period).mean()
 function wma(x, period=20, req_field="c")
 _data = x."Close"
 if lowercase(req_field) in ["ohlc", "all", "full"]
-    _data = x.drop("Volume", 1).mean(axis=1)
+_data = x.drop("Volume", 1).mean(axis=1)
 end
 if lowercase(req_field) in ["hl", "lh", "range"]
-    _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
+_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
 d = (_data * x."Volume").rolling(period).sum() / x."Volume".rolling(period).sum()
 setproperty!(d, "name", "WMA" * string(period))
@@ -46,7 +46,7 @@ val = _data.values
 while i <= length(val)
 hdr = py"nan"
 if i == period
-hdr = mean(val[1:period])
+hdr = mean(val[1:i])
 end
 if i > period
 hdr = (tl[end] * (period - 1) + val[i]) / period
@@ -62,25 +62,31 @@ end
 function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30), req_field="c")
 _data = x."Close"
 if uppercase(req_field) in ["HL", "LH", "RANGE"]
-    _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
+_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
 if uppercase(req_field) in ["OHLC", "FULL", "ALL"]
-    _data = x.drop("Volume", 1).mean(axis=1)
+_data = x.drop("Volume", 1).mean(axis=1)
 end
 change = (_data - _data.shift(period["er"])).abs()
 volatility = (_data - _data.shift(1)).abs().rolling(period["er"]).sum()
 er = change / volatility
 sc = (er * (2 / (period["fast"] + 1) - 2 / (period["slow"] + 1)) + 2 / (period["slow"] + 1)) ^ 2
-py"""
-data, period = $_data, $period
-_, hdr, __ = 0, [], nan
-while _ < data.size:
-    if _ == period['slow']: __ = data[:_].mean()
-    if _ > period['slow']: __ = hdr[-1] + $sc[_] * (data[_] - hdr[-1])
-    hdr.append(__)
-    _ += 1
-"""
-d = py"pd.Series(hdr, index=data.index)"
+hdr = []
+let i = 1
+val = _data.values
+while i <= length(val)
+j = py"nan"
+if i == period["slow"]
+j = mean(val[1:i])
+end
+if i > period["slow"]
+j = (hdr[end] * (period["slow"] - 1) + val[i]) / period["slow"]
+end
+push!(hdr, j)
+i += 1
+end
+end
+d = py"pd.Series($hdr, index=$_data.index)"
 setproperty!(d, "name", "KAMA" * string(period["er"]))
 end
 
@@ -184,16 +190,22 @@ end
 
 function atr(x, period=14)
 tr = py"pd.DataFrame([$x['High'] - $x['Low'], ($x['High'] - $x['Close'].shift(1)).abs(), ($x['Low'] - $x['Close'].shift(1)).abs()]).max()"
-py"""
-period = $period
-_, hdr, __ = 0, [], nan
-while _ < len($x):
-    if _ == period: __ = $tr[:_].mean()
-    if _ > period: __ = (hdr[-1] * (period - 1) + $tr[_]) / period
-    hdr.append(__)
-    _ += 1
-"""
-d = py"pd.Series(hdr, index=$x.index)"
+hdr = []
+let i = 1
+val = tr.values
+while i <= length(val)
+tmp = py"nan"
+if i == period
+tmp = mean(val[1:i])
+end
+if i > period
+tmp = (hdr[end] * (period - 1) + val[i]) / period 
+end
+push!(hdr, tmp)
+i += 1
+end
+end
+d = py"pd.Series($hdr, index=$x.index)"
 setproperty!(d, "name", "ATR"* string(period))
 end
 
@@ -279,19 +291,23 @@ h = py"pd.DataFrame([$di_plus, $di_minus, $g]).T"
 end
 
 function obv(x)
-py"""
-raw =$x
-hdr, _ = [raw['Volume'][0]], 0
-dcp = raw['Close'] - raw['Close'].shift(1)
-while _ < len(dcp):
-    if _ > 0:
-        val = 0
-        if dcp[_] > 0: val = raw['Volume'][_]
-        if dcp[_] < 0: val = -raw['Volume'][_]
-        hdr.append(hdr[-1] + val)
-    _ += 1
-"""
-h = py"pd.Series(hdr, index=dcp.index)"
+dcp = x."Close" - x."Close".shift(1)
+hdr = [x."Volume".values[1]]
+let i = 2
+val = x."Volume".values
+while i <= length(val)
+tmp = 0
+if dcp[i] > 0
+tmp = val[i]
+end
+if dcp[i] < 0
+tmp = -val[i]
+end
+push!(hdr, hdr[end] + tmp)
+i += 1
+end
+end
+h = py"pd.Series($hdr, index=$dcp.index)"
 setproperty!(h, "name", "OBV")
 end
 
