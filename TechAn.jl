@@ -210,35 +210,47 @@ setproperty!(d, "name", "ATR"* string(period))
 end
 
 function rsi(x, period=14)
-py"""
-def _gz(_):
-    if _ > 0: return _
-    return 0
-def _lz(_):
-    if _ < 0: return abs(_)
-    return 0
-"""
+function _gz(x)
+x > 0 ? x : 0
+end
+function _lz(x)
+x < 0 ? abs(x) : 0
+end
 delta = x."Close" - x."Close".shift(1)
-gain = py"$delta.apply(_gz)"
-loss = py"$delta.apply(_lz)"
-py"""
-_, hdr, __ = 0, [], nan
-while _ < len($gain):
-    if _ == $period: __ = $gain[:_].mean()
-    if _ > $period: __ = (hdr[-1] * ($period - 1) + $gain[_]) / $period
-    hdr.append(__)
-    _ += 1
-"""
-ag = py"pd.Series(hdr, index=$gain.index)"
-py"""
-_, hdr, __ = 0, [], nan
-while _ < len($loss):
-    if _ == $period: __ = $loss[:_].mean()
-    if _ > $period: __ = (hdr[-1] * ($period - 1) + $loss[_]) / $period
-    hdr.append(__)
-    _ += 1
-"""
-al = py"pd.Series(hdr, index=$loss.index)"
+gain = delta.apply(_gz)
+loss = delta.apply(_lz)
+hdr = []
+let i = 1
+val = gain.values
+while i <= length(val)
+tmp = py"nan"
+if i == period
+tmp = mean(val[1:i])
+end
+if i > period
+tmp = (hdr[end] * (period - 1) + val[i]) / period
+end
+push!(hdr, tmp)
+i += 1
+end
+end
+ag = py"pd.Series($hdr, index=$gain.index)"
+hdr = []
+let i = 1
+val = loss.values
+while i <= length(val)
+tmp = py"nan"
+if i == period
+tmp = mean(val[1:i])
+end
+if i > period
+tmp = (hdr[end] * (period - 1) + val[i]) / period
+end
+push!(hdr, tmp)
+i += 1
+end
+end
+al = py"pd.Series($hdr, index=$loss.index)"
 rs = ag / al
 h = 100 - 100 / (1 + rs)
 setproperty!(h, "name", "RSI" * string(period))
@@ -253,37 +265,53 @@ period = $period
 def _hgl(_):
     if _[0] > _[-1] and _[0] > 0: return _[0]
     return 0
-dm_plus = pd.DataFrame([$hcp, $lpc]).T.apply(_hgl, axis=1)
-dm_minus = pd.DataFrame([$lpc, $hcp]).T.apply(_hgl, axis=1)
-_, iph, __ = 0, [], nan
-while _ < len(dm_plus):
-    if _ == period: __ = dm_plus[:_].mean()
-    if _ > period: __ = (iph[-1] * (period - 1) + dm_plus[_]) / period
-    iph.append(__)
-    _ += 1
 """
-di_plus = py"pd.Series(iph, index=dm_plus.index) / $atr_ * 100"
+dm_plus = py"pd.DataFrame([$hcp, $lpc]).T.apply(_hgl, axis=1)"
+dm_minus = py"pd.DataFrame([$lpc, $hcp]).T.apply(_hgl, axis=1)"
+iph = []
+let i = 1
+val = dm_plus.values
+while i <= length(val)
+tmp = py"nan"
+if i == period
+tmp = mean(val[1:i])
+end
+if i > period
+tmp = (iph[end] * (period - 1) + val[i]) / period
+end
+push!(iph, tmp)
+i += 1
+end
+end
+di_plus = py"pd.Series($iph, index=$dm_plus.index) / $atr_ * 100"
+imh = []
+let i = 1
+val = dm_minus.values
+while i <= length(val)
+tmp = py"nan"
+if i == period
+tmp = mean(val[1:i])
+end
+if i > period
+tmp = (imh[end] * (period - 1) + val[i]) / period
+end
+push!(imh, tmp)
+i += 1
+end
+end
+di_minus = py"pd.Series($imh, index=$dm_minus.index) / $atr_ * 100"
+dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
 py"""
-_, imh, __ = 0, [], nan
-while _ < len(dm_minus):
-    if _ == period: __ = dm_minus[:_].mean()
-    if _ > period: __ = (imh[-1] * (period - 1) + dm_minus[_]) / period
-    imh.append(__)
-    _ += 1
-"""
-di_minus = py"pd.Series(imh, index=dm_minus.index) / $atr_ * 100"
-py"""
-dx = ($di_plus - $di_minus).abs() / ($di_plus + $di_minus) * 100
 _, hdr, __, val = 0, [], 0, nan
-while _ < len(dx):
-    if not isnan(dx[_]):
-        if __ == period: val = dx[_ - __:_].mean()
-        if __ > period: val = (hdr[-1] * (period - 1) + dx[__]) / period
+while _ < len($dx):
+    if not isnan($dx[_]):
+        if __ == period: val = $dx[_ - __:_].mean()
+        if __ > period: val = (hdr[-1] * (period - 1) + $dx[__]) / period
         __ += 1
     hdr.append(val)
     _ += 1
 """
-g = py"pd.Series(hdr, index=dx.index)"
+g = py"pd.Series(hdr, index=$dx.index)"
 setproperty!(di_plus, "name", "+DI" * string(period))
 setproperty!(di_minus, "name", "-DI" * string(period))
 setproperty!(g, "name", "ADX" * string(period))
@@ -344,7 +372,6 @@ else:
 if ~py"d.empty"
 py"d"
 end
-
 end
 
 function ratr(x, adhoc=true,  ratio=py"golden_ratio")
