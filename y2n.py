@@ -47,27 +47,39 @@ class Futures(AF, Viewer):
         return self._af.combine(freq, dataframe)
 
     def mas(self, raw=None, period=periods, dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.mas(raw, period, dataframe)
 
     def idrs(self, raw=None, period=periods, dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.idrs(raw, period, dataframe)
 
     def macd(self, raw=None, period=periods['macd'], dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.macd(raw, period, dataframe)
 
     def adx(self, raw=None, period=periods['adx'], dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.adx(raw, period, dataframe)
 
     def soc(self, raw=None, period=periods['soc'], dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.soc(raw, period, dataframe)
 
     def stc(self, raw=None, period=periods['stc'], dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.stc(raw, period, dataframe)
 
     def ratr(self, raw=None, period=periods['atr'], dataframe=True):
@@ -77,7 +89,9 @@ class Futures(AF, Viewer):
         return self.view.ratr(raw, period, dataframe)
 
     def best_quote(self, raw=None, period=periods, date=None, unbound=False, exclusive=True, dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         if date == None: date = raw.index[-1]
         return self.view.best_quote(raw, period, date, unbound, exclusive,  dataframe)
 
@@ -146,27 +160,40 @@ class Equities(AE, Viewer):
         return {'Date':list(__.index), 'Data':__.values}
 
     def mas(self, raw=None, period=periods, dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.mas(raw, period, dataframe)
 
     def idrs(self, raw=None, period=periods, dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.idrs(raw, period, dataframe)
 
     def adx(self, raw=None, period=periods['adx'], dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.adx(raw, period, dataframe)
 
     def macd(self, raw=None, period=periods['macd'], dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.macd(raw, period, dataframe)
 
     def soc(self, raw=None, period=periods['soc'], dataframe=True):
+        try:
+            if raw == None: raw = self.data
+        except: pass
         if raw == None: raw = self.data
         return self.view.soc(raw, period, dataframe)
 
     def stc(self, raw=None, period=periods['stc'], dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         return self.view.stc(raw, period, dataframe)
 
     def ratr(self, raw=None, period=periods['atr'], dataframe=True):
@@ -176,7 +203,9 @@ class Equities(AE, Viewer):
         return self.view.ratr(raw, period, dataframe)
 
     def best_quote(self, raw=None, period=periods, date=None, unbound=False, exclusive=True, dataframe=True):
-        if raw == None: raw = self.data
+        try:
+            if raw == None: raw = self.data
+        except: pass
         if date == None: date = raw.index[-1]
         return self.view.best_quote(raw, period, date, unbound, exclusive,  dataframe)
 
