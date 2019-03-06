@@ -28,7 +28,7 @@ class ONA(object):
                 hdr.append(val)
                 _ += 1
             __ = pd.Series(hdr, index=_data.index)
-        __.name = f'{favour}ma{period:d}'.upper()
+        __.name = f'{favour}ma{period:02d}'.upper()
         if dataframe: return __
         return __.to_dict()
 
@@ -93,7 +93,7 @@ class ONA(object):
             hdr.append(__)
             _ += 1
         _ = pd.Series(hdr, index=raw.index)
-        _.name = f'ATR{period:d}'
+        _.name = f'ATR{period:02d}'
         if dataframe: return _
         return _.to_dict()
 
@@ -123,7 +123,7 @@ class ONA(object):
         al = pd.Series(hdr, index=loss.index)
         rs = ag / al
         _ = 100 - 100 / (1 + rs)
-        _.name = f'RSI{period:d}'
+        _.name = f'RSI{period:02d}'
         if dataframe: return _
         return _.to_dict()
 
@@ -142,7 +142,7 @@ class ONA(object):
             iph.append(__)
             _ += 1
         di_plus = pd.Series(iph, index=dm_plus.index) / atr * 100
-        di_plus.name = f'+DI{period:d}'
+        di_plus.name = f'+DI{period:02d}'
 
         _, imh, __ = 0, [], np.nan
         while _ < len(dm_minus):
@@ -151,7 +151,7 @@ class ONA(object):
             imh.append(__)
             _ += 1
         di_minus = pd.Series(imh, index=dm_minus.index) / atr * 100
-        di_minus.name = f'-DI{period:d}'
+        di_minus.name = f'-DI{period:02d}'
 
         dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
         _, hdr, __, val = 0, [], 0, np.nan
@@ -163,7 +163,7 @@ class ONA(object):
             hdr.append(val)
             _ += 1
         _ = pd.Series(hdr, index=dx.index)
-        _.name = f'ADX{period:d}'
+        _.name = f'ADX{period:02d}'
         __ = pd.DataFrame([di_plus, di_minus, _]).T
         if dataframe: return __
         return __.to_dict()
@@ -183,7 +183,7 @@ class ONA(object):
             hdr.append(__)
             _ += 1
         _ = pd.Series(hdr, index=raw.index)
-        _.name = f"KAMA{period['er']:d}"
+        _.name = f"KAMA{period['er']:02d}"
         if dataframe: return _
         return _.to_dict()
 
@@ -301,7 +301,7 @@ class Viewer(ONA):
         return _.to_dict()
 
     def idrs(self, raw, period, dataframe=True):
-        _ = pd.DataFrame([self.adx(raw, period['adx'], True)[f"ADX{period['adx']:d}"], self.rsi(raw, period['simple'], True), self.atr(raw, period['atr'], True)]).T
+        _ = pd.DataFrame([self.adx(raw, period['adx'], True)[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple'], True), self.atr(raw, period['atr'], True)]).T
         if dataframe: return _
         return _.to_dict()
 
