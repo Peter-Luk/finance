@@ -70,6 +70,10 @@ class Futures(AF, Viewer):
         if raw == None: raw = self.data
         return self.view.stc(raw, period, dataframe)
 
+    def ratr(self, raw=None, period=periods['atr'], dataframe=True):
+        if raw == None: raw = self.data
+        return self.view.ratr(raw, period, dataframe)
+
     def best_quote(self, raw=None, period=periods, date=None, unbound=False, exclusive=True, dataframe=True):
         if raw == None: raw = self.data
         if date == None: date = raw.index[-1]
@@ -162,6 +166,10 @@ class Equities(AE, Viewer):
     def stc(self, raw=None, period=periods['stc'], dataframe=True):
         if raw == None: raw = self.data
         return self.view.stc(raw, period, dataframe)
+
+    def ratr(self, raw=None, period=periods['atr'], dataframe=True):
+        if raw == None: raw = self.data
+        return self.view.ratr(raw, period, dataframe)
 
     def best_quote(self, raw=None, period=periods, date=None, unbound=False, exclusive=True, dataframe=True):
         if raw == None: raw = self.data
