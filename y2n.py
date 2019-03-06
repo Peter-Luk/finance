@@ -58,6 +58,14 @@ class Futures(AF, Viewer):
         if raw == None: raw = self.data
         return self.view.macd(raw, period, dataframe)
 
+    def adx(self, raw=None, period=periods['adx'], dataframe=True):
+        if raw == None: raw = self.data
+        return self.view.adx(raw, period, dataframe)
+
+    def soc(self, raw=None, period=periods['soc'], dataframe=True):
+        if raw == None: raw = self.data
+        return self.view.soc(raw, period, dataframe)
+
     def stc(self, raw=None, period=periods['stc'], dataframe=True):
         if raw == None: raw = self.data
         return self.view.stc(raw, period, dataframe)
@@ -139,9 +147,17 @@ class Equities(AE, Viewer):
         if raw == None: raw = self.data
         return self.view.idrs(raw, period, dataframe)
 
+    def adx(self, raw=None, period=periods['adx'], dataframe=True):
+        if raw == None: raw = self.data
+        return self.view.adx(raw, period, dataframe)
+
     def macd(self, raw=None, period=periods['macd'], dataframe=True):
         if raw == None: raw = self.data
         return self.view.macd(raw, period, dataframe)
+
+    def soc(self, raw=None, period=periods['soc'], dataframe=True):
+        if raw == None: raw = self.data
+        return self.view.soc(raw, period, dataframe)
 
     def stc(self, raw=None, period=periods['stc'], dataframe=True):
         if raw == None: raw = self.data

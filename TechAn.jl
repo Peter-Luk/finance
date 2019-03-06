@@ -94,24 +94,26 @@ function apz(x, period=5)
 ehl = ema(x, period, "hl")
 #=
 hdr = []
-let i = 1
+let i = 1, j = 1
     val = ehl.values
     while i <= length(val)
-        j = 1
-        tmp = NaN
-        if !isnan(val[i])
+        if isnan(val[i])
+            push!(hdr, NaN)
+        else
+            tmp = NaN
             if j == period
                 tmp = mean(val[i - j:i])
             end
-            if i > period
+            if j > period
                 tmp = (hdr[end] * (period - 1) + val[i]) / period
             end
+            push!(hdr, tmp)
             j += 1
         end
-        push!(hdr, tmp)
         i += 1
     end
 end
+volatility = py"pd.Series($hdr, index=$ehl.index)"
 =#
 py"""
 _, hdr, __, val = 0, [], 0, nan
@@ -123,7 +125,6 @@ while _ < len($ehl):
     hdr.append(val)
     _ += 1
 """
-
 volatility = py"pd.Series(hdr, index=$ehl.index)"
 tr = py"pd.DataFrame([$x['High'] - $x['Low'], ($x['High'] - $x['Close'].shift(1)).abs(), ($x['Low'] - $x['Close'].shift(1)).abs()]).max()"
 gr = py"golden_ratio"
@@ -376,7 +377,7 @@ if adhoc:
         d.drop('Adj Close', 1, inplace=True)
 else:
     exist = False
-    t_str = "SELECT DISTINCT eid FROM records ORDER BY eid ASC"
+    t_str = 'SELECT DISTINCT eid FROM records ORDER BY eid ASC'
     uid = pd.read_sql(t_str, engine)
     if code in uid.values: exist = True
     if exist:
@@ -403,11 +404,6 @@ delta(py"$data['Close'][-1]", py"$(atr(data))[-1]", ratio)
 end
 
 function exist(c)
-py"""
-bool = False
 q_str = "SELECT DISTINCT eid FROM records ORDER BY eid ASC"
-uid = pd.read_sql(q_str, engine)
-if $c in uid.values: bool = True
-"""
-py"bool"
+c in py"pd.read_sql($q_str, engine)".values
 end
