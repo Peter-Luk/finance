@@ -187,7 +187,6 @@ class Equities(AE, Viewer):
         try:
             if raw == None: raw = self.data
         except: pass
-        if raw == None: raw = self.data
         return self.view.soc(raw, period, dataframe)
 
     def stc(self, raw=None, period=periods['stc'], dataframe=True):
