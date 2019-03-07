@@ -44,7 +44,7 @@ tl = []
 let i = 1
 val = _data.values
 while i <= length(val)
-hdr = py"nan"
+hdr = NaN
 if i == period
 hdr = mean(val[1:i])
 end
@@ -75,12 +75,12 @@ hdr = []
 let i = 1
 val = _data.values
 while i <= length(val)
-j = py"nan"
+j = NaN
 if i == period["slow"]
 j = mean(val[1:i])
 end
 if i > period["slow"]
-j = (hdr[end] * (period["slow"] - 1) + val[i]) / period["slow"]
+j = hdr[end] + sc[i] * (val[i] - hdr[end])
 end
 push!(hdr, j)
 i += 1
@@ -215,7 +215,7 @@ hdr = []
 let i = 1
 val = tr.values
 while i <= length(val)
-tmp = py"nan"
+tmp = NaN
 if i == period
 tmp = mean(val[1:i])
 end
@@ -244,7 +244,7 @@ hdr = []
 let i = 1
 val = gain.values
 while i <= length(val)
-tmp = py"nan"
+tmp = NaN
 if i == period
 tmp = mean(val[1:i])
 end
@@ -260,7 +260,7 @@ hdr = []
 let i = 1
 val = loss.values
 while i <= length(val)
-tmp = py"nan"
+tmp = NaN
 if i == period
 tmp = mean(val[1:i])
 end
@@ -282,7 +282,6 @@ atr_ = atr(x , period)
 hcp = x."High" - x."High".shift(1)
 lpc = x."Low".shift(1) - x."Low"
 py"""
-period = $period
 def _hgl(_):
     if _[0] > _[-1] and _[0] > 0: return _[0]
     return 0
@@ -293,7 +292,7 @@ iph = []
 let i = 1
 val = dm_plus.values
 while i <= length(val)
-tmp = py"nan"
+tmp = NaN
 if i == period
 tmp = mean(val[1:i])
 end
@@ -309,7 +308,7 @@ imh = []
 let i = 1
 val = dm_minus.values
 while i <= length(val)
-tmp = py"nan"
+tmp = NaN
 if i == period
 tmp = mean(val[1:i])
 end
@@ -326,8 +325,8 @@ py"""
 _, hdr, __, val = 0, [], 0, nan
 while _ < len($dx):
     if not isnan($dx[_]):
-        if __ == period: val = $dx[_ - __:_].mean()
-        if __ > period: val = (hdr[-1] * (period - 1) + $dx[__]) / period
+        if __ == $period: val = $dx[_ - __:_].mean()
+        if __ > $period: val = (hdr[-1] * ($period - 1) + $dx[__]) / $period
         __ += 1
     hdr.append(val)
     _ += 1
