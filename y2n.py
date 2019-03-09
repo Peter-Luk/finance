@@ -82,7 +82,7 @@ class Futures(AF, Viewer):
         except: pass
         return self.view.stc(raw, period, dataframe)
 
-    def ratr(self, raw=None, period=periods['atr'], dataframe=True):
+    def ratr(self, raw=None, period=periods['rsi'], dataframe=True):
         try:
             if raw == None: raw = self.data
         except: pass
@@ -195,7 +195,7 @@ class Equities(AE, Viewer):
         except: pass
         return self.view.stc(raw, period, dataframe)
 
-    def ratr(self, raw=None, period=periods['atr'], dataframe=True):
+    def ratr(self, raw=None, period=periods['rsi'], dataframe=True):
         try:
             if raw == None: raw = self.data
         except: pass

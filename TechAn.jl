@@ -1,4 +1,4 @@
-using PyCall, Pandas
+using Pandas
 py"""
 import pandas as pd
 import sqlalchemy as sqa
@@ -14,13 +14,16 @@ if platform in ['linux']:
     dir_ = '~/storage/shared'
     if 'EXTERNAL_STORAGE' in pathlib.os.environ.keys():
         dir_ = '~/storage/external-1'
-dir_ += '/data/sqlite3/Securities'
+        db_name = db['Equities']['name']
+dir_ += f'/data/sqlite3/{db_name}'
 path = pathlib.Path(dir_)
 engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
 """
-sma(x, period=20) = x."Close".rolling(period).mean()
+Eperiod = periods["Equities"]
 
-function wma(x, period=20, req_field="c")
+sma(x, period=Eperiod["simple"]) = x."Close".rolling(period).mean()
+
+function wma(x, period=Eperiod["simple"], req_field="c")
 _data = x."Close"
 if lowercase(req_field) in ["ohlc", "all", "full"]
 _data = x.drop("Volume", 1).mean(axis=1)
@@ -32,7 +35,7 @@ d = (_data * x."Volume").rolling(period).sum() / x."Volume".rolling(period).sum(
 setproperty!(d, "name", "WMA" * string(period))
 end
 
-function ema(x, period=20, req_field="c")
+function ema(x, period=Eperiod["simple"], req_field="c")
 _data = x."Close"
 if lowercase(req_field) in ["ohlc", "all", "full"]
 _data = x.drop("Volume", 1).mean(axis=1)
@@ -59,7 +62,7 @@ d = py"pd.Series($tl, index=$_data.index)"
 setproperty!(d, "name", "EMA"* string(period))
 end
 
-function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30), req_field="c")
+function kama(x, period=Eperiod["kama"], req_field="c")
 _data = x."Close"
 if uppercase(req_field) in ["HL", "LH", "RANGE"]
 _data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
@@ -90,7 +93,7 @@ d = py"pd.Series($hdr, index=$_data.index)"
 setproperty!(d, "name", "KAMA" * string(period["er"]))
 end
 
-function apz(x, period=5)
+function apz(x, period=Eperiod["apz"])
 ehl = ema(x, period, "hl")
 #=
 hdr = []
@@ -135,7 +138,7 @@ setproperty!(d, "columns", ["Upper", "Lower"])
 setproperty!(d, "name", "APZ" * string(period))
 end
 
-function kc(x, period=Dict("kama" => Dict("er" => 5, "fast" => 2, "slow" => 20), "atr" => 10))
+function kc(x, period=Eperiod["kc"])
 middle_line = kama(x, period["kama"], "hl")
 atr_ = atr(x, period["atr"])
 gr = py"golden_ratio"
@@ -145,7 +148,7 @@ d = py"pd.DataFrame([$upper, $lower]).T"
 setproperty!(d, "columns", ["Upper", "Lower"])
 end
 
-function bb(x, period=20)
+function bb(x, period=Eperiod["simple"])
 middle_line = sma(x, period)
 width = x."Close".rolling(period).std()
 upper = middle_line + width
@@ -155,7 +158,7 @@ setproperty!(d, "columns", ["Upper", "Lower"])
 setproperty!(d, "name", "BB" * string(period))
 end
 
-function macd(x, period=Dict("fast" => 12, "slow" => 26, "signal" => 9))
+function macd(x, period=Eperiod["macd"])
 py"""
 def __pema(pd_data, period):
     data, hdr, __ = pd_data.values, [], 0
@@ -182,7 +185,7 @@ h = py"pd.DataFrame([$m_line, $s_line, $m_hist]).T"
 setproperty!(h, "name", "MACD")
 end
 
-function soc(x, period=Dict("K" => 14, "D" => 3))
+function soc(x, period=Eperiod["soc"])
 ml = x."Low".rolling(period["K"]).min()
 mh = x."High".rolling(period["K"]).max()
 kseries = py"pd.Series(($x['Close'] - $ml) / ($mh - $ml) * 100, index=$x.index)"
@@ -194,7 +197,7 @@ hdr = py"pd.DataFrame([$k, $d]).T"
 setproperty!(hdr, "name", "SOC")
 end
 
-function stc(x, period=Dict("fast" => 23, "slow" => 50, "K" => 10, "D" => 10))
+function stc(x, period=Eperiod["stc"])
 slow_ = ema(x, period["slow"], "hl")
 fast_ = ema(x, period["fast"], "hl")
 m_line = fast_ - slow_
@@ -209,7 +212,7 @@ hdr = (m_line - k) / (d - k)
 setproperty!(hdr, "name", "STC")
 end
 
-function atr(x, period=14)
+function atr(x, period=Eperiod["atr"])
 tr = py"pd.DataFrame([$x['High'] - $x['Low'], ($x['High'] - $x['Close'].shift(1)).abs(), ($x['Low'] - $x['Close'].shift(1)).abs()]).max()"
 hdr = []
 let i = 1
@@ -230,7 +233,7 @@ d = py"pd.Series($hdr, index=$x.index)"
 setproperty!(d, "name", "ATR"* string(period))
 end
 
-function rsi(x, period=14)
+function rsi(x, period=Eperiod["rsi"])
 function _gz(x)
 x > 0 ? x : 0
 end
@@ -277,7 +280,7 @@ h = 100 - 100 / (1 + rs)
 setproperty!(h, "name", "RSI" * string(period))
 end
 
-function adx(x, period=14)
+function adx(x, period=Eperiod["adx"])
 atr_ = atr(x , period)
 hcp = x."High" - x."High".shift(1)
 lpc = x."Low".shift(1) - x."Low"
