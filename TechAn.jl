@@ -26,7 +26,7 @@ if lowercase(req_field) in ["ohlc", "all", "full"]
 _data = x.drop("Volume", 1).mean(axis=1)
 end
 if lowercase(req_field) in ["hl", "lh", "range"]
-_data = x[["High", "Low"]].mean(axis=1)
+_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
 d = (_data * x."Volume").rolling(period).sum() / x."Volume".rolling(period).sum()
 setproperty!(d, "name", "WMA" * string(period))
@@ -38,7 +38,7 @@ if lowercase(req_field) in ["ohlc", "all", "full"]
 _data = x.drop("Volume", 1).mean(axis=1)
 end
 if lowercase(req_field) in ["hl", "lh", "range"]
-_data = x[["High", "Low"]].mean(axis=1)
+_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
 tl = []
 let i = 1
@@ -62,7 +62,7 @@ end
 function kama(x, period=Dict("er" => 10, "fast" => 2, "slow" => 30), req_field="c")
 _data = x."Close"
 if uppercase(req_field) in ["HL", "LH", "RANGE"]
-_data = x[["High", "Low"]].mean(axis=1)
+_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
 if uppercase(req_field) in ["OHLC", "FULL", "ALL"]
 _data = x.drop("Volume", 1).mean(axis=1)
