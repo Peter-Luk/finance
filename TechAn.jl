@@ -1,3 +1,4 @@
+include("pref.jl")
 using Pandas
 py"""
 import pandas as pd
@@ -7,14 +8,12 @@ from scipy.constants import golden_ratio
 from numpy import nan, isnan, array
 from datetime import datetime
 start = datetime(datetime.today().year - 4, 12, 31).date()
-dir_ = '~'
-platform = pathlib.sys.platform
+dir_, db_name, platform = '~', db['Equities']['name'], pathlib.sys.platform
 if platform in ['linux']:
     import fix_yahoo_finance as yf
     dir_ = '~/storage/shared'
     if 'EXTERNAL_STORAGE' in pathlib.os.environ.keys():
         dir_ = '~/storage/external-1'
-        db_name = db['Equities']['name']
 dir_ += f'/data/sqlite3/{db_name}'
 path = pathlib.Path(dir_)
 engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
