@@ -305,7 +305,7 @@ class Viewer(ONA):
         if dataframe: return _
         return _.to_dict()
 
-    def best_quote(self, raw, period, date, unbound=False, exclusive=True, dataframe=True):
+    def maverick(self, raw, period, date, unbound=False, exclusive=True, dataframe=True):
         bare = self.ratr(raw, period['atr'], date, True)
         boundary = self.ovr(raw, period, date, True).T
         close = raw['Close'][date]

@@ -26,7 +26,7 @@ class Futures(AF, Viewer):
 
     def __call__(self, date=None):
         if date == None: date = self._date
-        _ = self.best_quote(date=date)
+        _ = self.maverick(date=date, unbound=False)
         _.name = self.code
         return _
 
@@ -88,12 +88,12 @@ class Futures(AF, Viewer):
         except: pass
         return self.view.ratr(raw, period, dataframe)
 
-    def best_quote(self, raw=None, period=periods, date=None, unbound=False, exclusive=True, dataframe=True):
+    def maverick(self, raw=None, period=periods, date=None, unbound=True, exclusive=True, dataframe=True):
         try:
             if raw == None: raw = self.data
         except: pass
         if date == None: date = raw.index[-1]
-        return self.view.best_quote(raw, period, date, unbound, exclusive,  dataframe)
+        return self.view.maverick(raw, period, date, unbound, exclusive, dataframe)
 
 class Equities(AE, Viewer):
     periods = pref.periods['Equities']
@@ -117,11 +117,11 @@ class Equities(AE, Viewer):
 
     def __call__(self, date=None):
         if date == None: date = self._date
-        return self.best_quote(date=date)
+        return self.maverick(date=date, unbound=False)
 
     def __str__(self):
         delta = round(self.data['Close'].diff()[-1] / self.data['Close'][-2] * 100, 3)
-        return f"{self.code} close @ {self._close} ({delta}%) on {self._date:'%Y-%m-%d'}"
+        return f"#{self.code} close @ {self._close} ({delta}%) on {self._date:'%Y-%m-%d'}"
 
     def insert(self, values, conditions):
         return self._ae.append(values, conditions)
@@ -201,12 +201,12 @@ class Equities(AE, Viewer):
         except: pass
         return self.view.ratr(raw, period, dataframe)
 
-    def best_quote(self, raw=None, period=periods, date=None, unbound=False, exclusive=True, dataframe=True):
+    def maverick(self, raw=None, period=periods, date=None, unbound=True, exclusive=True, dataframe=True):
         try:
             if raw == None: raw = self.data
         except: pass
         if date == None: date = raw.index[-1]
-        return self.view.best_quote(raw, period, date, unbound, exclusive,  dataframe)
+        return self.view.maverick(raw, period, date, unbound, exclusive, dataframe)
 
 def bqo(el, action='buy', bound=True, adhoc=False, dataframe=True):
     dl, il = [], []
@@ -218,7 +218,7 @@ def bqo(el, action='buy', bound=True, adhoc=False, dataframe=True):
         if isinstance(_, str):
             pF = pref.db['Futures']
             if _.upper() in entities(pF['name']): o_ = Futures(_.upper())
-        val = o_.best_quote(unbound=True).T[action][o_._date]
+        val = o_.maverick(unbound=True).T[action][o_._date]
         if bound: val = o_().T[action][o_._date]
         dl.append(val)
         il.append(o_.code)
