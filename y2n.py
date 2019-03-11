@@ -121,7 +121,7 @@ class Equities(AE, Viewer):
 
     def __str__(self):
         delta = round(self.data['Close'].diff()[-1] / self.data['Close'][-2] * 100, 3)
-        return f"#{self.code} close @ {self._close} ({delta}%) on {self._date:'%Y-%m-%d'}"
+        return f"#{self.code} close @ {self._close:.02f} ({delta}%) on {self._date:'%Y-%m-%d'}"
 
     def insert(self, values, conditions):
         return self._ae.append(values, conditions)
