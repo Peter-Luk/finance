@@ -46,54 +46,63 @@ class Futures(AF, Viewer):
     def combine(self, freq='bi-daily', dataframe=False):
         return self._af.combine(freq, dataframe)
 
-    def mas(self, raw=None, period=periods, dataframe=True):
-        try:
-            if raw == None: raw = self.data
-        except: pass
-        return self.view.mas(raw, period, dataframe)
+    def mas(self, period=periods, dataframe=True):
+        return self.view.mas(self.data, period, dataframe)
 
-    def idrs(self, raw=None, period=periods, dataframe=True):
-        try:
-            if raw == None: raw = self.data
-        except: pass
-        return self.view.idrs(raw, period, dataframe)
+    def idrs(self, period=periods, dataframe=True):
+        return self.view.idrs(self.data, period, dataframe)
 
-    def macd(self, raw=None, period=periods['macd'], dataframe=True):
-        try:
-            if raw == None: raw = self.data
-        except: pass
-        return self.view.macd(raw, period, dataframe)
+    def sma(self, period=periods['simple'], req_field='c', dataframe=True):
+        return self.view.ma(self.data, period, 's', req_field, dataframe)
 
-    def adx(self, raw=None, period=periods['adx'], dataframe=True):
-        try:
-            if raw == None: raw = self.data
-        except: pass
-        return self.view.adx(raw, period, dataframe)
+    def ema(self, period=periods['simple'], req_field='c', dataframe=True):
+        return self.view.ma(self.data, period, 'e', req_field, dataframe)
 
-    def soc(self, raw=None, period=periods['soc'], dataframe=True):
-        try:
-            if raw == None: raw = self.data
-        except: pass
-        return self.view.soc(raw, period, dataframe)
+    def wma(self, period=periods['simple'], req_field='c', dataframe=True):
+        return self.view.ma(self.data, period, 'w', req_field, dataframe)
 
-    def stc(self, raw=None, period=periods['stc'], dataframe=True):
-        try:
-            if raw == None: raw = self.data
-        except: pass
-        return self.view.stc(raw, period, dataframe)
+    def kama(self, period=periods['kama'], req_field='c', dataframe=True):
+        return self.view.kama(self.data, period, req_field, dataframe)
 
-    def ratr(self, raw=None, period=periods['rsi'], dataframe=True):
-        try:
-            if raw == None: raw = self.data
-        except: pass
-        return self.view.ratr(raw, period, dataframe)
+    def atr(self, period=periods['atr'], dataframe=True):
+        return self.view.atr(self.data, period, dataframe)
 
-    def maverick(self, raw=None, period=periods, date=None, unbound=True, exclusive=True, dataframe=True):
-        try:
-            if raw == None: raw = self.data
-        except: pass
-        if date == None: date = raw.index[-1]
-        return self.view.maverick(raw, period, date, unbound, exclusive, dataframe)
+    def rsi(self, period=periods['rsi'], dataframe=True):
+        return self.view.rsi(self.data, period, dataframe)
+
+    def obv(self, dataframe=True):
+        return self.view.obv(self.data, dataframe)
+
+    def vwap(self, dataframe=True):
+        return self.view.vwap(self.data, dataframe)
+
+    def bb(self, period=periods['simple'], dataframe=True):
+        return self.view.bb(self.data, period, dataframe)
+
+    def apz(self, period=periods['apz'], dataframe=True):
+        return self.view.apz(self.data, period, dataframe)
+
+    def kc(self, period=periods['kc'], dataframe=True):
+        return self.view.kc(self.data, period, dataframe)
+
+    def macd(self, period=periods['macd'], dataframe=True):
+        return self.view.macd(self.data, period, dataframe)
+
+    def adx(self, period=periods['adx'], dataframe=True):
+        return self.view.adx(self.data, period, dataframe)
+
+    def soc(self, period=periods['soc'], dataframe=True):
+        return self.view.soc(self.data, period, dataframe)
+
+    def stc(self, period=periods['stc'], dataframe=True):
+        return self.view.stc(self.data, period, dataframe)
+
+    def ratr(self, period=periods['atr'], dataframe=True):
+        return self.view.ratr(self.data, period, dataframe)
+
+    def maverick(self, period=periods, date=None, unbound=True, exclusive=True, dataframe=True):
+        if date == None: date = self.data.index[-1]
+        return self.view.maverick(self.data, period, date, unbound, exclusive, dataframe)
 
 class Equities(AE, Viewer):
     periods = pref.periods['Equities']
