@@ -73,6 +73,9 @@ class Futures(AF, Viewer):
     def obv(self, dataframe=True):
         return self.view.obv(self.data, dataframe)
 
+    def ovr(self, period=periods, dataframe=True):
+        return self.view.ovr(self.data, period, dataframe)
+
     def vwap(self, dataframe=True):
         return self.view.vwap(self.data, dataframe)
 
@@ -194,6 +197,9 @@ class Equities(AE, Viewer):
 
     def obv(self, dataframe=True):
         return self.view.obv(self.data, dataframe)
+
+    def ovr(self, period=periods, dataframe=True):
+        return self.view.ovr(self.data, period, dataframe)
 
     def vwap(self, dataframe=True):
         return self.view.vwap(self.data, dataframe)
