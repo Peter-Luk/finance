@@ -82,7 +82,7 @@ if i == period["slow"]
 j = mean(val[1:i])
 end
 if i > period["slow"]
-j = hdr[end] + sc[i] * (val[i] - hdr[end])
+j = hdr[end] + get(sc, i - 1) * (val[i] - hdr[end])
 end
 push!(hdr, j)
 i += 1
