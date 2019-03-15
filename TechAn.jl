@@ -7,7 +7,7 @@ import pathlib
 from scipy.constants import golden_ratio
 from numpy import nan, isnan, array
 from datetime import datetime
-start = datetime(datetime.today().year - 4, 12, 31).date()
+start = datetime(datetime.today().year - 4, 1, 1).date()
 dir_, db_name, platform = '~', db['Equities']['name'], pathlib.sys.platform
 if platform in ['linux']:
     import fix_yahoo_finance as yf
@@ -341,17 +341,17 @@ h = py"pd.DataFrame([$di_plus, $di_minus, $g]).T"
 end
 
 function obv(x)
-dcp = x."Close" - x."Close".shift(1)
-hdr = [x."Volume".values[1]]
-let i = 2
-val = x."Volume".values
-while i <= length(val)
+dcp = x."Close".diff(1)
+hdr = [get(x."Volume", 0)]
+let i = 1
+val = x."Volume"
+while i < length(val)
 tmp = 0
-if dcp[i] > 0
-tmp = val[i]
+if get(dcp, i) > 0
+tmp = get(val, i)
 end
-if dcp[i] < 0
-tmp = -val[i]
+if get(dcp, i) < 0
+tmp = -(get(val, i))
 end
 push!(hdr, hdr[end] + tmp)
 i += 1

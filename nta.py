@@ -228,14 +228,13 @@ class ONA(object):
         return _.to_dict()
 
     def obv(self, raw, dataframe=True):
-        hdr, _ = [raw['Volume'][0]], 0
-        dcp = raw['Close'] - raw['Close'].shift(1)
-        while _ < len(dcp):
-            if _ > 0:
-                val = 0
-                if dcp[_] > 0: val = raw['Volume'][_]
-                if dcp[_] < 0: val = -raw['Volume'][_]
-                hdr.append(hdr[-1] + val)
+        hdr, _ = [raw['Volume'][0]], 1
+        dcp = raw['Close'].diff(1)
+        while _ < dcp.size:
+            val = 0
+            if dcp[_] > 0: val = raw['Volume'][_]
+            if dcp[_] < 0: val = -raw['Volume'][_]
+            hdr.append(hdr[-1] + val)
             _ += 1
         _ = pd.Series(hdr, index=dcp.index)
         _.name = 'OBV'
