@@ -70,7 +70,7 @@ if uppercase(req_field) in ["OHLC", "FULL", "ALL"]
 _data = x.drop("Volume", 1).mean(axis=1)
 end
 change = (_data - _data.shift(period["er"])).abs()
-volatility = (_data - _data.shift(1)).abs().rolling(period["er"]).sum()
+volatility = _data.diff(1).abs().rolling(period["er"]).sum()
 er = change / volatility
 sc = (er * (2 / (period["fast"] + 1) - 2 / (period["slow"] + 1)) + 2 / (period["slow"] + 1)) ^ 2
 hdr = []
@@ -239,7 +239,7 @@ end
 function _lz(x)
 x < 0 ? abs(x) : 0
 end
-delta = x."Close" - x."Close".shift(1)
+delta = x."Close".diff(1)
 gain = delta.apply(_gz)
 loss = delta.apply(_lz)
 hdr = []

@@ -104,7 +104,7 @@ class ONA(object):
         def _lz(_):
             if _ < 0: return abs(_)
             return 0
-        delta = raw['Close'] - raw['Close'].shift(1)
+        delta = raw['Close'].diff(1)
         gain = delta.apply(_gz)
         loss = delta.apply(_lz)
         _, hdr, __ = 0, [], np.nan
@@ -173,7 +173,7 @@ class ONA(object):
         if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw[['High', 'Low']].mean(axis=1)
         if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
         change = (_data - _data.shift(period['er'])).abs()
-        volatility = (_data - _data.shift(1)).abs().rolling(period['er']).sum()
+        volatility = _data.diff(1).abs().rolling(period['er']).sum()
         er = change / volatility
         sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
         _, hdr, __ = 0, [], np.nan
