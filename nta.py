@@ -22,7 +22,7 @@ class ONA(object):
             __ = _.rolling(period).sum() / raw['Volume'].rolling(period).sum()
         if favour.upper() in ['E', 'EXPONENTIAL']:
             _, hdr, val = 0, [], np.nan
-            while _ < len(_data):
+            while _ < _data.size:
                 if _ == period: val = _data[:period].mean()
                 if _ > period: val = (hdr[-1] * (period - 1) + _data[_]) / period
                 hdr.append(val)
@@ -34,8 +34,8 @@ class ONA(object):
 
     def macd(self, raw, period, dataframe=True):
         def __pema(pd_data, period):
-            data, hdr, __ = pd_data.values, [], 0
-            for _ in range(len(data)):
+            data, hdr, _, __ = pd_data.values, [], 0, 0
+            while _ < data.size:
                 val = np.nan
                 if not np.isnan(data[_]):
                     if __ == period:
@@ -44,6 +44,7 @@ class ONA(object):
                         val = (hdr[-1] * (period - 1) + data[_]) / period
                     __ += 1
                 hdr.append(val)
+                _ += 1
             return pd.Series(hdr, index=pd_data.index)
 
         e_slow = self.ma(raw, period['slow'], 'e', 'hl', True)
@@ -109,14 +110,14 @@ class ONA(object):
         gain = delta.apply(_gz)
         loss = delta.apply(_lz)
         _, hdr, __ = 0, [], np.nan
-        while _ < len(gain):
+        while _ < gain.size:
             if _ == period: __ = gain[:_].mean()
             if _ > period: __ = (hdr[-1] * (period - 1) + gain[_]) / period
             hdr.append(__)
             _ += 1
         ag = pd.Series(hdr, index=gain.index)
         _, hdr, __ = 0, [], np.nan
-        while _ < len(loss):
+        while _ < loss.size:
             if _ == period: __ = loss[:_].mean()
             if _ > period: __ = (hdr[-1] * (period - 1) + loss[_]) / period
             hdr.append(__)
