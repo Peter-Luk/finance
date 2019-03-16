@@ -65,6 +65,7 @@ class ONA(object):
         d = k.rolling(period['D']).mean()
         d.name = '%D'
         _ = pd.DataFrame([k, d]).T
+        _.name = 'SOC'
         if dataframe: return _
         return _.to_dict()
 
