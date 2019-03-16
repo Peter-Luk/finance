@@ -74,14 +74,15 @@ volatility = _data.diff(1).abs().rolling(period["er"]).sum()
 er = change / volatility
 sc = (er * (2 / (period["fast"] + 1) - 2 / (period["slow"] + 1)) + 2 / (period["slow"] + 1)) ^ 2
 hdr = []
+val = _data.values
 let i = 1
-while i <= _data.size
+while i <= length(val)
 j = NaN
 if i == period["slow"]
-j = py"$_data[:$i-1].mean()"
+j = mean(val[1:i])
 end
 if i > period["slow"]
-j = hdr[end] + get(sc, i - 1) * (get(_data, i - 1) - hdr[end])
+j = hdr[end] + get(sc, i - 1) * (val[i] - hdr[end])
 end
 push!(hdr, j)
 i += 1
