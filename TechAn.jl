@@ -75,14 +75,13 @@ er = change / volatility
 sc = (er * (2 / (period["fast"] + 1) - 2 / (period["slow"] + 1)) + 2 / (period["slow"] + 1)) ^ 2
 hdr = []
 let i = 1
-val = _data.values
-while i <= length(val)
+while i <= _data.size
 j = NaN
 if i == period["slow"]
-j = mean(val[1:i])
+j = py"$_data[:$i-1].mean()"
 end
 if i > period["slow"]
-j = hdr[end] + get(sc, i - 1) * (val[i] - hdr[end])
+j = hdr[end] + get(sc, i - 1) * (get(_data, i - 1) - hdr[end])
 end
 push!(hdr, j)
 i += 1

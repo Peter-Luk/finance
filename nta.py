@@ -177,7 +177,7 @@ class ONA(object):
         er = change / volatility
         sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
         _, hdr, __ = 0, [], np.nan
-        while _ < len(raw):
+        while _ < _data.size:
             if _ == period['slow']: __ = _data[:_].mean()
             if _ > period['slow']: __ = hdr[-1] + sc[_] * (_data[_] - hdr[-1])
             hdr.append(__)
