@@ -281,8 +281,8 @@ end
 
 function adx(x, period=Eperiod["adx"])
 atr_ = atr(x , period)
-hcp = x."High" - x."High".shift(1)
-lpc = x."Low".shift(1) - x."Low"
+hcp = x."High".diff(1)
+lpc = -(x."Low".diff(1))
 py"""
 def _hgl(_):
     if _[0] > _[-1] and _[0] > 0: return _[0]

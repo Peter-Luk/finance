@@ -129,7 +129,7 @@ class ONA(object):
 
     def adx(self, raw, period, dataframe=True):
         atr = self.atr(raw, period, True)
-        hcp, lpc = raw['High'] - raw['High'].shift(1), raw['Low'].shift(1) - raw['Low']
+        hcp, lpc = raw['High'].diff(1), -(raw['Low'].diff(1))
         def _hgl(_):
             if _[0] > _[-1] and _[0] > 0: return _[0]
             return 0
