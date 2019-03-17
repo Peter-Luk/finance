@@ -12,7 +12,7 @@ class ONA(object):
         self.data = self.date = None
         del(self.data, self.date)
 
-    def ma(self, raw, period, favour='s', req_field='close', dataframe=True):
+    def ma(self, raw, period, favour='s', req_field='close'):
         if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
         if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw[['High', 'Low']].mean(axis=1)
         if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
@@ -29,10 +29,10 @@ class ONA(object):
                 _ += 1
             __ = pd.Series(hdr, index=_data.index)
         __.name = f'{favour}ma{period:02d}'.upper()
-        if dataframe: return __
+        return __
         return __.to_dict()
 
-    def macd(self, raw, period, dataframe=True):
+    def macd(self, raw, period):
         def __pema(pd_data, period):
             data, hdr, _, __ = pd_data.values, [], 0, 0
             while _ < data.size:
@@ -47,17 +47,16 @@ class ONA(object):
                 _ += 1
             return pd.Series(hdr, index=pd_data.index)
 
-        e_slow = self.ma(raw, period['slow'], 'e', 'hl', True)
-        e_fast = self.ma(raw, period['fast'], 'e', 'hl', True)
+        e_slow = self.ma(raw, period['slow'], 'e', 'hl')
+        e_fast = self.ma(raw, period['fast'], 'e', 'hl')
         m_line = e_fast - e_slow
         s_line = __pema(m_line, period['signal'])
         m_hist = m_line - s_line
         _ = pd.DataFrame([m_line, s_line, m_hist]).T
         _.columns = ['M Line', 'Signal Line', 'M Histogram']
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def soc(self, raw, period, dataframe=True):
+    def soc(self, raw, period):
         ml = raw['Low'].rolling(period['K']).min()
         mh = raw['High'].rolling(period['K']).max()
         kseries = pd.Series((raw['Close'] - ml) / (mh - ml) * 100, index=raw.index)
@@ -67,12 +66,11 @@ class ONA(object):
         d.name = '%D'
         _ = pd.DataFrame([k, d]).T
         _.name = 'SOC'
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def stc(self, raw, period, dataframe=True):
-        e_slow = self.ma(raw, period['slow'], 'e', 'hl', True)
-        e_fast = self.ma(raw, period['fast'], 'e', 'hl', True)
+    def stc(self, raw, period):
+        e_slow = self.ma(raw, period['slow'], 'e', 'hl')
+        e_fast = self.ma(raw, period['fast'], 'e', 'hl')
         m_line = e_fast - e_slow
         mh = m_line.rolling(period['K']).max()
         ml = m_line.rolling(period['K']).min()
@@ -83,10 +81,9 @@ class ONA(object):
         d.name = '%D'
         _ = (m_line - k) / (d - k)
         _.name = 'STC'
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def atr(self, raw, period, dataframe=True):
+    def atr(self, raw, period):
         tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
         _, hdr, __ = 0, [], np.nan
         while _ < len(raw):
@@ -96,10 +93,9 @@ class ONA(object):
             _ += 1
         _ = pd.Series(hdr, index=raw.index)
         _.name = f'ATR{period:02d}'
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def rsi(self, raw, period, dataframe=True):
+    def rsi(self, raw, period):
         def _gz(_):
             if _ > 0: return _
             return 0
@@ -126,11 +122,10 @@ class ONA(object):
         rs = ag / al
         _ = 100 - 100 / (1 + rs)
         _.name = f'RSI{period:02d}'
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def adx(self, raw, period, dataframe=True):
-        atr = self.atr(raw, period, True)
+    def adx(self, raw, period):
+        atr = self.atr(raw, period)
         hcp, lpc = raw['High'].diff(1), -(raw['Low'].diff(1))
         def _hgl(_):
             if _[0] > _[-1] and _[0] > 0: return _[0]
@@ -167,10 +162,10 @@ class ONA(object):
         _ = pd.Series(hdr, index=dx.index)
         _.name = f'ADX{period:02d}'
         __ = pd.DataFrame([di_plus, di_minus, _]).T
-        if dataframe: return __
+        return __
         return __.to_dict()
 
-    def kama(self, raw, period, req_field='c', dataframe=True):
+    def kama(self, raw, period, req_field='c'):
         if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
         if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw[['High', 'Low']].mean(axis=1)
         if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
@@ -186,11 +181,10 @@ class ONA(object):
             _ += 1
         _ = pd.Series(hdr, index=raw.index)
         _.name = f"KAMA{period['er']:02d}"
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def apz(self, raw, period, dataframe=True):
-        ehl = self.ma(raw, period, 'e', 'hl', True)
+    def apz(self, raw, period):
+        ehl = self.ma(raw, period, 'e', 'hl')
         _, hdr, __, val = 0, [], 0, np.nan
         while _ < len(ehl):
             if not np.isnan(ehl[_]):
@@ -206,30 +200,27 @@ class ONA(object):
         lower = volatility - tr * gr
         _ = pd.DataFrame([upper, lower]).T
         _.columns = ['Upper', 'Lower']
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def kc(self, raw, period, dataframe=True):
-        middle_line = self.kama(raw, period['kama'], 'hl', True)
-        atr = self.atr(raw, period['atr'], True)
+    def kc(self, raw, period):
+        middle_line = self.kama(raw, period['kama'], 'hl')
+        atr = self.atr(raw, period['atr'])
         upper = middle_line + (gr * atr)
         lower = middle_line - (gr * atr)
         _ = pd.DataFrame([upper, lower]).T
         _.columns = ['Upper', 'Lower']
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def bb(self, raw, period, dataframe=True):
-        middle_line = self.ma(raw, period, 's', 'c', True)
+    def bb(self, raw, period):
+        middle_line = self.ma(raw, period, 's', 'c')
         width = raw['Close'].rolling(period).std()
         upper = middle_line + width
         lower = middle_line - width
         _ = pd.DataFrame([upper, lower]).T
         _.columns = ['Upper', 'Lower']
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def obv(self, raw, dataframe=True):
+    def obv(self, raw):
         hdr, _ = [raw['Volume'][0]], 1
         dcp = raw['Close'].diff(1)
         while _ < dcp.size:
@@ -240,20 +231,18 @@ class ONA(object):
             _ += 1
         _ = pd.Series(hdr, index=dcp.index)
         _.name = 'OBV'
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def vwap(self, raw, dataframe=True):
+    def vwap(self, raw):
         pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw['Volume']
         _ = pd.Series(pv.cumsum() / raw['Volume'].cumsum(), index=raw.index)
         _.name = 'VWAP'
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
-    def ratr(self, raw, period, date=None, dataframe=True):
+    def ratr(self, raw, period, date=None):
         if date == None or date not in raw.index: date = raw.index[-1]
         def _patr(period, raw):
-            lc, lr = raw['Close'][date], self.atr(raw, period, True)[date]
+            lc, lr = raw['Close'][date], self.atr(raw, period)[date]
             _ = [lc + lr, lc, lc - lr]
             _.extend(gslice([lc + lr, lc]))
             _.extend(gslice([lc, lc - lr]))
@@ -268,14 +257,13 @@ class ONA(object):
         [hdr.extend(_pgap(_, raw)) for _ in _patr(period, raw)]
         hdr.sort()
         _ = pd.Series([hsirnd(__) for __ in hdr]).unique()
-        if dataframe: return _
-        return hdr
+        return _
 
-    def ovr(self, raw, period, date=None, dataframe=True):
+    def ovr(self, raw, period, date=None):
         if date not in raw.index: date = raw.index[-1]
         ols = ['APZ', 'BB', 'KC']
-        ups = pd.DataFrame([self.apz(raw, period['apz'], True)['Upper'], self.bb(raw, period['simple'], True)['Upper'], self.kc(raw, period['kc'], True)['Upper']], index=ols)[date]
-        los = pd.DataFrame([self.apz(raw, period['apz'], True)['Lower'], self.bb(raw, period['simple'], True)['Lower'], self.kc(raw, period['kc'], True)['Lower']], index=ols)[date]
+        ups = pd.DataFrame([self.apz(raw, period['apz'])['Upper'], self.bb(raw, period['simple'])['Upper'], self.kc(raw, period['kc'])['Upper']], index=ols)[date]
+        los = pd.DataFrame([self.apz(raw, period['apz'])['Lower'], self.bb(raw, period['simple'])['Lower'], self.kc(raw, period['kc'])['Lower']], index=ols)[date]
         hdr, val = {'Max':[], 'Min':[]}, np.nan
         for _ in ols:
             val = np.nan
@@ -285,7 +273,7 @@ class ONA(object):
             if los[_] == los.min(): val = hsirnd(los[_])
             hdr['Min'].append(val)
         _ = pd.DataFrame(hdr, index=ols).T
-        if dataframe: return _
+        return _
         return hdr
 
 class Viewer(ONA):
@@ -296,19 +284,17 @@ class Viewer(ONA):
         self.data = None
         del(self.data)
 
-    def mas(self, raw, period, dataframe=True):
-        _ = pd.DataFrame([self.kama(raw, period['kama'], 'c', True).map(hsirnd), self.ma(raw, period['simple'], 'e', 'c', True).map(hsirnd), self.ma(raw, period['simple'], 's', 'c', True).map(hsirnd), self.ma(raw, period['simple'], 'w', 'c', True).map(hsirnd)]).T
-        if dataframe: return _
-        return _.to_dict()
+    def mas(self, raw, period):
+        _ = pd.DataFrame([self.kama(raw, period['kama'], 'c').map(hsirnd), self.ma(raw, period['simple'], 'e', 'c').map(hsirnd), self.ma(raw, period['simple'], 's', 'c').map(hsirnd), self.ma(raw, period['simple'], 'w', 'c').map(hsirnd)]).T
+        return _
 
-    def idrs(self, raw, period, dataframe=True):
-        _ = pd.DataFrame([self.adx(raw, period['adx'], True)[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple'], True), self.atr(raw, period['atr'], True)]).T
-        if dataframe: return _
-        return _.to_dict()
+    def idrs(self, raw, period):
+        _ = pd.DataFrame([self.adx(raw, period['adx'])[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple']), self.atr(raw, period['atr'])]).T
+        return _
 
-    def maverick(self, raw, period, date, unbound=False, exclusive=True, dataframe=True):
-        bare = self.ratr(raw, period['atr'], date, True)
-        boundary = self.ovr(raw, period, date, True).T
+    def maverick(self, raw, period, date, unbound=False, exclusive=True):
+        bare = self.ratr(raw, period['atr'], date)
+        boundary = self.ovr(raw, period, date).T
         close = raw['Close'][date]
         inside = [_ for _ in bare.tolist() if _ > boundary['Min'].min() and _ < boundary['Max'].max()]
         outside = [_ for _ in bare.tolist() if _ not in inside]
@@ -321,8 +307,7 @@ class Viewer(ONA):
                 if close > min(outside): hdr['buy'] = min(outside)
                 if close < max(outside): hdr['sell'] = max(outside)
         _ = pd.DataFrame({date:hdr})
-        if dataframe: return _
-        return _.to_dict()
+        return _
 
 def hsirnd(value):
     if np.isnan(value) or not value > 0: return np.nan

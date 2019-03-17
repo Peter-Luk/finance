@@ -46,66 +46,66 @@ class Futures(AF, Viewer):
     def combine(self, freq='bi-daily'):
         return self._af.combine(freq)
 
-    def mas(self, period=periods, dataframe=True):
-        return self.view.mas(self.data, period, dataframe)
+    def mas(self, period=periods):
+        return self.view.mas(self.data, period)
 
-    def idrs(self, period=periods, dataframe=True):
-        return self.view.idrs(self.data, period, dataframe)
+    def idrs(self, period=periods):
+        return self.view.idrs(self.data, period)
 
-    def sma(self, period=periods['simple'], req_field='c', dataframe=True):
-        return self.view.ma(self.data, period, 's', req_field, dataframe)
+    def sma(self, period=periods['simple'], req_field='c'):
+        return self.view.ma(self.data, period, 's', req_field)
 
-    def ema(self, period=periods['simple'], req_field='c', dataframe=True):
-        return self.view.ma(self.data, period, 'e', req_field, dataframe)
+    def ema(self, period=periods['simple'], req_field='c'):
+        return self.view.ma(self.data, period, 'e', req_field)
 
-    def wma(self, period=periods['simple'], req_field='c', dataframe=True):
-        return self.view.ma(self.data, period, 'w', req_field, dataframe)
+    def wma(self, period=periods['simple'], req_field='c'):
+        return self.view.ma(self.data, period, 'w', req_field)
 
-    def kama(self, period=periods['kama'], req_field='c', dataframe=True):
-        return self.view.kama(self.data, period, req_field, dataframe)
+    def kama(self, period=periods['kama'], req_field='c'):
+        return self.view.kama(self.data, period, req_field)
 
-    def atr(self, period=periods['atr'], dataframe=True):
-        return self.view.atr(self.data, period, dataframe)
+    def atr(self, period=periods['atr']):
+        return self.view.atr(self.data, period)
 
-    def rsi(self, period=periods['rsi'], dataframe=True):
-        return self.view.rsi(self.data, period, dataframe)
+    def rsi(self, period=periods['rsi']):
+        return self.view.rsi(self.data, period)
 
-    def obv(self, dataframe=True):
-        return self.view.obv(self.data, dataframe)
+    def obv(self):
+        return self.view.obv(self.data)
 
-    def ovr(self, period=periods, dataframe=True):
-        return self.view.ovr(self.data, period, dataframe)
+    def ovr(self, period=periods):
+        return self.view.ovr(self.data, period)
 
-    def vwap(self, dataframe=True):
-        return self.view.vwap(self.data, dataframe)
+    def vwap(self):
+        return self.view.vwap(self.data)
 
-    def bb(self, period=periods['simple'], dataframe=True):
-        return self.view.bb(self.data, period, dataframe)
+    def bb(self, period=periods['simple']):
+        return self.view.bb(self.data, period)
 
-    def apz(self, period=periods['apz'], dataframe=True):
-        return self.view.apz(self.data, period, dataframe)
+    def apz(self, period=periods['apz']):
+        return self.view.apz(self.data, period)
 
-    def kc(self, period=periods['kc'], dataframe=True):
-        return self.view.kc(self.data, period, dataframe)
+    def kc(self, period=periods['kc']):
+        return self.view.kc(self.data, period)
 
-    def macd(self, period=periods['macd'], dataframe=True):
-        return self.view.macd(self.data, period, dataframe)
+    def macd(self, period=periods['macd']):
+        return self.view.macd(self.data, period)
 
-    def adx(self, period=periods['adx'], dataframe=True):
-        return self.view.adx(self.data, period, dataframe)
+    def adx(self, period=periods['adx']):
+        return self.view.adx(self.data, period)
 
-    def soc(self, period=periods['soc'], dataframe=True):
-        return self.view.soc(self.data, period, dataframe)
+    def soc(self, period=periods['soc']):
+        return self.view.soc(self.data, period)
 
-    def stc(self, period=periods['stc'], dataframe=True):
-        return self.view.stc(self.data, period, dataframe)
+    def stc(self, period=periods['stc']):
+        return self.view.stc(self.data, period)
 
-    def ratr(self, period=periods['atr'], dataframe=True):
-        return self.view.ratr(self.data, period, dataframe)
+    def ratr(self, period=periods['atr']):
+        return self.view.ratr(self.data, period)
 
-    def maverick(self, period=periods, date=None, unbound=True, exclusive=True, dataframe=True):
+    def maverick(self, period=periods, date=None, unbound=True, exclusive=True):
         if date == None: date = self.data.index[-1]
-        return self.view.maverick(self.data, period, date, unbound, exclusive, dataframe)
+        return self.view.maverick(self.data, period, date, unbound, exclusive)
 
 class Equities(AE, Viewer):
     periods = pref.periods['Equities']
@@ -170,68 +170,68 @@ class Equities(AE, Viewer):
             __.index.name = __.index.name.capitalize()
         return __
 
-    def mas(self, period=periods, dataframe=True):
-        return self.view.mas(self.data, period, dataframe)
+    def mas(self, period=periods):
+        return self.view.mas(self.data, period)
 
-    def idrs(self, period=periods, dataframe=True):
-        return self.view.idrs(self.data, period, dataframe)
+    def idrs(self, period=periods):
+        return self.view.idrs(self.data, period)
 
-    def sma(self, period=periods['simple'], req_field='c', dataframe=True):
-        return self.view.ma(self.data, period, 's', req_field, dataframe)
+    def sma(self, period=periods['simple'], req_field='c'):
+        return self.view.ma(self.data, period, 's', req_field)
 
-    def ema(self, period=periods['simple'], req_field='c', dataframe=True):
-        return self.view.ma(self.data, period, 'e', req_field, dataframe)
+    def ema(self, period=periods['simple'], req_field='c'):
+        return self.view.ma(self.data, period, 'e', req_field)
 
-    def wma(self, period=periods['simple'], req_field='c', dataframe=True):
-        return self.view.ma(self.data, period, 'w', req_field, dataframe)
+    def wma(self, period=periods['simple'], req_field='c'):
+        return self.view.ma(self.data, period, 'w', req_field)
 
-    def kama(self, period=periods['kama'], req_field='c', dataframe=True):
-        return self.view.kama(self.data, period, req_field, dataframe)
+    def kama(self, period=periods['kama'], req_field='c'):
+        return self.view.kama(self.data, period, req_field)
 
-    def atr(self, period=periods['atr'], dataframe=True):
-        return self.view.atr(self.data, period, dataframe)
+    def atr(self, period=periods['atr']):
+        return self.view.atr(self.data, period)
 
-    def rsi(self, period=periods['rsi'], dataframe=True):
-        return self.view.rsi(self.data, period, dataframe)
+    def rsi(self, period=periods['rsi']):
+        return self.view.rsi(self.data, period)
 
-    def obv(self, dataframe=True):
-        return self.view.obv(self.data, dataframe)
+    def obv(self):
+        return self.view.obv(self.data)
 
-    def ovr(self, period=periods, dataframe=True):
-        return self.view.ovr(self.data, period, dataframe)
+    def ovr(self, period=periods):
+        return self.view.ovr(self.data, period)
 
-    def vwap(self, dataframe=True):
-        return self.view.vwap(self.data, dataframe)
+    def vwap(self):
+        return self.view.vwap(self.data)
 
-    def bb(self, period=periods['simple'], dataframe=True):
-        return self.view.bb(self.data, period, dataframe)
+    def bb(self, period=periods['simple']):
+        return self.view.bb(self.data, period)
 
-    def apz(self, period=periods['apz'], dataframe=True):
-        return self.view.apz(self.data, period, dataframe)
+    def apz(self, period=periods['apz']):
+        return self.view.apz(self.data, period)
 
-    def kc(self, period=periods['kc'], dataframe=True):
-        return self.view.kc(self.data, period, dataframe)
+    def kc(self, period=periods['kc']):
+        return self.view.kc(self.data, period)
 
-    def macd(self, period=periods['macd'], dataframe=True):
-        return self.view.macd(self.data, period, dataframe)
+    def macd(self, period=periods['macd']):
+        return self.view.macd(self.data, period)
 
-    def adx(self, period=periods['adx'], dataframe=True):
-        return self.view.adx(self.data, period, dataframe)
+    def adx(self, period=periods['adx']):
+        return self.view.adx(self.data, period)
 
-    def soc(self, period=periods['soc'], dataframe=True):
-        return self.view.soc(self.data, period, dataframe)
+    def soc(self, period=periods['soc']):
+        return self.view.soc(self.data, period)
 
-    def stc(self, period=periods['stc'], dataframe=True):
-        return self.view.stc(self.data, period, dataframe)
+    def stc(self, period=periods['stc']):
+        return self.view.stc(self.data, period)
 
-    def ratr(self, period=periods['atr'], dataframe=True):
-        return self.view.ratr(self.data, period, dataframe)
+    def ratr(self, period=periods['atr']):
+        return self.view.ratr(self.data, period)
 
-    def maverick(self, period=periods, date=None, unbound=True, exclusive=True, dataframe=True):
+    def maverick(self, period=periods, date=None, unbound=True, exclusive=True):
         if date == None: date = self.data.index[-1]
-        return self.view.maverick(self.data, period, date, unbound, exclusive, dataframe)
+        return self.view.maverick(self.data, period, date, unbound, exclusive)
 
-def bqo(el, action='buy', bound=True, adhoc=False, dataframe=True):
+def bqo(el, action='buy', bound=True, adhoc=False):
     dl, il = [], []
     if isinstance(el, (int, str)): el = [el]
     for _ in el:
@@ -246,8 +246,7 @@ def bqo(el, action='buy', bound=True, adhoc=False, dataframe=True):
         dl.append(val)
         il.append(o_.code)
     _ = pd.DataFrame({action:dl}, index=il)
-    if dataframe: return _.T
-    return _.to_dict()
+    return _.T
 
 def entities(dbname=None, series=False):
     pF, pE = pref.db['Futures'], pref.db['Equities']
