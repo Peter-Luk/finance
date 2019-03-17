@@ -7,7 +7,7 @@ import pathlib
 from scipy.constants import golden_ratio
 from numpy import nan, isnan, array
 from datetime import datetime
-start = datetime(datetime.today().year - 4, 1, 1).date()
+start = datetime(datetime.today().year - 4, 12, 31).date()
 dir_, db_name, platform = '~', db['Equities']['name'], pathlib.sys.platform
 if platform in ['linux']:
     import fix_yahoo_finance as yf
