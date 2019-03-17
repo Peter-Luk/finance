@@ -77,7 +77,7 @@ class AE(AS):
         self.table = ae.table
         self.code = eid
         self.data = self.acquire({'date':'>datetime(datetime.today().year - 4, 12, 31).date()'})
-        self.close = self.data['Data'][-1, -2]
+        self.close = self.data['Close'][-1]
         self.yahoo_code = f'{eid:04d}.HK'
 
     def __del__(self):
@@ -141,15 +141,14 @@ class AE(AS):
         self.connect.execute(query)
         trans.commit()
 
-    def acquire(self, conditions, dataframe=False):
+    def acquire(self, conditions):
         hdr = {'eid':f'=={self.code}'}
         for _ in conditions.keys():
             if _ in [f'{__}'.split('.')[-1] for __ in self.columns]: hdr[_] = conditions[_]
         query = db.select([self.columns.date, self.columns.open, self.columns.high, self.columns.low, self.columns.close, self.columns.volume]).where(eval('db.and_(' + ', '.join([f"self.columns.{_}{hdr[_]}" for _ in hdr.keys()]) + ')'))
         res = pd.DataFrame(self.connect.execute(query).fetchall(), columns=[__.capitalize() for __ in [f'{_}'.split('.')[-1] for _ in self.columns] if __ not in ['eid', 'id']])
         res.set_index('Date', inplace=True)
-        if dataframe: return res
-        return {'Date': list(res.index), 'Data': res.values}
+        return res
 
 class AF(AS):
     def __init__(self, code):
@@ -221,7 +220,7 @@ class AF(AS):
         self.connect.execute(query)
         trans.commit()
 
-    def combine(self, freq='bi-daily', dataframe=True):
+    def combine(self, freq='bi-daily'):
         code = self.code
         if freq.lower() == 'bi-daily':
             res = []
@@ -257,5 +256,4 @@ class AF(AS):
             p_ = pd.DataFrame([_['open'], _['high'], _['low'], _['close'], _['volume']]).T
             p_.index.name = p_.index.name.capitalize()
             p_.columns = [_.capitalize() for _ in p_.columns]
-            if dataframe: return p_
-            return {'Date': list(p_.index), 'Data': p_.values}
+            return p_

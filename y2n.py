@@ -15,7 +15,7 @@ class Futures(AF, Viewer):
         self.table = self._af.table
         self.rc = self._af.columns
         self.__conn = self._af.connect
-        self.data = self.combine(self._conf['freq'], True)
+        self.data = self.combine(self._conf['freq'])
         self.view = Viewer(self.data)
         self._date = self.data.index[-1]
         self._close = self.data['Close'][-1]
@@ -43,8 +43,8 @@ class Futures(AF, Viewer):
     def update(self, values, conditions):
         return self._af.amend(values, conditions)
 
-    def combine(self, freq='bi-daily', dataframe=False):
-        return self._af.combine(freq, dataframe)
+    def combine(self, freq='bi-daily'):
+        return self._af.combine(freq)
 
     def mas(self, period=periods, dataframe=True):
         return self.view.mas(self.data, period, dataframe)
@@ -144,10 +144,10 @@ class Equities(AE, Viewer):
     def update(self, values, conditions):
         return self._ae.amend(values, conditions)
 
-    def acquire(self, conditions, dataframe=True):
-        return self._ae.acquire(conditions, dataframe)
+    def acquire(self, conditions, ):
+        return self._ae.acquire(conditions)
 
-    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False, dataframe=True):
+    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False):
         if not start:
             start = pd.datetime(pd.datetime.now().year - years, 12, 31)
         if code:
@@ -168,8 +168,7 @@ class Equities(AE, Viewer):
             __ = pd.read_sql(qtext, conn, index_col='date', parse_dates=['date'])
             __.columns = [_.capitalize() for _ in __.columns]
             __.index.name = __.index.name.capitalize()
-        if dataframe: return __
-        return {'Date':list(__.index), 'Data':__.values}
+        return __
 
     def mas(self, period=periods, dataframe=True):
         return self.view.mas(self.data, period, dataframe)
