@@ -94,29 +94,6 @@ end
 
 function apz(x, period=Eperiod["apz"])
 ehl = ema(x, period, "hl")
-#=
-hdr = []
-let i = 1, j = 1
-    val = ehl.values
-    while i <= length(val)
-        if isnan(val[i])
-            push!(hdr, NaN)
-        else
-            tmp = NaN
-            if j == period
-                tmp = mean(val[i - j:i])
-            end
-            if j > period
-                tmp = (hdr[end] * (period - 1) + val[i]) / period
-            end
-            push!(hdr, tmp)
-            j += 1
-        end
-        i += 1
-    end
-end
-volatility = py"pd.Series($hdr, index=$ehl.index)"
-=#
 py"""
 _, hdr, __, val = 0, [], 0, nan
 while _ < len($ehl):
