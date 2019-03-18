@@ -260,5 +260,6 @@ def entities(dbname=None, series=False):
         rc = db.Table(pE['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
     __ = [_[0] for _ in conn.execute(query).fetchall()]
-    if series: return pd.Series(__)
-    return __
+    res = [__ for __ in [_[0] for _ in conn.execute(query).fetchall()] if __ not in pE['exclude']]
+    if series: return pd.Series(res)
+    return res
