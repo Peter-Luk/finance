@@ -144,24 +144,31 @@ setproperty!(d, "name", "BB" * string(period))
 end
 
 function macd(x, period=Eperiod["macd"])
-py"""
-def __pema(pd_data, period):
-    data, hdr, __ = pd_data.values, [], 0
-    for _ in range(len(data)):
-        val = nan
-        if not isnan(data[_]):
-            if __ == period:
-                val = array(data[_ - period: _]).mean()
-            if __ > period:
-                val = (hdr[-1] * (period - 1) + data[_]) / period
-            __ += 1
-        hdr.append(val)
-    return pd.Series(hdr, index=pd_data.index)
-"""
+function pema(pd_data, period)
+hdr = []
+global j = 0
+for i in 1:length(pd_data.values)
+if isnan(pd_data.values[i])
+push!(hdr, NaN)
+else
+if j < period
+push!(hdr, NaN)
+end
+if j == period
+push!(hdr, mean(pd_data.values[i - j: i]))
+end
+if j > period
+push!(hdr, (hdr[end] * (period - 1) + pd_data.values[i]) / period)
+end
+j += 1
+end
+end
+py"pd.Series($hdr, index=$pd_data.index)"
+end
 e_slow = ema(x, period["slow"], "hl")
 e_fast = ema(x, period["fast"], "hl")
 m_line = e_fast - e_slow
-s_line = py"__pema($m_line, $period['signal'])"
+s_line = pema(m_line, period["signal"])
 m_hist = m_line - s_line
 setproperty!(m_line, "name", "M Line")
 setproperty!(s_line, "name", "Signal")
@@ -309,21 +316,30 @@ end
 end
 di_minus = py"pd.Series($imh, index=$dm_minus.index) / $atr_ * 100"
 dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
-py"""
-_, hdr, __, val = 0, [], 0, nan
-while _ < len($dx):
-    if not isnan($dx[_]):
-        if __ == $period: val = $dx[_ - __:_].mean()
-        if __ > $period: val = (hdr[-1] * ($period - 1) + $dx[__]) / $period
-        __ += 1
-    hdr.append(val)
-    _ += 1
-"""
-g = py"pd.Series(hdr, index=$dx.index)"
+
+hdr = []
+global j = 0
+for i in 1:length(dx.values)
+if isnan(dx.values[i])
+push!(hdr, NaN)
+else
+if j < period
+push!(hdr, NaN)
+end
+if j == period
+push!(hdr, mean(dx.values[i - j: i]))
+end
+if j > period
+push!(hdr, (hdr[end] * (period - 1) + dx.values[i]) / period)
+end
+j += 1
+end
+end
+g = py"pd.Series($hdr, index=$dx.index)"
 setproperty!(di_plus, "name", "+DI" * string(period))
 setproperty!(di_minus, "name", "-DI" * string(period))
 setproperty!(g, "name", "ADX" * string(period))
-h = py"pd.DataFrame([$di_plus, $di_minus, $g]).T"
+py"pd.DataFrame([$di_plus, $di_minus, $g]).T"
 end
 
 function obv(x)
