@@ -5,7 +5,6 @@ import pandas as pd
 import sqlalchemy as sqa
 import pathlib
 from scipy.constants import golden_ratio
-from numpy import nan, isnan, array
 from datetime import datetime
 start = datetime(datetime.today().year - 4, 12, 31).date()
 dir_, db_name, platform = '~', db['Equities']['name'], pathlib.sys.platform
