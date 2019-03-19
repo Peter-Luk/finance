@@ -94,6 +94,26 @@ end
 
 function apz(x, period=Eperiod["apz"])
 ehl = ema(x, period, "hl")
+#=
+hdr = []
+global j = 0
+for i in 1:length(ehl.values)
+if isnan(ehl.values)
+push!(hdr, NaN)
+else
+if j < period
+push!(hdr, NaN)
+end
+if j == period
+push!(hdr, mean(ehl.values[i - j: i]))
+end
+if j > period
+push!(hdr, (hdr[end] * (period - 1) + ehl.values[i]) / period)
+end
+j += 1
+end
+end
+=#
 py"""
 _, hdr, __, val = 0, [], 0, nan
 while _ < len($ehl):
