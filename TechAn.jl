@@ -94,11 +94,11 @@ end
 
 function apz(x, period=Eperiod["apz"])
 ehl = ema(x, period, "hl")
-#=
+
 hdr = []
 global j = 0
 for i in 1:length(ehl.values)
-if isnan(ehl.values)
+if isnan(ehl.values[i])
 push!(hdr, NaN)
 else
 if j < period
@@ -113,18 +113,7 @@ end
 j += 1
 end
 end
-=#
-py"""
-_, hdr, __, val = 0, [], 0, nan
-while _ < len($ehl):
-    if not isnan($ehl[_]):
-        if __ == $period: val = $ehl[_ - __:_].mean()
-        if __ > $period: val = (hdr[-1] * ($period - 1) + $ehl[_]) / $period
-        __ += 1
-    hdr.append(val)
-    _ += 1
-"""
-volatility = py"pd.Series(hdr, index=$ehl.index)"
+volatility = py"pd.Series($hdr, index=$ehl.index)"
 tr = py"pd.DataFrame([$x['High'] - $x['Low'], ($x['High'] - $x['Close'].shift(1)).abs(), ($x['Low'] - $x['Close'].shift(1)).abs()]).max()"
 gr = py"golden_ratio"
 upper = volatility + tr * gr
