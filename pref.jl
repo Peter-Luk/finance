@@ -57,6 +57,7 @@ periods = Dict(
         "simple" => 20,
         "apz" => 5)
 )
+toupper(x, i, j) = x[1:i-1] * uppercase(x[i:j]) * x[j+1:end]
 py"""
 db = dict(
     Equities = dict(
