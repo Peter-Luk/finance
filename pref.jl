@@ -58,19 +58,20 @@ periods = Dict(
         "apz" => 5)
 )
 toupper(x, i, j) = x[1:i-1] * uppercase(x[i:j]) * x[j+1:end]
-function pp2f(frame, case="capitalize")
-if lowercase(case) == "capitalize"
+function pp2f(frame, string_format="capitalize")
+if lowercase(string_format) == "capitalize"
 setproperty!(frame.index, "name", toupper(frame.index.name, 1, 1))
 setproperty!(frame, "columns", [toupper(n, 1, 1) for n in frame.columns.values.tolist()])
 end
-if lowercase(case) == "upper"
+if lowercase(string_format) == "upper"
 setproperty!(frame.index, "name", uppercase(frame.index.name))
 setproperty!(frame, "columns", [uppercase(n) for n in frame.columns.values.tolist()])
 end
-if lowercase(case) == "lower"
+if lowercase(string_format) == "lower"
 setproperty!(frame.index, "name", lowercase(frame.index.name))
 setproperty!(frame, "columns", [lowercase(n) for n in frame.columns.values.tolist()])
 end
+return frame
 end
 py"""
 db = dict(
