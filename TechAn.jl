@@ -372,6 +372,7 @@ function yahoo(code, start_from=py"start")
 c = lpad(code, 4, '0') * ".HK"
 d = py"yf.download($c, start, group_by='ticker')"
 d.drop("Adj Close", 1, inplace=true)
+return d
 end
 
 function fetch(c, adhoc=false)
