@@ -368,12 +368,11 @@ h = py"pd.Series($pv.cumsum() / $x['Volume'].cumsum(), index=$x.index)"
 setproperty!(h, "name", "VWAP")
 end
 
-function static_fetch(code, start_from=py"start")
+function fetch(c, adhoc=false)
+function internal(code, start_from=py"start")
 q_str = "SELECT date, open, high, low, close, volume FROM records WHERE eid=" * string(code) * " AND date>'" * string(start_from) * "'"
 pp2f(py"pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])", "capitalize")
 end
-
-function fetch(c, adhoc=false)
 if adhoc
 d = py"pd.DataFrame()"
 if py"platform" in ["linux"]
@@ -388,7 +387,7 @@ if c in uid.values
 exist = true
 end
 if exist
-d = static_fetch(c, py"start")
+d = internal(c, py"start")
 else
 if py"platform" in ["linux"]
 d = py"yf.download('{:04d}.HK'.format($c), start, group_by='ticker')"
