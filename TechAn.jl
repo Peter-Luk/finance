@@ -377,7 +377,7 @@ function fetch(c, adhoc=false)
 if adhoc
 d = py"pd.DataFrame()"
 if py"platform" in ["linux"]
-d = py"yf.download(f'{:04d}.HK'.format($c), start, group_by='ticker')"
+d = py"yf.download('{:04d}.HK'.format($c), start, group_by='ticker')"
 d.drop("Adj Close", 1, inplace=true)
 end
 else
