@@ -368,11 +368,24 @@ h = py"pd.Series($pv.cumsum() / $x['Volume'].cumsum(), index=$x.index)"
 setproperty!(h, "name", "VWAP")
 end
 
+function yahoo(code, start_from=py"start")
+c = lpad(code, 4, '0') * ".HK"
+d = py"yf.download($c, start, group_by='ticker')"
+d.drop("Adj Close", 1, inplace=true)
+end
+
 function fetch(c, adhoc=false)
 function internal(code, start_from=py"start")
 q_str = "SELECT date, open, high, low, close, volume FROM records WHERE eid=" * string(code) * " AND date>'" * string(start_from) * "'"
 pp2f(py"pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])", "capitalize")
 end
+#=
+function yahoo(code, start_from=py"start")
+c = lpad(code, 4, '0') * ".HK"
+d = py"yf.download($c, start, group_by='ticker')"
+d.drop("Adj Close", 1, inplace=true)
+end
+=#
 if adhoc
 d = py"pd.DataFrame()"
 if py"platform" in ["linux"]
