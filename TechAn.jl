@@ -19,6 +19,19 @@ engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
 """
 Eperiod = periods["Equities"]
 
+function grab(x, involved="c")
+dp = Dict("c" => "Close", "h" => "High", "l" => "Low", "o" => "Open")
+if lowercase(involved) in keys(dp)
+eval(Meta.parse("x." * dp[involved]))
+end
+if lowercase(involved) in ["hl", "lh", "range"]
+x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
+end
+if lowercase(involved) in ["ohlc", "full", "all"]
+x.drop("Volume", 1).mean(axis=1`)
+end
+end
+
 sma(x, period=Eperiod["simple"]) = x."Close".rolling(period).mean()
 
 function wma(x, period=Eperiod["simple"], req_field="c")
