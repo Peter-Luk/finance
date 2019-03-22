@@ -28,7 +28,7 @@ if lowercase(involved) in ["hl", "lh", "range"]
 x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
 if lowercase(involved) in ["ohlc", "full", "all"]
-x.drop("Volume", 1).mean(axis=1`)
+x.drop("Volume", 1).mean(axis=1)
 end
 end
 
