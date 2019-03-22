@@ -1,7 +1,7 @@
 import cherrypy
 from bt import LF as lf
 from utilities import datetime, linesep, platform, ltd, waf, today, IP
-from sys import argv
+from sys import argv, version_info
 from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT
 panda = False
 try:
@@ -21,11 +21,19 @@ class Analysor(object):
         hd = HEAD(TITLE('Analyse records'))
         ops = [OPTION(_, {'value':_}) for _ in waf()]
         if today.day == ltd(today.year, today.month): ops = [OPTION(_, {'value':_}) for _ in waf(1)]
-        sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
-        btn = BUTTON('Analyse', {'type':'submit'})
-        trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl,btn]]), {'align':'right'})]]))]
-        bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post', 'action':'proceed'}))
-        return str(HTML(linesep.join([f'{_}' for _ in [hd,bd]])))
+        if version_info.major == 3:
+            if version_info.minor > 6:
+                sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
+                btn = BUTTON('Analyse', {'type':'submit'})
+                trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl,btn]]), {'align':'right'})]]))]
+                bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post', 'action':'proceed'}))
+                return str(HTML(linesep.join([f'{_}' for _ in [hd,bd]])))
+            else:
+                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name':'contract'})
+                btn = BUTTON('Analyse', {'type':'submit'})
+                trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl,btn]]), {'align':'right'})]]))]
+                bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method':'post', 'action':'proceed'}))
+                return str(HTML(linesep.join(['{}'.format(_) for _ in [hd,bd]])))
 
     @cherrypy.expose
     def proceed(self, contract):
@@ -54,10 +62,21 @@ class Inputter(object):
         if today.day == ltd(today.year, today.month): ops = [OPTION(_, {'value':_}) for _ in waf(1)]
         sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
         btn = BUTTON('Append', {'type':'submit'})
-        trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]), {'align':'right'})]]))]
-        trs.extend([TR(linesep.join([f'{_}' for _ in [TD(f'{__.capitalize()}', {'align':'right'}), TD(INPUT({'type':'text', 'name':__}))]])) for __ in ['open', 'high', 'low', 'close', 'volume']])
-        bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post','action':'append'}))
-        return str(HTML(linesep.join([f'{_}' for _ in [hd, bd]])))
+        if version_info.major == 3:
+            if version_info.minor > 6:
+                sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
+                btn = BUTTON('Append', {'type':'submit'})
+                trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]), {'align':'right'})]]))]
+                trs.extend([TR(linesep.join([f'{_}' for _ in [TD(f'{__.capitalize()}', {'align':'right'}), TD(INPUT({'type':'text', 'name':__}))]])) for __ in ['open', 'high', 'low', 'close', 'volume']])
+                bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post','action':'append'}))
+                return str(HTML(linesep.join([f'{_}' for _ in [hd, bd]])))
+            else:
+                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name':'contract'})
+                btn = BUTTON('Append', {'type':'submit'})
+                trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl, btn]]), {'align':'right'})]]))]
+                trs.extend([TR(linesep.join(['{}'.format(_) for _ in [TD(f'{__.capitalize()}', {'align':'right'}), TD(INPUT({'type':'text', 'name':__}))]])) for __ in ['open', 'high', 'low', 'close', 'volume']])
+                bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method':'post','action':'append'}))
+                return str(HTML(linesep.join(['{}'.format(_) for _ in [hd, bd]])))
 
     @cherrypy.expose
     def append(self, contract, open, high, low, close, volume):
@@ -80,12 +99,21 @@ class Estimator(object):
         hd = HEAD(TITLE('Estimate session range'))
         ops = [OPTION(_, {'value':_}) for _ in waf()]
         if today.day == ltd(today.year, today.month): ops = [OPTION(_, {'value':_}) for _ in waf(1)]
-        sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
-        btn = BUTTON('Estimate', {'type':'submit'})
-        trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]),{'align':'right'})]]))]
-        trs.append(TR(linesep.join([f'{_}' for _ in [TD('Pivot Point', {'align':'right'}), TD(INPUT({'type':'text','name':'pp'}))]])))
-        bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post','action':'proceed'}))
-        return str(HTML(linesep.join([f'{_}' for _ in [hd,bd]])))
+        if version_info.major == 3:
+            if version_info.minor > 6:
+                sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
+                btn = BUTTON('Estimate', {'type':'submit'})
+                trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]),{'align':'right'})]]))]
+                trs.append(TR(linesep.join([f'{_}' for _ in [TD('Pivot Point', {'align':'right'}), TD(INPUT({'type':'text','name':'pp'}))]])))
+                bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post','action':'proceed'}))
+                return str(HTML(linesep.join([f'{_}' for _ in [hd,bd]])))
+            else:
+                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name':'contract'})
+                btn = BUTTON('Estimate', {'type':'submit'})
+                trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl, btn]]),{'align':'right'})]]))]
+                trs.append(TR(linesep.join(['{}'.format(_) for _ in [TD('Pivot Point', {'align':'right'}), TD(INPUT({'type':'text','name':'pp'}))]])))
+                bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method':'post','action':'proceed'}))
+                return str(HTML(linesep.join(['{}'.format(_) for _ in [hd,bd]])))
 
     @cherrypy.expose
     def proceed(self, contract, pp):
