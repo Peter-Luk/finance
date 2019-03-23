@@ -366,17 +366,7 @@ end
 function fetch(c, adhoc=false)
 function internal(code, start_from=py"start")
 q_str = "SELECT date, open, high, low, close, volume FROM records WHERE eid=" * string(code) * " AND date>'" * string(start_from) * "'"
-#=
 pp2f(py"pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])", "capitalize")
-=#
-py"""
-d = pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])
-d.columns = [_.capitalize() for _ in d.columns]
-d.index.name = d.index.name.capitalize()
-"""
-if ~py"d.empty"
-return py"d"
-end
 end
 
 function yahoo(code, start_from=py"start")
