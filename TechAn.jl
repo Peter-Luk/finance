@@ -21,9 +21,10 @@ Eperiod = periods["Equities"]
 
 function grab(x, involved="c")
 li = lowercase(involved)
-if li == "c"
-return x.Close
-end
+if li == "c"; return x.Close; end
+if li == "h"; return x.High; end
+if li == "l"; return x.Low; end
+if li == "o"; return x.Open; end
 if li  in ["hl", "lh", "range"]
 return x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
