@@ -61,15 +61,15 @@ toupper(x, i, j) = x[1:i-1] * uppercase(x[i:j]) * x[j+1:end]
 function pp2f(frame, string_format="capitalize")
 if lowercase(string_format) == "capitalize"
 setproperty!(frame.index, "name", toupper(frame.index.name, 1, 1))
-setproperty!(frame, "columns", [toupper(n, 1, 1) for n in frame.columns.values.tolist()])
+setproperty!(frame, "columns", [toupper(n, 1, 1) for n in frame.columns.values])
 end
 if lowercase(string_format) == "upper"
 setproperty!(frame.index, "name", uppercase(frame.index.name))
-setproperty!(frame, "columns", [uppercase(n) for n in frame.columns.values.tolist()])
+setproperty!(frame, "columns", [uppercase(n) for n in frame.columns.values])
 end
 if lowercase(string_format) == "lower"
 setproperty!(frame.index, "name", lowercase(frame.index.name))
-setproperty!(frame, "columns", [lowercase(n) for n in frame.columns.values.tolist()])
+setproperty!(frame, "columns", [lowercase(n) for n in frame.columns.values])
 end
 return frame
 end

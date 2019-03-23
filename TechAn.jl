@@ -20,40 +20,28 @@ engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
 Eperiod = periods["Equities"]
 
 function grab(x, involved="c")
-dp = Dict("c" => "Close", "h" => "High", "l" => "Low", "o" => "Open")
-if lowercase(involved) in keys(dp)
-eval(Meta.parse("x." * dp[involved]))
+li = lowercase(involved)
+if li == "c"
+return x.Close
 end
-if lowercase(involved) in ["hl", "lh", "range"]
-x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
+if li  in ["hl", "lh", "range"]
+return x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
-if lowercase(involved) in ["ohlc", "full", "all"]
-x.drop("Volume", 1).mean(axis=1)
+if li in ["ohlc", "full", "all"]
+return x.drop("Volume", 1).mean(axis=1)
 end
 end
 
 sma(x, period=Eperiod["simple"]) = x."Close".rolling(period).mean()
 
-function wma(x, period=Eperiod["simple"], req_field="c")
-_data = x."Close"
-if lowercase(req_field) in ["ohlc", "all", "full"]
-_data = x.drop("Volume", 1).mean(axis=1)
-end
-if lowercase(req_field) in ["hl", "lh", "range"]
-_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
-end
+function wma(x, period=Eperiod["simple"], rf="c"; field_initial=rf)
+_data = grab(x, field_initial)
 d = (_data * x."Volume").rolling(period).sum() / x."Volume".rolling(period).sum()
 setproperty!(d, "name", "WMA" * string(period))
 end
 
-function ema(x, period=Eperiod["simple"], req_field="c")
-_data = x."Close"
-if lowercase(req_field) in ["ohlc", "all", "full"]
-_data = x.drop("Volume", 1).mean(axis=1)
-end
-if lowercase(req_field) in ["hl", "lh", "range"]
-_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
-end
+function ema(x, period=Eperiod["simple"], rf="c"; field_initial=rf)
+_data = grab(x, field_initial)
 tl = []
 let i = 1
 val = _data.values
@@ -73,14 +61,8 @@ d = py"pd.Series($tl, index=$_data.index)"
 setproperty!(d, "name", "EMA"* string(period))
 end
 
-function kama(x, period=Eperiod["kama"], req_field="c")
-_data = x."Close"
-if uppercase(req_field) in ["HL", "LH", "RANGE"]
-_data = x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
-end
-if uppercase(req_field) in ["OHLC", "FULL", "ALL"]
-_data = x.drop("Volume", 1).mean(axis=1)
-end
+function kama(x, period=Eperiod["kama"], rf="c"; field_initial=rf)
+_data = grab(x, field_initial)
 change = (_data - _data.shift(period["er"])).abs()
 volatility = _data.diff(1).abs().rolling(period["er"]).sum()
 er = change / volatility
@@ -384,7 +366,17 @@ end
 function fetch(c, adhoc=false)
 function internal(code, start_from=py"start")
 q_str = "SELECT date, open, high, low, close, volume FROM records WHERE eid=" * string(code) * " AND date>'" * string(start_from) * "'"
+#=
 pp2f(py"pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])", "capitalize")
+=#
+py"""
+d = pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])
+d.columns = [_.capitalize() for _ in d.columns]
+d.index.name = d.index.name.capitalize()
+"""
+if ~py"d.empty"
+return py"d"
+end
 end
 
 function yahoo(code, start_from=py"start")
