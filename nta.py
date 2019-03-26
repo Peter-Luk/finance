@@ -1,6 +1,19 @@
 import pref
 pd, np, datetime, gr = pref.nta
 from utilities import gslice
+def stepper(x, period):
+    data, hdr, _, __ = x.values, [], 0, 0
+    while _ < data.size:
+        val = np.nan
+        if not np.isnan(data[_]):
+            if __ == period:
+                val = np.array(data[_ - period: _]).mean()
+            if __ > period:
+                val = (hdr[-1] * (period - 1) + data[_]) / period
+            __ += 1
+        hdr.append(val)
+        _ += 1
+    return pd.Series(hdr, index=x.index)
 
 class ONA(object):
     def __init__(self, data, date=datetime.today().date()):
@@ -21,36 +34,16 @@ class ONA(object):
             _ = _data * raw['Volume']
             __ = _.rolling(period).sum() / raw['Volume'].rolling(period).sum()
         if favour.upper() in ['E', 'EXPONENTIAL']:
-            _, hdr, val = 0, [], np.nan
-            while _ < _data.size:
-                if _ == period: val = _data[:period].mean()
-                if _ > period: val = (hdr[-1] * (period - 1) + _data[_]) / period
-                hdr.append(val)
-                _ += 1
-            __ = pd.Series(hdr, index=_data.index)
+            __ = stepper(_data, period)
         __.name = f'{favour}ma{period:02d}'.upper()
         return __
         return __.to_dict()
 
     def macd(self, raw, period):
-        def __pema(pd_data, period):
-            data, hdr, _, __ = pd_data.values, [], 0, 0
-            while _ < data.size:
-                val = np.nan
-                if not np.isnan(data[_]):
-                    if __ == period:
-                        val = np.array(data[_ - period: _]).mean()
-                    if __ > period:
-                        val = (hdr[-1] * (period - 1) + data[_]) / period
-                    __ += 1
-                hdr.append(val)
-                _ += 1
-            return pd.Series(hdr, index=pd_data.index)
-
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
         m_line = e_fast - e_slow
-        s_line = __pema(m_line, period['signal'])
+        s_line = stepper(m_line, period['signal'])
         m_hist = m_line - s_line
         _ = pd.DataFrame([m_line, s_line, m_hist]).T
         _.columns = ['M Line', 'Signal Line', 'M Histogram']
@@ -85,13 +78,7 @@ class ONA(object):
 
     def atr(self, raw, period):
         tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
-        _, hdr, __ = 0, [], np.nan
-        while _ < len(raw):
-            if _ == period: __ = tr[:_].mean()
-            if _ > period: __ = (hdr[-1] * (period - 1) + tr[_]) / period
-            hdr.append(__)
-            _ += 1
-        _ = pd.Series(hdr, index=raw.index)
+        _ = stepper(tr, period)
         _.name = f'ATR{period:02d}'
         return _
 
@@ -105,20 +92,8 @@ class ONA(object):
         delta = raw['Close'].diff(1)
         gain = delta.apply(_gz)
         loss = delta.apply(_lz)
-        _, hdr, __ = 0, [], np.nan
-        while _ < gain.size:
-            if _ == period: __ = gain[:_].mean()
-            if _ > period: __ = (hdr[-1] * (period - 1) + gain[_]) / period
-            hdr.append(__)
-            _ += 1
-        ag = pd.Series(hdr, index=gain.index)
-        _, hdr, __ = 0, [], np.nan
-        while _ < loss.size:
-            if _ == period: __ = loss[:_].mean()
-            if _ > period: __ = (hdr[-1] * (period - 1) + loss[_]) / period
-            hdr.append(__)
-            _ += 1
-        al = pd.Series(hdr, index=loss.index)
+        ag = stepper(gain, period)
+        al = stepper(loss, period)
         rs = ag / al
         _ = 100 - 100 / (1 + rs)
         _.name = f'RSI{period:02d}'
@@ -132,38 +107,17 @@ class ONA(object):
             return 0
         dm_plus = pd.DataFrame([hcp, lpc]).T.apply(_hgl, axis=1)
         dm_minus = pd.DataFrame([lpc, hcp]).T.apply(_hgl, axis=1)
-        _, iph, __ = 0, [], np.nan
-        while _ < len(dm_plus):
-            if _ == period: __ = dm_plus[:_].mean()
-            if _ > period: __ = (iph[-1] * (period - 1) + dm_plus[_]) / period
-            iph.append(__)
-            _ += 1
-        di_plus = pd.Series(iph, index=dm_plus.index) / atr * 100
+        di_plus = stepper(dm_plus, period) / atr * 100
         di_plus.name = f'+DI{period:02d}'
 
-        _, imh, __ = 0, [], np.nan
-        while _ < len(dm_minus):
-            if _ == period: __ = dm_minus[:_].mean()
-            if _ > period: __ = (imh[-1] * (period - 1) + dm_minus[_]) / period
-            imh.append(__)
-            _ += 1
-        di_minus = pd.Series(imh, index=dm_minus.index) / atr * 100
+        di_minus = stepper(dm_minus, period) / atr * 100
         di_minus.name = f'-DI{period:02d}'
 
         dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
-        _, hdr, __, val = 0, [], 0, np.nan
-        while _ < len(dx):
-            if not np.isnan(dx[_]):
-                if __ == period: val = dx[_ - __:_].mean()
-                if __ > period: val = (hdr[-1] * (period - 1) + dx[__]) / period
-                __ += 1
-            hdr.append(val)
-            _ += 1
-        _ = pd.Series(hdr, index=dx.index)
+        _ = stepper(dx, period)
         _.name = f'ADX{period:02d}'
         __ = pd.DataFrame([di_plus, di_minus, _]).T
         return __
-        return __.to_dict()
 
     def kama(self, raw, period, req_field='c'):
         if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
@@ -185,15 +139,7 @@ class ONA(object):
 
     def apz(self, raw, period):
         ehl = self.ma(raw, period, 'e', 'hl')
-        _, hdr, __, val = 0, [], 0, np.nan
-        while _ < len(ehl):
-            if not np.isnan(ehl[_]):
-                if __ == period: val = ehl[_ - __:_].mean()
-                if __ > period: val = (hdr[-1] * (period - 1) + ehl[_]) / period
-                __ += 1
-            hdr.append(val)
-            _ += 1
-        volatility = pd.Series(hdr, index=ehl.index)
+        volatility = stepper(ehl, period)
         tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
 
         upper = volatility + tr * gr
