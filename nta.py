@@ -15,6 +15,15 @@ def stepper(x, period):
         _ += 1
     return pd.Series(hdr, index=x.index)
 
+def grabber(x, initial='c'):
+    if initial.lower() in ['c', 'close']: hdr = x['Close']
+    if initial.lower() in ['h', 'high']: hdr = x['High']
+    if initial.lower() in ['l', 'low']: hdr = x['Low']
+    if initial.lower() in ['o', 'open']: hdr = x['Open']
+    if initial.lower() in ['hl', 'lh', 'range']: hdr = x.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+    if initial.lower() in ['ohlc', 'full', 'all']: hdr = x.drop('Volume', 1).mean(axis=1)
+    return hdr
+
 class ONA(object):
     def __init__(self, data, date=datetime.today().date()):
         self.data = data
@@ -25,10 +34,8 @@ class ONA(object):
         self.data = self.date = None
         del(self.data, self.date)
 
-    def ma(self, raw, period, favour='s', req_field='close'):
-        if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
-        if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw[['High', 'Low']].mean(axis=1)
-        if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
+    def ma(self, raw, period, favour='s', field_initial='close'):
+        _data = grabber(raw, field_initial)
         if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean()
         if favour.upper() in ['W', 'WEIGHTED']:
             _ = _data * raw['Volume']
@@ -119,10 +126,8 @@ class ONA(object):
         __ = pd.DataFrame([di_plus, di_minus, _]).T
         return __
 
-    def kama(self, raw, period, req_field='c'):
-        if req_field.upper() in ['C', 'CLOSE']: _data = raw['Close']
-        if req_field.upper() in ['HL', 'LH', 'RANGE']: _data = raw[['High', 'Low']].mean(axis=1)
-        if req_field.upper() in ['OHLC', 'FULL', 'ALL']: _data = raw.drop('Volume', 1).mean(axis=1)
+    def kama(self, raw, period, field_initial='c'):
+        _data = grabber(raw, field_initial)
         change = (_data - _data.shift(period['er'])).abs()
         volatility = _data.diff(1).abs().rolling(period['er']).sum()
         er = change / volatility

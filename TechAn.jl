@@ -19,13 +19,13 @@ engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
 """
 Eperiod = periods["Equities"]
 
-function grab(x, involved="c")
-li = lowercase(involved)
-if li == "c"; return x.Close; end
-if li == "h"; return x.High; end
-if li == "l"; return x.Low; end
-if li == "o"; return x.Open; end
-if li  in ["hl", "lh", "range"]
+function grabber(x, initial="c")
+li = lowercase(initial)
+if li in ["c", "close"]; return x.Close; end
+if li in ["h", "high"]; return x.High; end
+if li in ["l", "low"]; return x.Low; end
+if li in ["o", "open"]; return x.Open; end
+if li in ["hl", "lh", "range"]
 return x.drop(["Open", "Close", "Volume"], 1).mean(axis=1)
 end
 if li in ["ohlc", "full", "all"]
@@ -36,7 +36,7 @@ end
 sma(x, period=Eperiod["simple"]) = x."Close".rolling(period).mean()
 
 function wma(x, period=Eperiod["simple"], rf="c"; field_initial=rf)
-_data = grab(x, field_initial)
+_data = grabber(x, field_initial)
 d = (_data * x."Volume").rolling(period).sum() / x."Volume".rolling(period).sum()
 setproperty!(d, "name", "WMA" * string(period))
 end
@@ -64,14 +64,14 @@ return hdr
 end 
 
 function ema(x, period=Eperiod["simple"], rf="c"; field_initial=rf)
-_data = grab(x, field_initial)
+_data = grabber(x, field_initial)
 tmp = stepper(_data, period)
 d = py"pd.Series($tmp, index=$_data.index)"
 setproperty!(d, "name", "EMA"* string(period))
 end
 
 function kama(x, period=Eperiod["kama"], rf="c"; field_initial=rf)
-_data = grab(x, field_initial)
+_data = grabber(x, field_initial)
 change = (_data - _data.shift(period["er"])).abs()
 volatility = _data.diff(1).abs().rolling(period["er"]).sum()
 er = change / volatility
