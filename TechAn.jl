@@ -33,7 +33,7 @@ return x.drop("Volume", 1).mean(axis=1)
 end
 end
 
-sma(x, period=Eperiod["simple"]) = x."Close".rolling(period).mean()
+sma(x, period=Eperiod["simple"], rf="c"; field_initial=rf) = grabber(x, field_initial).rolling(period).mean()
 
 function wma(x, period=Eperiod["simple"], rf="c"; field_initial=rf)
 _data = grabber(x, field_initial)
