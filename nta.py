@@ -36,12 +36,12 @@ class ONA(object):
 
     def ma(self, raw, period, favour='s', field_initial='close'):
         _data = grabber(raw, field_initial)
-        if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean()
+        if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean().apply(hsirnd, 1)
         if favour.upper() in ['W', 'WEIGHTED']:
             _ = _data * raw['Volume']
-            __ = _.rolling(period).sum() / raw['Volume'].rolling(period).sum()
+            __ = (_.rolling(period).sum() / raw['Volume'].rolling(period).sum()).apply(hsirnd, 1)
         if favour.upper() in ['E', 'EXPONENTIAL']:
-            __ = stepper(_data, period)
+            __ = stepper(_data, period).apply(hsirnd, 1)
         __.name = f'{favour}ma{period:02d}'.upper()
         return __
         return __.to_dict()
@@ -138,7 +138,7 @@ class ONA(object):
             if _ > period['slow']: __ = hdr[-1] + sc[_] * (_data[_] - hdr[-1])
             hdr.append(__)
             _ += 1
-        _ = pd.Series(hdr, index=raw.index)
+        _ = pd.Series(hdr, index=raw.index).apply(hsirnd, 1)
         _.name = f"KAMA{period['er']:02d}"
         return _
 
@@ -149,7 +149,7 @@ class ONA(object):
 
         upper = volatility + tr * gr
         lower = volatility - tr * gr
-        _ = pd.DataFrame([upper, lower]).T
+        _ = pd.DataFrame([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)]).T
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -158,7 +158,7 @@ class ONA(object):
         atr = self.atr(raw, period['atr'])
         upper = middle_line + (gr * atr)
         lower = middle_line - (gr * atr)
-        _ = pd.DataFrame([upper, lower]).T
+        _ = pd.DataFrame([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)]).T
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -167,7 +167,7 @@ class ONA(object):
         width = raw['Close'].rolling(period).std()
         upper = middle_line + width
         lower = middle_line - width
-        _ = pd.DataFrame([upper, lower]).T
+        _ = pd.DataFrame([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)]).T
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -186,7 +186,7 @@ class ONA(object):
 
     def vwap(self, raw):
         pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw['Volume']
-        _ = pd.Series(pv.cumsum() / raw['Volume'].cumsum(), index=raw.index)
+        _ = pd.Series(pv.cumsum() / raw['Volume'].cumsum(), index=raw.index).apply(hsirnd, 1)
         _.name = 'VWAP'
         return _
 
@@ -207,7 +207,8 @@ class ONA(object):
         hdr = []
         [hdr.extend(_pgap(_, raw)) for _ in _patr(period, raw)]
         hdr.sort()
-        _ = pd.Series([hsirnd(__) for __ in hdr]).unique()
+        # _ = pd.Series([hsirnd(__) for __ in hdr]).unique()
+        _ = pd.Series(hdr).apply(hsirnd, 1).unique()
         return _
 
     def ovr(self, raw, period, date=None):
