@@ -239,7 +239,7 @@ class Viewer(ONA):
         _ = pd.DataFrame({date:hdr})
         return _
 
-def stepper(x, period):
+def stepper(x, period, func=None):
     data, hdr, _, __ = x.values, [], 0, 0
     while _ < data.size:
         val = np.nan
@@ -248,6 +248,8 @@ def stepper(x, period):
                 val = np.array(data[_ - period: _]).mean()
             if __ > period:
                 val = (hdr[-1] * (period - 1) + data[_]) / period
+                if func:
+                    val = hdr[-1] + func[_] * (data[_] - hdr[-1])
             __ += 1
         hdr.append(val)
         _ += 1
