@@ -1,28 +1,6 @@
 import pref
 pd, np, datetime, gr = pref.nta
 from utilities import gslice
-def stepper(x, period):
-    data, hdr, _, __ = x.values, [], 0, 0
-    while _ < data.size:
-        val = np.nan
-        if not np.isnan(data[_]):
-            if __ == period:
-                val = np.array(data[_ - period: _]).mean()
-            if __ > period:
-                val = (hdr[-1] * (period - 1) + data[_]) / period
-            __ += 1
-        hdr.append(val)
-        _ += 1
-    return pd.Series(hdr, index=x.index)
-
-def grabber(x, initial='c'):
-    if initial.lower() in ['c', 'close']: hdr = x['Close']
-    if initial.lower() in ['h', 'high']: hdr = x['High']
-    if initial.lower() in ['l', 'low']: hdr = x['Low']
-    if initial.lower() in ['o', 'open']: hdr = x['Open']
-    if initial.lower() in ['hl', 'lh', 'range']: hdr = x.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
-    if initial.lower() in ['ohlc', 'full', 'all']: hdr = x.drop('Volume', 1).mean(axis=1)
-    return hdr
 
 class ONA(object):
     def __init__(self, data, date=datetime.today().date()):
@@ -260,6 +238,29 @@ class Viewer(ONA):
                 if close < max(outside): hdr['sell'] = max(outside)
         _ = pd.DataFrame({date:hdr})
         return _
+
+def stepper(x, period):
+    data, hdr, _, __ = x.values, [], 0, 0
+    while _ < data.size:
+        val = np.nan
+        if not np.isnan(data[_]):
+            if __ == period:
+                val = np.array(data[_ - period: _]).mean()
+            if __ > period:
+                val = (hdr[-1] * (period - 1) + data[_]) / period
+            __ += 1
+        hdr.append(val)
+        _ += 1
+    return pd.Series(hdr, index=x.index)
+
+def grabber(x, initial='c'):
+    if initial.lower() in ['c', 'close']: hdr = x['Close']
+    if initial.lower() in ['h', 'high']: hdr = x['High']
+    if initial.lower() in ['l', 'low']: hdr = x['Low']
+    if initial.lower() in ['o', 'open']: hdr = x['Open']
+    if initial.lower() in ['hl', 'lh', 'range']: hdr = x.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+    if initial.lower() in ['ohlc', 'full', 'all']: hdr = x.drop('Volume', 1).mean(axis=1)
+    return hdr
 
 def hsirnd(value):
     if np.isnan(value) or not value > 0: return np.nan
