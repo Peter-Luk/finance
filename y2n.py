@@ -53,16 +53,16 @@ class Futures(AF, Viewer):
         return self.view.idrs(self.data, period)
 
     def sma(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 's', req_field)
+        return self.view.ma(self.data, period, 's', req_field).map(hsirnd)
 
     def ema(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 'e', req_field)
+        return self.view.ma(self.data, period, 'e', req_field).map(hsirnd)
 
     def wma(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 'w', req_field)
+        return self.view.ma(self.data, period, 'w', req_field).map(hsirnd)
 
     def kama(self, period=periods['kama'], req_field='c'):
-        return self.view.kama(self.data, period, req_field)
+        return self.view.kama(self.data, period, req_field).map(hsirnd)
 
     def atr(self, period=periods['atr']):
         return self.view.atr(self.data, period)
@@ -177,16 +177,16 @@ class Equities(AE, Viewer):
         return self.view.idrs(self.data, period)
 
     def sma(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 's', req_field)
+        return self.view.ma(self.data, period, 's', req_field).map(hsirnd)
 
     def ema(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 'e', req_field)
+        return self.view.ma(self.data, period, 'e', req_field).map(hsirnd)
 
     def wma(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 'w', req_field)
+        return self.view.ma(self.data, period, 'w', req_field).map(hsirnd)
 
     def kama(self, period=periods['kama'], req_field='c'):
-        return self.view.kama(self.data, period, req_field)
+        return self.view.kama(self.data, period, req_field).map(hsirnd)
 
     def atr(self, period=periods['atr']):
         return self.view.atr(self.data, period)

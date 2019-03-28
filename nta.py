@@ -14,15 +14,14 @@ class ONA(object):
 
     def ma(self, raw, period, favour='s', field_initial='close'):
         _data = grabber(raw, field_initial)
-        if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean().apply(hsirnd, 1)
+        if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean()
         if favour.upper() in ['W', 'WEIGHTED']:
             _ = _data * raw['Volume']
-            __ = (_.rolling(period).sum() / raw['Volume'].rolling(period).sum()).apply(hsirnd, 1)
+            __ = (_.rolling(period).sum() / raw['Volume'].rolling(period).sum())
         if favour.upper() in ['E', 'EXPONENTIAL']:
-            __ = stepper(_data, period).apply(hsirnd, 1)
+            __ = stepper(_data, period)
         __.name = f'{favour}ma{period:02d}'.upper()
         return __
-        return __.to_dict()
 
     def macd(self, raw, period):
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
@@ -110,7 +109,7 @@ class ONA(object):
         volatility = _data.diff(1).abs().rolling(period['er']).sum()
         er = change / volatility
         sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
-        _ = stepper(_data, period['slow'], sc).apply(hsirnd, 1)
+        _ = stepper(_data, period['slow'], sc)
         _.name = f"KAMA{period['er']:02d}"
         return _
 
