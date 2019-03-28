@@ -110,13 +110,14 @@ class ONA(object):
         volatility = _data.diff(1).abs().rolling(period['er']).sum()
         er = change / volatility
         sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
-        _, hdr, __ = 0, [], np.nan
-        while _ < _data.size:
-            if _ == period['slow']: __ = _data[:_].mean()
-            if _ > period['slow']: __ = hdr[-1] + sc[_] * (_data[_] - hdr[-1])
-            hdr.append(__)
-            _ += 1
-        _ = pd.Series(hdr, index=raw.index).apply(hsirnd, 1)
+        # _, hdr, __ = 0, [], np.nan
+        # while _ < _data.size:
+        #     if _ == period['slow']: __ = _data[:_].mean()
+        #     if _ > period['slow']: __ = hdr[-1] + sc[_] * (_data[_] - hdr[-1])
+        #     hdr.append(__)
+        #     _ += 1
+        # _ = pd.Series(hdr, index=raw.index).apply(hsirnd, 1)
+        _ = stepper(_data, period['slow'], sc).apply(hsirnd, 1)
         _.name = f"KAMA{period['er']:02d}"
         return _
 
@@ -239,7 +240,7 @@ class Viewer(ONA):
         _ = pd.DataFrame({date:hdr})
         return _
 
-def stepper(x, period, func=None):
+def stepper(x, period, pdSeries=None):
     data, hdr, _, __ = x.values, [], 0, 0
     while _ < data.size:
         val = np.nan
@@ -248,8 +249,9 @@ def stepper(x, period, func=None):
                 val = np.array(data[_ - period: _]).mean()
             if __ > period:
                 val = (hdr[-1] * (period - 1) + data[_]) / period
-                if func:
-                    val = hdr[-1] + func[_] * (data[_] - hdr[-1])
+                try:
+                    if pdSeries.any(): val = hdr[-1] + pdSeries[_] * (data[_] - hdr[-1])
+                except: pass
             __ += 1
         hdr.append(val)
         _ += 1
