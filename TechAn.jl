@@ -19,6 +19,10 @@ engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
 """
 Eperiod = periods["Equities"]
 
+function pdfr(o, s, e=-1)
+py"$o.iloc[$s:$e]"
+end
+
 function grabber(x, initial="c")
 li = lowercase(initial)
 if li in ["c", "close"]; return x.Close; end
