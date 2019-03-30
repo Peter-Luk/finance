@@ -25,8 +25,8 @@ if e != 0; return py"$o.iloc[$s:$e]"; end
 end
 
 function idf(o::PyObject, s::Any)
-if typeof <: String; return py"$o.loc[$s]"; end
-if typeof <: Int; return py"$o.iloc[$s]"; end
+if typeof(s) <: String; return py"$o.loc[$s]"; end
+if typeof(s) <: Int; return py"$o.iloc[$s]"; end
 end
 
 function grabber(x::PyObject, initial::String="c")
@@ -43,7 +43,11 @@ return x.drop("Volume", 1).mean(axis=1)
 end
 end
 
-sma(x::PyObject, period::Int=Eperiod["simple"], rf::String="c"; field_initial::String=rf) = grabber(x, field_initial).rolling(period).mean()
+function sma(x::Any, period::Int=Eperiod["simple"], rf::String="c"; field_initial::String=rf)
+if typeof(x) <: Int; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: PyObject; y = x; end
+grabber(y, field_initial).rolling(period).mean()
+end
 
 function wma(x::Any, period::Int=Eperiod["simple"], rf::String="c"; field_initial::String=rf)
 if typeof(x) <: Int; y = exist(x) ? fetch(x, false) : fetch(x, true); end
