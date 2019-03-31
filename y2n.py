@@ -266,7 +266,7 @@ def entities(dbname=None, series=False):
 
 def compose():
     tdict = {}
-    for _ in ae:
+    for _ in entities(pref.db['Equities']['name']):
         e = Equities(_)
         rd = e.data
         pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr()]).T
