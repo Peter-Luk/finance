@@ -264,9 +264,14 @@ def entities(dbname=None, series=False):
     if series: return pd.Series(res)
     return res
 
-def compose():
+def compose(code=None):
+    if code == None: code = entities(pref.db['Equities']['name'])
     tdict = {}
-    for _ in entities(pref.db['Equities']['name']):
+    if isinstance(code, (int, float)): code = [int(code)]
+    if isinstance(code, list):
+        try: code = [int(_) for _ in code]
+        except: pass
+    for _ in code:
         e = Equities(_)
         rd = e.data
         pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr()]).T
