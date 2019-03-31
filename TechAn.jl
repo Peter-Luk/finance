@@ -299,28 +299,15 @@ end
 
 if adhoc
 d = py"pd.DataFrame()"
-if py"platform" in ["linux"]
-d = yahoo(c)
-end
+if py"platform" in ["linux"]; d = yahoo(c); end
 else
-let exist = false
-t_str = "SELECT DISTINCT eid FROM records ORDER BY eid ASC"
-uid = py"pd.read_sql($t_str, engine)"
-if c in uid.values
-exist = true
-end
-if exist
+if c in entities()
 d = internal(c, py"start")
 else
-if py"platform" in ["linux"]
-d = yahoo(c)
+if py"platform" in ["linux"]; d = yahoo(c); end
 end
 end
-end
-end
-if ~d.empty
-d
-end
+if ~d.empty; d; end
 end
 
 function ratr(x::Any, adhoc::Bool=true, ratio::Float64=py"golden_ratio")
@@ -330,7 +317,13 @@ if typeof(x) <: PyObject; data = x; end
 delta(get(data."Close", length(data) - 1), get(atr(data), length(data) - 1), ratio)
 end
 
-function exist(c::Int)
+function entities()
 q_str = "SELECT DISTINCT eid FROM records ORDER BY eid ASC"
-c in py"pd.read_sql($q_str, engine)".values
+hdr = []
+for i in py"pd.read_sql($q_str, engine)".values
+if ~(i in py"db['Equities']['exclude']"); push!(hdr, i); end
 end
+return hdr
+end
+
+exist(c::Int) = c in entities()

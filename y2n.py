@@ -263,3 +263,15 @@ def entities(dbname=None, series=False):
     res = [__ for __ in [_[0] for _ in conn.execute(query).fetchall()] if __ not in pE['exclude']]
     if series: return pd.Series(res)
     return res
+
+def compose():
+    tdict = {}
+    for _ in ae:
+        e = Equities(_)
+        rd = e.data
+        pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr()]).T
+        pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR']
+        tdict[_] = pdhr
+    cps = pd.Series(tdict)
+    cps.index.name = 'Code'
+    return cps
