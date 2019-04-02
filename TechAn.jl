@@ -262,12 +262,8 @@ let i = 1
 val = y."Volume"
 while i < length(val)
 tmp = 0
-if get(dcp, i) > 0
-tmp = get(val, i)
-end
-if get(dcp, i) < 0
-tmp = -(get(val, i))
-end
+if get(dcp, i) > 0; tmp = get(val, i); end
+if get(dcp, i) < 0; tmp = abs(get(val, i)); end
 push!(hdr, hdr[end] + tmp)
 i += 1
 end
