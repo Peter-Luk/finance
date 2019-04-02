@@ -266,7 +266,7 @@ def entities(dbname=None, series=False):
 
 def compose(code=None):
     if code == None: code = entities(pref.db['Equities']['name'])
-    tdict = {}
+    tlist = []
     if isinstance(code, (int, float)): code = [int(code)]
     if isinstance(code, list):
         try: code = [int(_) for _ in code]
@@ -278,7 +278,7 @@ def compose(code=None):
         # pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()]).T
         pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
         pdhr.set_index = 'Date'
-        tdict[_] = pdhr
-    cps = pd.Series(tdict)
-    cps.index.name = 'Code'
+        tlist.append(pdhr)
+    cps = pd.concat(tlist, keys=code)
+    # cps.index.name = 'Code'
     return cps
