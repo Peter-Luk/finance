@@ -274,8 +274,8 @@ def compose(code=None):
     for _ in code:
         e = Equities(_)
         rd = e.data
-        pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr()]).T
-        pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR']
+        pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()]).T
+        pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
         pdhr.set_index = 'Date'
         tdict[_] = pdhr
     cps = pd.Series(tdict)
