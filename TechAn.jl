@@ -317,6 +317,15 @@ if typeof(x) <: PyObject; data = x; end
 delta(get(data."Close", length(data) - 1), get(atr(data), length(data) - 1), ratio)
 end
 
+function compose(code::Int)
+e = fetch(code)
+r = rsi(e)
+a = atr(e)
+x = adx(e).ADX14.diff()
+ph = py"pd.concat([$r, ($e.High - $e.Low), $e.Close.diff(), $a, $x], axis=1)"
+setproperty!(ph, "columns", ["RSI", "dHL", "dpC", "ATR", "dADX"])
+end
+
 function entities()
 q_str = "SELECT DISTINCT eid FROM records ORDER BY eid ASC"
 hdr = []
