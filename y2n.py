@@ -100,8 +100,8 @@ class Futures(AF, Viewer):
     def stc(self, period=periods['stc']):
         return self.view.stc(self.data, period)
 
-    def ratr(self, period=periods['atr']):
-        return self.view.ratr(self.data, period)
+    def ratr(self, period=periods['atr'], date=None):
+        return self.view.ratr(self.data, period, date)
 
     def maverick(self, period=periods, date=None, unbound=True, exclusive=True):
         if date == None: date = self.data.index[-1]
@@ -224,8 +224,8 @@ class Equities(AE, Viewer):
     def stc(self, period=periods['stc']):
         return self.view.stc(self.data, period)
 
-    def ratr(self, period=periods['atr']):
-        return self.view.ratr(self.data, period)
+    def ratr(self, period=periods['atr'], date=None):
+        return self.view.ratr(self.data, period, date)
 
     def maverick(self, period=periods, date=None, unbound=True, exclusive=True):
         if date == None: date = self.data.index[-1]
@@ -274,7 +274,8 @@ def compose(code=None):
     for _ in code:
         e = Equities(_)
         rd = e.data
-        pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()]).T
+        pdhr = pd.concat([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
+        # pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()]).T
         pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
         pdhr.set_index = 'Date'
         tdict[_] = pdhr
