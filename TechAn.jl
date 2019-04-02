@@ -53,7 +53,7 @@ function wma(x::Any, period::Int=Eperiod["simple"], rf::String="c"; field_initia
 if typeof(x) <: Int; y = exist(x) ? fetch(x, false) : fetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 _data = grabber(y, field_initial)
-d = (_data * y."Volume").rolling(period).sum() / y."Volume".rolling(period).sum()
+d = (_data * y.Volume).rolling(period).sum() / y.Volume.rolling(period).sum()
 setproperty!(d, "name", "WMA" * string(period))
 end
 
@@ -146,7 +146,7 @@ function bb(x::Any, period::Int=Eperiod["simple"])
 if typeof(x) <: Int; y = exist(x) ? fetch(x, false) : fetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 middle_line = sma(y, period)
-width = y."Close".rolling(period).std()
+width = y.Close.rolling(period).std()
 upper = middle_line + width
 lower = middle_line - width
 d = py"pd.DataFrame([$upper, $lower]).T"
@@ -173,8 +173,8 @@ end
 function soc(x::Any, period::Dict=Eperiod["soc"])
 if typeof(x) <: Int; y = exist(x) ? fetch(x, false) : fetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
-ml = y."Low".rolling(period["K"]).min()
-mh = y."High".rolling(period["K"]).max()
+ml = y.Low.rolling(period["K"]).min()
+mh = y.High.rolling(period["K"]).max()
 kseries = py"pd.Series(($y['Close'] - $ml) / ($mh - $ml) * 100, index=$y.index)"
 k = kseries.rolling(period["D"]).mean()
 d = k.rolling(period["D"]).mean()
@@ -215,7 +215,7 @@ if typeof(x) <: Int; y = exist(x) ? fetch(x, false) : fetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 function _gz(x::Number);x > 0 ? x : 0; end
 function _lz(x::Number);x < 0 ? abs(x) : 0; end
-delta = y."Close".diff(1)
+delta = y.Close.diff(1)
 gain = delta.apply(_gz)
 loss = delta.apply(_lz)
 tmp = stepper(gain, period)
@@ -231,8 +231,8 @@ function adx(x::Any, period::Int=Eperiod["adx"])
 if typeof(x) <: Int; y = exist(x) ? fetch(x, false) : fetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 atr_ = atr(y , period)
-hcp = y."High".diff(1)
-lpc = -(y."Low".diff(1))
+hcp = y.High.diff(1)
+lpc = abs(y.Low.diff(1))
 py"""
 def _hgl(_):
     if _[0] > _[-1] and _[0] > 0: return _[0]
@@ -256,10 +256,10 @@ end
 function obv(x::Any)
 if typeof(x) <: Int; y = exist(x) ? fetch(x, false) : fetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
-dcp = y."Close".diff(1)
-hdr = [get(y."Volume", 0)]
+dcp = y.Close.diff(1)
+hdr = [get(y.Volume, 0)]
 let i = 1
-val = y."Volume"
+val = y.Volume
 while i < length(val)
 tmp = 0
 if get(dcp, i) > 0; tmp = get(val, i); end
@@ -310,7 +310,7 @@ function ratr(x::Any, adhoc::Bool=true, ratio::Float64=py"golden_ratio")
 delta(b::Number, d::Number, r::Float64) = [b - d, b - d / r, b - (1 - 1 / r) * d, b, b + (1 - 1 / r) * d, b + d / r, b + d]
 if typeof(x) <: Int; data = py"platform" == "linux" ? fetch(x, adhoc) : fetch(x, false); end
 if typeof(x) <: PyObject; data = x; end
-delta(get(data."Close", length(data) - 1), get(atr(data), length(data) - 1), ratio)
+delta(get(data.Close, length(data) - 1), get(atr(data), length(data) - 1), ratio)
 end
 
 function compose(code::Int)
