@@ -44,13 +44,13 @@ end
 end
 
 function sma(x::Any, period::Signed=Eperiod["simple"], rf::String="c"; field_initial::String=rf)
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 grabber(y, field_initial).rolling(period).mean()
 end
 
 function wma(x::Any, period::Signed=Eperiod["simple"], rf::String="c"; field_initial::String=rf)
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 _data = grabber(y, field_initial)
 d = (_data * y.Volume).rolling(period).sum() / y.Volume.rolling(period).sum()
@@ -80,7 +80,7 @@ return hdr
 end 
 
 function ema(x::Any, period::Signed=Eperiod["simple"], rf::String="c"; field_initial::String=rf)
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 _data = grabber(y, field_initial)
 tmp = stepper(_data, period)
@@ -89,7 +89,7 @@ setproperty!(d, "name", "EMA"* string(period))
 end
 
 function kama(x::Any, period::Dict=Eperiod["kama"], rf::String="c"; field_initial::String=rf)
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 _data = grabber(y, field_initial)
 change = (_data - _data.shift(period["er"])).abs()
@@ -116,7 +116,7 @@ setproperty!(d, "name", "KAMA" * string(period["er"]))
 end
 
 function apz(x::Any, period::Signed=Eperiod["apz"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 ehl = ema(y, period, "hl")
 tmp = stepper(ehl, period)
@@ -131,7 +131,7 @@ setproperty!(d, "name", "APZ" * string(period))
 end
 
 function kc(x::Any, period::Dict=Eperiod["kc"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 middle_line = kama(y, period["kama"], "hl")
 atr_ = atr(y, period["atr"])
@@ -143,7 +143,7 @@ setproperty!(d, "columns", ["Upper", "Lower"])
 end
 
 function bb(x::Any, period::Signed=Eperiod["simple"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 middle_line = sma(y, period)
 width = y.Close.rolling(period).std()
@@ -155,7 +155,7 @@ setproperty!(d, "name", "BB" * string(period))
 end
 
 function macd(x::Any, period::Dict=Eperiod["macd"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 e_slow = ema(y, period["slow"], "hl")
 e_fast = ema(y, period["fast"], "hl")
@@ -171,7 +171,7 @@ setproperty!(h, "name", "MACD")
 end
 
 function soc(x::Any, period::Dict=Eperiod["soc"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 ml = y.Low.rolling(period["K"]).min()
 mh = y.High.rolling(period["K"]).max()
@@ -185,7 +185,7 @@ setproperty!(hdr, "name", "SOC")
 end
 
 function stc(x::Any, period::Dict=Eperiod["stc"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 slow_ = ema(y, period["slow"], "hl")
 fast_ = ema(y, period["fast"], "hl")
@@ -202,7 +202,7 @@ setproperty!(hdr, "name", "STC")
 end
 
 function atr(x::Any, period::Signed=Eperiod["atr"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 tr = py"pd.DataFrame([$y['High'] - $y['Low'], ($y['High'] - $y['Close'].shift(1)).abs(), ($y['Low'] - $y['Close'].shift(1)).abs()]).max()"
 tmp = stepper(tr, period)
@@ -211,7 +211,7 @@ setproperty!(d, "name", "ATR"* string(period))
 end
 
 function rsi(x::Any, period::Signed=Eperiod["rsi"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 function _gz(x::Number);x > 0 ? x : 0; end
 function _lz(x::Number);x < 0 ? abs(x) : 0; end
@@ -228,7 +228,7 @@ setproperty!(h, "name", "RSI" * string(period))
 end
 
 function adx(x::Any, period::Signed=Eperiod["adx"])
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 atr_ = atr(y , period)
 hcp = y.High.diff(1)
@@ -258,7 +258,7 @@ py"pd.DataFrame([$di_plus, $di_minus, $g]).T"
 end
 
 function obv(x::Any)
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 dcp = y.Close.diff(1)
 hdr = [get(y.Volume, 0)]
@@ -277,14 +277,14 @@ setproperty!(h, "name", "OBV")
 end
 
 function vwap(x::Any)
-if typeof(x) <: Signed; y = exist(x) ? fetch(x, false) : fetch(x, true); end
+if typeof(x) <: Signed; y = exist(x) ? dFetch(x, false) : dFetch(x, true); end
 if typeof(x) <: PyObject; y = x; end
 pv = y.drop(["Open", "Volume"], 1).mean(axis=1) * y."Volume"
 h = py"pd.Series($pv.cumsum() / $y['Volume'].cumsum(), index=$y.index)"
 setproperty!(h, "name", "VWAP")
 end
 
-function fetch(c::Signed, adhoc::Bool=false)
+function dFetch(c::Signed, adhoc::Bool=false)
 function internal(code::Signed, start_from=py"start")
 q_str = "SELECT date, open, high, low, close, volume FROM records WHERE eid=" * string(code) * " AND date>'" * string(start_from) * "'"
 pp2f(py"pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])", "capitalize")
@@ -312,7 +312,7 @@ end
 
 function ratr(x::Any, adhoc::Bool=true, ratio::Float64=py"golden_ratio")
 delta(b::Number, d::Number, r::Float64) = [b - d, b - d / r, b - (1 - 1 / r) * d, b, b + (1 - 1 / r) * d, b + d / r, b + d]
-if typeof(x) <: Signed; data = py"platform" == "linux" ? fetch(x, adhoc) : fetch(x, false); end
+if typeof(x) <: Signed; data = py"platform" == "linux" ? dFetch(x, adhoc) : dFetch(x, false); end
 if typeof(x) <: PyObject; data = x; end
 delta(get(data.Close, length(data) - 1), get(atr(data), length(data) - 1), ratio)
 end
@@ -327,7 +327,7 @@ end
 if typeof(code) <: Signed; push!(cl, code); end
 pl = []
 for c in cl
-e = fetch(c)
+e = dFetch(c)
 r = rsi(e); a = atr(e); x = adx(e).ADX14.diff()
 ph = py"pd.concat([$r, ($e.High - $e.Low), $e.Close.diff(), $a, $x], axis=1)"
 setproperty!(ph, "columns", ["RSI", "dHL", "dpC", "ATR", "dADX"])
