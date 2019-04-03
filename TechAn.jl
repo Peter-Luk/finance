@@ -327,7 +327,6 @@ e = fetch(c)
 r = rsi(e); a = atr(e); x = adx(e).ADX14.diff()
 ph = py"pd.concat([$r, ($e.High - $e.Low), $e.Close.diff(), $a, $x], axis=1)"
 setproperty!(ph, "columns", ["RSI", "dHL", "dpC", "ATR", "dADX"])
-setproperty!(ph, "set_index", "Date")
 push!(pl, ph)
 end
 py"pd.concat($pl, keys=$cl, names=['Code', 'Date'])"
