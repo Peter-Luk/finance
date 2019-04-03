@@ -30,7 +30,7 @@ class ONA(object):
         s_line = stepper(m_line, period['signal'])
         m_hist = m_line - s_line
         _ = pd.DataFrame([m_line, s_line, m_hist]).T
-        _.columns = ['M Line', 'Signal Line', 'M Histogram']
+        _.columns = ['M Line', 'Signal', 'Histogram']
         return _
 
     def soc(self, raw, period):
