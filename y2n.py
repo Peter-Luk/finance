@@ -274,7 +274,7 @@ def compose(code=None):
     for _ in code:
         e = Equities(_)
         rd = e.data
-        pdhr = pd.concat([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
+        pdhr = pd.concat([e.rsi(), rd.High.sub(rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
         pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
         tlist.append(pdhr)
-    return pd.concat(tlist, keys=code, names=['Code', 'Date'])
+    return pd.concat(tlist, keys=code, names=['Code', 'Date'], axis=1)

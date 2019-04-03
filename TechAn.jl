@@ -238,8 +238,12 @@ def _hgl(_):
     if _[0] > _[-1] and _[0] > 0: return _[0]
     return 0
 """
+#=
 dm_plus = py"pd.DataFrame([$hcp, $lpc]).T.apply(_hgl, axis=1)"
 dm_minus = py"pd.DataFrame([$lpc, $hcp]).T.apply(_hgl, axis=1)"
+=#
+dm_plus = py"pd.concat([$hcp, $lpc], axis=1).apply(_hgl, axis=1)"
+dm_minus = py"pd.concat([$lpc, $hcp], axis=1).apply(_hgl, axis=1)"
 tmp = stepper(dm_plus, period)
 di_plus = py"pd.Series($tmp, index=$dm_plus.index) / $atr_ * 100"
 tmp = stepper(dm_minus, period)
