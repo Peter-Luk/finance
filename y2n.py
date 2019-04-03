@@ -275,10 +275,7 @@ def compose(code=None):
         e = Equities(_)
         rd = e.data
         pdhr = pd.concat([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
-        # pdhr = pd.DataFrame([e.rsi(), (rd.High - rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()]).T
         pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
-        pdhr.set_index = 'Date'
         tlist.append(pdhr)
-    cps = pd.concat(tlist, keys=code)
-    # cps.index.name = 'Code'
+    cps = pd.concat(tlist, keys=code, names=['Code', 'Date'])
     return cps
