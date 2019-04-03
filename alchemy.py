@@ -254,6 +254,7 @@ class AF(AS):
             _ = pd.DataFrame(res)
             _.set_index(self._conf['index'], inplace=True)
             p_ = pd.DataFrame([_['open'], _['high'], _['low'], _['close'], _['volume']]).T
+            p_.index = p_.index.astype('datetime64[ns]')
             p_.index.name = p_.index.name.capitalize()
             p_.columns = [_.capitalize() for _ in p_.columns]
             return p_

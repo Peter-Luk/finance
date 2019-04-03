@@ -48,7 +48,7 @@ class ONA(object):
     def stc(self, raw, period):
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
-        m_line = e_fast - e_slow
+        m_line = e_fast.sub(e_slow)
         mh = m_line.rolling(period['K']).max()
         ml = m_line.rolling(period['K']).min()
         kseries = (m_line - ml) / (mh - ml)
@@ -61,7 +61,8 @@ class ONA(object):
         return _
 
     def atr(self, raw, period):
-        tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+        # tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+        tr = pd.DataFrame([raw['High'].sub(raw['Low']), raw['High'].sub(raw['Close'].shift(1)).abs(), raw['Low'].sub(raw['Close'].shift(1)).abs()]).max()
         _ = stepper(tr, period)
         _.name = f'ATR{period:02d}'
         return _
@@ -116,7 +117,8 @@ class ONA(object):
     def apz(self, raw, period):
         ehl = self.ma(raw, period, 'e', 'hl')
         volatility = stepper(ehl, period)
-        tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+        # tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+        tr = pd.DataFrame([raw['High'].sub(raw['Low']), raw['High'].sub(raw['Close'].shift(1)).abs(), raw['Low'].sub(raw['Close'].shift(1)).abs()]).max()
 
         upper = volatility + tr * gr
         lower = volatility - tr * gr
@@ -254,7 +256,8 @@ def grabber(x, initial='c'):
     if initial.lower() in ['h', 'high']: hdr = x['High']
     if initial.lower() in ['l', 'low']: hdr = x['Low']
     if initial.lower() in ['o', 'open']: hdr = x['Open']
-    if initial.lower() in ['hl', 'lh', 'range']: hdr = x.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+    # if initial.lower() in ['hl', 'lh', 'range']: hdr = x.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
+    if initial.lower() in ['hl', 'lh', 'range']: hdr = x[['High', 'Low']].mean(axis=1)
     if initial.lower() in ['ohlc', 'full', 'all']: hdr = x.drop('Volume', 1).mean(axis=1)
     return hdr
 
