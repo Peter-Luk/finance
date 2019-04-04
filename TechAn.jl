@@ -333,7 +333,7 @@ ph = py"pd.concat([$r, ($e.High - $e.Low), $e.Close.diff(), $a, $x], axis=1)"
 setproperty!(ph, "columns", ["RSI", "dHL", "dpC", "ATR", "dADX"])
 push!(pl, ph)
 end
-py"pd.concat($pl, keys=$cl, names=['Code', 'Date'])"
+py"pd.concat($pl, keys=$cl, names=['Code', 'Data'], axis=1)"
 end
 
 function entities()

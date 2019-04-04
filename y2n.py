@@ -1,5 +1,5 @@
 import pref
-pd, np, db, yf, datetime, sleep = pref.y2n
+pd, np, db, yf, gr, datetime, sleep = pref.y2n
 from utilities import filepath, mtf
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
@@ -277,4 +277,11 @@ def compose(code=None):
         pdhr = pd.concat([e.rsi(), rd.High.sub(rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
         pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
         tlist.append(pdhr)
-    return pd.concat(tlist, keys=code, names=['Code', 'Date'], axis=1)
+    return pd.concat(tlist, keys=code, names=['Code','Data'], axis=1)
+
+def listed(df, date, buy=True):
+    txr = df.reorder_levels(['Data','Code'], 1)
+    rtr = txr.loc[date, 'RSI']
+    if buy:
+        return rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.to_series()
+    return rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.to_series()
