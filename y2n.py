@@ -282,6 +282,13 @@ def compose(code=None):
 def listed(df, date, buy=True):
     txr = df.reorder_levels(['Data','Code'], 1)
     rtr = txr.loc[date, 'RSI']
+    hdr = []
     if buy:
-        return rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.to_series()
-    return rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.to_series()
+        rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
+        if rl:
+            hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["buy", date] for _ in rl])
+            return pd.Series(hdr, index=rl)
+    rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
+    if rl:
+        hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in rl])
+        return pd.Series(hdr, index=rl)
