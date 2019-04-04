@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path, os, sys, functools
 from time import sleep
 
-y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, datetime, sleep]
+y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, golden_ratio, datetime, sleep]
 nta = [pandas, numpy, datetime, golden_ratio]
 alchemy = [sys.platform, os.environ, os.sep, os.listdir, Path, sqlalchemy, pandas, datetime]
 utils = [os.sep, os.environ, os.linesep, sys.platform, sys.version_info, Path, sqlalchemy, fix_yahoo_finance, golden_ratio, sleep, datetime, functools.reduce]
