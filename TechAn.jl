@@ -345,4 +345,9 @@ end
 return hdr
 end
 
+function gslice(x::Array, ratio::Float64=py"golden_ratio")
+hdr = map(y -> y .+ diff(x) .* [-1 + 1 / ratio, -1 / ratio, 1, 1 / ratio, 1 - 1 / ratio], x)
+sort!(unique!([hdr[1]; hdr[end]]))
+end
+
 exist(c::Signed) = c in entities()
