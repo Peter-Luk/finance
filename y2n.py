@@ -284,11 +284,12 @@ def listed(df, date, buy=True):
     rtr = txr.loc[date, 'RSI']
     hdr = []
     if buy:
-        rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
+        rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
         if rl:
             hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["buy", date] for _ in rl])
             return pd.Series(hdr, index=rl, name='buy')
-    rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
-    if rl:
-        hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in rl])
-        return pd.Series(hdr, index=rl, name='sell')
+    else:
+        rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
+        if rl:
+            hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in rl])
+            return pd.Series(hdr, index=rl, name='sell')
