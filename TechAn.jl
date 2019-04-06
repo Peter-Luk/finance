@@ -310,11 +310,13 @@ end
 if ~d.empty; d; end
 end
 
-function ratr(x::Any, adhoc::Bool=true, ratio::Float64=py"golden_ratio")
-delta(b::Number, d::Number, r::Float64) = [b - d, b - d / r, b - (1 - 1 / r) * d, b, b + (1 - 1 / r) * d, b + d / r, b + d]
+function ratr(x::Any, adhoc::Bool=false, dt::Any=nothing; date::Any=dt)
+dta(x::Array) = [x[1] - x[end], x[1], x[1] + x[end]]
 if typeof(x) <: Signed; data = py"platform" == "linux" ? dFetch(x, adhoc) : dFetch(x, false); end
 if typeof(x) <: PyObject; data = x; end
-delta(get(data.Close, length(data) - 1), get(atr(data), length(data) - 1), ratio)
+if typeof(date) <: Nothing; date = get(data.index, length(data) -1); end
+tmp = dta(py"pd.concat([$data.Close, $(atr(data))],1).loc[$date].values")
+sort!(unique!([gslice(tmp[1:end-1]);gslice(tmp[end-1:end])]))
 end
 
 function compose(code::Any=entities())
