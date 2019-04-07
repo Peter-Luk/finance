@@ -189,7 +189,7 @@ hdr = (m_line - k) / (d - k)
 setproperty!(hdr, "name", "STC")
 end
 
-function atr(x::Any, period::Signed=Eperiod["atr"], dt::Any=nothing; date::Any=dt)
+function atr(x::Any, pe::Signed=Eperiod["atr"], dt::Any=nothing; date::Any=dt, period::Signed=pe)
 y = data_factory(x, date=date)
 tr = py"pd.DataFrame([$y['High'] - $y['Low'], ($y['High'] - $y['Close'].shift(1)).abs(), ($y['Low'] - $y['Close'].shift(1)).abs()]).max()"
 tmp = stepper(tr, period)
@@ -289,10 +289,10 @@ end
 if ~d.empty; d; end
 end
 
-function ratr(x::Any, adhoc::Bool=false, dt::Any=nothing; date::Any=dt)
+function ratr(x::Any, dt::Any=nothing, ac::Bool=false, pe::Signed=Eperiod["atr"]; date::Any=dt, period::Signed=pe, adhoc::Bool=ac)
 dta(x::Array) = [x[1] - x[end], x[1], x[1] + x[end]]
-y = data_factory(x, date=date)
-tmp = dta(py"pd.concat([$y.Close, $(atr(y))], 1).iloc[-1].values")
+y = data_factory(x, adhoc, date=date)
+tmp = dta(py"pd.concat([$y.Close, $(atr(y, period))], 1).iloc[-1].values")
 sort!(unique!([gslice(tmp[1:end-1]); gslice(tmp[end-1:end])]))
 end
 
