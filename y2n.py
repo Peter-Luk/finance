@@ -280,6 +280,10 @@ def compose(code=None):
     return pd.concat(tlist, keys=code, names=['Code','Data'], axis=1)
 
 def listed(df, date, buy=True):
+    if not isinstance(date, datetime):
+        try:
+            date = datetime.strptime(date, '%Y%m%d')
+        except: pass
     txr = df.reorder_levels(['Data','Code'], 1)
     rtr = txr.loc[date, 'RSI']
     hdr = []
