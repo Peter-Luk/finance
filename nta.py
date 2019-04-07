@@ -29,7 +29,7 @@ class ONA(object):
         m_line = e_fast - e_slow
         s_line = stepper(m_line, period['signal'])
         m_hist = m_line - s_line
-        _ = pd.DataFrame([m_line, s_line, m_hist]).T
+        _ = pd.concat([m_line, s_line, m_hist], axis=1)
         _.columns = ['M Line', 'Signal', 'Histogram']
         return _
 
@@ -41,7 +41,7 @@ class ONA(object):
         k.name = '%K'
         d = k.rolling(period['D']).mean()
         d.name = '%D'
-        _ = pd.DataFrame([k, d]).T
+        _ = pd.concat([k, d], axis=1)
         _.name = 'SOC'
         return _
 
@@ -61,8 +61,7 @@ class ONA(object):
         return _
 
     def atr(self, raw, period):
-        # tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
-        tr = pd.DataFrame([raw['High'].sub(raw['Low']), raw['High'].sub(raw['Close'].shift(1)).abs(), raw['Low'].sub(raw['Close'].shift(1)).abs()]).max()
+        tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
         _ = stepper(tr, period)
         _.name = f'ATR{period:02d}'
         return _
@@ -90,8 +89,8 @@ class ONA(object):
         def _hgl(_):
             if _[0] > _[-1] and _[0] > 0: return _[0]
             return 0
-        dm_plus = pd.DataFrame([hcp, lpc]).T.apply(_hgl, axis=1)
-        dm_minus = pd.DataFrame([lpc, hcp]).T.apply(_hgl, axis=1)
+        dm_plus = pd.concat([hcp, lpc], axis=1).apply(_hgl, axis=1)
+        dm_minus = pd.concat([lpc, hcp], axis=1).apply(_hgl, axis=1)
         di_plus = stepper(dm_plus, period) / atr * 100
         di_plus.name = f'+DI{period:02d}'
 
@@ -101,7 +100,7 @@ class ONA(object):
         dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
         _ = stepper(dx, period)
         _.name = f'ADX{period:02d}'
-        __ = pd.DataFrame([di_plus, di_minus, _]).T
+        __ = pd.concat([di_plus, di_minus, _], axis=1)
         return __
 
     def kama(self, raw, period, field_initial='c'):
@@ -117,12 +116,12 @@ class ONA(object):
     def apz(self, raw, period):
         ehl = self.ma(raw, period, 'e', 'hl')
         volatility = stepper(ehl, period)
-        # tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
-        tr = pd.DataFrame([raw['High'].sub(raw['Low']), raw['High'].sub(raw['Close'].shift(1)).abs(), raw['Low'].sub(raw['Close'].shift(1)).abs()]).max()
+        tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+        # tr = pd.concat([raw['High'].sub(raw['Low']), raw['High'].sub(raw['Close'].shift(1)).abs(), raw['Low'].sub(raw['Close'].shift(1)).abs()], axis=1).max()
 
         upper = volatility + tr * gr
         lower = volatility - tr * gr
-        _ = pd.DataFrame([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)]).T
+        _ = pd.concat([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -131,7 +130,7 @@ class ONA(object):
         atr = self.atr(raw, period['atr'])
         upper = middle_line + (gr * atr)
         lower = middle_line - (gr * atr)
-        _ = pd.DataFrame([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)]).T
+        _ = pd.concat([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -140,7 +139,7 @@ class ONA(object):
         width = raw['Close'].rolling(period).std()
         upper = middle_line + width
         lower = middle_line - width
-        _ = pd.DataFrame([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)]).T
+        _ = pd.concat([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -210,11 +209,11 @@ class Viewer(ONA):
         del(self.data)
 
     def mas(self, raw, period):
-        _ = pd.DataFrame([self.kama(raw, period['kama'], 'c').map(hsirnd), self.ma(raw, period['simple'], 'e', 'c').map(hsirnd), self.ma(raw, period['simple'], 's', 'c').map(hsirnd), self.ma(raw, period['simple'], 'w', 'c').map(hsirnd)]).T
+        _ = pd.concat([self.kama(raw, period['kama'], 'c').map(hsirnd), self.ma(raw, period['simple'], 'e', 'c').map(hsirnd), self.ma(raw, period['simple'], 's', 'c').map(hsirnd), self.ma(raw, period['simple'], 'w', 'c').map(hsirnd)], axis=1)
         return _
 
     def idrs(self, raw, period):
-        _ = pd.DataFrame([self.adx(raw, period['adx'])[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple']), self.atr(raw, period['atr'])]).T
+        _ = pd.concat([self.adx(raw, period['adx'])[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple']), self.atr(raw, period['atr'])], axis=1)
         return _
 
     def maverick(self, raw, period, date, unbound=False, exclusive=True):
