@@ -160,17 +160,17 @@ h = py"pd.concat([$m_line, $s_line, $m_hist], axis=1)"
 setproperty!(h, "name", "MACD")
 end
 
-function soc(x::Any, period::Dict=Eperiod["soc"], dt::Any=nothing; date::Any=dt)
+function soc(x::Any, dt::Any=nothing, pe::Dict=Eperiod["soc"]; date::Any=dt, period::Dict=pe)
 y = data_factory(x, date=date)
 ml = y.Low.rolling(period["K"]).min()
 mh = y.High.rolling(period["K"]).max()
-kseries = py"pd.Series(($y['Close'] - $ml) / ($mh - $ml) * 100, index=$y.index)"
+kseries = py"pd.Series(($y.Close - $ml) / ($mh - $ml) * 100, index=$y.index)"
 k = kseries.rolling(period["D"]).mean()
 d = k.rolling(period["D"]).mean()
 setproperty!(k, "name", "%K")
 setproperty!(d, "name", "%D")
 hdr = py"pd.concat([$k, $d], axis=1)"
-setproperty!(hdr, "name", "SOC" * string(date))
+setproperty!(hdr, "name", "SOC@" * string(get(y.index, length(y) - 1)))
 end
 
 function stc(x::Any, period::Dict=Eperiod["stc"], dt::Any=nothing; date::Any=dt)
@@ -191,7 +191,7 @@ end
 
 function atr(x::Any, pe::Signed=Eperiod["atr"], dt::Any=nothing; date::Any=dt, period::Signed=pe)
 y = data_factory(x, date=date)
-tr = py"pd.DataFrame([$y['High'] - $y['Low'], ($y['High'] - $y['Close'].shift(1)).abs(), ($y['Low'] - $y['Close'].shift(1)).abs()]).max()"
+tr = py"pd.DataFrame([$y.High - $y.Low, ($y.High - $y.Close.shift(1)).abs(), ($y.Low - $y.Close.shift(1)).abs()]).max()"
 tmp = stepper(tr, period)
 d = py"pd.Series($tmp, index=$y.index)"
 setproperty!(d, "name", "ATR"* string(period))

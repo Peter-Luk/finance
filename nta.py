@@ -34,9 +34,9 @@ class ONA(object):
         return _
 
     def soc(self, raw, period):
-        ml = raw['Low'].rolling(period['K']).min()
-        mh = raw['High'].rolling(period['K']).max()
-        kseries = pd.Series((raw['Close'] - ml) / (mh - ml) * 100, index=raw.index)
+        ml = raw.Low.rolling(period['K']).min()
+        mh = raw.High.rolling(period['K']).max()
+        kseries = pd.Series((raw.Close - ml) / (mh - ml) * 100, index=raw.index)
         k = kseries.rolling(period['D']).mean()
         k.name = '%K'
         d = k.rolling(period['D']).mean()
@@ -61,7 +61,7 @@ class ONA(object):
         return _
 
     def atr(self, raw, period):
-        tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
+        tr = pd.DataFrame([raw.High - raw.Low, (raw.High - raw.Close.shift(1)).abs(), (raw.Low - raw.Close.shift(1)).abs()]).max()
         _ = stepper(tr, period)
         _.name = f'ATR{period:02d}'
         return _
