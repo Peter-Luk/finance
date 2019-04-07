@@ -191,8 +191,8 @@ class ONA(object):
     def ovr(self, raw, period, date=None):
         if date not in raw.index: date = raw.index[-1]
         ols = ['APZ', 'BB', 'KC']
-        ups = pd.DataFrame([self.apz(raw, period['apz']).Upper, self.bb(raw, period['simple']).Upper, self.kc(raw, period['kc']).Upper], index=ols).loc[date]
-        los = pd.DataFrame([self.apz(raw, period['apz']).Lower, self.bb(raw, period['simple']).Lower, self.kc(raw, period['kc']).Lower], index=ols).loc[date]
+        ups = pd.DataFrame([self.apz(raw, period['apz'])['Upper'], self.bb(raw, period['simple'])['Upper'], self.kc(raw, period['kc'])['Upper']], index=ols)[date]
+        los = pd.DataFrame([self.apz(raw, period['apz'])['Lower'], self.bb(raw, period['simple'])['Lower'], self.kc(raw, period['kc'])['Lower']], index=ols)[date]
         hdr, val = {'Max':[], 'Min':[]}, np.nan
         for _ in ols:
             val = np.nan
@@ -224,7 +224,7 @@ class Viewer(ONA):
     def maverick(self, raw, period, date, unbound=False, exclusive=True):
         bare = self.ratr(raw, period['atr'], date)
         boundary = self.ovr(raw, period, date).T
-        close = raw['Close'][date]
+        close = raw.Close.loc[date]
         inside = [_ for _ in bare.tolist() if _ > boundary['Min'].min() and _ < boundary['Max'].max()]
         outside = [_ for _ in bare.tolist() if _ not in inside]
         hdr = {'buy':np.nan, 'sell':np.nan}
