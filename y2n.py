@@ -188,8 +188,13 @@ class Equities(AE, Viewer):
     def kama(self, period=periods['kama'], req_field='c'):
         return self.view.kama(self.data, period, req_field).map(hsirnd)
 
-    def atr(self, period=periods['atr']):
-        return self.view.atr(self.data, period)
+    def atr(self, date=None, period=periods['atr']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.atr(self.data, period, date)
 
     def rsi(self, period=periods['rsi']):
         return self.view.rsi(self.data, period)
@@ -212,20 +217,35 @@ class Equities(AE, Viewer):
     def kc(self, period=periods['kc']):
         return self.view.kc(self.data, period)
 
-    def macd(self, period=periods['macd']):
-        return self.view.macd(self.data, period)
+    def macd(self, date=None, period=periods['macd']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.macd(self.data, period, date)
 
     def adx(self, period=periods['adx']):
         return self.view.adx(self.data, period)
 
-    def soc(self, period=periods['soc']):
-        return self.view.soc(self.data, period)
+    def soc(self, date=None, period=periods['soc']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.soc(self.data, period, date)
 
     def stc(self, period=periods['stc']):
         return self.view.stc(self.data, period)
 
-    def ratr(self, period=periods['atr'], date=None):
-        return self.view.ratr(self.data, period, date)
+    def ratr(self, date=None, period=periods['atr']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.ratr(self.data, period, date)
 
     def maverick(self, period=periods, date=None, unbound=True, exclusive=True):
         if date == None: date = self.data.index[-1]

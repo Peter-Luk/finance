@@ -16,14 +16,16 @@ class ONA(object):
         _data = grabber(raw, field_initial)
         if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean()
         if favour.upper() in ['W', 'WEIGHTED']:
-            _ = _data * raw['Volume']
-            __ = (_.rolling(period).sum() / raw['Volume'].rolling(period).sum())
+            _ = _data * raw.Volume
+            __ = (_.rolling(period).sum() / raw.Volume.rolling(period).sum())
         if favour.upper() in ['E', 'EXPONENTIAL']:
             __ = stepper(_data, period)
         __.name = f'{favour}ma{period:02d}'.upper()
         return __
 
-    def macd(self, raw, period):
+    def macd(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
         m_line = e_fast - e_slow
@@ -33,7 +35,9 @@ class ONA(object):
         _.columns = ['M Line', 'Signal', 'Histogram']
         return _
 
-    def soc(self, raw, period):
+    def soc(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         ml = raw.Low.rolling(period['K']).min()
         mh = raw.High.rolling(period['K']).max()
         kseries = pd.Series((raw.Close - ml) / (mh - ml) * 100, index=raw.index)
@@ -60,7 +64,9 @@ class ONA(object):
         _.name = 'STC'
         return _
 
-    def atr(self, raw, period):
+    def atr(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         tr = pd.DataFrame([raw.High - raw.Low, (raw.High - raw.Close.shift(1)).abs(), (raw.Low - raw.Close.shift(1)).abs()]).max()
         _ = stepper(tr, period)
         _.name = f'ATR{period:02d}'
@@ -73,7 +79,7 @@ class ONA(object):
         def _lz(_):
             if _ < 0: return abs(_)
             return 0
-        delta = raw['Close'].diff(1)
+        delta = raw.Close.diff(1)
         gain = delta.apply(_gz)
         loss = delta.apply(_lz)
         ag = stepper(gain, period)
@@ -85,7 +91,7 @@ class ONA(object):
 
     def adx(self, raw, period):
         atr = self.atr(raw, period)
-        hcp, lpc = raw['High'].diff(1), -(raw['Low'].diff(1))
+        hcp, lpc = raw.High.diff(1), -(raw.Low.diff(1))
         def _hgl(_):
             if _[0] > _[-1] and _[0] > 0: return _[0]
             return 0
@@ -116,8 +122,7 @@ class ONA(object):
     def apz(self, raw, period):
         ehl = self.ma(raw, period, 'e', 'hl')
         volatility = stepper(ehl, period)
-        tr = pd.DataFrame([raw['High'] - raw['Low'], (raw['High'] - raw['Close'].shift(1)).abs(), (raw['Low'] - raw['Close'].shift(1)).abs()]).max()
-        # tr = pd.concat([raw['High'].sub(raw['Low']), raw['High'].sub(raw['Close'].shift(1)).abs(), raw['Low'].sub(raw['Close'].shift(1)).abs()], axis=1).max()
+        tr = pd.DataFrame([raw.High - raw.Low, (raw.High - raw.Close.shift(1)).abs(), (raw.Low - raw.Close.shift(1)).abs()]).max()
 
         upper = volatility + tr * gr
         lower = volatility - tr * gr
@@ -136,7 +141,7 @@ class ONA(object):
 
     def bb(self, raw, period):
         middle_line = self.ma(raw, period, 's', 'c')
-        width = raw['Close'].rolling(period).std()
+        width = raw.Close.rolling(period).std()
         upper = middle_line + width
         lower = middle_line - width
         _ = pd.concat([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
@@ -144,12 +149,12 @@ class ONA(object):
         return _
 
     def obv(self, raw):
-        hdr, _ = [raw['Volume'][0]], 1
-        dcp = raw['Close'].diff(1)
+        hdr, _ = [raw.Volume.iloc[0]], 1
+        dcp = raw.Close.diff(1)
         while _ < dcp.size:
             val = 0
-            if dcp[_] > 0: val = raw['Volume'][_]
-            if dcp[_] < 0: val = -raw['Volume'][_]
+            if dcp[_] > 0: val = raw.Volume.iloc[_]
+            if dcp[_] < 0: val = -raw.Volume.iloc[_]
             hdr.append(hdr[-1] + val)
             _ += 1
         _ = pd.Series(hdr, index=dcp.index)
@@ -157,37 +162,37 @@ class ONA(object):
         return _
 
     def vwap(self, raw):
-        pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw['Volume']
-        _ = pd.Series(pv.cumsum() / raw['Volume'].cumsum(), index=raw.index).apply(hsirnd, 1)
+        pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw.Volume
+        _ = pd.Series(pv.cumsum() / raw.Volume.cumsum(), index=raw.index).apply(hsirnd, 1)
         _.name = 'VWAP'
         return _
 
     def ratr(self, raw, period, date=None):
-        if date == None or date not in raw.index: date = raw.index[-1]
-        def _patr(period, raw):
-            lc, lr = raw['Close'][date], self.atr(raw, period)[date]
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
+        def _patr(period, raw, date):
+            lc, lr = raw.Close.loc[date], self.atr(raw, period, date).loc[date]
             _ = [lc + lr, lc, lc - lr]
             _.extend(gslice([lc + lr, lc]))
             _.extend(gslice([lc, lc - lr]))
             return _
 
         def _pgap(pivot, raw):
-            gap = pivot - raw['Close'][date]
+            gap = pivot - raw.Close.iloc[-1]
             _ = gslice([pivot + gap, pivot])
             _.extend(gslice([pivot, pivot - gap]))
             return _
         hdr = []
-        [hdr.extend(_pgap(_, raw)) for _ in _patr(period, raw)]
+        [hdr.extend(_pgap(_, raw)) for _ in _patr(period, raw, date)]
         hdr.sort()
-        # _ = pd.Series([hsirnd(__) for __ in hdr]).unique()
         _ = pd.Series(hdr).apply(hsirnd, 1).unique()
         return _
 
     def ovr(self, raw, period, date=None):
         if date not in raw.index: date = raw.index[-1]
         ols = ['APZ', 'BB', 'KC']
-        ups = pd.DataFrame([self.apz(raw, period['apz'])['Upper'], self.bb(raw, period['simple'])['Upper'], self.kc(raw, period['kc'])['Upper']], index=ols)[date]
-        los = pd.DataFrame([self.apz(raw, period['apz'])['Lower'], self.bb(raw, period['simple'])['Lower'], self.kc(raw, period['kc'])['Lower']], index=ols)[date]
+        ups = pd.DataFrame([self.apz(raw, period['apz']).Upper, self.bb(raw, period['simple']).Upper, self.kc(raw, period['kc']).Upper], index=ols).loc[date]
+        los = pd.DataFrame([self.apz(raw, period['apz']).Lower, self.bb(raw, period['simple']).Lower, self.kc(raw, period['kc']).Lower], index=ols).loc[date]
         hdr, val = {'Max':[], 'Min':[]}, np.nan
         for _ in ols:
             val = np.nan
@@ -251,10 +256,10 @@ def stepper(x, period, pdSeries=None):
     return pd.Series(hdr, index=x.index)
 
 def grabber(x, initial='c'):
-    if initial.lower() in ['c', 'close']: hdr = x['Close']
-    if initial.lower() in ['h', 'high']: hdr = x['High']
-    if initial.lower() in ['l', 'low']: hdr = x['Low']
-    if initial.lower() in ['o', 'open']: hdr = x['Open']
+    if initial.lower() in ['c', 'close']: hdr = x.Close
+    if initial.lower() in ['h', 'high']: hdr = x.High
+    if initial.lower() in ['l', 'low']: hdr = x.Low
+    if initial.lower() in ['o', 'open']: hdr = x.Open
     # if initial.lower() in ['hl', 'lh', 'range']: hdr = x.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
     if initial.lower() in ['hl', 'lh', 'range']: hdr = x[['High', 'Low']].mean(axis=1)
     if initial.lower() in ['ohlc', 'full', 'all']: hdr = x.drop('Volume', 1).mean(axis=1)
