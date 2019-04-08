@@ -12,7 +12,14 @@ class ONA(object):
         self.data = self.date = None
         del(self.data, self.date)
 
-    def ma(self, raw, period, favour='s', field_initial='close'):
+    def ma(self, raw, period, favour='s', field_initial='close', date=None):
+        if date != None:
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         _data = grabber(raw, field_initial)
         if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean()
         if favour.upper() in ['W', 'WEIGHTED']:
@@ -25,7 +32,12 @@ class ONA(object):
 
     def macd(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
         m_line = e_fast - e_slow
@@ -37,7 +49,12 @@ class ONA(object):
 
     def soc(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         ml = raw.Low.rolling(period['K']).min()
         mh = raw.High.rolling(period['K']).max()
         kseries = pd.Series((raw.Close - ml) / (mh - ml) * 100, index=raw.index)
@@ -51,7 +68,12 @@ class ONA(object):
 
     def stc(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
         m_line = e_fast.sub(e_slow)
@@ -68,7 +90,12 @@ class ONA(object):
 
     def atr(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         tr = pd.DataFrame([raw.High - raw.Low, (raw.High - raw.Close.shift(1)).abs(), (raw.Low - raw.Close.shift(1)).abs()]).max()
         _ = stepper(tr, period)
         _.name = f'ATR{period:02d}'
@@ -95,7 +122,12 @@ class ONA(object):
 
     def adx(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         atr = self.atr(raw, period, date)
         hcp, lpc = raw.High.diff(1), -(raw.Low.diff(1))
         def _hgl(_):
@@ -115,7 +147,14 @@ class ONA(object):
         __ = pd.concat([di_plus, di_minus, _], axis=1)
         return __
 
-    def kama(self, raw, period, field_initial='c'):
+    def kama(self, raw, period, field_initial='c', date=None):
+        if date != None:
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         _data = grabber(raw, field_initial)
         change = (_data - _data.shift(period['er'])).abs()
         volatility = _data.diff(1).abs().rolling(period['er']).sum()
@@ -127,7 +166,12 @@ class ONA(object):
 
     def apz(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         ehl = self.ma(raw, period, 'e', 'hl')
         volatility = stepper(ehl, period)
         tr = pd.DataFrame([raw.High - raw.Low, (raw.High - raw.Close.shift(1)).abs(), (raw.Low - raw.Close.shift(1)).abs()]).max()
@@ -140,7 +184,12 @@ class ONA(object):
 
     def kc(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         middle_line = self.kama(raw, period['kama'], 'hl')
         atr = self.atr(raw, period['atr'])
         upper = middle_line + (gr * atr)
@@ -151,7 +200,12 @@ class ONA(object):
 
     def bb(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         middle_line = self.ma(raw, period, 's', 'c')
         width = raw.Close.rolling(period).std()
         upper = middle_line + width
@@ -162,7 +216,12 @@ class ONA(object):
 
     def obv(self, raw, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         hdr, _ = [raw.Volume.iloc[0]], 1
         dcp = raw.Close.diff(1)
         while _ < dcp.size:
@@ -177,7 +236,12 @@ class ONA(object):
 
     def vwap(self, raw, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw.Volume
         _ = pd.Series(pv.cumsum() / raw.Volume.cumsum(), index=raw.index).apply(hsirnd, 1)
         _.name = 'VWAP'
@@ -185,7 +249,12 @@ class ONA(object):
 
     def ratr(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         def _patr(period, raw, date):
             lc, lr = raw.Close.loc[date], self.atr(raw, period, date).loc[date]
             _ = [lc + lr, lc, lc - lr]
@@ -206,7 +275,12 @@ class ONA(object):
 
     def ovr(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         if date not in raw.index: date = raw.index[-1]
         ols = ['APZ', 'BB', 'KC']
         ups = pd.DataFrame([self.apz(raw, period['apz'])['Upper'], self.bb(raw, period['simple'])['Upper'], self.kc(raw, period['kc'])['Upper']], index=ols)[date]
@@ -232,12 +306,24 @@ class Viewer(ONA):
         del(self.data)
 
     def mas(self, raw, period):
-        _ = pd.concat([self.kama(raw, period['kama'], 'c').map(hsirnd), self.ma(raw, period['simple'], 'e', 'c').map(hsirnd), self.ma(raw, period['simple'], 's', 'c').map(hsirnd), self.ma(raw, period['simple'], 'w', 'c').map(hsirnd)], axis=1)
+        if date != None:
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
+        _ = pd.concat([self.kama(raw, period['kama'], 'c', date).map(hsirnd), self.ma(raw, period['simple'], 'e', 'c', date).map(hsirnd), self.ma(raw, period['simple'], 's', 'c', date).map(hsirnd), self.ma(raw, period['simple'], 'w', 'c', date).map(hsirnd)], axis=1)
         return _
 
     def idrs(self, raw, period, date=None):
         if date != None:
-            if isinstance(date, datetime): raw = raw.loc[:date]
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         _ = pd.concat([self.adx(raw, period['adx'], date)[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple'], date), self.atr(raw, period['atr'], date)], axis=1)
         return _
 

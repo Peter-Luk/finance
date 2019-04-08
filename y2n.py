@@ -46,65 +46,84 @@ class Futures(AF, Viewer):
     def combine(self, freq='bi-daily'):
         return self._af.combine(freq)
 
-    def mas(self, period=periods):
-        return self.view.mas(self.data, period)
+    def mas(self, date=None, period=periods):
+        if date == None: date = self._date
+        return self.view.mas(self.data, period, date)
 
-    def idrs(self, period=periods):
-        return self.view.idrs(self.data, period)
+    def idrs(self, date=None, period=periods):
+        if date == None: date = self._date
+        return self.view.idrs(self.data, period. date)
 
-    def sma(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 's', req_field).map(hsirnd)
+    def sma(self, data=None, period=periods['simple'], req_field='c'):
+        if date == None: date = self._date
+        return self.view.ma(self.data, period, 's', req_field, date).map(hsirnd)
 
-    def ema(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 'e', req_field).map(hsirnd)
+    def ema(self, date=None, period=periods['simple'], req_field='c'):
+        if date == None: date = self._date
+        return self.view.ma(self.data, period, 'e', req_field, date).map(hsirnd)
 
-    def wma(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 'w', req_field).map(hsirnd)
+    def wma(self, date=None, period=periods['simple'], req_field='c'):
+        if date == None: date = self._date
+        return self.view.ma(self.data, period, 'w', req_field, date).map(hsirnd)
 
-    def kama(self, period=periods['kama'], req_field='c'):
-        return self.view.kama(self.data, period, req_field).map(hsirnd)
+    def kama(self, date=None, period=periods['kama'], req_field='c'):
+        if date == None: date = self._date
+        return self.view.kama(self.data, period, req_field, date).map(hsirnd)
 
-    def atr(self, period=periods['atr']):
-        return self.view.atr(self.data, period)
+    def atr(self, date=None, period=periods['atr']):
+        if date == None: date = self._date
+        return self.view.atr(self.data, period, date)
 
-    def rsi(self, period=periods['rsi']):
-        return self.view.rsi(self.data, period)
+    def rsi(self, date=None, period=periods['rsi']):
+        if date == None: date = self._date
+        return self.view.rsi(self.data, period, date)
 
-    def obv(self):
-        return self.view.obv(self.data)
+    def obv(self, date=None):
+        if date == None: date = self._date
+        return self.view.obv(self.data, date)
 
-    def ovr(self, period=periods):
-        return self.view.ovr(self.data, period)
+    def ovr(self, date=None, period=periods):
+        if date == None: date = self._date
+        return self.view.ovr(self.data, period, date)
 
-    def vwap(self):
-        return self.view.vwap(self.data)
+    def vwap(self, date=None):
+        if date == None: date = self._date
+        return self.view.vwap(self.data, date)
 
-    def bb(self, period=periods['simple']):
-        return self.view.bb(self.data, period)
+    def bb(self, date=None, period=periods['simple']):
+        if date == None: date = self._date
+        return self.view.bb(self.data, period, date)
 
-    def apz(self, period=periods['apz']):
-        return self.view.apz(self.data, period)
+    def apz(self, date=None, period=periods['apz']):
+        if date == None: date = self._date
+        return self.view.apz(self.data, period, date)
 
-    def kc(self, period=periods['kc']):
-        return self.view.kc(self.data, period)
+    def kc(self, date=None, period=periods['kc']):
+        if date == None: date = self._date
+        return self.view.kc(self.data, period, date)
 
-    def macd(self, period=periods['macd']):
-        return self.view.macd(self.data, period)
+    def macd(self, date=None, period=periods['macd']):
+        if date == None: date = self._date
+        return self.view.macd(self.data, period, date)
 
-    def adx(self, period=periods['adx']):
-        return self.view.adx(self.data, period)
+    def adx(self, date=None, period=periods['adx']):
+        if date == None: date = self._date
+        return self.view.adx(self.data, period, date)
 
-    def soc(self, period=periods['soc']):
-        return self.view.soc(self.data, period)
+    def soc(self, date=None, period=periods['soc']):
+        if date == None: date = self._date
+        return self.view.soc(self.data, period, date)
 
-    def stc(self, period=periods['stc']):
-        return self.view.stc(self.data, period)
+    def stc(self, date=None, period=periods['stc']):
+        if date == None: date = self._date
+        return self.view.stc(self.data, period, date)
 
-    def ratr(self, period=periods['atr'], date=None):
+    def ratr(self, date=None, period=periods['atr']):
+        if date == None: date = self._date
         return self.view.ratr(self.data, period, date)
 
-    def maverick(self, period=periods, date=None, unbound=True, exclusive=True):
-        if date == None: date = self.data.index[-1]
+    def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
+        if date == None: date = self._date
         return self.view.maverick(self.data, period, date, unbound, exclusive)
 
 class Equities(AE, Viewer):
@@ -170,135 +189,85 @@ class Equities(AE, Viewer):
             __.index.name = __.index.name.capitalize()
         return __
 
-    def mas(self, period=periods):
-        return self.view.mas(self.data, period)
+    def mas(self, date=None, period=periods):
+        if date == None: date = self._date
+        return self.view.mas(self.data, period, date)
 
-    def idrs(self, period=periods):
-        return self.view.idrs(self.data, period)
+    def idrs(self, date=None, period=periods):
+        if date == None: date = self._date
+        return self.view.idrs(self.data, period. date)
 
-    def sma(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 's', req_field).map(hsirnd)
+    def sma(self, data=None, period=periods['simple'], req_field='c'):
+        if date == None: date = self._date
+        return self.view.ma(self.data, period, 's', req_field, date).map(hsirnd)
 
-    def ema(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 'e', req_field).map(hsirnd)
+    def ema(self, date=None, period=periods['simple'], req_field='c'):
+        if date == None: date = self._date
+        return self.view.ma(self.data, period, 'e', req_field, date).map(hsirnd)
 
-    def wma(self, period=periods['simple'], req_field='c'):
-        return self.view.ma(self.data, period, 'w', req_field).map(hsirnd)
+    def wma(self, date=None, period=periods['simple'], req_field='c'):
+        if date == None: date = self._date
+        return self.view.ma(self.data, period, 'w', req_field, date).map(hsirnd)
 
-    def kama(self, period=periods['kama'], req_field='c'):
-        return self.view.kama(self.data, period, req_field).map(hsirnd)
+    def kama(self, date=None, period=periods['kama'], req_field='c'):
+        if date == None: date = self._date
+        return self.view.kama(self.data, period, req_field, date).map(hsirnd)
 
     def atr(self, date=None, period=periods['atr']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.atr(self.data, period, date)
+        return self.view.atr(self.data, period, date)
 
     def rsi(self, date=None, period=periods['rsi']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.rsi(self.data, period, date)
+        return self.view.rsi(self.data, period, date)
 
     def obv(self, date=None):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.obv(self.data, date)
+        return self.view.obv(self.data, date)
 
     def ovr(self, date=None, period=periods):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.ovr(self.data, period, date)
+        return self.view.ovr(self.data, period, date)
 
     def vwap(self, date=None):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.vwap(self.data, date)
+        return self.view.vwap(self.data, date)
 
     def bb(self, date=None, period=periods['simple']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.bb(self.data, period, date)
+        return self.view.bb(self.data, period, date)
 
     def apz(self, date=None, period=periods['apz']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.apz(self.data, period, date)
+        return self.view.apz(self.data, period, date)
 
     def kc(self, date=None, period=periods['kc']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.kc(self.data, period, date)
+        return self.view.kc(self.data, period, date)
 
     def macd(self, date=None, period=periods['macd']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.macd(self.data, period, date)
+        return self.view.macd(self.data, period, date)
 
     def adx(self, date=None, period=periods['adx']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.adx(self.data, period, date)
+        return self.view.adx(self.data, period, date)
 
     def soc(self, date=None, period=periods['soc']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.soc(self.data, period, date)
+        return self.view.soc(self.data, period, date)
 
     def stc(self, date=None, period=periods['stc']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.stc(self.data, period, date)
+        return self.view.stc(self.data, period, date)
 
     def ratr(self, date=None, period=periods['atr']):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.ratr(self.data, period, date)
+        return self.view.ratr(self.data, period, date)
 
     def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
         if date == None: date = self._date
-        if isinstance(date, str):
-            try: date = datetime.strptime(date, "%Y%m%d")
-            except: pass
-        if isinstance(date, datetime):
-            return self.view.maverick(self.data, period, date, unbound, exclusive)
+        return self.view.maverick(self.data, period, date, unbound, exclusive)
 
 def bqo(el, action='buy', bound=True, adhoc=False):
     dl, il = [], []
