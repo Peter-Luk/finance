@@ -308,7 +308,7 @@ pl = []
 for c in cl
 e = dFetch(c)
 r = rsi(e); a = atr(e); x = adx(e).ADX14.diff()
-ph = py"pd.concat([$r, ($e.High - $e.Low), $e.Close.diff(), $a, $x], axis=1)"
+ph = py"pd.concat([$r, $(e.High.sub(e.Low)), $e.Close.diff(), $a, $x], axis=1)"
 setproperty!(ph, "columns", ["RSI", "dHL", "dpC", "ATR", "dADX"])
 push!(pl, ph)
 end

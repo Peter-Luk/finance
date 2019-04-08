@@ -49,7 +49,9 @@ class ONA(object):
         _.name = 'SOC'
         return _
 
-    def stc(self, raw, period):
+    def stc(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
         m_line = e_fast.sub(e_slow)
@@ -72,7 +74,9 @@ class ONA(object):
         _.name = f'ATR{period:02d}'
         return _
 
-    def rsi(self, raw, period):
+    def rsi(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         def _gz(_):
             if _ > 0: return _
             return 0
@@ -89,8 +93,10 @@ class ONA(object):
         _.name = f'RSI{period:02d}'
         return _
 
-    def adx(self, raw, period):
-        atr = self.atr(raw, period)
+    def adx(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
+        atr = self.atr(raw, period, date)
         hcp, lpc = raw.High.diff(1), -(raw.Low.diff(1))
         def _hgl(_):
             if _[0] > _[-1] and _[0] > 0: return _[0]
@@ -119,7 +125,9 @@ class ONA(object):
         _.name = f"KAMA{period['er']:02d}"
         return _
 
-    def apz(self, raw, period):
+    def apz(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         ehl = self.ma(raw, period, 'e', 'hl')
         volatility = stepper(ehl, period)
         tr = pd.DataFrame([raw.High - raw.Low, (raw.High - raw.Close.shift(1)).abs(), (raw.Low - raw.Close.shift(1)).abs()]).max()
@@ -130,7 +138,9 @@ class ONA(object):
         _.columns = ['Upper', 'Lower']
         return _
 
-    def kc(self, raw, period):
+    def kc(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         middle_line = self.kama(raw, period['kama'], 'hl')
         atr = self.atr(raw, period['atr'])
         upper = middle_line + (gr * atr)
@@ -139,7 +149,9 @@ class ONA(object):
         _.columns = ['Upper', 'Lower']
         return _
 
-    def bb(self, raw, period):
+    def bb(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         middle_line = self.ma(raw, period, 's', 'c')
         width = raw.Close.rolling(period).std()
         upper = middle_line + width
@@ -148,7 +160,9 @@ class ONA(object):
         _.columns = ['Upper', 'Lower']
         return _
 
-    def obv(self, raw):
+    def obv(self, raw, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         hdr, _ = [raw.Volume.iloc[0]], 1
         dcp = raw.Close.diff(1)
         while _ < dcp.size:
@@ -161,7 +175,9 @@ class ONA(object):
         _.name = 'OBV'
         return _
 
-    def vwap(self, raw):
+    def vwap(self, raw, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw.Volume
         _ = pd.Series(pv.cumsum() / raw.Volume.cumsum(), index=raw.index).apply(hsirnd, 1)
         _.name = 'VWAP'
@@ -189,6 +205,8 @@ class ONA(object):
         return _
 
     def ovr(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
         if date not in raw.index: date = raw.index[-1]
         ols = ['APZ', 'BB', 'KC']
         ups = pd.DataFrame([self.apz(raw, period['apz'])['Upper'], self.bb(raw, period['simple'])['Upper'], self.kc(raw, period['kc'])['Upper']], index=ols)[date]
@@ -217,8 +235,10 @@ class Viewer(ONA):
         _ = pd.concat([self.kama(raw, period['kama'], 'c').map(hsirnd), self.ma(raw, period['simple'], 'e', 'c').map(hsirnd), self.ma(raw, period['simple'], 's', 'c').map(hsirnd), self.ma(raw, period['simple'], 'w', 'c').map(hsirnd)], axis=1)
         return _
 
-    def idrs(self, raw, period):
-        _ = pd.concat([self.adx(raw, period['adx'])[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple']), self.atr(raw, period['atr'])], axis=1)
+    def idrs(self, raw, period, date=None):
+        if date != None:
+            if isinstance(date, datetime): raw = raw.loc[:date]
+        _ = pd.concat([self.adx(raw, period['adx'], date)[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple'], date), self.atr(raw, period['atr'], date)], axis=1)
         return _
 
     def maverick(self, raw, period, date, unbound=False, exclusive=True):

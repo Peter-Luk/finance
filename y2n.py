@@ -196,26 +196,61 @@ class Equities(AE, Viewer):
         if isinstance(date, datetime):
             return self.view.atr(self.data, period, date)
 
-    def rsi(self, period=periods['rsi']):
-        return self.view.rsi(self.data, period)
+    def rsi(self, date=None, period=periods['rsi']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.rsi(self.data, period, date)
 
-    def obv(self):
-        return self.view.obv(self.data)
+    def obv(self, date=None):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.obv(self.data, date)
 
-    def ovr(self, period=periods):
-        return self.view.ovr(self.data, period)
+    def ovr(self, date=None, period=periods):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.ovr(self.data, period, date)
 
-    def vwap(self):
-        return self.view.vwap(self.data)
+    def vwap(self, date=None):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.vwap(self.data, date)
 
-    def bb(self, period=periods['simple']):
-        return self.view.bb(self.data, period)
+    def bb(self, date=None, period=periods['simple']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.bb(self.data, period, date)
 
-    def apz(self, period=periods['apz']):
-        return self.view.apz(self.data, period)
+    def apz(self, date=None, period=periods['apz']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.apz(self.data, period, date)
 
-    def kc(self, period=periods['kc']):
-        return self.view.kc(self.data, period)
+    def kc(self, date=None, period=periods['kc']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.kc(self.data, period, date)
 
     def macd(self, date=None, period=periods['macd']):
         if date == None: date = self._date
@@ -225,8 +260,13 @@ class Equities(AE, Viewer):
         if isinstance(date, datetime):
             return self.view.macd(self.data, period, date)
 
-    def adx(self, period=periods['adx']):
-        return self.view.adx(self.data, period)
+    def adx(self, date=None, period=periods['adx']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.adx(self.data, period, date)
 
     def soc(self, date=None, period=periods['soc']):
         if date == None: date = self._date
@@ -236,8 +276,13 @@ class Equities(AE, Viewer):
         if isinstance(date, datetime):
             return self.view.soc(self.data, period, date)
 
-    def stc(self, period=periods['stc']):
-        return self.view.stc(self.data, period)
+    def stc(self, date=None, period=periods['stc']):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.stc(self.data, period, date)
 
     def ratr(self, date=None, period=periods['atr']):
         if date == None: date = self._date
@@ -247,9 +292,13 @@ class Equities(AE, Viewer):
         if isinstance(date, datetime):
             return self.view.ratr(self.data, period, date)
 
-    def maverick(self, period=periods, date=None, unbound=True, exclusive=True):
-        if date == None: date = self.data.index[-1]
-        return self.view.maverick(self.data, period, date, unbound, exclusive)
+    def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
+        if date == None: date = self._date
+        if isinstance(date, str):
+            try: date = datetime.strptime(date, "%Y%m%d")
+            except: pass
+        if isinstance(date, datetime):
+            return self.view.maverick(self.data, period, date, unbound, exclusive)
 
 def bqo(el, action='buy', bound=True, adhoc=False):
     dl, il = [], []
@@ -300,20 +349,20 @@ def compose(code=None):
     return pd.concat(tlist, keys=code, names=['Code','Data'], axis=1)
 
 def listed(df, date, buy=True):
-    if not isinstance(date, datetime):
-        try:
-            date = datetime.strptime(date, '%Y%m%d')
+    if isinstance(date, str):
+        try: date = datetime.strptime(date, "%Y%m%d")
         except: pass
-    txr = df.reorder_levels(['Data','Code'], 1)
-    rtr = txr.loc[date, 'RSI']
-    hdr = []
-    if buy:
-        rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
-        if rl:
-            hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["buy", date] for _ in rl])
-            return pd.Series(hdr, index=rl, name='buy')
-    else:
-        rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
-        if rl:
-            hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in rl])
-            return pd.Series(hdr, index=rl, name='sell')
+    if isinstance(date, datetime):
+        txr = df.reorder_levels(['Data','Code'], 1)
+        rtr = txr.loc[date, 'RSI']
+        hdr = []
+        if buy:
+            rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
+            if rl:
+                hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["buy", date] for _ in rl])
+                return pd.Series(hdr, index=rl, name='buy')
+        else:
+            rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
+            if rl:
+                hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in rl])
+                return pd.Series(hdr, index=rl, name='sell')
