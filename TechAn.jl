@@ -293,7 +293,14 @@ function ratr(x::Any, dt::Any=nothing, ac::Bool=false, pe::Signed=Eperiod["atr"]
 dta(x::Array) = [x[1] - x[end], x[1], x[1] + x[end]]
 y = data_factory(x, adhoc, date=date)
 tmp = dta(py"pd.concat([$y.Close, $(atr(y, period))], 1).iloc[-1].values")
-sort!(unique!([gslice(tmp[1:end-1]); gslice(tmp[end-1:end])]))
+re = sort!(unique!([gslice(tmp[1:end-1]); gslice(tmp[end-1:end])]))
+hdr = []
+for i in 1:length(re)-1
+for j in gslice(re[i:i+1])
+push!(hdr, j)
+end
+end
+sort!(unique!(hdr))
 end
 
 function compose(code::Any=entities())
@@ -325,8 +332,12 @@ return hdr
 end
 
 function gslice(x::Array, ratio::Float64=py"golden_ratio")
+#=
 hdr = map(y -> y .+ diff(x) .* [-1 + 1 / ratio, -1 / ratio, 1, 1 / ratio, 1 - 1 / ratio], x)
-sort!(unique!([hdr[1]; hdr[end]]))
+=#
+dx = abs(diff(x)[1])
+hdr =[x[1], x[1] + dx * (1 - 1 / ratio), x[1] + dx / ratio, x[1] + dx]
+sort!(unique!(hdr))
 end
 
 function data_factory(x::Any, adhoc::Bool=false, dt::Any=nothing; date::Any=dt)
