@@ -290,7 +290,7 @@ if ~d.empty; d; end
 end
 
 function ratr(x::Any, dt::Any=nothing, ac::Bool=false, pe::Signed=Eperiod["atr"]; date::Any=dt, period::Signed=pe, adhoc::Bool=ac)
-dta(x::Array) = [x[1] - x[end], x[1], x[1] + x[end]]
+dta(x::Array, gr::Float64=py"golden_ratio") = [x[1] - gr * x[end], x[1], x[1] + gr * x[end]]
 y = data_factory(x, adhoc, date=date)
 tmp = dta(py"pd.concat([$y.Close, $(atr(y, period))], 1).iloc[-1].values")
 re = sort!(unique!([gslice(tmp[1:end-1]); gslice(tmp[end-1:end])]))
