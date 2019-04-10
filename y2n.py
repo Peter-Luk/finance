@@ -317,7 +317,7 @@ def compose(code=None):
         tlist.append(pdhr)
     return pd.concat(tlist, keys=code, names=['Code','Data'], axis=1)
 
-def listed(df, date, buy=True):
+def strayed(df, date, buy=True):
     if isinstance(date, str):
         try: date = datetime.strptime(date, "%Y%m%d")
         except: pass
