@@ -263,7 +263,8 @@ h = py"pd.Series($pv.cumsum() / $y['Volume'].cumsum(), index=$y.index)"
 setproperty!(h, "name", "VWAP")
 end
 
-function dFetch(c::Signed, adhoc::Bool=false)
+import Base.fetch
+function fetch(c::Signed, adhoc::Bool=false)
 function internal(code::Signed, start_from=py"start")
 q_str = "SELECT date, open, high, low, close, volume FROM records WHERE eid=" * string(code) * " AND date>'" * string(start_from) * "'"
 pp2f(py"pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])", "capitalize")
@@ -304,6 +305,13 @@ sort!(unique!(hdr))
 end
 
 function compose(code::Any=entities())
+function grab(c::Signed)
+e = fetch(c)
+r = rsi(e); a = atr(e); x = adx(e).ADX14.diff()
+ph = py"pd.concat([$r, $(e.High.sub(e.Low)), $e.Close.diff(), $a, $x], axis=1)"
+setproperty!(ph, "columns", ["RSI", "dHL", "dpC", "ATR", "dADX"])
+return ph
+end
 cl = []
 if typeof(code) <: Array
 for c in code
@@ -312,12 +320,8 @@ end
 end
 if typeof(code) <: Signed; push!(cl, code); end
 pl = []
-for c in cl
-e = dFetch(c)
-r = rsi(e); a = atr(e); x = adx(e).ADX14.diff()
-ph = py"pd.concat([$r, $(e.High.sub(e.Low)), $e.Close.diff(), $a, $x], axis=1)"
-setproperty!(ph, "columns", ["RSI", "dHL", "dpC", "ATR", "dADX"])
-push!(pl, ph)
+@sync for c in cl
+@async push!(pl, grab(c))
 end
 py"pd.concat($pl, keys=$cl, names=['Code', 'Data'], axis=1)"
 end
@@ -342,7 +346,7 @@ end
 
 function data_factory(x::Any, adhoc::Bool=false, dt::Any=nothing; date::Any=dt)
 if ~(typeof(x) <: PyObject)
-if typeof(x) <: Signed; x = py"platform" == "linux" ? dFetch(x, adhoc) : dFetch(x, false); end
+if typeof(x) <: Signed; x = py"platform" == "linux" ? fetch(x, adhoc) : fetch(x, false); end
 end
 if typeof(date) <: Nothing; date = get(x.index, length(x) -1); end
 y = py"$x.loc[:$date]"
