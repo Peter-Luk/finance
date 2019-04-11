@@ -322,10 +322,10 @@ if typeof(c) <: Signed; push!(cl, c); end
 end
 end
 if typeof(code) <: Signed; push!(cl, code); end
-c1 = Channel(length(cl))
-c2 = Channel(length(cl))
+c1 = Channel{Signed}(length(cl))
+c2 = Channel{PyObject}(length(cl))
 pl = []
-for c in cl; put!(c1, c); end
+foreach(c->put!(c1,c),cl)
 for c in cl; @async grab(); end
 for c in cl; push!(pl, take!(c2)); end
 py"pd.concat($pl, keys=$cl, names=['Code', 'Data'], axis=1)"
