@@ -328,6 +328,7 @@ pl = []
 foreach(c->put!(c1,c),cl)
 for c in cl; @async grab(); end
 for c in cl; push!(pl, take!(c2)); end
+close(c1); close(c2)
 py"pd.concat($pl, keys=$cl, names=['Code', 'Data'], axis=1)"
 end
 
