@@ -1,6 +1,5 @@
 include("pref.jl")
 using Pandas
-using Threads
 py"""
 import pandas as pd
 import sqlalchemy as sqa
