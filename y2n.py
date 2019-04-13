@@ -3,6 +3,7 @@ pd, np, db, yf, gr, datetime, sleep = pref.y2n
 from utilities import filepath, mtf
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
+import asyncio
 
 class Futures(AF, Viewer):
     periods = pref.periods['Futures']
@@ -182,11 +183,13 @@ class Equities(AE, Viewer):
             __.drop('Adj Close', 1, inplace=True)
         else:
             from alchemy import AS
-            qtext = f"SELECT date, open, high, low, close, volume FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
+            fields = ['date', 'open', 'high', 'low', 'close', 'volume']
+            sfc = ', '.join(['{} as {}'.format(_, _.capitalize()) for _ in fields])
+            qtext = f"SELECT {sfc} FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
             conn = AS(self._conf['name']).connect
-            __ = pd.read_sql(qtext, conn, index_col='date', parse_dates=['date'])
-            __.columns = [_.capitalize() for _ in __.columns]
-            __.index.name = __.index.name.capitalize()
+            __ = pd.read_sql(qtext, conn, index_col='Date', parse_dates=['Date'])
+            # __.columns = [_.capitalize() for _ in __.columns]
+            # __.index.name = __.index.name.capitalize()
         return __
 
     def mas(self, date=None, period=periods):
@@ -303,12 +306,31 @@ def entities(dbname=None, series=False):
     return res
 
 def compose(code=None):
+    async def a_grab(c):
+        e = await Equities(c)
+        rd = e.data
+        pdhr = pd.concat([e.rsi(), rd.High.sub(rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
+        pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
+        return pdhr
+
+    async def process(clist):
+        # obj = ', '.join([f'a_grab({_:d})' for _ in clist])
+        tmp = await asyncio.gather(a_grab(1), a_grab(5), a_grab(27), a_grab(522))
+        return tmp
+
+    def grab(c):
+        e = Equities(c)
+        rd = e.data
+        pdhr = pd.concat([e.rsi(), rd.High.sub(rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
+        pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
+        return pdhr
+
     if code == None: code = entities(pref.db['Equities']['name'])
-    tlist = []
     if isinstance(code, (int, float)): code = [int(code)]
     if isinstance(code, list):
         try: code = [int(_) for _ in code]
         except: pass
+    """
     for _ in code:
         e = Equities(_)
         rd = e.data
@@ -316,6 +338,12 @@ def compose(code=None):
         pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
         tlist.append(pdhr)
     return pd.concat(tlist, keys=code, names=['Code','Data'], axis=1)
+    """
+    """
+    pl = asyncio.run(process(code))
+    return pd.concat(pl, keys=code, names=['Code','Data'], axis=1)
+    """
+    return pd.concat([grab(_) for _ in code], keys=code, names=['Code','Data'], axis=1)
 
 def strayed(df, date, buy=True):
     if isinstance(date, str):

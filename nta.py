@@ -305,7 +305,7 @@ class Viewer(ONA):
         self.data = None
         del(self.data)
 
-    def mas(self, raw, period):
+    def mas(self, raw, period, date=None):
         if date != None:
             if isinstance(date, str):
                 try: date = datetime.strptime(date, '%Y%m%d')
