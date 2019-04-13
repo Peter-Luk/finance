@@ -306,18 +306,6 @@ def entities(dbname=None, series=False):
     return res
 
 def compose(code=None):
-    async def a_grab(c):
-        e = await Equities(c)
-        rd = e.data
-        pdhr = pd.concat([e.rsi(), rd.High.sub(rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
-        pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
-        return pdhr
-
-    async def process(clist):
-        # obj = ', '.join([f'a_grab({_:d})' for _ in clist])
-        tmp = await asyncio.gather(a_grab(1), a_grab(5), a_grab(27), a_grab(522))
-        return tmp
-
     def grab(c):
         e = Equities(c)
         rd = e.data
@@ -330,19 +318,6 @@ def compose(code=None):
     if isinstance(code, list):
         try: code = [int(_) for _ in code]
         except: pass
-    """
-    for _ in code:
-        e = Equities(_)
-        rd = e.data
-        pdhr = pd.concat([e.rsi(), rd.High.sub(rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
-        pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
-        tlist.append(pdhr)
-    return pd.concat(tlist, keys=code, names=['Code','Data'], axis=1)
-    """
-    """
-    pl = asyncio.run(process(code))
-    return pd.concat(pl, keys=code, names=['Code','Data'], axis=1)
-    """
     return pd.concat([grab(_) for _ in code], keys=code, names=['Code','Data'], axis=1)
 
 def strayed(df, date, buy=True):
