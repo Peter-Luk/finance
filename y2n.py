@@ -293,12 +293,12 @@ def entities(dbname=None, series=False):
     pF, pE = pref.db['Futures'], pref.db['Equities']
     if not dbname: dbname = pE['name']
     engine = db.create_engine(f'sqlite:///{filepath(dbname)}')
-    conn = engine.connect()
+    meta, conn = db.MetaData(), engine.connect()
     if dbname == pF['name']:
-        rc = db.Table(pF['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        rc = db.Table(pF['table'], meta, autoload=True, autoload_with=engine).columns
         query = db.select([rc.code.distinct()]).order_by(db.asc(rc.code))
     if dbname == pE['name']:
-        rc = db.Table(pE['table'], db.MetaData(), autoload=True, autoload_with=engine).columns
+        rc = db.Table(pE['table'], meta, autoload=True, autoload_with=engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
     __ = [_[0] for _ in conn.execute(query).fetchall()]
     res = [__ for __ in [_[0] for _ in conn.execute(query).fetchall()] if __ not in pE['exclude']]
