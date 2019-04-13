@@ -3,7 +3,6 @@ pd, np, db, yf, gr, datetime, sleep = pref.y2n
 from utilities import filepath, mtf
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
-import asyncio
 
 class Futures(AF, Viewer):
     periods = pref.periods['Futures']
