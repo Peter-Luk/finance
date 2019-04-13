@@ -266,8 +266,8 @@ end
 import Base.fetch
 function fetch(c::Signed, adhoc::Bool=false)
 function internal(code::Signed, start_from=py"start")
-q_str = "SELECT date, open, high, low, close, volume FROM records WHERE eid=" * string(code) * " AND date>'" * string(start_from) * "'"
-pp2f(py"pd.read_sql($q_str, engine, index_col='date', parse_dates=['date'])", "capitalize")
+q_str = "SELECT date as Date, open as Open, high as High, low as Low, close as Close, volume as Volume FROM records WHERE eid=" * string(code) * " AND date>'" * string(start_from) * "'"
+py"pd.read_sql($q_str, engine, index_col='Date', parse_dates=['Date'])"
 end
 
 function yahoo(code::Signed, start_from=py"start")
