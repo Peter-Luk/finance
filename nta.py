@@ -344,7 +344,8 @@ class Viewer(ONA):
         _ = pd.DataFrame({date:hdr})
         return _
 
-def stepper(x, period, pdSeries=None):
+# def stepper(x, period, pdSeries=None):
+def stepper(x, period, addition=None):
     data, hdr, _, __ = x.values, [], 0, 0
     while _ < data.size:
         val = np.nan
@@ -353,9 +354,10 @@ def stepper(x, period, pdSeries=None):
                 val = np.array(data[_ - period: _]).mean()
             if __ > period:
                 val = (hdr[-1] * (period - 1) + data[_]) / period
-                try:
-                    if pdSeries.any(): val = hdr[-1] + pdSeries[_] * (data[_] - hdr[-1])
-                except: pass
+                # try:
+                #     if pdSeries.any(): val = hdr[-1] + pdSeries[_] * (data[_] - hdr[-1])
+                # except: pass
+                if isinstance(addition, pd.Series): val = hdr[-1] + addition[_] * (data[_] - hdr[-1])
             __ += 1
         hdr.append(val)
         _ += 1
