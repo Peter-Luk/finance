@@ -1,4 +1,5 @@
 import pref
+import asyncio, aiosqlite
 pd, np, db, yf, gr, datetime, sleep = pref.y2n
 from utilities import filepath, mtf
 from nta import Viewer, hsirnd
@@ -337,3 +338,23 @@ def strayed(df, date, buy=True):
             if rl:
                 hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in rl])
                 return pd.Series(hdr, index=rl, name='sell')
+
+async def aio_fetch(c, return_type='dataframe'):
+    dbpath = filepath(pref.db['Equities']['name'])
+    db = await aiosqlite.connect(dbpath)
+    db.row_factory = aiosqlite.Row
+    fields = ['date','open','high','low','close','volume']
+    sfc = ', '.join(['{} as {}'.format(_, _.capitalize()) for _ in fields])
+    qstr1 = f"select {sfc} from {pref.db['Equities']['table']} where eid={c:d} order by date asc"
+    cursor = await db.execute(qstr1)
+    rows = await cursor.fetchall()
+    await cursor.close()
+    await db.close()
+    if return_type.lower() == 'dataframe':
+        pdate = [datetime.strptime(_['Date'], '%Y-%m-%d') for _ in rows]
+        pr = pd.DataFrame(rows, index=pdate)
+        pr.drop(0, axis=1, inplace=True)
+        pr.index.name = fields[0].capitalize()
+        pr.columns = [_.capitalize() for _ in fields[1:]]
+        return await asyncio.sleep(0, result=pr)
+    return await asyncio.sleep(0, result=rows)
