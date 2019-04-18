@@ -1,5 +1,6 @@
 import multiprocessing
 from y2n import Equities, entities, pref, datetime, gr, pd
+from tqdm import tqdm
 
 def grab(c):
     e = Equities(c)
@@ -14,7 +15,7 @@ def mav(c):
 
 def compose(code=entities(pref.db['Equities']['name'])):
     with multiprocessing.Pool() as pool:
-        r = pool.map(grab, code)
+        r = pool.map(grab, tqdm(code))
     return pd.concat(r, keys=code, names=['Code', 'Data'], axis=1)
 
 def strayed(df, date, buy=True):
@@ -29,13 +30,13 @@ def strayed(df, date, buy=True):
             rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
             if rl:
                 with multiprocessing.Pool() as pool:
-                    r = pool.map(mav, rl)
+                    r = pool.map(mav, tqdm(rl))
                     hdr.extend([_.loc["buy", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='buy')
         else:
             rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
             if rl:
                 with multiprocessing.Pool() as pool:
-                    r = pool.map(mav, rl)
+                    r = pool.map(mav, tqdm(rl))
                     hdr.extend([_.loc["sell", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='sell')

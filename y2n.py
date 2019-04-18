@@ -1,7 +1,7 @@
 import pref
-import asyncio, aiosqlite
 pd, np, db, yf, gr, datetime, sleep = pref.y2n
 from utilities import filepath, mtf
+from tqdm import tqdm
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
 
@@ -318,7 +318,7 @@ def compose(code=None):
     if isinstance(code, list):
         try: code = [int(_) for _ in code]
         except: pass
-        return pd.concat([grab(_) for _ in code], keys=code, names=['Code','Data'], axis=1)
+        return pd.concat([grab(_) for _ in tqdm(code)], keys=code, names=['Code','Data'], axis=1)
 
 def strayed(df, date, buy=True):
     if isinstance(date, str):
@@ -331,38 +331,10 @@ def strayed(df, date, buy=True):
         if buy:
             rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
             if rl:
-                hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["buy", date] for _ in rl])
+                hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["buy", date] for _ in tqdm(rl)])
                 return pd.Series(hdr, index=rl, name='buy')
         else:
             rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
             if rl:
-                hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in rl])
+                hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in tqdm(rl)])
                 return pd.Series(hdr, index=rl, name='sell')
-
-async def aio_compose(c=None):
-    dE = pref.db['Equities']
-    dbpath = filepath(dE['name'])
-    db = await aiosqlite.connect(dbpath)
-    db.row_factory = aiosqlite.Row
-    fields = ['date','open','high','low','close','volume']
-    sfc = ', '.join(['{} as {}'.format(_, _.capitalize()) for _ in fields])
-    if c == None: code = entities(dE['name'])
-    if isinstance(c, (int, float)): code = [int(c)]
-    if isinstance(c, (list, tuple)): code = list(c)
-    hdr, pE = [], pref.periods['Equities']
-    for x in code:
-        qstr1 = f"select {sfc} from {dE['table']} where eid={x:d} order by date asc"
-        cursor = await db.execute(qstr1)
-        rows = await cursor.fetchall()
-        await cursor.close()
-        pdate = [datetime.strptime(_['Date'], '%Y-%m-%d') for _ in rows]
-        pr = pd.DataFrame(rows, index=pdate)
-        pr.drop(0, axis=1, inplace=True)
-        pr.index.name = fields[0].capitalize()
-        pr.columns = [_.capitalize() for _ in fields[1:]]
-        pV = Viewer(pr)
-        pdhr = pd.concat([pV.rsi(pr,pE['rsi']), pr.High.sub(pr.Low), pr.Close.diff(), pV.atr(pr,pE['atr']), pV.adx(pr,pE['adx'])[f"ADX{pE['adx']}"].diff()], axis=1)
-        pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
-        hdr.append(pdhr)
-    await db.close()
-    return await asyncio.sleep(0, result=pd.concat(hdr, keys=code, names=['Code','Data'], axis=1))
