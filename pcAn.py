@@ -29,17 +29,17 @@ def strayed(df, date, buy=True):
         hdr = []
         if buy:
             rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
+            al = [(_, date) for _ in rl]
             if rl:
                 with multiprocessing.Pool() as pool:
-                    # r = pool.map(mav, tqdm(rl))
-                    r = list(tqdm(pool.imap(lambda x:mav(x, date), rl), total=len(rl)))
+                    r = pool.starmap(mav, al)
                     hdr.extend([_.loc["buy", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='buy')
         else:
             rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
+            al = [(_, date) for _ in rl]
             if rl:
                 with multiprocessing.Pool() as pool:
-                    # r = pool.map(mav, tqdm(rl))
-                    r = list(tqdm(pool.imap(lambda x:mav(x, date), rl), total=len(rl)))
+                    r = pool.starmap(mav, al)
                     hdr.extend([_.loc["sell", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='sell')
