@@ -1,7 +1,6 @@
 import pref
-pd, np, db, yf, gr, datetime, sleep = pref.y2n
+pd, np, db, yf, gr, datetime, tqdm, sleep = pref.y2n
 from utilities import filepath, mtf
-from tqdm import tqdm
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
 

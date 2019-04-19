@@ -1,6 +1,5 @@
 import multiprocessing
-from y2n import Equities, entities, pref, datetime, gr, pd
-from tqdm import tqdm
+from y2n import Equities, entities, pref, datetime, tqdm, gr, pd
 
 def grab(c):
     e = Equities(c)
@@ -29,16 +28,16 @@ def strayed(df, date, buy=True):
         hdr = []
         if buy:
             rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
-            al = [(_, date) for _ in rl]
             if rl:
+                al = [(_, date) for _ in rl]
                 with multiprocessing.Pool() as pool:
                     r = pool.starmap(mav, al)
                     hdr.extend([_.loc["buy", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='buy')
         else:
             rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
-            al = [(_, date) for _ in rl]
             if rl:
+                al = [(_, date) for _ in rl]
                 with multiprocessing.Pool() as pool:
                     r = pool.starmap(mav, al)
                     hdr.extend([_.loc["sell", date] for _ in r])
