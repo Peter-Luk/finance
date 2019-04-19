@@ -15,7 +15,8 @@ def mav(c):
 
 def compose(code=entities(pref.db['Equities']['name'])):
     with multiprocessing.Pool() as pool:
-        r = pool.map(grab, tqdm(code))
+        # r = pool.map(grab, tqdm(code))
+        r = list(tqdm.tqdm(p.imap(grab, code), total=len(code)))
     return pd.concat(r, keys=code, names=['Code', 'Data'], axis=1)
 
 def strayed(df, date, buy=True):
