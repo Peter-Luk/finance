@@ -9,8 +9,8 @@ def grab(c):
     pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
     return pdhr
 
-def mav(c):
-    e = Equities(c).maverick(unbound=False)
+def mav(c, date):
+    e = Equities(c).maverick(date, unbound=False)
     return e
 
 def compose(code=entities(pref.db['Equities']['name'])):
@@ -32,7 +32,7 @@ def strayed(df, date, buy=True):
             if rl:
                 with multiprocessing.Pool() as pool:
                     # r = pool.map(mav, tqdm(rl))
-                    r = list(tqdm(pool.imap(mav, rl), total=len(rl)))
+                    r = list(tqdm(pool.imap(lambda x:mav(x, date), rl), total=len(rl)))
                     hdr.extend([_.loc["buy", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='buy')
         else:
@@ -40,6 +40,6 @@ def strayed(df, date, buy=True):
             if rl:
                 with multiprocessing.Pool() as pool:
                     # r = pool.map(mav, tqdm(rl))
-                    r = list(tqdm(pool.imap(mav, rl), total=len(rl)))
+                    r = list(tqdm(pool.imap(lambda x:mav(x, date), rl), total=len(rl)))
                     hdr.extend([_.loc["sell", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='sell')
