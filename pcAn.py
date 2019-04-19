@@ -16,7 +16,7 @@ def mav(c):
 def compose(code=entities(pref.db['Equities']['name'])):
     with multiprocessing.Pool() as pool:
         # r = pool.map(grab, tqdm(code))
-        r = list(tqdm.tqdm(p.imap(grab, code), total=len(code)))
+        r = list(tqdm(pool.imap(grab, code), total=len(code)))
     return pd.concat(r, keys=code, names=['Code', 'Data'], axis=1)
 
 def strayed(df, date, buy=True):
@@ -31,13 +31,15 @@ def strayed(df, date, buy=True):
             rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
             if rl:
                 with multiprocessing.Pool() as pool:
-                    r = pool.map(mav, tqdm(rl))
+                    # r = pool.map(mav, tqdm(rl))
+                    r = list(tqdm(pool.imap(mav, rl), total=len(rl)))
                     hdr.extend([_.loc["buy", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='buy')
         else:
             rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
             if rl:
                 with multiprocessing.Pool() as pool:
-                    r = pool.map(mav, tqdm(rl))
+                    # r = pool.map(mav, tqdm(rl))
+                    r = list(tqdm(pool.imap(mav, rl), total=len(rl)))
                     hdr.extend([_.loc["sell", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='sell')
