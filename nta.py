@@ -330,7 +330,7 @@ class Viewer(ONA):
     def maverick(self, raw, period, date, unbound=False, exclusive=True):
         if date != None:
             if isinstance(date, str):
-                try: date = datetime.strptime(date, '%Y%m%d')
+                try: date = datetime.strptime(date, '%Y%m%d').date()
                 except: pass
             if isinstance(date, datetime):
                 try: raw = raw.loc[:date]
