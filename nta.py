@@ -328,6 +328,13 @@ class Viewer(ONA):
         return _
 
     def maverick(self, raw, period, date, unbound=False, exclusive=True):
+        if date != None:
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
         bare = self.ratr(raw, period['atr'], date)
         boundary = self.ovr(raw, period, date).T
         close = raw.Close.loc[date]
