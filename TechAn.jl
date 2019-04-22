@@ -305,15 +305,20 @@ sort!(unique!(hdr))
 end
 
 function compose(code::Any=entities())
+function grab(c)
+#=
 function grab()
 while true
 c = take!(c1)
+=#
 e = fetch(c)
 r = rsi(e); a = atr(e); x = adx(e).ADX14.diff()
 ph = py"pd.concat([$r, $(e.High.sub(e.Low)), $e.Close.diff(), $a, $x], axis=1)"
 setproperty!(ph, "columns", ["RSI", "dHL", "dpC", "ATR", "dADX"])
+#=
 put!(c2, ph)
 end
+=#
 end
 cl = []
 if typeof(code) <: Array
@@ -322,6 +327,7 @@ if typeof(c) <: Signed; push!(cl, c); end
 end
 end
 if typeof(code) <: Signed; push!(cl, code); end
+#=
 c1 = Channel{Signed}(length(cl))
 c2 = Channel{PyObject}(length(cl))
 pl = []
@@ -329,6 +335,8 @@ foreach(c->put!(c1,c),cl)
 for c in cl; @async grab(); end
 for c in cl; push!(pl, take!(c2)); end
 close(c1); close(c2)
+=#
+pl = pmap(grab, cl, batch_size=ceil(Int, length(cl)/nworkers()))
 py"pd.concat($pl, keys=$cl, names=['Code', 'Data'], axis=1)"
 end
 
