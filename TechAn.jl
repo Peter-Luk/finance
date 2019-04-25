@@ -1,3 +1,5 @@
+include("pandas_helper.jl")
+#=
 include("pref.jl")
 using Pandas
 py"""
@@ -17,6 +19,7 @@ dir_ += f'/data/sqlite3/{db_name}'
 path = pathlib.Path(dir_)
 engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
 """
+=#
 Eperiod = periods["Equities"]
 
 function rdf(o::PyObject, s::Signed, e::Signed=0)
