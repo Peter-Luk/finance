@@ -199,7 +199,7 @@ class Equities(AE, Viewer):
         if date == None: date = self._date
         return self.view.idrs(self.data, period. date)
 
-    def sma(self, data=None, period=periods['simple'], req_field='c'):
+    def sma(self, date=None, period=periods['simple'], req_field='c'):
         if date == None: date = self._date
         return self.view.ma(self.data, period, 's', req_field, date).map(hsirnd)
 
