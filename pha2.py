@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, MetaData, Table, select, insert, update, and_
 from utilities import filepath, datetime
+import pandas as pd
 
 class Record(object):
     def __init__(self, sid, iid=None):
@@ -11,10 +12,24 @@ class Record(object):
             self._table = Table('records', MetaData(), autoload=True, autoload_with=engine)
             self._columns = self._table.columns
             self._connect = engine.connect()
+            self.data = self.__pandas_data()
 
     def __del__(self):
-        self.sid = engine = self._table = self._columns = self._connect = None
-        del(self.sid, engine, self._table, self._columns, self._connect)
+        self.sid = engine = self._table = self._columns = self._connect = self.data = None
+        del(self.sid, engine, self._table, self._columns, self._connect, self.data)
+
+    def __pandas_data(self):
+        qstr = f"SELECT date, time, sys, dia, pulse FROM records WHERE subject_id={self.sid}"
+        rd = pd.read_sql(qstr, self._connect)
+        def condt(a):
+            try:
+                tmp = datetime.strptime(f'{a[0]} {a[1]}', '%Y-%m-%d %H:%M:%S.%f')
+            except:
+                tmp = datetime.strptime(f'{a[0]} {a[1]}', '%Y-%m-%d %H:%M:%S')
+            return tmp
+        rd.index = rd.apply(condt, axis=1)
+        rd.drop(['date', 'time'], axis=1, inplace=True)
+        return rd
 
     def append(self, *args):
         if args:
