@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, MetaData, Table, select, insert, update, and_
 from utilities import filepath, datetime
+from datetime import time
 import pandas as pd
 
 class Record(object):
@@ -23,13 +24,20 @@ class Record(object):
     def grab(self):
         qstr = f"SELECT date, time, sys, dia, pulse FROM records WHERE subject_id={self.sid}"
         rd = pd.read_sql(qstr, self._connect)
-        def condt(a):
+        def stime(_):
+            if isinstance(_, str):
+                try:
+                    __ = datetime.strptime(_, '%H:%M:%S').time()
+                except:
+                    __ = datetime.strptime(_, '%H%M%S').time()
+            return __
+        def comdt(_):
             try:
-                tmp = datetime.strptime(f'{a[0]} {a[1]}', '%Y-%m-%d %H:%M:%S.%f')
+                __ = datetime.strptime(f'{_[0]} {_[1]}', '%Y-%m-%d %H:%M:%S.%f')
             except:
-                tmp = datetime.strptime(f'{a[0]} {a[1]}', '%Y-%m-%d %H:%M:%S')
-            return tmp
-        rd.index = rd.apply(condt, axis=1)
+                __ = datetime.strptime(f'{_[0]} {_[1]}', '%Y-%m-%d %H:%M:%S')
+            return __
+        rd.index = rd.apply(comdt, axis=1)
         rd.drop(['date', 'time'], axis=1, inplace=True)
         return rd
 
