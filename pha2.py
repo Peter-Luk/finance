@@ -12,13 +12,15 @@ class Record(object):
             self._table = Table('records', MetaData(), autoload=True, autoload_with=engine)
             self._columns = self._table.columns
             self._connect = engine.connect()
-            self.data = self.__pandas_data()
+
+    def __call__(self):
+        return self.grab()
 
     def __del__(self):
-        self.sid = engine = self._table = self._columns = self._connect = self.data = None
-        del(self.sid, engine, self._table, self._columns, self._connect, self.data)
+        self.sid = engine = self._table = self._columns = self._connect = None
+        del(self.sid, engine, self._table, self._columns, self._connect)
 
-    def __pandas_data(self):
+    def grab(self):
         qstr = f"SELECT date, time, sys, dia, pulse FROM records WHERE subject_id={self.sid}"
         rd = pd.read_sql(qstr, self._connect)
         def condt(a):
