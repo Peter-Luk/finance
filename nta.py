@@ -351,7 +351,6 @@ class Viewer(ONA):
         _ = pd.DataFrame({date:hdr})
         return _
 
-# def stepper(x, period, pdSeries=None):
 def stepper(x, period, addition=None):
     data, hdr, _, __ = x.values, [], 0, 0
     while _ < data.size:
@@ -361,9 +360,6 @@ def stepper(x, period, addition=None):
                 val = np.array(data[_ - period: _]).mean()
             if __ > period:
                 val = (hdr[-1] * (period - 1) + data[_]) / period
-                # try:
-                #     if pdSeries.any(): val = hdr[-1] + pdSeries[_] * (data[_] - hdr[-1])
-                # except: pass
                 if isinstance(addition, pd.Series): val = hdr[-1] + addition[_] * (data[_] - hdr[-1])
             __ += 1
         hdr.append(val)
@@ -375,7 +371,6 @@ def grabber(x, initial='c'):
     if initial.lower() in ['h', 'high']: hdr = x.High
     if initial.lower() in ['l', 'low']: hdr = x.Low
     if initial.lower() in ['o', 'open']: hdr = x.Open
-    # if initial.lower() in ['hl', 'lh', 'range']: hdr = x.drop(['Open', 'Close', 'Volume'], 1).mean(axis=1)
     if initial.lower() in ['hl', 'lh', 'range']: hdr = x[['High', 'Low']].mean(axis=1)
     if initial.lower() in ['ohlc', 'full', 'all']: hdr = x.drop('Volume', 1).mean(axis=1)
     return hdr
