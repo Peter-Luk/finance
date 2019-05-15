@@ -340,4 +340,4 @@ def strayed(df, date, buy=True):
 
 def adhoc(__):
     _ = Equities(__, True)
-    print(f'{_}\n{_()}\{_.ratr()}')
+    print(f'{_}\n{_()}\n{_.ratr()}')
