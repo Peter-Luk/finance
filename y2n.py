@@ -337,3 +337,7 @@ def strayed(df, date, buy=True):
             if rl:
                 hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in tqdm(rl)])
                 return pd.Series(hdr, index=rl, name='sell')
+
+def adhoc(__):
+    _ = Equities(__, True)
+    print(f'{_}\n{_()}\{_.ratr()}')
