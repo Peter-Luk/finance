@@ -341,3 +341,10 @@ def strayed(df, date, buy=True):
 def adhoc(__):
     _ = Equities(__, True)
     print(f'{_}\n{_()}\n{_.ratr()}')
+
+def summary(__):
+    ae = entities()
+    if not isinstance(__, (list, tuple)):__ = list(__)
+    for ___ in [_ for _ in __ if _ in ae]:
+        _ = Equities(___)
+        print(f'\n{_}\n{_()}\n{_.ratr()}')
