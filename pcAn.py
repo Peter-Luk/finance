@@ -43,12 +43,13 @@ def strayed(df, date, buy=True):
                     hdr.extend([_.loc["sell", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='sell')
 
-def printer(__):
+def press(__):
     _ = Equities(__)
-    print(f'{_}\n{_()}\n{_.ratr()}\n')
+    return f'{_}\n{_()}\n{_.ratr()}'
 
 def summary(__):
     ae = entities()
     if not isinstance(__, (tuple, list)): __ = list(__)
     with multiprocessing.Pool() as pool:
-        pool.map(printer, [_ for _ in __ if _ in ae])
+        _ = pool.map(press, [_ for _ in __ if _ in ae])
+    print('\n'.join(_))
