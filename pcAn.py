@@ -49,7 +49,7 @@ def press(__):
 
 def summary(__):
     ae = entities()
-    if not isinstance(__, (tuple, list)): __ = list(__)
+    if not isinstance(__, (tuple, list)): __ = [__]
     with multiprocessing.Pool() as pool:
         _ = pool.map(press, [_ for _ in __ if _ in ae])
     print('\n'.join(_))
