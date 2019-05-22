@@ -1,25 +1,4 @@
 include("pandas_helper.jl")
-#=
-include("pref.jl")
-using Pandas
-py"""
-import pandas as pd
-import sqlalchemy as sqa
-import pathlib
-from scipy.constants import golden_ratio
-from datetime import datetime
-start = datetime(datetime.today().year - 4, 12, 31).date()
-dir_, db_name, platform = '~', db['Equities']['name'], pathlib.sys.platform
-if platform in ['linux']:
-    import fix_yahoo_finance as yf
-    dir_ = '~/storage/shared'
-    if 'EXTERNAL_STORAGE' in pathlib.os.environ.keys():
-        dir_ = '~/storage/external-1'
-dir_ += f'/data/sqlite3/{db_name}'
-path = pathlib.Path(dir_)
-engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
-"""
-=#
 Eperiod = periods["Equities"]
 
 function rdf(o::PyObject, s::Signed, e::Signed=0)
@@ -367,6 +346,12 @@ if typeof(x) <: Signed; x = py"platform" == "linux" ? fetch(x, adhoc) : fetch(x,
 end
 if typeof(date) <: Nothing; date = get(x.index, length(x) -1); end
 y = py"$x.loc[:$date]"
+end
+
+function vodec(x::PyObject)
+s1 = get(x, x.dHL>(x.dHL.mean()+x.dHL.std()))
+s2 = get(s1, s1.dpC<-abs(s1.dpC.mean()))
+get(s2, s2.dADX>(s2.dADX.mean()+s2.dADX.std()))
 end
 
 exist(c::Signed) = c in entities()
