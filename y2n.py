@@ -183,7 +183,7 @@ class Equities(AE, Viewer):
         else:
             from alchemy import AS
             fields = ['date', 'open', 'high', 'low', 'close', 'volume']
-            sfc = ', '.join(['{} as {}'.format(_, _.capitalize()) for _ in fields])
+            sfc = ', '.join([f'{_} as {_.capitalize()}' for _ in fields])
             qtext = f"SELECT {sfc} FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
             conn = AS(self._conf['name']).connect
             __ = pd.read_sql(qtext, conn, index_col='Date', parse_dates=['Date'])
