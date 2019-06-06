@@ -369,13 +369,11 @@ def stepper(x, period, addition=None):
     return pd.Series(hdr, index=x.index)
 
 def grabber(x, initial='c'):
-    if initial.lower() in ['c', 'close']: hdr = x.Close
-    if initial.lower() in ['h', 'high']: hdr = x.High
-    if initial.lower() in ['l', 'low']: hdr = x.Low
-    if initial.lower() in ['o', 'open']: hdr = x.Open
-    if initial.lower() in ['hl', 'lh', 'range']: hdr = x[['High', 'Low']].mean(axis=1)
-    if initial.lower() in ['ohlc', 'full', 'all']: hdr = x.drop('Volume', 1).mean(axis=1)
-    return hdr
+    fdict = {'c':'Close', 'h':'High', 'l':'Low', 'o':'Open'}
+    if initial.lower() in fdict.keys(): return eval(f'x.{fdict[initial.lower()]}')
+    if initial.capitalize() in fdict.values(): return eval(f'x.{initial.capitalize()}')
+    if initial.lower() in ['hl', 'lh', 'range']: return x[['High', 'Low']].mean(axis=1)
+    if initial.lower() in ['ohlc', 'full', 'all']: return x.drop('Volume', 1).mean(axis=1)
 
 def hsirnd(value):
     if np.isnan(value) or not value > 0: return np.nan
