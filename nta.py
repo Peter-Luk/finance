@@ -356,11 +356,13 @@ def stepper(x, period, addition=None):
     while _ < data.size:
         val = np.nan
         if not np.isnan(data[_]):
-            if __ == period:
-                val = np.array(data[_ - period: _]).mean()
+            # if __ == period:
+            #     val = np.array(data[_ - period: _]).mean()
             if __ > period:
                 val = (hdr[-1] * (period - 1) + data[_]) / period
                 if isinstance(addition, pd.Series): val = hdr[-1] + addition[_] * (data[_] - hdr[-1])
+            elif __ == period:
+                val = np.array(data[_ - period: _]).mean()
             __ += 1
         hdr.append(val)
         _ += 1
