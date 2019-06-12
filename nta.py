@@ -23,8 +23,7 @@ class ONA(object):
         _data = grabber(raw, field_initial)
         if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean()
         if favour.upper() in ['W', 'WEIGHTED']:
-            _ = _data * raw.Volume
-            __ = (_.rolling(period).sum() / raw.Volume.rolling(period).sum())
+            __ = (_data * raw.Volume).rolling(period).sum() / raw.Volume.rolling(period).sum()
         if favour.upper() in ['E', 'EXPONENTIAL']:
             __ = stepper(_data, period)
         __.name = f'{favour}ma{period:02d}'.upper()
