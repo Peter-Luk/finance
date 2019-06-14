@@ -1,6 +1,7 @@
 import pref
 pd, np, datetime, gr = pref.nta
 from utilities import gslice
+# from numba import jit
 
 class ONA(object):
     def __init__(self, data, date=datetime.today().date()):
@@ -350,6 +351,7 @@ class Viewer(ONA):
         _ = pd.DataFrame({date:hdr})
         return _
 
+# @jit(nopython=True)
 def stepper(x, period, addition=None):
     data, hdr, _, __ = x.values, [], 0, 0
     while _ < data.size:
@@ -359,7 +361,9 @@ def stepper(x, period, addition=None):
             #     val = np.array(data[_ - period: _]).mean()
             if __ > period:
                 val = (hdr[-1] * (period - 1) + data[_]) / period
-                if isinstance(addition, pd.Series): val = hdr[-1] + addition[_] * (data[_] - hdr[-1])
+                if isinstance(addition, pd.Series):
+                    an = addition.values
+                    val = hdr[-1] + an[_] * (data[_] - hdr[-1])
             elif __ == period:
                 val = np.array(data[_ - period: _]).mean()
             __ += 1
