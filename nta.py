@@ -352,23 +352,42 @@ class Viewer(ONA):
         return _
 
 # @jit(nopython=True)
-def stepper(x, period, addition=None):
+def _step(x, period):
     data, hdr, _, __ = x.values, [], 0, 0
     while _ < data.size:
         val = np.nan
         if not np.isnan(data[_]):
-            # if __ == period:
-            #     val = np.array(data[_ - period: _]).mean()
             if __ > period:
                 val = (hdr[-1] * (period - 1) + data[_]) / period
-                if isinstance(addition, pd.Series):
-                    an = addition.values
-                    val = hdr[-1] + an[_] * (data[_] - hdr[-1])
             elif __ == period:
                 val = np.array(data[_ - period: _]).mean()
             __ += 1
         hdr.append(val)
         _ += 1
+    return hdr
+
+def stepper(x, period, addition=None):
+# def stepper(x, period, addition=np.nan):
+    data, an, hdr, _, __ = x.values, addition, [], 0, 0
+    if isinstance(addition, pd.Series):
+        an = addition.values
+        while _ < data.size:
+            val = np.nan
+            if not np.isnan(data[_]):
+                # if __ == period:
+                #     val = np.array(data[_ - period: _]).mean()
+                if __ > period:
+                    val = (hdr[-1] * (period - 1) + data[_]) / period
+                    if isinstance(addition, pd.Series):
+                    # if not np.isnan(addition):
+                        val = hdr[-1] + an[_] * (data[_] - hdr[-1])
+                elif __ == period:
+                    val = np.array(data[_ - period: _]).mean()
+                __ += 1
+            hdr.append(val)
+            _ += 1
+    else:
+        hdr = _step(x, period)
     return pd.Series(hdr, index=x.index)
 
 def grabber(x, initial='c'):
