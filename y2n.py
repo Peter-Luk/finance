@@ -118,9 +118,9 @@ class Futures(AF, Viewer):
         if date == None: date = self._date
         return self.view.stc(self.data, period, date)
 
-    def ratr(self, date=None, period=periods['atr']):
+    def gratr(self, date=None, period=periods['atr']):
         if date == None: date = self._date
-        return self.view.ratr(self.data, period, date)
+        return self.view.gratr(self.data, period, date)
 
     def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
         if date == None: date = self._date
@@ -263,9 +263,9 @@ class Equities(AE, Viewer):
         if date == None: date = self._date
         return self.view.stc(self.data, period, date)
 
-    def ratr(self, date=None, period=periods['atr']):
+    def gratr(self, date=None, period=periods['atr']):
         if date == None: date = self._date
-        return self.view.ratr(self.data, period, date)
+        return self.view.gratr(self.data, period, date)
 
     def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
         if date == None: date = self._date
@@ -340,11 +340,11 @@ def strayed(df, date, buy=True):
 
 def adhoc(__):
     _ = Equities(__, True)
-    print(f'{_}\n{_()}\n{_.ratr()}')
+    print(f'{_}\n{_()}\n{_.gratr()}')
 
 def summary(__):
     ae = entities()
     if not isinstance(__, (list, tuple)):__ = list(__)
     for ___ in [_ for _ in __ if _ in ae]:
         _ = Equities(___)
-        print(f'\n{_}\n{_()}\n{_.ratr()}')
+        print(f'\n{_}\n{_()}\n{_.gratr()}')
