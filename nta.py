@@ -246,7 +246,7 @@ class ONA(object):
         _.name = 'VWAP'
         return _
 
-    def gratr(self, raw, period, date=None):
+    def gat(self, raw, period, date=None):
         if date != None:
             if isinstance(date, str):
                 try: date = datetime.strptime(date, '%Y%m%d')
@@ -334,7 +334,7 @@ class Viewer(ONA):
             if isinstance(date, datetime):
                 try: raw = raw.loc[:date]
                 except: pass
-        bare = self.gratr(raw, period['atr'], date)
+        bare = self.gat(raw, period['atr'], date)
         boundary = self.ovr(raw, period, date).T
         close = raw.Close.loc[date]
         inside = [_ for _ in bare.tolist() if _ > boundary['Min'].min() and _ < boundary['Max'].max()]

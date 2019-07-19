@@ -45,7 +45,7 @@ def strayed(df, date, buy=True):
 
 def press(__):
     _ = Equities(__)
-    return f'{_}\n{_()}\n{_.gratr()}\n'
+    return f'{_}\n{_()}\n{_.gat()}\n'
 
 def summary(__):
     ae = entities()
