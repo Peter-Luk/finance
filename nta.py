@@ -335,7 +335,7 @@ class Viewer(ONA):
             if isinstance(date, datetime):
                 try: raw = raw.loc[:date]
                 except: pass
-        bare = self.gat(raw, period['atr'], date)
+        bare = self.gat(raw, period['atr'], date).apply(hsirnd, 1).unique()
         boundary = self.ovr(raw, period, date).T
         close = raw.Close.loc[date]
         inside = [_ for _ in bare.tolist() if _ > boundary['Min'].min() and _ < boundary['Max'].max()]
