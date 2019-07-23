@@ -269,7 +269,8 @@ class ONA(object):
         hdr = []
         [hdr.extend(_pgap(_, raw)) for _ in _patr(period, raw, date)]
         hdr.sort()
-        _ = pd.Series(hdr).apply(hsirnd, 1).unique()
+        # _ = pd.Series(hdr).apply(hsirnd, 1).unique()
+        _ = pd.Series(hdr)
         return _
 
     def ovr(self, raw, period, date=None):

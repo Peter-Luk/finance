@@ -120,7 +120,7 @@ class Futures(AF, Viewer):
 
     def gat(self, date=None, period=periods['atr']):
         if date == None: date = self._date
-        return self.view.gat(self.data, period, date)
+        return self.view.gat(self.data, period, date).apply(hsirnd, 1).unique()
 
     def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
         if date == None: date = self._date
@@ -129,6 +129,7 @@ class Futures(AF, Viewer):
 class Equities(AE, Viewer):
     periods = pref.periods['Equities']
     def __init__(self, code, adhoc=False):
+        self.foreign = False
         self._conf = pref.db['Equities']
         if code not in entities(self._conf['name']): adhoc = True
         self.code = code
@@ -143,8 +144,8 @@ class Equities(AE, Viewer):
         self._close = hsirnd(self.data['Close'][-1])
 
     def __del__(self):
-        self._conf = self.rc = self._ae =self.__conn = self.data = self.view = self._date = self._close = None
-        del(self._conf, self.rc, self._ae, self.__conn, self.data, self.view, self._date, self._close)
+        self.foreign = self._conf = self.rc = self._ae =self.__conn = self.data = self.view = self._date = self._close = None
+        del(self.foreign, self._conf, self.rc, self._ae, self.__conn, self.data, self.view, self._date, self._close)
 
     def __call__(self, date=None):
         if date == None: date = self._date
@@ -174,7 +175,11 @@ class Equities(AE, Viewer):
             if code not in [_ for _ in entities(self._conf['name']) if _ not in exclude]: adhoc = True
         if adhoc:
             while adhoc:
-                __ = yf.download(f'{code:04d}.HK', start, group_by='ticker')
+                try:
+                    __ = yf.download(code.upper(), start, group_by='ticker')
+                    self.foreign = True
+                except:
+                    __ = yf.download(f'{code:04d}.HK', start, group_by='ticker')
                 if len(__): adhoc = not adhoc
                 else:
                     print('Retry in 30 seconds')
@@ -265,7 +270,8 @@ class Equities(AE, Viewer):
 
     def gat(self, date=None, period=periods['atr']):
         if date == None: date = self._date
-        return self.view.gat(self.data, period, date)
+        if self.foreign: return self.view.gat(self.data, period, date).round(2).unique()
+        return self.view.gat(self.data, period, date).apply(hsirnd, 1).unique()
 
     def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
         if date == None: date = self._date
