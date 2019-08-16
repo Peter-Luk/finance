@@ -41,6 +41,7 @@ periods = dict(
             atr = 7),
         adx = 7,
         simple = 12,
+        dc = 12,
         apz = 5),
     Equities = dict(
         macd = dict(
@@ -69,6 +70,7 @@ periods = dict(
             atr = 10),
         adx = 14,
         simple = 20,
+        dc = 20,
         apz = 5)
 )
 db = dict(

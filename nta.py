@@ -181,6 +181,28 @@ class ONA(object):
         _.columns = ['Upper', 'Lower']
         return _
 
+    def dc(self, raw, period, date=None):
+        # Donchian Channel
+        if date != None:
+            if isinstance(date, str):
+                try: date = datetime.strptime(date, '%Y%m%d')
+                except: pass
+            if isinstance(date, datetime):
+                try: raw = raw.loc[:date]
+                except: pass
+        pax = raw.High.rolling(period).max()
+        pin = raw.Low.rolling(period).min()
+        # ehl = self.ma(raw, period, 'e', 'hl')
+        # volatility = stepper(ehl, period)
+        # tr = pd.DataFrame([raw.High - raw.Low, (raw.High - raw.Close.shift(1)).abs(), (raw.Low - raw.Close.shift(1)).abs()]).max()
+        #
+        # upper = volatility + tr * gr
+        # lower = volatility - tr * gr
+        # _ = pd.concat([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
+        _ = pd.concat([pax.apply(hsirnd, 1), pin.apply(hsirnd, 1)], axis=1)
+        _.columns = ['Upper', 'Lower']
+        return _
+
     def kc(self, raw, period, date=None):
         if date != None:
             if isinstance(date, str):

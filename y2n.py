@@ -98,6 +98,10 @@ class Futures(AF, Viewer):
         if date == None: date = self._date
         return self.view.apz(self.data, period, date)
 
+    def dc(self, date=None, period=periods['dc']):
+        if date == None: date = self._date
+        return self.view.dc(self.data, period, date)
+
     def kc(self, date=None, period=periods['kc']):
         if date == None: date = self._date
         return self.view.kc(self.data, period, date)
@@ -247,6 +251,10 @@ class Equities(AE, Viewer):
     def apz(self, date=None, period=periods['apz']):
         if date == None: date = self._date
         return self.view.apz(self.data, period, date)
+
+    def dc(self, date=None, period=periods['dc']):
+        if date == None: date = self._date
+        return self.view.dc(self.data, period, date)
 
     def kc(self, date=None, period=periods['kc']):
         if date == None: date = self._date
