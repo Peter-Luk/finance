@@ -344,3 +344,9 @@ Transfer data to first positional argument database 'table_name' (default: 'db_t
         self.conn.cursor().executemany(iqstr, dl)
         self.conn.commit()
         return len(nd)
+
+def cyd(code):
+    import time
+    today425 = datetime.today().replace(hour=16, minute=25, second=0, microsecond=0)
+    while datetime.now() < today425: time.sleep(2)
+    wap(code)
