@@ -349,4 +349,4 @@ def cyd(code):
     import time
     today425 = datetime.today().replace(hour=16, minute=25, second=0, microsecond=0)
     while datetime.now() < today425: time.sleep(2)
-    wap(code)
+    return wap(code)
