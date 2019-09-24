@@ -345,8 +345,8 @@ Transfer data to first positional argument database 'table_name' (default: 'db_t
         self.conn.commit()
         return len(nd)
 
-def cyd(code, start_time=datetime.time(16,25)):
+def cyd(code):
     import datetime, time
-    today425 = datetime.datetime.today().replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0)
+    today425 = datetime.datetime.today().replace(hour=16, minute=25, second=0, microsecond=0)
     while datetime.datetime.now() < today425: time.sleep(2)
     return wap(code)
