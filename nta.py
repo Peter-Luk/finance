@@ -364,7 +364,7 @@ class Viewer(ONA):
         outside = [_ for _ in bare.tolist() if _ not in inside]
         hdr = {'buy':np.nan, 'sell':np.nan}
         # hdr['buy'] = close
-        if inside:
+        if inside != []:
             if close > min(inside): hdr['buy'] = min(inside)
             if close < max(inside): hdr['sell'] = max(inside)
         if unbound:
