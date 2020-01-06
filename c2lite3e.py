@@ -131,7 +131,7 @@ def wap(*args, **kwargs):
 Original obtain daily update thru API (Yahoo) via Pandas DataReader
 but depicted since 0.6, cuurently using 'fix yahoo finance' to scrape data and update 'local' database.
     """
-    ic, aid, period = 0, [_ for _ in get_stored_eid() if _ not in [805]], 20
+    ic, aid, period = 0, [_ for _ in get_stored_eid() if _ not in [805,1828]], 20
     lkw = list(kwargs.keys())
     if 'period' in lkw: period = kwargs['period']
     conn = lite.connect(filepath(db_name))
