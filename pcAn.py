@@ -50,6 +50,10 @@ def press(__):
 def summary(__):
     ae = entities()
     if not isinstance(__, (tuple, list)): __ = [__]
-    with multiprocessing.Pool() as pool:
-        _ = pool.map(press, [_ for _ in __ if _ in ae])
+    try:
+        with multiprocessing.Pool() as pool:
+            _ = pool.map(press, __)
+            # _ = pool.map(press, [_ for _ in __ if _ in ae])
+    except:
+        _ = [press(___) for ___ in __]
     print('\n'.join(_))
