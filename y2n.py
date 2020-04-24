@@ -352,6 +352,10 @@ def strayed(df, date, buy=True):
                 hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in tqdm(rl)])
                 return pd.Series(hdr, index=rl, name='sell')
 
+def _press(__):
+    _ = Equities(__)
+    return f'\n{_}\n{_()}\n{_.gat()}'
+
 def adhoc(__):
     _ = Equities(__, True)
     print(f'{_}\n{_()}\n{_.gat()}')
@@ -359,7 +363,9 @@ def adhoc(__):
 def summary(__):
     ae = entities()
     if not isinstance(__, (list, tuple)):__ = list(__)
-    for ___ in  __:
-    # for ___ in [_ for _ in __ if _ in ae]:
-        _ = Equities(___)
-        print(f'\n{_}\n{_()}\n{_.gat()}')
+    _ = [_press(_) for _ in __]
+    print('\n'.join(_))
+    # for ___ in  __:
+    # # for ___ in [_ for _ in __ if _ in ae]:
+    #     _ = Equities(___)
+    #     print(f'\n{_}\n{_()}\n{_.gat()}')
