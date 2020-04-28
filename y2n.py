@@ -362,10 +362,6 @@ def adhoc(__):
 
 def summary(__):
     ae = entities()
-    if not isinstance(__, (list, tuple)):__ = list(__)
+    if not isinstance(__, (list, tuple)): __ = list(__)
     _ = [_press(_) for _ in __]
     print('\n'.join(_))
-    # for ___ in  __:
-    # # for ___ in [_ for _ in __ if _ in ae]:
-    #     _ = Equities(___)
-    #     print(f'\n{_}\n{_()}\n{_.gat()}')
