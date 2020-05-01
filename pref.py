@@ -86,6 +86,10 @@ db = dict(
         index = 'date',
         freq = 'bi-daily')
 )
+driver = dict(
+    Chrome = 'chromedriver.exe',
+    Firefox = 'geckodriver.exe',
+    Ie = 'IEDriverServer.exe')
 public_holiday[2016] = {1:(1,), 2:(8, 9, 10), 3:(25, 28), 4:(4,), 5:(2,), 6:(9,), 7:(1,), 9:(16,), 10:(10,), 12:(26, 27)}
 public_holiday[2017] = {1:(2, 30, 31), 4:(4, 14, 17), 5:(1, 3, 30), 10:(2, 5), 12:(25, 26)}
 public_holiday[2018] = {1:(1,), 2:(16, 19), 3:(30,), 4:(2, 5), 5:(1, 22), 6:(18,), 7:(2,), 9:(25,), 10:(1, 17), 12:(25, 26)}
