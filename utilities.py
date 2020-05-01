@@ -1,11 +1,18 @@
 import socket
 #from pandas_datareader import data
 import pref
-sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, datetime, reduce = pref.utils
+sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, datetime, driver, reduce = pref.utils
 ph = pref.public_holiday
 
 today = datetime.today()
 year, month, month_string = today.year, today.month, today.strftime('%B')
+
+def driver_path(browser):
+    _ = [str(Path.home())]
+    __ = driver[browser.capitalize()]
+    _.extend(__['path'])
+    _.append(__['name'])
+    return sep.join(_)
 
 def filepath(*args, **kwargs):
     name, file_type, data_path = args[0], 'data', 'sqlite3'
