@@ -4,8 +4,8 @@ from pref import Path, os, driver
 def driver_path(browser):
     _ = [str(Path.home())]
     __ = driver[browser.capitalize()]
-    _.extend(__.path)
-    _.append(__.name)
+    _.extend(__['path'])
+    _.append(__['name'])
     return os.sep.join(_)
 
 # Start Chrome
