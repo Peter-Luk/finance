@@ -1,11 +1,11 @@
 # from selenium import webdriver
 from pref import Path, os, driver
 
-def driver_path(browser, sub_path=['browser','driver']):
-
+def driver_path(browser):
     _ = [str(Path.home())]
-    _.extend(sub_path)
-    _.append(driver[browser.capitalize()])
+    __ = driver[browser.capitalize()]
+    _.extend(__.path)
+    _.append(__.name)
     return os.sep.join(_)
 
 # Start Chrome
