@@ -6,6 +6,17 @@ from tqdm import tqdm
 from pathlib import Path, os, sys, functools
 from time import sleep
 
+driver = dict(
+    Chrome = dict(
+        name = 'chromedriver.exe',
+        path = ['browser', 'driver']),
+    Firefox = dict(
+        name = 'geckodriver.exe',
+        path = ['browser', 'driver']),
+    Ie = dict(
+        name = 'IEDriverServer.exe',
+        path = ['browser', 'driver'])
+)
 # y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, golden_ratio, datetime, tqdm, sleep]
 y2n = [pandas, numpy, sqlalchemy, yfinance, golden_ratio, datetime, tqdm, sleep]
 nta = [pandas, numpy, datetime, golden_ratio]
@@ -85,17 +96,6 @@ db = dict(
         table = 'records',
         index = 'date',
         freq = 'bi-daily')
-)
-driver = dict(
-    Chrome = dict(
-        name = 'chromedriver.exe',
-        path = ['browser', 'driver']),
-    Firefox = dict(
-        name = 'geckodriver.exe',
-        path = ['browser', 'driver']),
-    Ie = dict(
-        name = 'IEDriverServer.exe',
-        path = ['browser', 'driver'])
 )
 public_holiday[2016] = {1:(1,), 2:(8, 9, 10), 3:(25, 28), 4:(4,), 5:(2,), 6:(9,), 7:(1,), 9:(16,), 10:(10,), 12:(26, 27)}
 public_holiday[2017] = {1:(2, 30, 31), 4:(4, 14, 17), 5:(1, 3, 30), 10:(2, 5), 12:(25, 26)}
