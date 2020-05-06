@@ -10,7 +10,8 @@ try:
 except:
     summary = getattr(__import__('trial01'), 'summary')
 
-server_host, server_port = IP('public').address, 80
+server_host, server_port = str(IP()), 80
+# server_host, server_port = IP('public').address, 80
 if len(argv) > 1: server_host = argv[1]
 if platform in ('linux', 'linux2'): server_port = 2080
 cherrypy.config.update({'server.socket_host': server_host,'server.socket_port': server_port})

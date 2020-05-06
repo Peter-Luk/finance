@@ -278,7 +278,8 @@ class IP():
         self.address = self.mode = None
         del self.mode, self.address
 
-    def __call__(self):
+    def __str__(self):
+    # def __call__(self):
         return self.address
 
 def dvs(d):
