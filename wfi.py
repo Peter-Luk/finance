@@ -25,6 +25,15 @@ class WFutures(object):
         self.browser.quit()
         del self.browser
 
+    def confirm(self, tabs=waf()):
+        for _ in [__ for __ in tabs if __ in waf()]:
+            self.browser.switch_to.window(_)
+            t = (_[0] + _[-2] + 'b').lower()
+            exec(f"self.{t}.click()")
+        if tabs == self.window0:
+            self.browser.switch_to.window(tabs)
+            self.eb.click()
+
     def refresh(self, _):
         if _ in waf():
             fields = ['open','high','low','close','volume']
@@ -52,4 +61,14 @@ class WFutures(object):
     def __load(self, tabs):
         for _ in [__ for __ in tabs if __ in waf()]:
             self.browser.execute_script(f"window.open('http://{self.lip}','{_}');")
-            self.refresh(_)
+            fields = ['open','high','low','close','volume']
+            self.browser.switch_to.window(_)
+            for __ in self.browser.find_elements_by_tag_name('option'):
+                if __.text == _:
+                    __.click()
+                    break
+            t = (_[0] + _[-2] + 'b').lower()
+            exec(f"self.{t}=self.browser.find_element_by_tag_name('button')")
+            for __ in fields:
+                t = (_[0] + _[-2] + __[0]).lower()
+                exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
