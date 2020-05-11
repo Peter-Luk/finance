@@ -14,6 +14,7 @@ class WFutures(object):
         self.window0 = self.browser.window_handles[0]
         self.refresh(self.window0)
         self.__load(waf())
+        self.browser.execute_script("window.open('https://web.whatsapp.com','WhatsApp');")
         self.browser.switch_to.window(self.window0)
 
     def __del__(self):
