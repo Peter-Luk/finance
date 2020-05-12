@@ -25,6 +25,18 @@ class WFutures(object):
         self.browser.quit()
         del self.browser
 
+    def closing(self, tab, close, volume):
+        if tab in waf():
+            self.browser.switch_to.window(tab)
+            t = (tab[0] + tab[-2] + 'c').lower()
+            exec(f"self.{t}.clear()")
+            exec(f"self.{t}.send_keys({close})")
+            t = (tab[0] + tab[-2] + 'v').lower()
+            exec(f"self.{t}.clear()")
+            exec(f"self.{t}.send_keys({volume})")
+            self.confirm([tab])
+
+
     def confirm(self, tabs=waf()):
         for _ in [__ for __ in tabs if __ in waf()]:
             self.browser.switch_to.window(_)
