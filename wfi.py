@@ -50,6 +50,7 @@ class WFutures(object):
         if _ in waf():
             fields = ['open','high','low','close','volume']
             self.browser.switch_to.window(_)
+            self.browser.back()
             for __ in self.browser.find_elements_by_tag_name('option'):
                 if __.text == _:
                     __.click()
