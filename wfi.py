@@ -37,7 +37,7 @@ class WFutures(object):
             self.confirm([tab])
 
     def reset(self, tabs=waf()):
-        for _ in [__ for __ in tabs if __ in waf()]
+        for _ in [__ for __ in tabs if __ in waf()]:
             self.browser.switch_to.window(_)
             self.browser.back()
             self.refresh(_)
@@ -47,7 +47,7 @@ class WFutures(object):
             self.refresh(_)
 
     def confirm(self, tabs=waf()):
-        for _ in [__ for __ in tabs if __ in waf()]
+        for _ in [__ for __ in tabs if __ in waf()]:
             self.browser.switch_to.window(_)
             t = (_[0] + _[-2] + 'b').lower()
             exec(f"self.{t}.click()")
