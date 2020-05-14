@@ -46,7 +46,7 @@ class WFutures(object):
             self.browser.back()
             self.refresh(tabs)
 
-    def set_open(self, tab, _):
+    def update_open(self, tab, _):
         if tab in waf():
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'o').lower()
@@ -57,14 +57,14 @@ class WFutures(object):
             self.pivot.clear()
             self.pivot.send_keys(_)
 
-    def set_high(self, tab, _):
+    def update_high(self, tab, _):
         if tab in waf():
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'h').lower()
             exec(f'self.{t}.clear()')
             exec(f'self.{t}.send_keys({_})')
 
-    def set_low(self, tab, _):
+    def update_low(self, tab, _):
         if tab in waf():
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'l').lower()
