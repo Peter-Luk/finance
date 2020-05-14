@@ -46,11 +46,11 @@ class WFutures(object):
             self.browser.back()
             self.refresh(tabs)
 
-    def update_open(self, tab, _):
+    def set_open(self, tab, _):
         if tab in waf():
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'o').lower()
-            exec(f'self.{t}.clear()')
+            # exec(f'self.{t}.clear()')
             exec(f'self.{t}.send_keys({_})')
         if tab == self.window0:
             self.browser.switch_to.window(tab)
