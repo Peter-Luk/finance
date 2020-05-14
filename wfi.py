@@ -25,7 +25,7 @@ class WFutures(object):
         self.browser.quit()
         del self.browser
 
-    def closing(self, tab, close, volume):
+    def close_down(self, tab, close, volume):
         if tab in waf():
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'c').lower()
@@ -34,7 +34,7 @@ class WFutures(object):
             t = (tab[0] + tab[-2] + 'v').lower()
             exec(f"self.{t}.clear()")
             exec(f"self.{t}.send_keys({volume})")
-            self.confirm([tab])
+            self.__cfm([tab])
 
     def reset(self, tabs=waf()):
         for _ in [__ for __ in tabs if __ in waf()]:
@@ -46,7 +46,7 @@ class WFutures(object):
             self.browser.back()
             self.refresh(tabs)
 
-    def confirm(self, tabs=waf()):
+    def __cfm(self, tabs=waf()):
         for _ in [__ for __ in tabs if __ in waf()]:
             self.browser.switch_to.window(_)
             t = (_[0] + _[-2] + 'b').lower()
