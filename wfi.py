@@ -41,10 +41,10 @@ class WFutures(object):
             self.browser.switch_to.window(_)
             self.browser.back()
             self.refresh(_)
-        if _ == self.window[0]:
-            self.browser.switch_to.window(_)
+        if tabs == self.window[0]:
+            self.browser.switch_to.window(tabs)
             self.browser.back()
-            self.refresh(_)
+            self.refresh(tabs)
 
     def confirm(self, tabs=waf()):
         for _ in [__ for __ in tabs if __ in waf()]:
