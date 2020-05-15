@@ -41,7 +41,7 @@ class WFutures(object):
             self.browser.switch_to.window(_)
             self.browser.back()
             self.refresh(_)
-        if tabs == self.window[0]:
+        if tabs == self.window0:
             self.browser.switch_to.window(tabs)
             self.browser.back()
             self.refresh(tabs)
