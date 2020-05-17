@@ -1,7 +1,7 @@
 from utilities import driver_path, waf, mtf, IP
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-preference = 'Firefox'
+lf, preference = waf(), 'Firefox'
 
 class WFutures(object):
     def __init__(self, ip=None, _=None):
@@ -13,7 +13,7 @@ class WFutures(object):
         self.browser.get(f'http://{self.lip}/estimate')
         self.window0 = self.browser.window_handles[0]
         self.refresh(self.window0)
-        self.__load(waf())
+        self.__load(lf)
         self.browser.execute_script("window.open('https://web.whatsapp.com','WhatsApp');")
         self.browser.switch_to.window(self.window0)
 
@@ -26,7 +26,7 @@ class WFutures(object):
         del self.browser
 
     def close_down(self, tab, close, volume):
-        if tab in waf():
+        if tab in lf:
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'c').lower()
             exec(f"self.{t}.clear()")
@@ -36,8 +36,8 @@ class WFutures(object):
             exec(f"self.{t}.send_keys({volume})")
             self.__cfm([tab])
 
-    def reset(self, tabs=waf()):
-        for _ in [__ for __ in tabs if __ in waf()]:
+    def reset(self, tabs=lf):
+        for _ in [__ for __ in tabs if __ in lf]:
             self.browser.switch_to.window(_)
             self.browser.back()
             self.refresh(_)
@@ -47,7 +47,7 @@ class WFutures(object):
             self.refresh(tabs)
 
     def set_open(self, tab, _):
-        if tab in waf():
+        if tab in lf:
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'o').lower()
             # exec(f'self.{t}.clear()')
@@ -58,21 +58,21 @@ class WFutures(object):
             self.pivot.send_keys(_)
 
     def update_high(self, tab, _):
-        if tab in waf():
+        if tab in lf:
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'h').lower()
             exec(f'self.{t}.clear()')
             exec(f'self.{t}.send_keys({_})')
 
     def update_low(self, tab, _):
-        if tab in waf():
+        if tab in lf:
             self.browser.switch_to.window(tab)
             t = (tab[0] + tab[-2] + 'l').lower()
             exec(f'self.{t}.clear()')
             exec(f'self.{t}.send_keys({_})')
 
-    def __cfm(self, tabs=waf()):
-        for _ in [__ for __ in tabs if __ in waf()]:
+    def __cfm(self, tabs=lf):
+        for _ in [__ for __ in tabs if __ in lf]:
             self.browser.switch_to.window(_)
             t = (_[0] + _[-2] + 'b').lower()
             exec(f"self.{t}.click()")
@@ -81,7 +81,7 @@ class WFutures(object):
             self.eb.click()
 
     def refresh(self, _):
-        if _ in waf():
+        if _ in lf:
             fields = ['open','high','low','close','volume']
             self.browser.switch_to.window(_)
             self.browser.back()
@@ -106,7 +106,7 @@ class WFutures(object):
             self.eb = self.browser.find_element_by_tag_name('button')
 
     def __load(self, tabs):
-        for _ in [__ for __ in tabs if __ in waf()]:
+        for _ in [__ for __ in tabs if __ in lf]:
             self.browser.execute_script(f"window.open('http://{self.lip}','{_}');")
             fields = ['open','high','low','close','volume']
             self.browser.switch_to.window(_)
