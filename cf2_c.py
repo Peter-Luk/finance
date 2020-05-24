@@ -121,6 +121,33 @@ class Estimator(object):
         i2 = PI(code=contract)
         return i2.estimate(pivot_point=pp, format='html', concise=True)
 
+class Estimate_Entities(object):
+    @cherrypy.expose
+    def index(self):
+#         hd = HEAD(TITLE('Estimate session range'))
+#         ops = [OPTION(_, {'value':_}) for _ in waf()]
+#         if today.day == ltd(today.year, today.month): ops = [OPTION(_, {'value':_}) for _ in waf(1)]
+#         if version_info.major == 3:
+#             if version_info.minor > 6:
+#                 sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
+#                 btn = BUTTON('Estimate', {'type':'submit'})
+#                 trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]),{'align':'right'})]]))]
+#                 trs.append(TR(linesep.join([f'{_}' for _ in [TD('Pivot Point', {'align':'right'}), TD(INPUT({'type':'text','name':'pp'}))]])))
+#                 bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post','action':'proceed'}))
+#                 return str(HTML(linesep.join([f'{_}' for _ in [hd,bd]])))
+#             else:
+#                 sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name':'contract'})
+#                 btn = BUTTON('Estimate', {'type':'submit'})
+#                 trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl, btn]]),{'align':'right'})]]))]
+#                 trs.append(TR(linesep.join(['{}'.format(_) for _ in [TD('Pivot Point', {'align':'right'}), TD(INPUT({'type':'text','name':'pp'}))]])))
+#                 bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method':'post','action':'proceed'}))
+#                 return str(HTML(linesep.join(['{}'.format(_) for _ in [hd,bd]])))
+#
+#     @cherrypy.expose
+#     def proceed(self, contract, pp):
+#         i2 = PI(code=contract)
+#         return i2.estimate(pivot_point=pp, format='html', concise=True)
+
 if __name__ == '__main__':
     cherrypy.tree.mount(Inputter())
     cherrypy.tree.mount(Estimator(), '/estimate')
