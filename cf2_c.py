@@ -2,7 +2,7 @@ import cherrypy
 from bt import LF as lf
 from utilities import datetime, linesep, platform, ltd, waf, today, IP
 from sys import argv, version_info
-from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT
+from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TEXTAREA, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT
 
 from y2n import Equities, entities
 
@@ -151,7 +151,9 @@ class Estimate_Equities(object):
     def proceed(self, code, pp=None):
         _ = Equities(int(code))
         hd = HEAD(TITLE(f'{code} for {today}'))
-        bd = BODY(TABLE(linesep.join([f'{TR(TD(__))}' for __ in [_, _(), _.gat()]])))
+        text_attrs = {'height':3, 'width':80}
+        bd = BODY(TABLE(linesep.join([f"{TR(TD(TEXTAREA(__, text_attrs)))}" for __ in [_, _(), _.gat()]])))
+        # bd = BODY(TABLE(linesep.join([f'{TR(TD(__))}' for __ in [_, _(), _.gat()]])))
         return str(HTML(linesep.join(['{}'.format(_) for _ in [hd,bd]])))
 #         i2 = PI(code=contract)
 #         return i2.estimate(pivot_point=pp, format='html', concise=True)
