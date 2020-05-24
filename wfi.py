@@ -10,8 +10,9 @@ class WFutures(object):
         if ip is None: self.lip = str(IP())
         self.browser = eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         wait = WebDriverWait(self.browser, 600)
-        self.browser.get(f'http://{self.lip}/estimate')
+        self.browser.get(f'http://{self.lip}/futures')
         self.window0 = self.browser.window_handles[0]
+        self.browser.execute_script(f"window.open('http://{self.lip}/equities','Local');")
         self.refresh(self.window0)
         self.__load(lf)
         self.browser.execute_script("window.open('https://web.whatsapp.com','WhatsApp');")
