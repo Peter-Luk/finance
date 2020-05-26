@@ -118,8 +118,9 @@ class WFutures(object):
 
     def estimate(self, code):
         if isinstance(code, (int, float)): code = str(int(code))
-        self.browser.switch_to.window('Local')
-        self.browser.back()
+        self.reset('Local')
+        # self.browser.switch_to.window('Local')
+        # self.browser.back()
         for _ in self.browser.find_elements_by_tag_name('option'):
             if _.text == code:
                 _.click()
