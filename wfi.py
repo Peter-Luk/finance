@@ -117,6 +117,7 @@ class WFutures(object):
             self.eb = self.browser.find_element_by_tag_name('button')
 
     def estimate(self, code):
+        if isinstance(code, (int, float)): code = str(int(code))
         self.browser.switch_to.window('Local')
         self.browser.back()
         for _ in self.browser.find_elements_by_tag_name('option'):
