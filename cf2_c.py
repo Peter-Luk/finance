@@ -151,7 +151,7 @@ class Estimate_Equities(object):
     def proceed(self, code, pp=None):
         _ = Equities(int(code))
         hd = HEAD(TITLE(f'{code} for {today}'))
-        text_attrs = {'style':'height:70px;width:650px;'}
+        text_attrs = {'style':'height:70px;width:650px;','disabled':True, 'autofocus':False}
         bd = BODY(TABLE(linesep.join([f"{TR(TD(TEXTAREA(__, text_attrs)))}" for __ in [_, _(), _.gat()]])))
         # bd = BODY(TABLE(linesep.join([f'{TR(TD(__))}' for __ in [_, _(), _.gat()]])))
         return str(HTML(linesep.join(['{}'.format(_) for _ in [hd,bd]])))
