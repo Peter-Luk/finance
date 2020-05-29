@@ -5,7 +5,7 @@ from datetime import datetime
 import random
 today = datetime.today()
 lf, preference = waf(), 'Firefox'
-if today.day == ltd(today.year, today.month): lf = waf(1)
+# if today.day == ltd(today.year, today.month): lf = waf(1)
 
 class WFutures(object):
     def __init__(self, ip=None, _=None):
