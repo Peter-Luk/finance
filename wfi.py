@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 
+fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
 
@@ -31,13 +32,15 @@ class WFutures(object):
 
     def close_down(self, tab, close, volume):
         if tab in lf:
-            self.browser.switch_to.window(tab)
-            t = (tab[0] + tab[-2] + 'c').lower()
-            exec(f"self.{t}.clear()")
-            exec(f"self.{t}.send_keys({close})")
-            t = (tab[0] + tab[-2] + 'v').lower()
-            exec(f"self.{t}.clear()")
-            exec(f"self.{t}.send_keys({volume})")
+            self.__update(tab, 'close', close)
+            self.__update(tab, 'volume', volume)
+            # self.browser.switch_to.window(tab)
+            # t = (tab[0] + tab[-2] + 'c').lower()
+            # exec(f"self.{t}.clear()")
+            # exec(f"self.{t}.send_keys({close})")
+            # t = (tab[0] + tab[-2] + 'v').lower()
+            # exec(f"self.{t}.clear()")
+            # exec(f"self.{t}.send_keys({volume})")
             self.__cfm([tab])
 
     def reset(self, tabs=lf):
@@ -52,28 +55,39 @@ class WFutures(object):
 
     def set_open(self, tab, _):
         if tab in lf:
-            self.browser.switch_to.window(tab)
-            t = (tab[0] + tab[-2] + 'o').lower()
+            self.__update(tab, 'open', _)
+            # self.browser.switch_to.window(tab)
+            # t = (tab[0] + tab[-2] + 'o').lower()
             # exec(f'self.{t}.clear()')
-            exec(f'self.{t}.send_keys({_})')
+            # exec(f'self.{t}.send_keys({_})')
         if tab == self.window0:
             self.browser.switch_to.window(tab)
             self.pivot.clear()
             self.pivot.send_keys(_)
 
-    def update_high(self, tab, _):
-        if tab in lf:
+    def __update(self, tab, field, _):
+        if (tab in lf) and (field in fields):
             self.browser.switch_to.window(tab)
-            t = (tab[0] + tab[-2] + 'h').lower()
+            t = (tab[0] + tab[-2] + field[0]).lower()
             exec(f'self.{t}.clear()')
             exec(f'self.{t}.send_keys({_})')
 
+
+    def update_high(self, tab, _):
+        self.__update(tab, 'high', _)
+        # if tab in lf:
+        #     self.browser.switch_to.window(tab)
+        #     t = (tab[0] + tab[-2] + 'h').lower()
+        #     exec(f'self.{t}.clear()')
+        #     exec(f'self.{t}.send_keys({_})')
+
     def update_low(self, tab, _):
-        if tab in lf:
-            self.browser.switch_to.window(tab)
-            t = (tab[0] + tab[-2] + 'l').lower()
-            exec(f'self.{t}.clear()')
-            exec(f'self.{t}.send_keys({_})')
+        self.__update(tab, 'low', _)
+        # if tab in lf:
+        #     self.browser.switch_to.window(tab)
+        #     t = (tab[0] + tab[-2] + 'l').lower()
+        #     exec(f'self.{t}.clear()')
+        #     exec(f'self.{t}.send_keys({_})')
 
     def __cfm(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
@@ -86,7 +100,7 @@ class WFutures(object):
 
     def refresh(self, _):
         if _ in lf:
-            fields = ['open','high','low','close','volume']
+            # fields = ['open','high','low','close','volume']
             self.browser.switch_to.window(_)
             self.browser.back()
             for __ in self.browser.find_elements_by_tag_name('option'):
@@ -132,7 +146,7 @@ class WFutures(object):
     def __load(self, tabs):
         for _ in [__ for __ in tabs if __ in lf]:
             self.browser.execute_script(f"window.open('http://{self.lip}','{_}');")
-            fields = ['open','high','low','close','volume']
+            # fields = ['open','high','low','close','volume']
             self.browser.switch_to.window(_)
             for __ in self.browser.find_elements_by_tag_name('option'):
                 if __.text == _:
