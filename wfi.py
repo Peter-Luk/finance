@@ -31,17 +31,13 @@ class WFutures(object):
         del self.browser
 
     def close_down(self, tab, close, volume):
-        if tab in lf:
-            self.__update(tab, 'close', close)
-            self.__update(tab, 'volume', volume)
-            # self.browser.switch_to.window(tab)
-            # t = (tab[0] + tab[-2] + 'c').lower()
-            # exec(f"self.{t}.clear()")
-            # exec(f"self.{t}.send_keys({close})")
-            # t = (tab[0] + tab[-2] + 'v').lower()
-            # exec(f"self.{t}.clear()")
-            # exec(f"self.{t}.send_keys({volume})")
-            self.__cfm([tab])
+        __ = lf
+        __.extend([x.lower() for x in lf])
+        # if tab in lf:
+        if tab in __:
+            self.__update(tab.upper(), 'close', close)
+            self.__update(tab.upper(), 'volume', volume)
+            self.__cfm([tab.upper()])
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
@@ -54,12 +50,10 @@ class WFutures(object):
             self.refresh(tabs)
 
     def set_open(self, tab, _):
-        if tab in lf:
-            self.__update(tab, 'open', _)
-            # self.browser.switch_to.window(tab)
-            # t = (tab[0] + tab[-2] + 'o').lower()
-            # exec(f'self.{t}.clear()')
-            # exec(f'self.{t}.send_keys({_})')
+        __ = lf
+        __.extend([x.lower() for x in lf])
+        if tab in __:
+            self.__update(tab.upper(), 'open', _)
         if tab == self.window0:
             self.browser.switch_to.window(tab)
             self.pivot.clear()
@@ -72,22 +66,15 @@ class WFutures(object):
             exec(f'self.{t}.clear()')
             exec(f'self.{t}.send_keys({_})')
 
-
     def update_high(self, tab, _):
-        self.__update(tab, 'high', _)
-        # if tab in lf:
-        #     self.browser.switch_to.window(tab)
-        #     t = (tab[0] + tab[-2] + 'h').lower()
-        #     exec(f'self.{t}.clear()')
-        #     exec(f'self.{t}.send_keys({_})')
+        __ = lf
+        __.extend([x.lower() for x in lf])
+        if tab in __: self.__update(tab.upper(), 'high', _)
 
     def update_low(self, tab, _):
-        self.__update(tab, 'low', _)
-        # if tab in lf:
-        #     self.browser.switch_to.window(tab)
-        #     t = (tab[0] + tab[-2] + 'l').lower()
-        #     exec(f'self.{t}.clear()')
-        #     exec(f'self.{t}.send_keys({_})')
+        __ = lf
+        __.extend([x.lower() for x in lf])
+        if tab in __: self.__update(tab, 'low', _)
 
     def __cfm(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
