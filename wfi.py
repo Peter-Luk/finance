@@ -87,7 +87,6 @@ class WFutures(object):
 
     def refresh(self, _):
         if _ in lf:
-            # fields = ['open','high','low','close','volume']
             self.browser.switch_to.window(_)
             self.browser.back()
             for __ in self.browser.find_elements_by_tag_name('option'):
