@@ -31,7 +31,7 @@ class WFutures(object):
         del self.browser
 
     def close_down(self, tab, close, volume):
-        __ = lf
+        __ = list(lf)
         __.extend([x.lower() for x in lf])
         # if tab in lf:
         if tab in __:
@@ -50,7 +50,7 @@ class WFutures(object):
             self.refresh(tabs)
 
     def set_open(self, tab, _):
-        __ = lf
+        __ = list(lf)
         __.extend([x.lower() for x in lf])
         if tab in __:
             self.__update(tab.upper(), 'open', _)
@@ -67,12 +67,12 @@ class WFutures(object):
             exec(f'self.{t}.send_keys({_})')
 
     def update_high(self, tab, _):
-        __ = lf
+        __ = list(lf)
         __.extend([x.lower() for x in lf])
         if tab in __: self.__update(tab.upper(), 'high', _)
 
     def update_low(self, tab, _):
-        __ = lf
+        __ = list(lf)
         __.extend([x.lower() for x in lf])
         if tab in __: self.__update(tab, 'low', _)
 
