@@ -74,7 +74,7 @@ class WFutures(object):
     def update_low(self, tab, _):
         __ = list(lf)
         __.extend([x.lower() for x in lf])
-        if tab in __: self.__update(tab, 'low', _)
+        if tab in __: self.__update(tab.upper(), 'low', _)
 
     def __cfm(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
