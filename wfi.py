@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 
-sites = {'SINA':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml', 'NIKKEI':'https://indexes.nikkei.co.jp/en/nkave', 'CNBC_Pre':'https://www.cnbc.com/pre-markets/'}
+sites = {'SINA':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml', 'NIKKEI':'https://indexes.nikkei.co.jp/en/nkave', 'CNBC_Pre':'https://www.cnbc.com/pre-markets/', 'WhatsApp':'https://web.whatsapp.com'}
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
@@ -20,7 +20,8 @@ class WFutures(object):
         self.browser.execute_script(f"window.open('http://{self.lip}/equities','Local');")
         self.refresh(self.window0)
         self.__load(lf)
-        self.browser.execute_script("window.open('https://web.whatsapp.com','WhatsApp');")
+        self.browser.execute_script(f"window.open('{sites['WhatsApp']}','WhatsApp');")
+        self.browser.execute_script(f"window.open('{sites['CNBC_Pre']}','CNBC');")
         self.browser.switch_to.window(self.window0)
 
     def __del__(self):
@@ -39,6 +40,10 @@ class WFutures(object):
             self.__update(tab.upper(), 'close', close)
             self.__update(tab.upper(), 'volume', volume)
             self.__cfm([tab.upper()])
+
+    def dows(self, site='CNBC'):
+        self.browser.switch_to.window(site)
+        return [_.text for _ in self.browser.find_elements_by_class_name('BasicTable-quoteGain')][:2]
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
