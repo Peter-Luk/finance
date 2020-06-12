@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 
-sites = {'SINA':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml', 'NIKKEI':'https://indexes.nikkei.co.jp/en/nkave', 'CNBC_Pre':'https://www.cnbc.com/pre-markets/', 'WhatsApp':'https://web.whatsapp.com'}
+sites = {'SINA':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml', 'NIKKEI':'https://indexes.nikkei.co.jp/en/nkave', 'CNBC_Pre':'https://www.cnbc.com/pre-markets/', 'WhatsApp':'https://web.whatsapp.com', 'SMS':'https://messages.google.com/web'}
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
