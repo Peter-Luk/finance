@@ -43,7 +43,8 @@ class WFutures(object):
 
     def dows(self, site='CNBC'):
         self.browser.switch_to.window(site)
-        return [_.text for _ in self.browser.find_elements_by_class_name('BasicTable-quoteGain')][:2]
+        _ = self.browser.find_elements_by_class_name('BasicTable-quoteGain')[:2]
+        return [__.text for __ in _]
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
