@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 
-source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave', 'delta':'top-nk225-differ re-top-nk225-diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta':'BasicTable-quoteGain'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
+source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-class':'BasicTable-quoteGain'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
 # diff_class = {'NIKKEI':'top-nk225-differ re-top-nk225-diff', 'CNBC':'BasicTable-quoteGain'}
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
@@ -45,7 +45,7 @@ class WFutures(object):
 
     def dows(self, site='CNBC'):
         self.browser.switch_to.window(site)
-        _ = self.browser.find_elements_by_class_name(source[site]['delta'])[:2]
+        _ = self.browser.find_elements_by_class_name(source[site]['delta-class'])[:2]
         return [__.text for __ in _]
 
     def reset(self, tabs=lf):
