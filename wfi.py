@@ -3,8 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 
-sites = {'SINA':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml', 'NIKKEI':'https://indexes.nikkei.co.jp/en/nkave', 'CNBC_Pre':'https://www.cnbc.com/pre-markets/', 'WhatsApp':'https://web.whatsapp.com', 'SMS':'https://messages.google.com/web'}
-diff_class = {'NIKKEI':'top-nk225-differ re-top-nk225-diff', 'CNBC':'BasicTable-quoteGain'}
+source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave', 'delta':'top-nk225-differ re-top-nk225-diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta':'BasicTable-quoteGain'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
+# diff_class = {'NIKKEI':'top-nk225-differ re-top-nk225-diff', 'CNBC':'BasicTable-quoteGain'}
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
@@ -21,9 +21,9 @@ class WFutures(object):
         self.browser.execute_script(f"window.open('http://{self.lip}/equities','Local');")
         self.refresh(self.window0)
         self.__load(lf)
-        self.browser.execute_script(f"window.open('{sites['WhatsApp']}','WhatsApp');")
-        self.browser.execute_script(f"window.open('{sites['CNBC_Pre']}','CNBC');")
-        self.browser.execute_script(f"window.open('{sites['NIKKEI']}','NIKKEI');")
+        self.browser.execute_script(f"window.open('{source['WhatsApp']['site']}','WhatsApp');")
+        self.browser.execute_script(f"window.open('{source['CNBC']['site']}','CNBC');")
+        self.browser.execute_script(f"window.open('{source['NIKKEI']['site']}','NIKKEI');")
         self.browser.switch_to.window(self.window0)
 
     def __del__(self):
@@ -45,7 +45,7 @@ class WFutures(object):
 
     def dows(self, site='CNBC'):
         self.browser.switch_to.window(site)
-        _ = self.browser.find_elements_by_class_name(diff_class[site])[:2]
+        _ = self.browser.find_elements_by_class_name(source[site]['delta'])[:2]
         return [__.text for __ in _]
 
     def reset(self, tabs=lf):
