@@ -48,6 +48,11 @@ class WFutures(object):
         _ = self.browser.find_elements_by_class_name(source[site]['delta-class'])[:2]
         return [__.text for __ in _]
 
+    def nk225(self, site='NIKKEI'):
+        self.browser.switch_to.window(site)
+        _ = self.browser.find_element_by_id(source[site]['delta-id'])
+        return __.text
+
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
             self.browser.switch_to.window(_)
