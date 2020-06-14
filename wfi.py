@@ -23,6 +23,7 @@ class WFutures(object):
         self.__load(lf)
         self.browser.execute_script(f"window.open('{sites['WhatsApp']}','WhatsApp');")
         self.browser.execute_script(f"window.open('{sites['CNBC_Pre']}','CNBC');")
+        self.browser.execute_script(f"window.open('{sites['NIKKEI']}','NIKKEI');")
         self.browser.switch_to.window(self.window0)
 
     def __del__(self):
