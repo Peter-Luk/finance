@@ -3,7 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 
-source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-class':'BasicTable-quoteGain'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
+# source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-class':'BasicTable-quoteGain'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
+source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-xpath':'BasicTable-quote'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
 # diff_class = {'NIKKEI':'top-nk225-differ re-top-nk225-diff', 'CNBC':'BasicTable-quoteGain'}
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
@@ -44,14 +45,17 @@ class WFutures(object):
             self.__cfm([tab.upper()])
 
     def dows(self, site='CNBC'):
-        self.browser.switch_to.window(site)
-        _ = self.browser.find_elements_by_class_name(source[site]['delta-class'])[:2]
-        return [__.text for __ in _]
+        if self.browser.current_url == source[site]['site']: self.refresh(site)
+        else: self.browser.switch_to.window(site)
+        # _ = self.browser.find_elements_by_class_name(source[site]['delta-class'])[0]
+        _ = self.browser.find_elements_by_xpath(f"//*[contains(text(),{source[site]['delta-xpath']})]")[0]
+        return float(_.text)
 
     def nk225(self, site='NIKKEI'):
-        self.browser.switch_to.window(site)
+        if self.browser.current_url == source[site]['site']: self.refresh(site)
+        else: self.browser.switch_to.window(site)
         _ = self.browser.find_element_by_id(source[site]['delta-id'])
-        return __.text
+        return float(_.text.split(' ')[0])
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
