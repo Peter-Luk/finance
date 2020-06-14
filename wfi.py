@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import random
 
 sites = {'SINA':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml', 'NIKKEI':'https://indexes.nikkei.co.jp/en/nkave', 'CNBC_Pre':'https://www.cnbc.com/pre-markets/', 'WhatsApp':'https://web.whatsapp.com', 'SMS':'https://messages.google.com/web'}
+diff_class = {'NIKKEI':'top-nk225-differ re-top-nk225-diff', 'CNBC':'BasicTable-quoteGain'}
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
@@ -43,7 +44,7 @@ class WFutures(object):
 
     def dows(self, site='CNBC'):
         self.browser.switch_to.window(site)
-        _ = self.browser.find_elements_by_class_name('BasicTable-quoteGain')[:2]
+        _ = self.browser.find_elements_by_class_name(diff_class[site])[:2]
         return [__.text for __ in _]
 
     def reset(self, tabs=lf):
