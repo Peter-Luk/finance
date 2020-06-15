@@ -44,12 +44,12 @@ class WFutures(object):
             self.__update(tab.upper(), 'volume', volume)
             self.__cfm([tab.upper()])
 
-    def dows(self, site='CNBC'):
+    def dow(self, site='CNBC'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
         # _ = self.browser.find_elements_by_class_name(source[site]['delta-class'])[0]
-        _ = self.browser.find_elements_by_xpath(f"//*[contains(text(),{source[site]['delta-xpath']})]")[0]
-        return float(_.text)
+        _ = [__.text for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline')]")]
+        return float(_[0])
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
