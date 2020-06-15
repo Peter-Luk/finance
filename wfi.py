@@ -3,9 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 
-# source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-class':'BasicTable-quoteGain'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
 source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-xpath':'BasicTable-quote'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
-# diff_class = {'NIKKEI':'top-nk225-differ re-top-nk225-diff', 'CNBC':'BasicTable-quoteGain'}
+idxfs = ['DOW', 'S&P', 'Nasdaq', 'Russell']
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
@@ -38,18 +37,18 @@ class WFutures(object):
     def close_down(self, tab, close, volume):
         __ = list(lf)
         __.extend([x.lower() for x in lf])
-        # if tab in lf:
         if tab in __:
             self.__update(tab.upper(), 'close', close)
             self.__update(tab.upper(), 'volume', volume)
             self.__cfm([tab.upper()])
 
-    def dow(self, site='CNBC'):
+    def usif(self, idx='DOW', site='CNBC'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        # _ = self.browser.find_elements_by_class_name(source[site]['delta-class'])[0]
         _ = [__.text for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
-        return float(_[0])
+        if idx in idxfs:
+            ix = 2 * idxfs.index(idx)
+            return [float(__) for __ in _[ix:ix+1]]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
