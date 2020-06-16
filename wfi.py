@@ -10,7 +10,7 @@ lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
 
 def fstrip(_, sep=','):
-    return float(''.join(_.split(sep)))
+    return float(_.replace(sep,''))
 
 class WFutures(object):
     def __init__(self, ip=None, _=None):
