@@ -35,12 +35,11 @@ class WFutures(object):
         del self.browser
 
     def close_down(self, tab, close, volume):
-        __ = list(lf)
-        __.extend([x.lower() for x in lf])
-        if tab in __:
-            self.__update(tab.upper(), 'close', close)
-            self.__update(tab.upper(), 'volume', volume)
-            self.__cfm([tab.upper()])
+        tab = tab.upper()
+        if tab in lf:
+            self.__update(tab, 'close', close)
+            self.__update(tab, 'volume', volume)
+            self.__cfm([tab])
 
     def usif(self, idx='DOW', site='CNBC'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
@@ -68,10 +67,7 @@ class WFutures(object):
             self.refresh(tabs)
 
     def set_open(self, tab, _):
-        __ = list(lf)
-        __.extend([x.lower() for x in lf])
-        if tab in __:
-            self.__update(tab.upper(), 'open', _)
+        if tab.upper() in lf: self.__update(tab.upper(), 'open', _)
         if tab == self.window0:
             self.browser.switch_to.window(tab)
             self.pivot.clear()
@@ -85,14 +81,12 @@ class WFutures(object):
             exec(f'self.{t}.send_keys({_})')
 
     def update_high(self, tab, _):
-        __ = list(lf)
-        __.extend([x.lower() for x in lf])
-        if tab in __: self.__update(tab.upper(), 'high', _)
+        tab = tab.upper()
+        if tab in lf: self.__update(tab, 'high', _)
 
     def update_low(self, tab, _):
-        __ = list(lf)
-        __.extend([x.lower() for x in lf])
-        if tab in __: self.__update(tab.upper(), 'low', _)
+        tab = tab.upper()
+        if tab in lf: self.__update(tab, 'low', _)
 
     def __cfm(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
@@ -104,11 +98,11 @@ class WFutures(object):
             self.eb.click()
 
     def refresh(self, _):
-        if _ in lf:
-            self.browser.switch_to.window(_)
+        if _.upper() in lf:
+            self.browser.switch_to.window(_.upper())
             self.browser.back()
             for __ in self.browser.find_elements_by_tag_name('option'):
-                if __.text == _:
+                if __.text == _.upper():
                     __.click()
                     break
             t = (_[0] + _[-2] + 'b').lower()
@@ -139,8 +133,6 @@ class WFutures(object):
     def analyse(self, code):
         if isinstance(code, (int, float)): code = str(int(code))
         self.reset('Local')
-        # self.browser.switch_to.window('Local')
-        # self.browser.back()
         for _ in self.browser.find_elements_by_tag_name('option'):
             if _.text == code:
                 _.click()
@@ -150,7 +142,6 @@ class WFutures(object):
     def __load(self, tabs):
         for _ in [__ for __ in tabs if __ in lf]:
             self.browser.execute_script(f"window.open('http://{self.lip}','{_}');")
-            # fields = ['open','high','low','close','volume']
             self.browser.switch_to.window(_)
             for __ in self.browser.find_elements_by_tag_name('option'):
                 if __.text == _:
