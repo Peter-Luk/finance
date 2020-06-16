@@ -9,9 +9,6 @@ fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
 
-def fstrip(_, sep=','):
-    return float(_.replace(sep,''))
-
 class WFutures(object):
     def __init__(self, ip=None, _=None):
         if _ is None: _ = preference
@@ -51,14 +48,14 @@ class WFutures(object):
         _ = [__.text for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
         if idx in idxfs:
             ix = 2 * idxfs.index(idx)
-            return [fstrip(__) for __ in _[ix:ix+2]]
+            return [floor(__.replace(',','')) for __ in _[ix:ix+2]]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
         _ = self.browser.find_element_by_id(source[site]['delta-id'])
         t = _.text.split(' ')[0].split(',')
-        return fstrip(t)
+        return float(t.replace(',',''))
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
