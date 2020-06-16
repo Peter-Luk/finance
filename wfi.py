@@ -48,13 +48,14 @@ class WFutures(object):
         _ = [__.text for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
         if idx in idxfs:
             ix = 2 * idxfs.index(idx)
-            return [float(__) for __ in _[ix:ix+1]]
+            return [float(__) for __ in _[ix:ix+2]]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
         _ = self.browser.find_element_by_id(source[site]['delta-id'])
-        return float(_.text.split(' ')[0])
+        t = _.text.split(' ')[0].split(',')
+        return float(t)
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
