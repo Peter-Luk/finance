@@ -17,6 +17,13 @@ driver = dict(
         name = 'IEDriverServer.exe',
         path = ['browser', 'driver'])
 )
+
+B_scale = dict(
+    BABA = 1 / 8,
+    NTES = 1 / 25,
+    JD = 1 / 2)
+
+USHK = 7.75
 # y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, golden_ratio, datetime, tqdm, sleep]
 y2n = [pandas, numpy, sqlalchemy, yfinance, golden_ratio, datetime, tqdm, sleep]
 nta = [pandas, numpy, datetime, golden_ratio]
