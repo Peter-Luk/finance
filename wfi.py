@@ -54,7 +54,7 @@ class WFutures(object):
         else: self.browser.switch_to.window(site)
         _ = self.browser.find_element_by_id(source[site]['delta-id'])
         t = _.text.split(' ')[0].split(',')
-        return float(t.replace(',',''))
+        return float(t[0].replace(',',''))
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
