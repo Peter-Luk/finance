@@ -1,5 +1,5 @@
 import pref
-pd, np, db, yf, gr, datetime, tqdm, sleep = pref.y2n
+pd, np, db, yf, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 from utilities import filepath, mtf
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
@@ -365,3 +365,8 @@ def summary(__):
     if not isinstance(__, (list, tuple)): __ = list(__)
     _ = [_press(_) for _ in __]
     print('\n'.join(_))
+
+def A2B(_):
+    __ = Equities(_)
+    atr = __.gat()
+    return [x*B_scale[_]*USHK for x in [atr[0], __._close, atr[-1]]]
