@@ -369,4 +369,4 @@ def summary(__):
 def A2B(_):
     __ = Equities(_)
     atr = __.gat()
-    return [x*B_scale[_]*USHK for x in [atr[0], __._close, atr[-1]]]
+    return [float(format(x*B_scale[_]*USHK,'0.2f')) for x in [atr[0], __._close, atr[-1]]]
