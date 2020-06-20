@@ -367,6 +367,7 @@ def summary(__):
     print('\n'.join(_))
 
 def A2B(_):
-    __ = Equities(_)
-    atr = __.gat()
-    return [float(format(x*B_scale[_]*USHK,'0.2f')) for x in [atr[0], __._close, atr[-1]]]
+    if _.upper() in B_scale.keys():
+        __ = Equities(_.upper())
+        atr = __.gat()
+        return [float(format(x*B_scale[_.upper()]*USHK,'0.2f')) for x in [atr[0], __._close, atr[-1]]]
