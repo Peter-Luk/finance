@@ -41,13 +41,13 @@ class WFutures(object):
             self.__update(tab, 'volume', volume)
             self.__cfm([tab])
 
-    def usif(self, idx='DOW', site='CNBC'):
+    def usif(self, idx='Dow', site='CNBC'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
         divs = self.browser.find_elements_by_tag_name('div')
         for d in divs:
             try:
-                self.browser.find_element_by_partial_link_text(idx.capitalize())
+                self.browser.find_element_by_partial_link_text(idx)
                 div = d
             except: pass
         _ = [__.text for __ in div.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
