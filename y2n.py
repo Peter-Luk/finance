@@ -370,5 +370,5 @@ def A2B(_):
     _ = _.upper()
     if _ in B_scale.keys():
         __ = Equities(_)
-        atr = __.gat()
-        return [float(round(x*B_scale[_]*USHK,2)) for x in [atr[0], __._close, atr[-1]]]
+        r = __.gat()
+        return [float(round(x*B_scale[_]*USHK,2)) for x in [r[0], r[1], __._close, r[-2], r[-1]]]
