@@ -47,10 +47,13 @@ class WFutures(object):
         for d in self.browser.find_elements_by_tag_name('div'):
             try:
                 d.find_element_by_partial_link_text(idx)
-                div = d
+                # div = d
+            # except: pass
+        # return [float(__.text.replace(',','')) for __ in div.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
+                return [float(__.text.replace(',','')) for __ in d.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
             except: pass
-        _ = [__.text for __ in div.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
-        return [float(__.replace(',','')) for __ in _]
+        # _ = [__.text for __ in div.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
+        # return [float(__.replace(',','')) for __ in _]
         # _ = [__.text for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
         # if idx in idxfs:
         #     ix = 2 * idxfs.index(idx)
