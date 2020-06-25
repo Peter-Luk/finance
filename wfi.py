@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import random
 
 source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-xpath':'BasicTable-quote'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
-idxfs = ['DOW', 'S&P', 'Nasdaq', 'Russell']
+idxfs = ['DOW', 'S&P', 'NASDAQ', 'RUSSELL']
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
@@ -42,19 +42,19 @@ class WFutures(object):
             self.__cfm([tab])
 
     def usif(self, idx='Dow', site='CNBC'):
-        divs = []
+        # divs = []
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        for d in self.browser.find_elements_by_tag_name('div'):
-            try:
-                d.find_element_by_partial_link_text(idx)
-                divs.append(d)
-            except: pass
-        return [float(__.text.replace(',','')) for __ in divs[-1].find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
-        # _ = [__.text for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
-        # if idx in idxfs:
-        #     ix = 2 * idxfs.index(idx)
-        #     return [float(__.replace(',','')) for __ in _[ix:ix+2]]
+        def _findidx():
+            for d in self.browser.find_elements_by_tag_name('div'):
+                try:
+                    d.find_element_by_partial_link_text(idx)
+                    return d
+                except: pass
+        _ = [float(__.text.replace(',','')) for __ in _findidx().find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
+        if idx.upper() in idxfs:
+            ix = 2 * idxfs.index(idx.upper())
+            return _[ix:ix+2]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
