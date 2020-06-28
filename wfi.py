@@ -47,7 +47,7 @@ class WFutures(object):
         else: self.browser.switch_to.window(site)
         for d in self.browser.find_elements_by_tag_name('div'):
             try:
-                d.find_element_by_link_text(idx)
+                d.find_element_by_partial_link_text(idx)
                 divs.append(d)
             except: pass
         _ = [float(__.text.replace(',','')) for __ in divs[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
