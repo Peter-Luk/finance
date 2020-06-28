@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import random
 
 source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-xpath':'BasicTable-quote'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
-idxfs = ['DOW', 'S&P', 'NASDAQ', 'RUSSELL']
+# idxfs = ['DOW', 'S&P', 'NASDAQ', 'RUSSELL']
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
