@@ -50,7 +50,7 @@ class WFutures(object):
                 d.find_element_by_link_text(idx)
                 divs.append(d)
             except: pass
-        _ = [float(__.text.replace(',','')) for __ in div[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
+        _ = [float(__.text.replace(',','')) for __ in divs[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
         return _
         # _ = [float(__.text.replace(',','')) for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
         # if idx.upper() in idxfs:
