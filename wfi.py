@@ -42,16 +42,15 @@ class WFutures(object):
             self.__cfm([tab])
 
     def usif(self, idx='Dow', site='CNBC'):
-        divs = []
+        _ = []
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        for d in self.browser.find_elements_by_tag_name('div'):
+        for __ in self.browser.find_elements_by_tag_name('div'):
             try:
-                d.find_element_by_partial_link_text(idx)
-                divs.append(d)
+                __.find_element_by_partial_link_text(idx)
+                _.append(__)
             except: pass
-        _ = [float(__.text.replace(',','')) for __ in divs[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
-        return _
+        return [float(__.text.replace(',','')) for __ in _[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
         # _ = [float(__.text.replace(',','')) for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
         # if idx.upper() in idxfs:
         #     ix = 2 * idxfs.index(idx.upper())
