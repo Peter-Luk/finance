@@ -4,7 +4,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 import random
 
 from pref import source, fields
-from pref import source, fields
 # source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-xpath':'BasicTable-quote'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
 # fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
