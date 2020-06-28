@@ -42,12 +42,20 @@ class WFutures(object):
             self.__cfm([tab])
 
     def usif(self, idx='Dow', site='CNBC'):
+        divs = []
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        _ = [float(__.text.replace(',','')) for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
-        if idx.upper() in idxfs:
-            ix = 2 * idxfs.index(idx.upper())
-            return _[ix:ix+2]
+        for d in self.browser.find_elements_by_tag_name('div'):
+            try:
+                d.find_element_by_link_text(idx)
+                divs.append(d)
+            except: pass
+        _ = [float(__.text.replace(',','')) for __ in div[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
+        return _
+        # _ = [float(__.text.replace(',','')) for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
+        # if idx.upper() in idxfs:
+        #     ix = 2 * idxfs.index(idx.upper())
+        #     return _[ix:ix+2]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
