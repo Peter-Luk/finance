@@ -3,8 +3,10 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import random
 
-source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-xpath':'BasicTable-quote'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
-fields = ['open','high','low','close','volume']
+from pref import source, fields
+from pref import source, fields
+# source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-xpath':'BasicTable-quote'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
+# fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
 
@@ -49,12 +51,12 @@ class WFutures(object):
                 __.find_element_by_partial_link_text(idx)
                 _.append(__)
             except: pass
-        return [float(__.text.replace(',','')) for __ in _[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
+        return [float(__.text.replace(',','')) for __ in _[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta_xpath']}Gain' or @class='{source[site]['delta_xpath']}Decline']")]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        _ = self.browser.find_element_by_id(source[site]['delta-id'])
+        _ = self.browser.find_element_by_id(source[site]['delta_id'])
         t = _.text.split(' ')[0].split(',')
         return float(t[0].replace(',',''))
 
