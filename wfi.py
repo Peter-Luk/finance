@@ -4,7 +4,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 import random
 
 source = {'SINA':{'site':'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml'}, 'NIKKEI':{'site':'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225', 'delta-id':'diff'}, 'CNBC':{'site':'https://www.cnbc.com/pre-markets/', 'delta-xpath':'BasicTable-quote'}, 'WhatsApp':{'site':'https://web.whatsapp.com'}, 'SMS':{'site':'https://messages.google.com/web'}}
-# idxfs = ['DOW', 'S&P', 'NASDAQ', 'RUSSELL']
 fields = ['open','high','low','close','volume']
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
@@ -51,10 +50,6 @@ class WFutures(object):
                 _.append(__)
             except: pass
         return [float(__.text.replace(',','')) for __ in _[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
-        # _ = [float(__.text.replace(',','')) for __ in self.browser.find_elements_by_xpath(f"//td[@class='{source[site]['delta-xpath']}Gain' or @class='{source[site]['delta-xpath']}Decline']")]
-        # if idx.upper() in idxfs:
-        #     ix = 2 * idxfs.index(idx.upper())
-        #     return _[ix:ix+2]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
