@@ -40,15 +40,16 @@ class WFutures(object):
             self.__cfm([tab])
 
     def usif(self, idx='Dow', site='CNBC'):
-        _ = []
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        for __ in self.browser.find_elements_by_tag_name('div'):
-            try:
-                __.find_element_by_partial_link_text(idx)
-                _.append(__)
-            except: pass
-        return [float(__.text.replace(',','')) for __ in _[-1].find_elements_by_xpath(f".//td[@class='{source[site]['delta_xpath']}Gain' or @class='{source[site]['delta_xpath']}Decline']")]
+        divs = self.browser.find_elements_by_tag_name('div')
+        def _findidx(idx):
+            for __ in reversed(divs):
+                try:
+                    __.find_element_by_partial_link_text(idx)
+                    return __
+                except: pass
+        return [float(__.text.replace(',','')) for __ in _findidx(idx).find_elements_by_xpath(f".//td[@class='{source[site]['delta_xpath']}Gain' or @class='{source[site]['delta_xpath']}Decline']")]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
