@@ -19,14 +19,16 @@ class WFutures(object):
         self.browser.execute_script(f"window.open('http://{self.lip}/equities','Local');")
         self.refresh(self.window0)
         self.__load(lf)
-        self.browser.execute_script(f"window.open('{source['WhatsApp']['site']}','WhatsApp');")
-        self.browser.execute_script(f"window.open('{source['CNBC']['site']}','CNBC');")
-        self.browser.execute_script(f"window.open('{source['NIKKEI']['site']}','NIKKEI');")
+        self.auxiliary_load(['WhatsApp', 'CNBC', 'NIKKEI'])
         self.browser.switch_to.window(self.window0)
 
     def __del__(self):
         self.lip = self.browser = self.pivot = self.eb = None
         del self.lip, self.browser, self.pivot, self.eb
+
+    def auxiliary_load(self, _):
+        if not isinstance(_, (tuple, list)): _ = [_]
+        [self.browser.execute_script(f"window.open('{source[__]['site']}', __);") for __ in _ if __ in source.keys()]
 
     def kill(self):
         self.browser.quit()
