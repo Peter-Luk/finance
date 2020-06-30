@@ -43,8 +43,9 @@ class WFutures(object):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
         divs = self.browser.find_elements_by_tag_name('div')
+        divs.reverse()
         def _findidx(idx):
-            for __ in reversed(divs):
+            for __ in divs:
                 try:
                     __.find_element_by_partial_link_text(idx)
                     return __
