@@ -20,9 +20,9 @@ class WFutures(object):
         self.refresh(self.window0)
         self.__load(lf)
         # self.auxiliary_load('NIKKEI')
-        self.browser.execute_script(f"window.open('{source['NIKKEI']['site']}', 'NIKKEI');")
-        self.browser.execute_script(f"window.open('{source['CNBC']['site']}', 'CNBC');")
-        self.auxiliary_load('WhatsApp')
+        # self.browser.execute_script(f"window.open('{source['NIKKEI']['site']}', 'NIKKEI');")
+        # self.browser.execute_script(f"window.open('{source['CNBC']['site']}', 'CNBC');")
+        self.auxiliary_load(['NIKKEI', 'CNBC', 'WhatsApp'])
         # self.browser.execute_script(f"window.open('{source['WhatsApp']['site']}', 'WhatsApp');")
         self.browser.switch_to.window(self.window0)
 
@@ -31,8 +31,8 @@ class WFutures(object):
         del self.lip, self.browser, self.pivot, self.eb
 
     def auxiliary_load(self, _):
-        if _ in source.keys():
-            self.browser.execute_script(f"window.open('{source[_]['site']}', '{_}');")
+        if not isinstance(_, (list, tuple)): _ = [_]
+        [self.browser.execute_script(f"window.open('{source[__]['site']}', '{__}');") for __ in _ if __ in source.keys()]
 
     def kill(self):
         self.browser.quit()
