@@ -30,7 +30,7 @@ class WFutures(object):
         if not isinstance(_, (tuple, list)): _ = [_]
         for __ in _:
             if __ in source.keys():
-                self.browser.execute_script(f"window.open('{source[__]['site']}', __);")
+                self.browser.execute_script(f"window.open('{source[__]['site']}', '__');")
 
     def kill(self):
         self.browser.quit()
