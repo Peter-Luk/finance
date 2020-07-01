@@ -32,7 +32,7 @@ class WFutures(object):
 
     def auxiliary_load(self, _):
         if _ in source.keys():
-            self.browser.execute_script(f"window.open('{source[_]['site']}', f'{_}');")
+            self.browser.execute_script(f"window.open('{source[_]['site']}', '{_}');")
 
     def kill(self):
         self.browser.quit()
