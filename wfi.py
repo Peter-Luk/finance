@@ -19,11 +19,7 @@ class WFutures(object):
         self.browser.execute_script(f"window.open('http://{self.lip}/equities','Local');")
         self.refresh(self.window0)
         self.__load(lf)
-        # self.auxiliary_load('NIKKEI')
-        # self.browser.execute_script(f"window.open('{source['NIKKEI']['site']}', 'NIKKEI');")
-        # self.browser.execute_script(f"window.open('{source['CNBC']['site']}', 'CNBC');")
         self.auxiliary_load(['NIKKEI', 'CNBC', 'WhatsApp'])
-        # self.browser.execute_script(f"window.open('{source['WhatsApp']['site']}', 'WhatsApp');")
         self.browser.switch_to.window(self.window0)
 
     def __del__(self):
