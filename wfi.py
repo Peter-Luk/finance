@@ -56,7 +56,7 @@ class WFutures(object):
             idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'],'div[2]'
             if _ in idx:
                 if implied: div = 'div[4]'
-                return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[{1+idx.index(_)}]/div[1]/div/{div}/div/div/table/tr/td[3]'
+                return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div/{div}/div/div/table/tbody/tr/td[3]'
         return float(self.browser.find_element_by_xpath(cxpath(idx)).text.replace(',',''))
 
     def nk225(self, site='NIKKEI'):
