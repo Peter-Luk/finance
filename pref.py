@@ -32,6 +32,20 @@ source = dict(
     SMS = dict(
         site = 'https://messages.google.com/web'))
 
+CNBC_index_xpath = dict(
+    Dow = dict(
+        change = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[1]/div/div[2]/div/div/table/tbody/tr/td[3]',
+        implied = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[1]/div/div[4]/div/div/table/tbody/tr/td[3]'),
+    SP = dict(
+        change = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[2]/div/div[2]/div/div/table/tbody/tr/td[3]',
+        implied = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[2]/div/div[4]/div/div/table/tbody/tr/td[3]'),
+    Nasdaq = dict(
+        change = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[3]/div/div[2]/div/div/table/tbody/tr/td[3]',
+        implied = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[3]/div/div[4]/div/div/table/tbody/tr/td[3]'),
+    Russell = dict(
+        change = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[4]/div/div[2]/div/div/table/tbody/tr/td[3]',
+        implied = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[4]/div/div[4]/div/div/table/tbody/tr/td[3]'))
+
 fields = ['open','high','low','close','volume']
 B_scale = dict(
     BABA = 1 / 8,

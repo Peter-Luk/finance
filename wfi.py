@@ -29,6 +29,9 @@ class WFutures(object):
         if not isinstance(_, (list, tuple)): _ = [_]
         [self.browser.execute_script(f"window.open('{source[__]['site']}', '{__}');") for __ in _ if __ in source.keys()]
 
+    def cxpath(_, type='implied'):
+        base = '/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div'
+
     def kill(self):
         self.browser.quit()
         del self.browser
