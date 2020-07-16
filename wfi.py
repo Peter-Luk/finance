@@ -28,12 +28,12 @@ class WFutures(object):
     def auxiliary_load(self, _):
         if not isinstance(_, (list, tuple)): _ = [_]
         [self.browser.execute_script(f"window.open('{source[__]['site']}', '{__}');") for __ in _ if __ in source.keys()]
-
-    def cxpath(_, implied=True):
-        idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'],'div[2]'
-        if _ in idx:
-            if implied: div = 'div[4]'
-            return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[{1+idx.index(_)}]/div[1]/div/{div}/div/div/table/tr/td[3]'
+    #
+    # def cxpath(_, implied=True):
+    #     idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'],'div[2]'
+    #     if _ in idx:
+    #         if implied: div = 'div[4]'
+    #         return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[{1+idx.index(_)}]/div[1]/div/{div}/div/div/table/tr/td[3]'
 
     def kill(self):
         self.browser.quit()
@@ -162,3 +162,9 @@ class WFutures(object):
             for __ in fields:
                 t = (_[0] + _[-2] + __[0]).lower()
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
+
+def cxpath(_, implied=True):
+    idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'],'div[2]'
+    if _ in idx:
+        if implied: div = 'div[4]'
+        return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[{1+idx.index(_)}]/div[1]/div/{div}/div/div/table/tr/td[3]'
