@@ -40,7 +40,7 @@ class WFutures(object):
             self.__update(tab, 'volume', volume)
             self.__cfm([tab])
 
-    def usif(self, idx='Dow', site='CNBC'):
+    def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
         # divs = self.browser.find_elements_by_tag_name('div')
@@ -52,12 +52,12 @@ class WFutures(object):
         #             return __
         #         except: pass
         # return [float(__.text.replace(',','')) for __ in _findidx(idx).find_elements_by_xpath(f".//td[@class='{source[site]['delta_xpath']}Gain' or @class='{source[site]['delta_xpath']}Decline']")]
-        def cxpath(_, implied=True):
-            idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'],'div[2]'
+        def cxpath(_, implied):
+            idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'], 'div[2]'
             if _ in idx:
                 if implied: div = 'div[4]'
                 return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div/{div}/div/div/table/tbody/tr/td[3]'
-        return float(self.browser.find_element_by_xpath(cxpath(idx)).text.replace(',',''))
+        return float(self.browser.find_element_by_xpath(cxpath(idx, implied)).text.replace(',',''))
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
