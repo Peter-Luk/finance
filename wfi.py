@@ -17,7 +17,7 @@ class WFutures(object):
         self.browser.get(f'http://{self.lip}/futures')
         self.window0 = self.browser.window_handles[0]
         self.browser.execute_script(f"window.open('http://{self.lip}/equities','Local');")
-        self.auxiliary_load(['NIKKEI', 'CNBC', 'WhatsApp'])
+        self.auxiliary_load(['NIKKEI', 'CNBC', 'SINA', 'WhatsApp'])
         self.__load(lf)
         self.refresh(self.window0)
 
@@ -39,6 +39,11 @@ class WFutures(object):
             self.__update(tab, 'close', close)
             self.__update(tab, 'volume', volume)
             self.__cfm([tab])
+
+    def sc(self, site='SINA'):
+        if self.browser.current_url == source[site]['site']: self.refresh(site)
+        else: self.browser.switch_to.window(site)
+        return float(self.browser.find_element_by_xpath('/html/body/div[8]/div[3]/div[2]/div[1]/div[1]/div[1]/div[1]').text.replace(',',''))
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
