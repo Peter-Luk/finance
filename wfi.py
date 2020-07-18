@@ -45,12 +45,6 @@ class WFutures(object):
         else: self.browser.switch_to.window(site)
         return float(self.browser.find_element_by_xpath('//*[@id="change"]').text.replace(',',''))
 
-    def cxpath(_, implied=True):
-        idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'],'div[2]'
-        if _ in idx:
-            if implied: div = 'div[4]'
-            return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[{1+idx.index(_)}]/div[1]/div/{div}/div/div/table/tr/td[3]'
-
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]['site']: self.refresh(site)
         else: self.browser.switch_to.window(site)
