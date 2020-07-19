@@ -27,7 +27,8 @@ class WFutures(object):
 
     def auxiliary_load(self, _):
         if not isinstance(_, (list, tuple)): _ = [_]
-        [self.browser.execute_script(f"window.open('{source[__]['site']}', '{__}');") for __ in _ if __ in source.keys()]
+        [self.browser.execute_script(f"window.open('{source[__]}', '{__}');") for __ in _ if __ in source.keys()]
+        # [self.browser.execute_script(f"window.open('{source[__]['site']}', '{__}');") for __ in _ if __ in source.keys()]
 
     def kill(self):
         self.browser.quit()
@@ -41,12 +42,14 @@ class WFutures(object):
             self.__cfm([tab])
 
     def sc(self, site='SINA'):
-        if self.browser.current_url == source[site]['site']: self.refresh(site)
+        # if self.browser.current_url == source[site]['site']: self.refresh(site)
+        if self.browser.current_url == source[site]: self.refresh(site)
         else: self.browser.switch_to.window(site)
         return float(self.browser.find_element_by_xpath('//*[@id="change"]').text.replace(',',''))
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
-        if self.browser.current_url == source[site]['site']: self.refresh(site)
+        # if self.browser.current_url == source[site]['site']: self.refresh(site)
+        if self.browser.current_url == source[site]: self.refresh(site)
         else: self.browser.switch_to.window(site)
         # divs = self.browser.find_elements_by_tag_name('div')
         # divs.reverse()
@@ -65,9 +68,11 @@ class WFutures(object):
         return float(self.browser.find_element_by_xpath(cxpath(idx, implied)).text.replace(',',''))
 
     def nk225(self, site='NIKKEI'):
-        if self.browser.current_url == source[site]['site']: self.refresh(site)
+        # if self.browser.current_url == source[site]['site']: self.refresh(site)
+        if self.browser.current_url == source[site]: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        _ = self.browser.find_element_by_id(source[site]['delta_id'])
+        # _ = self.browser.find_element_by_id(source[site]['delta_id'])
+        _ = self.browser.find_element_by_xpath('//*[@id="diff"]')
         t = _.text.split(' ')[0].split(',')
         return float(t[0].replace(',',''))
 
