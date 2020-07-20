@@ -50,15 +50,6 @@ class WFutures(object):
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        # divs = self.browser.find_elements_by_tag_name('div')
-        # divs.reverse()
-        # def _findidx(idx):
-        #     for __ in divs:
-        #         try:
-        #             __.find_element_by_partial_link_text(idx)
-        #             return __
-        #         except: pass
-        # return [float(__.text.replace(',','')) for __ in _findidx(idx).find_elements_by_xpath(f".//td[@class='{source[site]['delta_xpath']}Gain' or @class='{source[site]['delta_xpath']}Decline']")]
         def cxpath(_, __):
             idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'], 'div[2]'
             if _ in idx:
