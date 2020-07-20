@@ -40,9 +40,22 @@ class WFutures(object):
             self.__update(tab, 'volume', volume)
             self.__cfm([tab])
 
-    def sc(self, site='SINA'):
+    def shanghai_composite(self, site='SINA'):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.browser.switch_to.window(site)
+        _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        if _ == '--': _ = '0'
+        return float(_.replace(',',''))
+
+    def load_A_share(self, code, site='SINA'):
+        __ = source[site].replace('000001', code)
+        self.browser.execute_script(f"window.open('{__}', 'sh{code:06}');")
+        self.browser.switch_to.window(f'sh{code:06}')
+
+    def shanghai_A(self, code, site='SINA'):
+        __ = source[site].replace('000001', code)
+        if self.browser.current_url == __: self.refresh(f'sh{code:06}')
+        else: self.browser.switch_to.window(f'sh{code:06}')
         _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
         if _ == '--': _ = '0'
         return float(_.replace(',',''))
