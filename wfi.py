@@ -43,7 +43,9 @@ class WFutures(object):
     def sc(self, site='SINA'):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.browser.switch_to.window(site)
-        return float(self.browser.find_element_by_xpath('//*[@id="change"]').text.replace(',',''))
+        _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        if _ == '--': _ = '0'
+        return float(_.replace(',',''))
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]: self.refresh(site)
