@@ -40,9 +40,12 @@ class WFutures(object):
             self.__update(tab, 'volume', volume)
             self.__cfm([tab])
 
+    def goto(self, _):
+        self.browser.switch_to.window(_)
+
     def shanghai_composite(self, site='SINA'):
         if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.browser.switch_to.window(site)
+        else: self.goto(site)
         _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
         if _ == '--': _ = '0'
         return float(_.replace(',',''))
@@ -50,19 +53,19 @@ class WFutures(object):
     def load_A_share(self, code, site='SINA'):
         __ = source[site].replace('000001', code)
         self.browser.execute_script(f"window.open('{__}', 'sh{code:06}');")
-        self.browser.switch_to.window(f'sh{code:06}')
+        self.goto(f'sh{code:06}')
 
     def shanghai_A(self, code, site='SINA'):
         __ = source[site].replace('000001', code)
         if self.browser.current_url == __: self.refresh(f'sh{code:06}')
-        else: self.browser.switch_to.window(f'sh{code:06}')
+        else: self.goto(f'sh{code:06}')
         _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
         if _ == '--': _ = '0'
         return float(_.replace(',',''))
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.browser.switch_to.window(site)
+        else: self.goto(site)
         def cxpath(_, __):
             idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'], 'div[2]'
             if _ in idx:
@@ -72,7 +75,7 @@ class WFutures(object):
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.browser.switch_to.window(site)
+        else: self.goto(site)
         # _ = self.browser.find_element_by_id(source[site]['delta_id'])
         _ = self.browser.find_element_by_xpath('//*[@id="diff"]')
         t = _.text.split(' ')[0].split(',')
@@ -80,24 +83,24 @@ class WFutures(object):
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
-            self.browser.switch_to.window(_)
+            self.goto(_)
             self.browser.back()
             self.refresh(_)
         if tabs in [self.window0, 'Local']:
-            self.browser.switch_to.window(tabs)
+            self.goto(tabs)
             self.browser.back()
             self.refresh(tabs)
 
     def set_open(self, tab, _):
         if tab.upper() in lf: self.__update(tab.upper(), 'open', _)
         if tab == self.window0:
-            self.browser.switch_to.window(tab)
+            self.goto(tab)
             self.pivot.clear()
             self.pivot.send_keys(_)
 
     def __update(self, tab, field, _):
         if (tab in lf) and (field in fields):
-            self.browser.switch_to.window(tab)
+            self.goto(tab)
             t = (tab[0] + tab[-2] + field[0]).lower()
             exec(f'self.{t}.clear()')
             exec(f'self.{t}.send_keys({_})')
@@ -112,16 +115,16 @@ class WFutures(object):
 
     def __cfm(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
-            self.browser.switch_to.window(_)
+            self.goto(_)
             t = (_[0] + _[-2] + 'b').lower()
             exec(f"self.{t}.click()")
         if tabs == self.window0:
-            self.browser.switch_to.window(tabs)
+            self.goto(tabs)
             self.eb.click()
 
     def refresh(self, _):
         if _.upper() in lf:
-            self.browser.switch_to.window(_.upper())
+            self.goto(_.upper())
             self.browser.back()
             for __ in self.browser.find_elements_by_tag_name('option'):
                 if __.text == _.upper():
@@ -134,7 +137,7 @@ class WFutures(object):
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
                 exec(f"self.{t}.clear()")
         if _ == self.window0:
-            self.browser.switch_to.window(_)
+            self.goto(_)
             for __ in self.browser.find_elements_by_tag_name('option'):
                 if __.text == mtf('mhi'):
                     __.click()
@@ -143,7 +146,7 @@ class WFutures(object):
             self.pivot.clear()
             self.eb = self.browser.find_element_by_tag_name('button')
         if _ == 'Local':
-            self.browser.switch_to.window(_)
+            self.goto(_)
             options = self.browser.find_elements_by_tag_name('option')
             preferred_code = random.choice([__.text for __ in options])
             for __ in options:
@@ -164,7 +167,7 @@ class WFutures(object):
     def __load(self, tabs):
         for _ in [__ for __ in tabs if __ in lf]:
             self.browser.execute_script(f"window.open('http://{self.lip}','{_}');")
-            self.browser.switch_to.window(_)
+            self.goto(_)
             for __ in self.browser.find_elements_by_tag_name('option'):
                 if __.text == _:
                     __.click()
