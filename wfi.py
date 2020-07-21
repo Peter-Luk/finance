@@ -79,7 +79,7 @@ class WFutures(object):
                 if __: div = 'div[4]'
                 return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div/{div}/div/div/table/tbody/tr/td[3]'
         _ = cxpath(idx, implied)
-        price = self.browser.find_element_by_xpath(_.replace('td[3]','td[2]').text
+        price = self.browser.find_element_by_xpath(_.replace('td[3]','td[2]')).text
         change = self.browser.find_element_by_xpath(_).text
         return [float(__.replace(',','')) for __ in [price, change]]
 
