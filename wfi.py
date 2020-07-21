@@ -76,15 +76,19 @@ class WFutures(object):
             if _ in idx:
                 if __: div = 'div[4]'
                 return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div/{div}/div/div/table/tbody/tr/td[3]'
-        return float(self.browser.find_element_by_xpath(cxpath(idx, implied)).text.replace(',',''))
+        _ = cxpath(idx, implied)
+        price = self.browser.find_element_by_xpath(_.replace('td[3]','td[2]').text
+        change = self.browser.find_element_by_xpath(_).text
+        return [float(__.replace(',','')) for __ in [price, change]]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
         # _ = self.browser.find_element_by_id(source[site]['delta_id'])
-        _ = self.browser.find_element_by_xpath('//*[@id="diff"]')
-        t = _.text.split(' ')[0].split(',')
-        return float(t[0].replace(',',''))
+        price = self.browser.find_element_by_xpath('//*[@id="price"]').text
+        _ = self.browser.find_element_by_xpath('//*[@id="diff"]').text
+        t = _.split(' ')[0].split(',')
+        return [float(__.replace(',','')) for __ in [price, t[0]]]
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
