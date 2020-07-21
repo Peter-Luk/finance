@@ -46,9 +46,13 @@ class WFutures(object):
     def shanghai_composite(self, site='SINA'):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
-        _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        if _ == '--': _ = '0'
-        return float(_.replace(',',''))
+        price = self.browser.find_element_by_xpath('//*[@id="price"]').text
+        change = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        if change == '--': change = '0'
+        return [float(_.replace(',','')) for _ in [price, change]]
+        # _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        # if _ == '--': _ = '0'
+        # return float(_.replace(',',''))
 
     def load_A_share(self, code, site='SINA'):
         __ = source[site].replace('000001', code)
@@ -59,9 +63,10 @@ class WFutures(object):
         __ = source[site].replace('000001', code)
         if self.browser.current_url == __: self.refresh(f'sh{code:06}')
         else: self.goto(f'sh{code:06}')
-        _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        if _ == '--': _ = '0'
-        return float(_.replace(',',''))
+        price = self.browser.find_element_by_xpath('//*[@id="price"]').text
+        change = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        if change == '--': change = '0'
+        return [float(_.replace(',','')) for _ in [price, change]]
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]: self.refresh(site)
