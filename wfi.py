@@ -55,14 +55,16 @@ class WFutures(object):
         # return float(_.replace(',',''))
 
     def load_A_share(self, code, site='SINA'):
+        if isinstance(code, int): code = f'{code:06}'
         __ = source[site].replace('000001', code)
-        self.browser.execute_script(f"window.open('{__}', 'sh{code:06}');")
-        self.goto(f'sh{code:06}')
+        self.browser.execute_script(f"window.open('{__}', 'sh{code}');")
+        self.goto(f'sh{code}')
 
     def shanghai_A(self, code, site='SINA'):
+        if isinstance(code, int): code = f'{code:06}'
         __ = source[site].replace('000001', code)
-        if self.browser.current_url == __: self.refresh(f'sh{code:06}')
-        else: self.goto(f'sh{code:06}')
+        if self.browser.current_url == __: self.refresh(f'sh{code}')
+        else: self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
         if change == '--': change = '0'
