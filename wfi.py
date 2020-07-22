@@ -50,9 +50,6 @@ class WFutures(object):
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
         if change == '--': change = '0'
         return [float(_.replace(',','')) for _ in [price, change]]
-        # _ = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        # if _ == '--': _ = '0'
-        # return float(_.replace(',',''))
 
     def load_A_share(self, code, site='SINA'):
         if isinstance(code, int): code = f'{code:06}'
@@ -81,21 +78,11 @@ class WFutures(object):
                 return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div/{div}/div/div/table/tbody/tr'
 
         _ = self.browser.find_element_by_xpath(cxpath(idx, implied))
-        # def cxpath(_, __):
-        #     idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'], 'div[2]'
-        #     if _ in idx:
-        #         if __: div = 'div[4]'
-        #         return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div/{div}/div/div/table/tbody/tr/td[3]'
-        # _ = cxpath(idx, implied)
-        # price = self.browser.find_element_by_xpath(_.replace('td[3]','td[2]')).text
-        # change = self.browser.find_element_by_xpath(_).text
-        # return [float(__.replace(',','')) for __ in [price, change]]
         return [float(_.find_element_by_xpath(__).text.replace(',','')) for __ in ['./td[2]', './td[3]']]
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
-        # _ = self.browser.find_element_by_id(source[site]['delta_id'])
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         _ = self.browser.find_element_by_xpath('//*[@id="diff"]').text
         t = _.split(' ')[0].split(',')
