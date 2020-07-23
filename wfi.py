@@ -1,7 +1,7 @@
-from utilities import driver_path, today, ltd, waf, mtf, IP
+from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-import random
+import re, random
 
 from pref import source, fields
 lf, preference = waf(), 'Firefox'
@@ -88,7 +88,7 @@ class WFutures(object):
         _ = self.browser.find_element_by_xpath(cxpath(idx))
         price = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[2]').text
         change = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[3]').text
-        last = _.find_element_by_xpath('./div[5]').text
+        last = datetime.strptime(''.join(re.split('\: |\|', _.find_element_by_xpath('./div[5]').text)[1:]), '%a %b %d %Y %I:%M %p EDT')
         _ = [float(__.replace(',','')) for __ in [price, change]]
         _.append(last)
         return _
