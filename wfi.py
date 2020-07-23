@@ -48,8 +48,11 @@ class WFutures(object):
         else: self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        last = self.browser.find_element_by_xpath('//*[@id="hqTime"]').text
         if change == '--': change = '0'
-        return [float(_.replace(',','')) for _ in [price, change]]
+        _ = [float(_.replace(',','')) for _ in [price, change]]
+        _.append(last)
+        return _
 
     def load_A_share(self, code, site='SINA'):
         if isinstance(code, int): code = f'{code:06}'
@@ -64,29 +67,42 @@ class WFutures(object):
         else: self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        last = self.browser.find_element_by_xpath('//*[@id="hqTime"]').text
         if change == '--': change = '0'
-        return [float(_.replace(',','')) for _ in [price, change]]
+        _ = [float(_.replace(',','')) for _ in [price, change]]
+        _.append(last)
+        return _
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
+        div = 'div[2]'
+        if  implied: div = 'div[4]'
 
-        def cxpath(_, __):
-            idx, div = ['Dow', 'S&P', 'Nasdaq', 'Russell'], 'div[2]'
+        def cxpath(_):
+            idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
             if _ in idx:
-                if __: div = 'div[4]'
-                return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div/{div}/div/div/table/tbody/tr'
+                # return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div/{div}/div/div/table/tbody/tr'
+                return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
 
-        _ = self.browser.find_element_by_xpath(cxpath(idx, implied))
-        return [float(_.find_element_by_xpath(__).text.replace(',','')) for __ in ['./td[2]', './td[3]']]
+        _ = self.browser.find_element_by_xpath(cxpath(idx))
+        price = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[2]').text
+        change = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[3]').text
+        last = _.find_element_by_xpath('./div[5]').text
+        _ = [float(__.replace(',','')) for __ in [price, change]]
+        _.append(last)
+        return _
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
-        _ = self.browser.find_element_by_xpath('//*[@id="diff"]').text
-        t = _.split(' ')[0].split(',')
-        return [float(__.replace(',','')) for __ in [price, t[0]]]
+        change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
+        t = change.split(' ')[0].split(',')
+        last = self.browser.find_element_by_xpath('//*[@id="datedtime"]').text
+        _ = [float(__.replace(',','')) for __ in [price, t[0]]]
+        _.append(last)
+        return _
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
