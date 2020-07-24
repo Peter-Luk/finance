@@ -48,7 +48,7 @@ class WFutures(object):
         else: self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = self.browser.find_element_by_xpath('//*[@id="hqTime"]').text
+        last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
         if change == '--': change = '0'
         _ = [float(_.replace(',','')) for _ in [price, change]]
         _.append(last)
@@ -67,7 +67,7 @@ class WFutures(object):
         else: self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = self.browser.find_element_by_xpath('//*[@id="hqTime"]').text
+        last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
         if change == '--': change = '0'
         _ = [float(_.replace(',','')) for _ in [price, change]]
         _.append(last)
