@@ -51,7 +51,9 @@ class WFutures(object):
         last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
         if change == '--': change = '0'
         _ = [float(_.replace(',','')) for _ in [price, change]]
-        _.extend([_[-1] / (_[0] - _[-1]) * 100, last])
+        __ = _[-1] / (_[0] - _[-1]) * 100
+        __ = float(f'{__:0.3f}')
+        _.extend([__, last])
         return _
 
     def load_A_share(self, code, site='SINA'):
@@ -70,7 +72,11 @@ class WFutures(object):
         last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
         if change == '--': change = '0'
         _ = [float(_.replace(',','')) for _ in [price, change]]
-        _.extend([_[-1] / (_[0] - _[-1]) * 100, last])
+        __ = _[-1] / (_[0] - _[-1]) * 100
+        __ = float(f'{__:0.3f}')
+        _.extend([__, last])
+        price = _.find_element_by_xpath('./td[2]').text
+        change = _.find_element_by_xpath('./td[3]').text
         return _
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
@@ -90,7 +96,9 @@ class WFutures(object):
         change = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[3]').text
         last = datetime.strptime(''.join(re.split('\: |\|', _.find_element_by_xpath('./div[5]').text)[1:]), '%a %b %d %Y %I:%M %p EDT')
         _ = [float(__.replace(',','')) for __ in [price, change]]
-        _.extend([_[-1] / (_[0] - _[-1]) * 100, last])
+        __ = _[-1] / (_[0] - _[-1]) * 100
+        __ = float(f'{__:0.3f}')
+        _.extend([__, last])
         return _
 
     def nk225(self, site='NIKKEI'):
