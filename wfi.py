@@ -75,8 +75,6 @@ class WFutures(object):
         __ = _[-1] / (_[0] - _[-1]) * 100
         __ = float(f'{__:0.3f}')
         _.extend([__, last])
-        price = _.find_element_by_xpath('./td[2]').text
-        change = _.find_element_by_xpath('./td[3]').text
         return _
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
