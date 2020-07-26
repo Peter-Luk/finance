@@ -25,7 +25,7 @@ class WFutures(object):
         self.lip = self.browser = self.pivot = self.eb = None
         del self.lip, self.browser, self.pivot, self.eb
 
-    def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKET', 'SINA']):
+    def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA']):
         if not isinstance(_, (list, tuple)): _ = [_]
         [self.browser.execute_script(f"window.open('{source[__]}', '{__}');") for __ in _ if __ in source.keys()]
 
