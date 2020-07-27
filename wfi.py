@@ -101,12 +101,21 @@ class WFutures(object):
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
+        def convert(_):
+            rstring  = '\([0-2][0-9]\:[0-5][0-9]\)'
+            if re.search(rstring, _):
+                return datetime.strptime(_, '%b/%d/%Y(%H:%M)')
+            return datetime.strptime(_.split('(')[0], '%b/%d/%Y')
+
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
         t = change.split(' ')[0].split(',')
-        last = self.browser.find_element_by_xpath('//*[@id="datedtime"]').text
+        last = convert(self.browser.find_element_by_xpath('//*[@id="datedtime"]').text)
         _ = [float(__.replace(',','')) for __ in [price, t[0]]]
-        _.append(last)
+        __ = _[-1] / (_[0] - _[-1]) * 100
+        __ = float(f'{__:0.3f}')
+        _.extend([__, last])
+        # _.append(last)
         return _
 
     def reset(self, tabs=lf):
