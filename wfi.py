@@ -24,9 +24,11 @@ class WFutures(object):
         self.lip = self.browser = self.pivot = self.eb = None
         del self.lip, self.browser, self.pivot, self.eb
 
-    def __percent_change(self, _):
+    def __status(self, p, c, l):
+        _ = [float(_.replace(',','')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
-        return float(f'{__:0.3f}')
+        _.extend([float(f'{__:0.3f}'), l])
+        return _
 
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA']):
         if not isinstance(_, (list, tuple)): _ = [_]
@@ -53,9 +55,7 @@ class WFutures(object):
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
         last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
         if change == '--': change = '0'
-        _ = [float(_.replace(',','')) for _ in [price, change]]
-        _.extend([self.__percent_change(_), last])
-        return _
+        return self.__status(price, change, last)
 
     def load_A_share(self, code, site='SINA'):
         if isinstance(code, int): code = f'{code:06}'
@@ -72,9 +72,7 @@ class WFutures(object):
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
         last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
         if change == '--': change = '0'
-        _ = [float(_.replace(',','')) for _ in [price, change]]
-        _.extend([self.__percent_change(_), last])
-        return _
+        return self.__status(price, change, last)
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]: self.refresh(site)
@@ -91,9 +89,7 @@ class WFutures(object):
         price = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[2]').text
         change = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[3]').text
         last = datetime.strptime(''.join(re.split('\: |\|', _.find_element_by_xpath('./div[5]').text)[1:]), '%a %b %d %Y %I:%M %p EDT')
-        _ = [float(__.replace(',','')) for __ in [price, change]]
-        _.extend([self.__percent_change(_), last])
-        return _
+        return self.__status(price, change, last)
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]: self.refresh(site)
@@ -108,9 +104,7 @@ class WFutures(object):
         change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
         t = change.split(' ')[0].split(',')
         last = convert(self.browser.find_element_by_xpath('//*[@id="datedtime"]').text)
-        _ = [float(__.replace(',','')) for __ in [price, t[0]]]
-        _.extend([self.__percent_change(_), last])
-        return _
+        return self.__status(price, t[0], last)
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
