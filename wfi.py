@@ -83,7 +83,7 @@ class WFutures(object):
         try:
             self.goto('WhatsApp')
             wait = WebDriverWait(self.browser, 600)
-            x_arg = '//span[contains(@title,' + recipent + ')]'
+            x_arg = f'//span[contains(@title, {recipent})]'
             group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
             group_title.click()
             inp_xpath = '//div[@class="input"][@dir="auto"][@data-tab="1"]'
