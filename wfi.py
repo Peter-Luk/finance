@@ -165,87 +165,14 @@ class WFutures(object):
         if tabs == self.window0:
             self.goto(tabs)
             self.eb.click()
-
-    def refresh(self, _):
-        if _.upper() in lf:
-            self.goto(_.upper())
-            self.browser.back()
-            for __ in self.browser.find_elements_by_tag_name('option'):
-                if __.text == _.upper():
-                    __.click()
-
-    def usif(self, idx='Dow', site='CNBC', implied=True):
-        if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.goto(site)
-        div = 'div[2]'
-        if  implied: div = 'div[4]'
-
-        def cxpath(_):
-            idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
-            if _ in idx:
-                return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
-
-        _ = self.browser.find_element_by_xpath(cxpath(idx))
-        price = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[2]').text
-        change = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[3]').text
-        last = datetime.strptime(''.join(re.split('\: |\|', _.find_element_by_xpath('./div[5]').text)[1:]), '%a %b %d %Y %I:%M %p EDT')
-        return self.__status(price, change, last)
-
-    def nk225(self, site='NIKKEI'):
-        if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.goto(site)
-        def convert(_):
-            rstring  = '\([0-2][0-9]\:[0-5][0-9]\)'
-            if re.search(rstring, _):
-                return datetime.strptime(_, '%b/%d/%Y(%H:%M)')
-            return datetime.strptime(_.split('(')[0], '%b/%d/%Y')
-
-        price = self.browser.find_element_by_xpath('//*[@id="price"]').text
-        change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
-        t = change.split(' ')[0].split(',')
-        last = convert(self.browser.find_element_by_xpath('//*[@id="datedtime"]').text)
-        return self.__status(price, t[0], last)
-
-    def reset(self, tabs=lf):
-        for _ in [__ for __ in tabs if __ in lf]:
-            self.goto(_)
-            self.browser.back()
-            self.refresh(_)
-        if tabs in [self.window0, 'Local']:
-            self.goto(tabs)
-            self.browser.back()
-            self.refresh(tabs)
-
-    def set_open(self, tab, _):
-        if tab.upper() in lf: self.__update(tab.upper(), 'open', _)
-        if tab == self.window0:
-            self.goto(tab)
-            self.pivot.clear()
-            self.pivot.send_keys(_)
-
-    def __update(self, tab, field, _):
-        if (tab in lf) and (field in fields):
-            self.goto(tab)
-            t = (tab[0] + tab[-2] + field[0]).lower()
-            exec(f'self.{t}.clear()')
-            exec(f'self.{t}.send_keys({_})')
-
-    def update_high(self, tab, _):
-        tab = tab.upper()
-        if tab in lf: self.__update(tab, 'high', _)
-
-    def update_low(self, tab, _):
-        tab = tab.upper()
-        if tab in lf: self.__update(tab, 'low', _)
-
-    def __cfm(self, tabs=lf):
-        for _ in [__ for __ in tabs if __ in lf]:
-            self.goto(_)
-            t = (_[0] + _[-2] + 'b').lower()
-            exec(f"self.{t}.click()")
-        if tabs == self.window0:
-            self.goto(tabs)
-            self.eb.click()
+#
+    # def refresh(self, _):
+    #     if _.upper() in lf:
+    #         self.goto(_.upper())
+    #         self.browser.back()
+    #         for __ in self.browser.find_elements_by_tag_name('option'):
+    #             if __.text == _.upper():
+    #                 __.click()
 
     def refresh(self, _):
         if _.upper() in lf:
