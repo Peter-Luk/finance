@@ -1,4 +1,4 @@
-from utilities import driver_path, today, ltd, waf, mtf, IP, datetime, linesep
+from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,13 +7,8 @@ from selenium.webdriver.common.by import By
 import re, random
 
 from pref import source, fields
-from pt_2 import PI
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
-
-def festi(_, __='mhi'):
-    i2 = PI(mtf(__))
-    return linesep.join([i2.estimate(_), f"range between {max(i2.estimate(_)['Daily']['upper'])} and {min(i2.estimate(_)['Daily']['lower'])}"])
 
 class WFutures(object):
     def __init__(self, ip=None, _=None):

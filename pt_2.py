@@ -2,7 +2,7 @@
 Local Futures (sqlite) analysis using pandas, matplotlib (visualize) via pyplot.
 """
 him = getattr(__import__('handy'), 'him')
-__ = him([{'utilities':('dvs', 'gr', 'get_month')}, ({'trial01':('I2',), 'pandas':(), 'sys':('version_info',), 'os':('linesep',)}, "alias={'I2':'I2', 'pandas':'pd'}")])
+__ = him([{'utilities':('dvs', 'gr', 'get_month', 'mtf', 'datetime')}, ({'trial01':('I2',), 'pandas':(), 'sys':('version_info',), 'os':('linesep',)}, "alias={'I2':'I2', 'pandas':'pd'}")])
 for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
 if version_info.major == 2: __ = him([({'threading':('Thread',), 'Queue':('Queue',)}, "case='capitalize'")])
 if version_info.major == 3: __ = him([({'threading':('Thread',), 'queue':('Queue',)}, "case='capitalize'")])
@@ -315,3 +315,9 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
         except:pass
         if programmatic == True: return res
         return rest
+
+def festi(_, __='mhi'):
+    i2, p = PI(mtf(__)), 'Daily'
+    if datetime.now().hour > 12: p = 'Session'
+    r = i2.estimate(_, programmatic=True)[p]
+    return linesep.join([i2.estimate(_), f"range between {max(r['upper'])} and {min(r['lower'])}"])
