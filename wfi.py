@@ -8,10 +8,12 @@ import re, random
 
 from pref import source, fields
 from pt_2 import PI
-i2 = PI(mtf('mhi'))
 lf, preference = waf(), 'Firefox'
 if today.day == ltd(today.year, today.month): lf = waf(1)
-# string = linesep.join([i2.estimate(pivot), f"range between {max(i2.estimate(pivot)['Daily']['upper'])} and {min(i2.estimate(pivot)['Daily']['lower'])}"])
+
+def festi(_, __='mhi'):
+    i2 = PI(mtf(__))
+    return linesep.join([i2.estimate(_), f"range between {max(i2.estimate(_)['Daily']['upper'])} and {min(i2.estimate(_)['Daily']['lower'])}"])
 
 class WFutures(object):
     def __init__(self, ip=None, _=None):
