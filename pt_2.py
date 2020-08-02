@@ -317,7 +317,7 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
         return rest
 
 def festi(_, __='mhi'):
-    i2, p = PI(mtf(__)), 'Daily'
-    if datetime.now().hour > 12: p = 'Session'
+    i2, p, g = PI(mtf(__)), 'Daily', ''
+    if datetime.now().hour > 12: p, g = 'Session', 'afternoon '
     r = i2.estimate(_, programmatic=True)[p]
-    return linesep.join([i2.estimate(_), f"range between {max(r['upper'])} and {min(r['lower'])}"])
+    return linesep.join([f'{mtf(__)} estimate base on {g}opening @ {_},', i2.estimate(_), f"range between {max(r['upper'])} and {min(r['lower'])}"])
