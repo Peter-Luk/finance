@@ -165,14 +165,6 @@ class WFutures(object):
         if tabs == self.window0:
             self.goto(tabs)
             self.eb.click()
-#
-    # def refresh(self, _):
-    #     if _.upper() in lf:
-    #         self.goto(_.upper())
-    #         self.browser.back()
-    #         for __ in self.browser.find_elements_by_tag_name('option'):
-    #             if __.text == _.upper():
-    #                 __.click()
 
     def refresh(self, _):
         if _.upper() in lf:
