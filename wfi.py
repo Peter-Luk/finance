@@ -103,9 +103,9 @@ class WFutures(object):
         _ = self.browser.find_element_by_xpath(cxpath(idx))
         price = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[2]').text
         change = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[3]').text
-        l = _.find_element_by_xpath('./div[5]').text[1:]
+        l = ''.join(re.split('\: |\|', _.find_element_by_xpath('./div[5]').text)[1:])
         try:
-            last = datetime.strptime(''.join(re.split('\: |\|', l)), '%a %b %d %Y %I:%M %p EDT')
+            last = datetime.strptime(l, '%a %b %d %Y %I:%M %p EDT')
         except:
             last = datetime.strptime(l, '%a %b %d %Y')
         return self.__status(price, change, last)
