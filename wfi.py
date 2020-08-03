@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 import re, random
 
 from pref import source, fields
+from pt_2 import festi
 lf, preference = waf(), 'Firefox'
 milly = '"凌月明Milly"'
 if today.day == ltd(today.year, today.month): lf = waf(1)
