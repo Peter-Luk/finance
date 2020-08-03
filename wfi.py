@@ -8,6 +8,7 @@ import re, random
 
 from pref import source, fields
 lf, preference = waf(), 'Firefox'
+milly = '"凌月明Milly"'
 if today.day == ltd(today.year, today.month): lf = waf(1)
 
 class WFutures(object):
@@ -83,9 +84,12 @@ class WFutures(object):
             x_arg = f'//span[contains(@title, {recipent})]'
             group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
             group_title.click()
-            inp_xpath = '//div[@class="input"][@dir="auto"][@data-tab="1"]'
+            inp_xpath = '//div[@class="_3FRCZ copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
+            # inp_xpath = '//div[@class="input"][@dir="auto"][@data-tab="1"]'
             input_box = wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
-            input_box.send_keys(message + Keys.ENTER)
+            for i in range(100):
+                input_box.send_keys(message + Keys.ENTER)
+                time.sleep(1)
             return f'Message successfully sent to {recipent} @ {datetime.now()}'
         except: pass
 
