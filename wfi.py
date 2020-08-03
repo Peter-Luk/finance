@@ -87,9 +87,10 @@ class WFutures(object):
             inp_xpath = '//div[@class="_3FRCZ copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
             # inp_xpath = '//div[@class="input"][@dir="auto"][@data-tab="1"]'
             input_box = wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
-            for i in range(100):
-                input_box.send_keys(message + Keys.ENTER)
-                time.sleep(1)
+            # for i in range(100):
+            #     input_box.send_keys(message + Keys.ENTER)
+            #     time.sleep(1)
+            input_box.send_keys(message + Keys.ENTER)
             return f'Message successfully sent to {recipent} @ {datetime.now()}'
         except: pass
 
