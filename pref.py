@@ -18,6 +18,13 @@ driver = dict(
         path = ['browser', 'driver'])
 )
 
+private = dict(
+    mobile = dict(
+        primary = 63344427,
+        secondary = 90757228),
+    whatsapp_input = {90757228 : '_3FRCZ'}
+)
+
 source = dict(
     SINA = 'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml',
     NIKKEI = 'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225',

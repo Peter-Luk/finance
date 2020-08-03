@@ -1,4 +1,4 @@
-from utilities import driver_path, today, ltd, waf, mtf, IP, datetime, wxpinc, mobile
+from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import re, random
 
-from pref import source, fields
+from pref import source, fields, private
 from pt_2 import festi
 lf, preference = waf(), 'Firefox'
 milly = '"凌月明Milly"'
@@ -78,14 +78,15 @@ class WFutures(object):
         if change == '--': change = '0'
         return self.__status(price, change, last)
 
-    def whatsend(self, recipent, message, mobile=mobile['secondary']):
+    def whatsend(self, recipent, message, mobile=private['mobile']['secondary']):
         try:
             self.goto('WhatsApp')
             wait = WebDriverWait(self.browser, 600)
             x_arg = f'//span[contains(@title, {recipent})]'
             group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
             group_title.click()
-            inp_xpath = f'//div[@class="{wxpinc[mobile]} copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
+            _ = private['whatsapp_input'][mobile]
+            inp_xpath = f'//div[@class="{_} copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
             # inp_xpath = '//div[@class="input"][@dir="auto"][@data-tab="1"]'
             input_box = wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
             # for i in range(100):
