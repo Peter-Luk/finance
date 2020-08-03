@@ -6,6 +6,8 @@ ph = pref.public_holiday
 
 today = datetime.today()
 year, month, month_string = today.year, today.month, today.strftime('%B')
+mobile = {'primary':63344427, 'secondary':90757228}
+wxpinc = {90757228: '_3FRCZ'}
 
 def driver_path(browser):
     _ = [str(Path.home())]

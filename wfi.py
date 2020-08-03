@@ -1,4 +1,4 @@
-from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
+from utilities import driver_path, today, ltd, waf, mtf, IP, datetime, wxpinc, mobile
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -78,14 +78,14 @@ class WFutures(object):
         if change == '--': change = '0'
         return self.__status(price, change, last)
 
-    def whatsend(self, recipent, message):
+    def whatsend(self, recipent, message, mobile=mobile['secondary']):
         try:
             self.goto('WhatsApp')
             wait = WebDriverWait(self.browser, 600)
             x_arg = f'//span[contains(@title, {recipent})]'
             group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
             group_title.click()
-            inp_xpath = '//div[@class="_3FRCZ copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
+            inp_xpath = f'//div[@class="{wxpinc[mobile]} copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
             # inp_xpath = '//div[@class="input"][@dir="auto"][@data-tab="1"]'
             input_box = wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
             # for i in range(100):
