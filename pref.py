@@ -22,7 +22,8 @@ private = dict(
     mobile = dict(
         primary = 63344427,
         secondary = 90757228),
-    whatsapp_input = {90757228 : '_3FRCZ'}
+    whatsapp = dict(
+        input = {90757228 : '_3FRCZ'})
 )
 
 source = dict(
