@@ -34,7 +34,7 @@ class WFutures(object):
         _.extend([float(f'{__:0.3f}'), l])
         return _
 
-    def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA']):
+    def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
         if not isinstance(_, (list, tuple)): _ = [_]
         [self.browser.execute_script(f"window.open('{source[__]}', '{__}');") for __ in _ if __ in source.keys()]
 
@@ -66,6 +66,12 @@ class WFutures(object):
         __ = source[site].replace('000001', code)
         self.browser.execute_script(f"window.open('{__}', 'sh{code}');")
         self.goto(f'sh{code}')
+
+    def gold(self, site='Gold'):
+        if self.browser.current_url == source[site]: self.refresh(site)
+        else: self.goto(site)
+        price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+        return float(price.replace(',',''))
 
     def shanghai_A(self, code, site='SINA'):
         if isinstance(code, int): code = f'{code:06}'

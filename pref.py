@@ -30,7 +30,8 @@ source = dict(
     NIKKEI = 'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225',
     CNBC = 'https://www.cnbc.com/pre-markets/',
     WhatsApp = 'https://web.whatsapp.com',
-    SMS = 'https://messages.google.com/web')
+    SMS = 'https://messages.google.com/web',
+    Gold = 'https://www.gold.org/')
 
 fields = ['open','high','low','close','volume']
 B_scale = dict(
