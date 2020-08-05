@@ -18,13 +18,19 @@ driver = dict(
         path = ['browser', 'driver'])
 )
 
-private = dict(
-    mobile = dict(
-        primary = 63344427,
-        secondary = 90757228),
-    whatsapp = dict(
-        input = {90757228 : '_3FRCZ'})
-)
+subject = {
+    'Peter Luk': dict(
+        mobile = dict(
+            primary = 63344427,
+            secondary = 90757228),
+        whatsapp = dict(
+            input = {90757228 : '_3FRCZ'})),
+    'Milly Ling': dict(
+        mobile = dict(
+            primary = 90107008),
+        whatsapp = dict(
+            alias = '"凌月明Milly"'))
+    }
 
 source = dict(
     SINA = 'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml',
