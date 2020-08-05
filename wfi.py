@@ -70,8 +70,10 @@ class WFutures(object):
     def gold(self, site='Gold'):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
-        price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
-        return float(price.replace(',',''))
+        try:
+            price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+            return float(price.replace(',',''))
+        except: return 'Market (probably) close.'
 
     def shanghai_A(self, code, site='SINA'):
         if isinstance(code, int): code = f'{code:06}'
