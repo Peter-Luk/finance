@@ -71,8 +71,7 @@ class WFutures(object):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
         price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
-        last = datetime.strptime(self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[3]').text.split(': ')[-1], '%d %B %Y %H:%M:%S')
-        return [float(price.replace(',','')), last]
+        return float(price.replace(',',''))
 
     def shanghai_A(self, code, site='SINA'):
         if isinstance(code, int): code = f'{code:06}'
