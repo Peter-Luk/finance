@@ -9,8 +9,8 @@ import re, random
 from pref import source, fields, subject
 from pt_2 import festi
 lf, preference = waf(), 'Firefox'
-owner = subject['Peter Luk']
-# milly = '"凌月明Milly"'
+__owner = subject['Peter Luk']
+milly = subject['Milly Ling']['whatsapp']['alias']
 if today.day == ltd(today.year, today.month): lf = waf(1)
 
 class WFutures(object):
@@ -87,14 +87,14 @@ class WFutures(object):
         if change == '--': change = '0'
         return self.__status(price, change, last)
 
-    def whatsend(self, recipent, message, mobile=owner['mobile']['secondary']):
+    def whatsend(self, recipent, message, mobile=__owner['mobile']['secondary']):
         try:
             self.goto('WhatsApp')
             wait = WebDriverWait(self.browser, 600)
             x_arg = f'//span[contains(@title, {recipent})]'
             group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
             group_title.click()
-            _ = owner['whatsapp']['input'][mobile]
+            _ = __owner['whatsapp']['input'][mobile]
             inp_xpath = f'//div[@class="{_} copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
             # inp_xpath = '//div[@class="input"][@dir="auto"][@data-tab="1"]'
             input_box = wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
