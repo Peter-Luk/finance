@@ -9,7 +9,7 @@ import re, random
 from pref import source, fields, subject
 from pt_2 import festi
 lf, preference = waf(), 'Firefox'
-__owner = subject['Peter Luk']
+__author = subject['Peter Luk']
 milly = subject['Milly Ling']['whatsapp']['alias']
 if today.day == ltd(today.year, today.month): lf = waf(1)
 
@@ -87,20 +87,16 @@ class WFutures(object):
         if change == '--': change = '0'
         return self.__status(price, change, last)
 
-    def whatsend(self, recipent, message, mobile=__owner['mobile']['secondary']):
+    def whatsend(self, recipent, message, mobile=__author['mobile']['secondary']):
         try:
             self.goto('WhatsApp')
             wait = WebDriverWait(self.browser, 600)
             x_arg = f'//span[contains(@title, {recipent})]'
             group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
             group_title.click()
-            _ = __owner['whatsapp']['input'][mobile]
+            _ = __author['whatsapp']['input'][mobile]
             inp_xpath = f'//div[@class="{_} copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
-            # inp_xpath = '//div[@class="input"][@dir="auto"][@data-tab="1"]'
             input_box = wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
-            # for i in range(100):
-            #     input_box.send_keys(message + Keys.ENTER)
-            #     time.sleep(1)
             input_box.send_keys(message + Keys.ENTER)
             return f'Message successfully sent to {recipent} @ {datetime.now()}'
         except: pass
