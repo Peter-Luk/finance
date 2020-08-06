@@ -22,12 +22,15 @@ subject = {
     'Peter Luk': dict(
         mobile = dict(
             primary = 63344427,
-            secondary = 90757228),
+            secondary = 90757228,
+            home = 27600722),
         whatsapp = dict(
-            input = {90757228 : '_3FRCZ'})),
+            input = {90757228 : '_3FRCZ'},
+            alias = '"陸永原"')),
     'Milly Ling': dict(
         mobile = dict(
-            primary = 90107008),
+            primary = 90107008,
+            home = 21750098),
         whatsapp = dict(
             alias = '"凌月明Milly"'))
     }
