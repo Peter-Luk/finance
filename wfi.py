@@ -20,6 +20,7 @@ class WFutures(object):
         if ip is None: self.lip = str(IP())
         self.browser = eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         self.browser.get(f'http://{self.lip}/futures')
+        self.wait = WebDriverWait(self.browser, 600)
         self.window0 = self.browser.window_handles[0]
         self.browser.execute_script(f"window.open('http://{self.lip}/equities','Local');")
         self.__load(lf)
@@ -91,13 +92,13 @@ class WFutures(object):
     def whatsend(self, recipent, message, sender=subject['Peter Luk']):
         try:
             self.goto('WhatsApp')
-            wait, mobile = WebDriverWait(self.browser, 600), sender['mobile']['secondary']
+            mobile = sender['mobile']['secondary']
             x_arg = f'//span[contains(@title, {recipent})]'
-            group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
+            group_title = self.wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
             group_title.click()
             _ = sender['whatsapp']['input'][mobile]
             inp_xpath = f'//div[@class="{_} copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
-            input_box = wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
+            input_box = self.wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
             input_box.send_keys(message + Keys.ENTER)
             return f'Message successfully sent to {recipent} @ {datetime.now()}'
         except: pass
@@ -229,6 +230,7 @@ class WFutures(object):
                 if __.text == _:
                     __.click()
                     break
+            self.wait.until(EC.presence_of_element_located((By.TAG_Name, 'button')))
             t = (_[0] + _[-2] + 'b').lower()
             exec(f"self.{t}=self.browser.find_element_by_tag_name('button')")
             for __ in fields:
