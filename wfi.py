@@ -27,8 +27,8 @@ class WFutures(object):
         self.refresh(self.window0)
 
     def __del__(self):
-        self.lip = self.browser = self.pivot = self.eb = None
-        del self.lip, self.browser, self.pivot, self.eb
+        self.lip = self.browser = self.wait = self.pivot = self.eb = None
+        del self.lip, self.browser, self.wait, self.pivot, self.eb
 
     def __status(self, p, c, l):
         _ = [float(_.replace(',','')) for _ in [p, c]]
