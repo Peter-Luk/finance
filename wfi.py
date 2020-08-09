@@ -88,7 +88,6 @@ class WFutures(object):
         if change == '--': change = '0'
         return self.__status(price, change, last)
 
-    # def whatsend(self, recipent, message, mobile=__author['mobile']['secondary']):
     def whatsend(self, recipent, message, sender=subject['Peter Luk']):
         try:
             self.goto('WhatsApp')
@@ -230,10 +229,10 @@ class WFutures(object):
                 if __.text == _:
                     __.click()
                     break
-            # self.wait.until(EC.presence_of_element_located((By.TAG_NAME, 'button')))
+            self.wait.until(EC.presence_of_element_located((By.TAG_NAME, 'button')))
             t = (_[0] + _[-2] + 'b').lower()
-            # exec(f"self.{t}=self.browser.find_element_by_tag_name('button')")
-            exec(f"self.{t}={self.wait.until(EC.presence_of_element_located((By.TAG_NAME, 'button')))}")
+            exec(f"self.{t}=self.browser.find_element_by_tag_name('button')")
+            # exec(f"self.{t}={self.wait.until(EC.presence_of_element_located((By.TAG_NAME, 'button')))}")
             for __ in fields:
                 t = (_[0] + _[-2] + __[0]).lower()
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
