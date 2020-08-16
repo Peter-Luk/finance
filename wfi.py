@@ -19,6 +19,7 @@ class WFutures(object):
         self.lip = ip
         if ip is None: self.lip = str(IP())
         self.browser = eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
+        self.browser.implicitly_wait(10)
         self.browser.get(f'http://{self.lip}/futures')
         self.wait = WebDriverWait(self.browser, 600)
         self.window0 = self.browser.window_handles[0]
