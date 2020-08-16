@@ -1,14 +1,15 @@
 from sqlalchemy import create_engine, MetaData, Table, select, insert, update, and_
 from utilities import filepath, datetime
 from datetime import time
+from pytz import timezone
 import pandas as pd
 
 class Record(object):
-    def __init__(self, sid, iid=None):
+    def __init__(self, sid, iid=None, tz='Asia/Hong_Kong'):
         if not iid: iid = 1
         # self.iid = iid
         if isinstance(sid, int) and isinstance(iid, int):
-            self.sid, self.iid = sid, iid
+            self.sid, self.iid, self.tz = sid, iid, tz
             engine = create_engine(f"sqlite:///{filepath('Health')}")
             self._table = Table('records', MetaData(), autoload=True, autoload_with=engine)
             self._columns = self._table.columns
@@ -52,6 +53,7 @@ class Record(object):
                 hdr['instrument_id'] = self.iid
                 query = insert(self._table)
                 now = datetime.now()
+                if not(now.tzinfo == self.tz): now = now.astimezone(timezone(self.tz))
                 hdr['date'], hdr['time'] = now.date(), now.time()
                 self._connect.execute(query, [hdr])
 
