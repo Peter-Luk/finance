@@ -6,9 +6,10 @@ from utilities import filepath
 eb, fb = pref.db['Equities'], pref.db['Futures']
 if platform == 'win32': home = str(Path.home())
 if platform in ['linux', 'linux2']:
-    subpath = 'shared'
-    if environ['EXTERNAL_STORAGE']: subpath = 'external-1'
-    home = sep.join([str(Path.home()), 'storage', subpath])
+    subpath, home = 'shared', f'{Path.home()}'
+    if 'EXTERNAL_STORAGE' in environ.keys():
+        subpath = 'external-1'
+        home = sep.join([str(Path.home()), 'storage', subpath])
 
 def get_db(*args, **kwargs):
     if isinstance(args[0], str): db_path = sep.join([home, args[0]])

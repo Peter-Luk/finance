@@ -173,7 +173,8 @@ class Equities(AE, Viewer):
 
     def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False):
         if not start:
-            start = pd.datetime(pd.datetime.now().year - years, 12, 31)
+            # start = pd.datetime(pd.datetime.now().year - years, 12, 31)
+            start = datetime(datetime.now().year - years, 12, 31)
         if code:
             if isinstance(code, (int, float)): code = int(code)
             if code not in [_ for _ in entities(self._conf['name']) if _ not in exclude]: adhoc = True
