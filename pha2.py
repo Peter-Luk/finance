@@ -52,8 +52,7 @@ class Record(object):
                 if isinstance(args[3], str): hdr['remarks'] = args[3]
                 hdr['instrument_id'] = self.iid
                 query = insert(self._table)
-                now = datetime.now()
-                if not(now.tzinfo == self.tz): now = now.astimezone(timezone(self.tz))
+                now = datetime.now().astimezone(timezone(self.tz))
                 hdr['date'], hdr['time'] = now.date(), now.time()
                 self._connect.execute(query, [hdr])
 
