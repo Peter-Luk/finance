@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine, MetaData, Table, select, insert, update, and_
 from utilities import filepath, datetime
 from datetime import time
-from pytz import timezone
 import pandas as pd
 
 class Record(object):
@@ -43,6 +42,7 @@ class Record(object):
         return rd
 
     def append(self, *args):
+        from pytz import timezone
         if args:
             hdr, largs = {'subject_id':self.sid}, len(args)
             if largs == 4:
