@@ -24,13 +24,13 @@ class Record(object):
     def grab(self):
         qstr = f"SELECT date, time, sys, dia, pulse FROM records WHERE subject_id={self.sid}"
         rd = pd.read_sql(qstr, self._connect)
-        def stime(_):
-            if isinstance(_, str):
-                try:
-                    __ = datetime.strptime(_, '%H:%M:%S').time()
-                except:
-                    __ = datetime.strptime(_, '%H%M%S').time()
-            return __
+#         def stime(_):
+#             if isinstance(_, str):
+#                 try:
+#                     __ = datetime.strptime(_, '%H:%M:%S').time()
+#                 except:
+#                     __ = datetime.strptime(_, '%H%M%S').time()
+#             return __
         def comdt(_):
             try:
                 __ = datetime.strptime(f'{_[0]} {_[1]}', '%Y-%m-%d %H:%M:%S.%f')
