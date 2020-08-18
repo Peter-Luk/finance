@@ -74,7 +74,9 @@ class WFutures(object):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
         try:
-            price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+            # price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+            price = self.browser.find_element_by_xpath('/html/body/div[2]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+                    # /html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]
             return float(price.replace(',',''))
         except: return 'Market (probably) close.'
 
