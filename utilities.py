@@ -1,10 +1,11 @@
 import socket
+from pytz import timezone
 #from pandas_datareader import data
 import pref
 sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, datetime, driver, reduce = pref.utils
 ph = pref.public_holiday
 
-today = datetime.today()
+today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
 
 def driver_path(browser):
