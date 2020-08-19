@@ -75,14 +75,19 @@ class WFutures(object):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
         try:
-            # price = self.browser.find_element_by_xpath('//*[@id="block-wgcheadergoldspotprice"]/span[1]').text
-            price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+            _ = self.browser.find_element_by_xpath('//*[@id="block-wgcheadergoldspotprice"]')
+            price = _.find_element_by_xpath('./span[1]').text
+
             return float(price.replace(',',''))
-        except:
-            try:
-                price = self.browser.find_element_by_xpath('/html/body/div[2]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
-                return float(price.replace(',',''))
-            except: pass
+        except: pass
+#         try:
+#             price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+#             return float(price.replace(',',''))
+#         except:
+#             try:
+#                 price = self.browser.find_element_by_xpath('/html/body/div[2]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+#                 return float(price.replace(',',''))
+#             except: pass
         return 'Market (probably) close.'
 
     def shanghai_A(self, code, site='SINA'):
