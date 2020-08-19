@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from pytz import timezone
 import re, random
 
 from pref import source, fields, subject
@@ -60,7 +61,7 @@ class WFutures(object):
         else: self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
+        last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(timezone('Asia/Shanghai'))
         if change == '--': change = '0'
         return self.__status(price, change, last)
 
@@ -74,11 +75,15 @@ class WFutures(object):
         if self.browser.current_url == source[site]: self.refresh(site)
         else: self.goto(site)
         try:
-            # price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
-            price = self.browser.find_element_by_xpath('/html/body/div[2]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
-                    # /html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]
+            # price = self.browser.find_element_by_xpath('//*[@id="block-wgcheadergoldspotprice"]/span[1]').text
+            price = self.browser.find_element_by_xpath('/html/body/div[3]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
             return float(price.replace(',',''))
-        except: return 'Market (probably) close.'
+        except:
+            try:
+                price = self.browser.find_element_by_xpath('/html/body/div[2]/div[1]/header/div[2]/div[1]/div[2]/h2/span[1]').text
+                return float(price.replace(',',''))
+            except: pass
+        return 'Market (probably) close.'
 
     def shanghai_A(self, code, site='SINA'):
         if isinstance(code, int): code = f'{code:06}'
@@ -87,7 +92,7 @@ class WFutures(object):
         else: self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
+        last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(timezone('Asia/Shanghai'))
         if change == '--': change = '0'
         return self.__status(price, change, last)
 
@@ -121,9 +126,9 @@ class WFutures(object):
         change = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[3]').text
         l = ''.join(re.split('\: |\|', _.find_element_by_xpath('./div[5]').text)[1:])
         try:
-            last = datetime.strptime(l, '%a %b %d %Y %I:%M %p EDT')
+            last = datetime.strptime(l, '%a %b %d %Y %I:%M %p EDT').astimezone(timezone('America/New_York'))
         except:
-            last = datetime.strptime(l, '%a %b %d %Y')
+            last = datetime.strptime(l, '%a %b %d %Y').astimezone(timezone('America/New_York'))
         return self.__status(price, change, last)
 
     def nk225(self, site='NIKKEI'):
@@ -132,8 +137,8 @@ class WFutures(object):
         def convert(_):
             rstring  = '\([0-2][0-9]\:[0-5][0-9]\)'
             if re.search(rstring, _):
-                return datetime.strptime(_, '%b/%d/%Y(%H:%M)')
-            return datetime.strptime(_.split('(')[0], '%b/%d/%Y')
+                return datetime.strptime(_, '%b/%d/%Y(%H:%M)').astimezone(timezone('Asia/Tokyo'))
+            return datetime.strptime(_.split('(')[0], '%b/%d/%Y').astimezone(timezone('Asia/Tokyo'))
 
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
