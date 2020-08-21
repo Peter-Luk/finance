@@ -56,7 +56,7 @@ class LF(object):
         q = figure(title='%s RSI' % self.code.upper(), x_axis_label='Date', background_fill_color='#DFDFE5', plot_height=250, x_axis_type='datetime')
         q.xgrid.grid_line_color = 'white'
         q.ygrid.grid_line_color = 'white'
-        q.line(imp['Date'], imp['RSI'], legend='RSI', color='navy', line_width=3, alpha=0.5)
+        q.line(imp['Date'], imp['RSI'], legend_label='RSI', color='navy', line_width=3, alpha=0.5)
         q.legend.location = 'top_left'
 
         inc = bmp.Close > bmp.Open
@@ -87,8 +87,8 @@ class LF(object):
                     l.append(i[0])
                     h.append(i[-1])
             r.line(omp['Date'], l, color=v, line_width=3, alpha=0.5)
-            r.line(omp['Date'], h, color=v, legend=k, line_width=3, alpha=0.5)
-        [r.circle(imp['Date'], imp[k], legend=k, color=v, size=5) for k, v in cmatch.items()]
+            r.line(omp['Date'], h, color=v, legend_label=k, line_width=3, alpha=0.5)
+        [r.circle(imp['Date'], imp[k], legend_label=k, color=v, size=5) for k, v in cmatch.items()]
         r.legend.location = 'top_left'
         grid = gridplot([r, q], ncols=1, plot_width=800)
         try:
