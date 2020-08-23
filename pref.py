@@ -32,7 +32,22 @@ subject = {
             primary = 90107008,
             home = 21750098),
         whatsapp = dict(
-            alias = '"凌月明Milly"'))
+            alias = '"凌月明Milly"')),
+    'Mickey Wong': dict(
+        mobile = dict(
+            primary = '+65 83826103'),
+        whatsapp = dict(
+            alias = '"Wong Mickey"')),
+    'Chan Cheung Yiu': dict(
+        mobile = dict(
+            primary = 91031418),
+        whatsapp = dict(
+            alias = '"陳長耀"')),
+    'Josephine Yuen': dict(
+        mobile = dict(
+            primary = 98682629),
+        whatsapp = dict(
+            alias = '"袁淑兒Josephine"'))
     }
 
 source = dict(
