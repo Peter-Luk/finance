@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from pytz import timezone
+from y2n import Futures
 import re, random
 
 from pref import source, fields, subject
@@ -13,6 +14,14 @@ lf, preference = waf(), 'Firefox'
 # __author = subject['Peter Luk']
 milly = subject['Milly Ling']['whatsapp']['alias']
 if today.day == ltd(today.year, today.month): lf = waf(1)
+
+def fan(__='mhi',mt=True):
+    _ = list(filter(lambda x: __.upper() in x, waf()))
+    _.remove(mtf(__.upper()))
+    _  = _.pop()
+    if mt: _ = mtf(__)
+    _ = Futures(_)
+    return f'{_}\n{_()}\n{_.gat()}'
 
 class WFutures(object):
     def __init__(self, ip=None, _=None):
