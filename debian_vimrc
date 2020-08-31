@@ -1,0 +1,15 @@
+call pathogen#infect()
+call pathogen#helptags()
+syntax on
+filetype plugin indent on
+set hlsearch
+set incsearch
+set cursorline
+set relativenumber
+set title
+set lazyredraw
+set tabstop=4
+set smarttab
+set expandtab
+set autoindent
+nnoremap <leader>f :CtrlPFunky<Cr>
