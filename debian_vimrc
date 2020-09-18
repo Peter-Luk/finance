@@ -1,7 +1,5 @@
 call pathogen#infect()
 call pathogen#helptags()
-syntax on
-filetype plugin indent on
 set hlsearch
 set incsearch
 set cursorline
@@ -12,4 +10,15 @@ set tabstop=4
 set smarttab
 set expandtab
 set autoindent
+set statusline+=%#warningmsg#
+set statusline+=%{SynasticStatuslineFlag()}
+set statusline+=%*
+let g:python_highlight_all=1
+let g:syntastic_always_populate_loc_list=1
+let g:syntastic_auto_loc_list=1
+let g:syntastic_check_on_open=1
+let g:syntastic_check_on_wq=0
+map <Leader>vp :VimuxPromptCommand<CR> 
 nnoremap <leader>f :CtrlPFunky<Cr>
+syntax on
+filetype plugin indent on
