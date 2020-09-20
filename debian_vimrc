@@ -13,11 +13,32 @@ set autoindent
 set statusline+=%#warningmsg#
 set statusline+=%{SynasticStatuslineFlag()}
 set statusline+=%*
+set rtp+=~/../usr/lib/python3/dist-packages/powerline/bindings/vim/
+set laststatus=2
+set t_Co=256
+
+function _update_ps1() {
+        PS1=$(powerline-shell $?)
+}
+
+if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+        PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+fi
+
 let g:python_highlight_all=1
 let g:syntastic_always_populate_loc_list=1
 let g:syntastic_auto_loc_list=1
 let g:syntastic_check_on_open=1
 let g:syntastic_check_on_wq=0
+let g:tmux_navigator_no_mappings=1
+let g:tmux_navigator_save_on_switch=2
+let g:tmux_navigator_disable_when_zoomed=1
+
+nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+nnoremap <silent> <c-\> :TmuxNavigatePrevious<cr>
 map <Leader>vp :VimuxPromptCommand<CR> 
 nnoremap <leader>f :CtrlPFunky<Cr>
 syntax on

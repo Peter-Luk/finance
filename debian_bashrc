@@ -1,10 +1,10 @@
 # Path to your oh-my-bash installation.
-export OSH=/home/peterluk/.oh-my-bash
+export OSH=/root/.oh-my-bash
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-bash is loaded.
-OSH_THEME="powerline-multiline"
 # OSH_THEME="font"
+OSH_THEME="powerline-multiline"
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -61,10 +61,7 @@ completions=(
 # aliases=(
 #   general
 # )
-# if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-#     tmux attach -t default || tmux new -s default
-# fi
-#
+
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-bash/plugins/*)
 # Custom plugins may be added to ~/.oh-my-bash/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
@@ -87,7 +84,7 @@ export LANG=zh_HK.UTF-8
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
-  export EDITOR='mvim'
+  export EDITOR='vim'
 fi
 
 # Compilation flags
@@ -104,13 +101,12 @@ export ARCHFLAGS="-arch x86_64"
 # Example aliases
 # alias bashconfig="mate ~/.bashrc"
 # alias ohmybash="mate ~/.oh-my-bash"
-# if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-#         (tmux attach -t default && tmux detach -E false) || tmux new -s default; exit
-# fi
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
         ( tmux attach -t default || tmux new -s default ); exit
 fi
+export HOME=~/../home
 alias ~pf="cd ~/scripts/python/finance"
 alias ~data="cd ~/data/sqlite3"
 alias cls='printf "\033c"'
 alias gem='git commit --allow-empty-message'
+cd ~
