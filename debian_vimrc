@@ -4,6 +4,19 @@ set hlsearch
 set incsearch
 set cursorline
 set relativenumber
+
+set number
+set shiftwidth=4
+set showmatch
+set autowrite
+set backspace=2
+set encoding=utf-8
+set ignorecase
+set mouse=a
+set nocompatible
+set smartcase
+set smartindent
+
 set title
 set lazyredraw
 set tabstop=4
@@ -26,6 +39,8 @@ if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
 fi
 
 let g:python_highlight_all=1
+let g:indentLine_setColors=1
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 let g:syntastic_always_populate_loc_list=1
 let g:syntastic_auto_loc_list=1
 let g:syntastic_check_on_open=1
@@ -40,6 +55,10 @@ nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
 nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
 nnoremap <silent> <c-\> :TmuxNavigatePrevious<cr>
 map <Leader>vp :VimuxPromptCommand<CR> 
-nnoremap <leader>f :CtrlPFunky<Cr>
+nnoremap <leader>fk :CtrlPFunky<Cr>
+map <ScrollWheelUp> <C-Y>
+imap <ScrollWheelUp> <C-X><C-Y>
+map <ScrollWheelDown> <C-E>
+
 syntax on
 filetype plugin indent on
