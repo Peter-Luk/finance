@@ -28,14 +28,14 @@ set statusline+=%{SynasticStatuslineFlag()}
 set statusline+=%*
 set rtp+=~/../usr/lib/python3/dist-packages/powerline/bindings/vim/
 set laststatus=2
-set t_Co=256
+set t_Co=256:
 
 function _update_ps1() {
-        PS1=$(powerline-shell $?)
+    PS1=$(powerline-shell $?)
 }
 
 if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
-        PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 fi
 
 let g:python_highlight_all=1
