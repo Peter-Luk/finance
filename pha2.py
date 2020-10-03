@@ -70,23 +70,29 @@ class Record(object):
                 #     self._connect.execute(query, args[1])
 if __name__ == "__main__":
     from pathlib import sys
-    confirm, dk = 'Y', 'at ease prior to bed'
-    if datetime.today().hour < 13: dk = 'wake up, washed before breakfast'
+    sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
+    if datetime.today().hour < 13:
+        dk = 'wake up, washed before breakfast'
     while confirm.upper() != 'N':
-        sid = 1
         if sys.version_info.major == 2:
-            sy = raw_input("(S)ystolic: ")
-            dia = raw_input("(D)iastolic: ")
-            pul = raw_input("(P)ulse: ")
-            rmk = raw_input("(R)emark: ")
+            sd = raw_input("Subject ID")
+            sy = raw_input("Systolic: ")
+            dia = raw_input("Diastolic: ")
+            pul = raw_input("Pulse: ")
+            rmk = raw_input("Remark: ")
             confirm = raw_input("Continue? (Y)es/(N)o: ")
         if sys.version_info.major == 3:
-            sy = input("(S)ystolic: ")
-            dia = input("(D)iastolic: ")
-            pul = input("(P)ulse: ")
-            rmk = input(f"(R)emark (default: {dk}): ")
+            sd = input(f"Subject ID (default: {sid}): ")
+            sy = input("Systolic: ")
+            dia = input("Diastolic: ")
+            pul = input("Pulse: ")
+            rmk = input(f"Remark (default: {dk}): ")
             confirm = input("Continue? (Y)es/(N)o: ")
-    _ = Record(sid)
+    try:
+        sd = int(sd)
+    except:
+        sd = sid
+    _ = Record(sd)
     if rmk == '':
         rmk = dk
     _.append(int(sy), int(dia), int(pul), rmk)
