@@ -1,11 +1,11 @@
-from sqlalchemy import create_engine, MetaData, Table, select, insert, update, and_
+from sqlalchemy import create_engine, MetaData, Table, insert, update
 from utilities import filepath, datetime
-from datetime import time
 import pandas as pd
 
 class Record(object):
     def __init__(self, sid, iid=None, tz='Asia/Hong_Kong'):
-        if not iid: iid = 1
+        if not iid:
+            iid = 1
         # self.iid = iid
         if isinstance(sid, int) and isinstance(iid, int):
             self.sid, self.iid, self.tz = sid, iid, tz
@@ -31,6 +31,7 @@ class Record(object):
 #                 except:
 #                     __ = datetime.strptime(_, '%H%M%S').time()
 #             return __
+
         def comdt(_):
             try:
                 __ = datetime.strptime(f'{_[0]} {_[1]}', '%Y-%m-%d %H:%M:%S.%f')
@@ -67,3 +68,25 @@ class Record(object):
                     return str(query)
                 # if isinstance(args[1], dict):
                 #     self._connect.execute(query, args[1])
+if __name__ == "__main__":
+    from pathlib import sys
+    confirm, dk = 'Y', 'at ease prior to bed'
+    if datetime.today().hour < 13: dk = 'wake up, washed before breakfast'
+    while confirm.upper() != 'N':
+        sid = 1
+        if sys.version_info.major == 2:
+            sy = raw_input("(S)ystolic: ")
+            dia = raw_input("(D)iastolic: ")
+            pul = raw_input("(P)ulse: ")
+            rmk = raw_input("(R)emark: ")
+            confirm = raw_input("Continue? (Y)es/(N)o: ")
+        if sys.version_info.major == 3:
+            sy = input("(S)ystolic: ")
+            dia = input("(D)iastolic: ")
+            pul = input("(P)ulse: ")
+            rmk = input(f"(R)emark (default: {dk}): ")
+            confirm = input("Continue? (Y)es/(N)o: ")
+    _ = Record(sid)
+    if rmk == '':
+        rmk = dk
+    _.append(int(sy), int(dia), int(pul), rmk)
