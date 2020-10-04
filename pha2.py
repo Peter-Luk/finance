@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, MetaData, Table, insert, update
 from utilities import filepath, datetime
 import pandas as pd
+
 class Record(object):
     def __init__(self, sid, iid=None, tz='Asia/Hong_Kong'):
         if not iid:
