@@ -75,7 +75,7 @@ def process(i, s, d, p, r):
 
 if __name__ == "__main__":
     from pathlib import sys
-    sid, confirm, dk = 1, 'Y', 'at ease priot to bed'
+    sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
     if datetime.today().hour < 13:
         dk = 'wake up, washed before breakfast'
     while confirm.upper() != 'N':
