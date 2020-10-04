@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine, MetaData, Table, insert, update
 from utilities import filepath, datetime
 import pandas as pd
-
 class Record(object):
     def __init__(self, sid, iid=None, tz='Asia/Hong_Kong'):
         if not iid:
@@ -68,35 +67,42 @@ class Record(object):
                     return str(query)
                 # if isinstance(args[1], dict):
                 #     self._connect.execute(query, args[1])
+
+def process(i, s, d, p, r):
+    _ = Record(i)
+    _.append(int(s), int(d), int(p), r)
+
 if __name__ == "__main__":
     from pathlib import sys
-    sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
+    sid, confirm, dk = 1, 'Y', 'at ease priot to bed'
     if datetime.today().hour < 13:
         dk = 'wake up, washed before breakfast'
     while confirm.upper() != 'N':
         if sys.version_info.major == 2:
             sd = raw_input("Subject ID")
+            try:
+                sd = int(sd)
+            except:
+                sd = sid
             sy = raw_input("Systolic: ")
             dia = raw_input("Diastolic: ")
             pul = raw_input("Pulse: ")
             rmk = raw_input("Remark: ")
-            _process()
+            if rmk == '':
+                rmk = dk
+            process(sd, sy, dia, pul, rmk)
             confirm = raw_input("Continue? (Y)es/(N)o: ")
         if sys.version_info.major == 3:
             sd = input(f"Subject ID (default: {sid}): ")
+            try:
+                sd = int(sd)
+            except:
+                sd = sid
             sy = input("Systolic: ")
             dia = input("Diastolic: ")
             pul = input("Pulse: ")
             rmk = input(f"Remark (default: {dk}): ")
-            _process()
+            if rmk == '':
+                rmk = dk
+            process(sd, sy, dia, pul, rmk)
             confirm = input("Continue? (Y)es/(N)o: ")
-
-    def _process():
-        try:
-            sd = int(sd)
-        except:
-            sd = sid
-        _ = Record(sd)
-        if rmk == '':
-            rmk = dk
-        _.append(int(sy), int(dia), int(pul), rmk)
