@@ -62,7 +62,8 @@ fields = ['open','high','low','close','volume']
 B_scale = dict(
     BABA = 1 / 8,
     YUMC = 1,
-    NTES = 1 / 25,
+    NTES = 1 / 5,
+    # NTES = 1 / 25,
     JD = 1 / 2)
 
 USHK = 7.75
