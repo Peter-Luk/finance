@@ -69,12 +69,12 @@ class Record(object):
                 # if isinstance(args[1], dict):
                 #     self._connect.execute(query, args[1])
 
-def process(i, s, d, p, r):
-    _ = Record(i)
-    _.append(int(s), int(d), int(p), r)
-
 if __name__ == "__main__":
     from pathlib import sys
+    def process(i, s, d, p, r):
+        _ = Record(i)
+        _.append(int(s), int(d), int(p), r)
+
     sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
     if datetime.today().hour < 13:
         dk = 'wake up, washed before breakfast'
