@@ -80,6 +80,7 @@ if __name__ == "__main__":
             dia = raw_input("Diastolic: ")
             pul = raw_input("Pulse: ")
             rmk = raw_input("Remark: ")
+            _process()
             confirm = raw_input("Continue? (Y)es/(N)o: ")
         if sys.version_info.major == 3:
             sd = input(f"Subject ID (default: {sid}): ")
@@ -87,12 +88,15 @@ if __name__ == "__main__":
             dia = input("Diastolic: ")
             pul = input("Pulse: ")
             rmk = input(f"Remark (default: {dk}): ")
+            _process()
             confirm = input("Continue? (Y)es/(N)o: ")
-    try:
-        sd = int(sd)
-    except:
-        sd = sid
-    _ = Record(sd)
-    if rmk == '':
-        rmk = dk
-    _.append(int(sy), int(dia), int(pul), rmk)
+
+    def _process():
+        try:
+            sd = int(sd)
+        except:
+            sd = sid
+        _ = Record(sd)
+        if rmk == '':
+            rmk = dk
+        _.append(int(sy), int(dia), int(pul), rmk)
