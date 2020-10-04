@@ -26,7 +26,8 @@ class Futures(AF, Viewer):
         del(self._conf, self.table, self.rc, self._af, self.__conn, self.code, self.data, self.view, self._date, self._close)
 
     def __call__(self, date=None):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         _ = self.maverick(date=date, unbound=False)
         _.name = self.code
         return _
