@@ -1,15 +1,16 @@
 import pref
-pd, np, db, yf, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
-from utilities import filepath, mtf
+from utilities import filepath
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
+pd, np, db, yf, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
 class Futures(AF, Viewer):
     periods = pref.periods['Futures']
     def __init__(self, code):
         self._conf = pref.db['Futures']
         rc = entities(self._conf['name'])
-        if code.upper() not in rc: code = rc[-1]
+        if code.upper() not in rc:
+            code = rc[-1]
         self.code = code
         self._af = AF(self.code)
         self.table = self._af.table
