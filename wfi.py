@@ -13,21 +13,25 @@ from pt_2 import festi
 lf, preference = waf(), 'Firefox'
 # __author = subject['Peter Luk']
 milly = subject['Milly Ling']['whatsapp']['alias']
-if today.day == ltd(today.year, today.month): lf = waf(1)
+if today.day == ltd(today.year, today.month):
+    lf = waf(1)
 
-def fan(__='mhi',mt=True):
+def fan(__='mhi', mt=True):
     _ = list(filter(lambda x: __.upper() in x, waf()))
     _.remove(mtf(__.upper()))
     _  = _.pop()
-    if mt: _ = mtf(__)
+    if mt:
+        _ = mtf(__)
     _ = Futures(_)
     return f'{_}\n{_()}\n{_.gat()}'
 
 class WFutures(object):
     def __init__(self, ip=None, _=None):
-        if _ is None: _ = preference
+        if _ is None:
+            _ = preference
         self.lip = ip
-        if ip is None: self.lip = str(IP())
+        if ip is None:
+            self.lip = str(IP())
         self.browser = eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         self.browser.implicitly_wait(10)
         self.browser.get(f'http://{self.lip}/futures')
@@ -42,13 +46,14 @@ class WFutures(object):
         del self.lip, self.browser, self.wait, self.pivot, self.eb
 
     def __status(self, p, c, l):
-        _ = [float(_.replace(',','')) for _ in [p, c]]
+        _ = [float(_.replace(',', '')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
         _.extend([float(f'{__:0.3f}'), l])
         return _
 
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
-        if not isinstance(_, (list, tuple)): _ = [_]
+        if not isinstance(_, (list, tuple)):
+            _ = [_]
         [self.browser.execute_script(f"window.open('{source[__]}', '{__}');") for __ in _ if __ in source.keys()]
 
     def kill(self):
@@ -66,39 +71,50 @@ class WFutures(object):
         self.browser.switch_to.window(_)
 
     def shanghai_composite(self, site='SINA'):
-        if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.goto(site)
+        if self.browser.current_url == source[site]:
+            self.refresh(site)
+        else:
+            self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
         last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(timezone('Asia/Shanghai'))
-        if change == '--': change = '0'
+        if change == '--':
+            change = '0'
         return self.__status(price, change, last)
 
     def load_A_share(self, code, site='SINA'):
-        if isinstance(code, int): code = f'{code:06}'
+        if isinstance(code, int):
+            code = f'{code:06}'
         __ = source[site].replace('000001', code)
         self.browser.execute_script(f"window.open('{__}', 'sh{code}');")
         self.goto(f'sh{code}')
 
     def gold(self, site='Gold'):
-        if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.goto(site)
+        if self.browser.current_url == source[site]:
+            self.refresh(site)
+        else:
+            self.goto(site)
         try:
             _ = self.browser.find_element_by_xpath('//*[@id="block-wgcheadergoldspotprice"]')
             price = _.find_element_by_xpath('./h2/span[1]').text
-            return float(price.replace(',',''))
-        except: pass
+            return float(price.replace(',', ''))
+        except:
+            pass
         return 'Market (probably) close.'
 
     def shanghai_A(self, code, site='SINA'):
-        if isinstance(code, int): code = f'{code:06}'
+        if isinstance(code, int):
+            code = f'{code:06}'
         __ = source[site].replace('000001', code)
-        if self.browser.current_url == __: self.refresh(f'sh{code}')
-        else: self.goto(f'sh{code}')
+        if self.browser.current_url == __:
+            self.refresh(f'sh{code}')
+        else:
+            self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
         last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(timezone('Asia/Shanghai'))
-        if change == '--': change = '0'
+        if change == '--':
+            change = '0'
         return self.__status(price, change, last)
 
     def whatsend(self, recipent, message, sender=subject['Peter Luk']):
@@ -113,18 +129,23 @@ class WFutures(object):
             input_box = self.wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
             input_box.send_keys(message + Keys.ENTER)
             return f'Message successfully sent to {recipent} @ {datetime.now()}'
-        except: pass
+        except:
+            pass
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
-        if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.goto(site)
+        if self.browser.current_url == source[site]:
+            self.refresh(site)
+        else:
+            self.goto(site)
         div = 'div[2]'
-        if  implied: div = 'div[4]'
+        if  implied:
+            div = 'div[4]'
 
         def cxpath(_):
             idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
             if _ in idx:
-                return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
+                return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
+                # return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
 
         _ = self.browser.find_element_by_xpath(cxpath(idx))
         price = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[2]').text
