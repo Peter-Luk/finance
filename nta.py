@@ -1,42 +1,54 @@
+from utilities import gslice
 import pref
 pd, np, datetime, gr = pref.nta
-from utilities import gslice
+
 
 class ONA(object):
     def __init__(self, data, date=datetime.today().date()):
         self.data = data
         self.date = date
-        if date not in self.data.index: self.date = self.data.index[-1]
+        if date not in self.data.index:
+            self.date = self.data.index[-1]
 
     def __del__(self):
         self.data = self.date = None
         del(self.data, self.date)
 
     def ma(self, raw, period, favour='s', field_initial='close', date=None):
-        if date != None:
+        if date is not None:
             if isinstance(date, str):
-                try: date = datetime.strptime(date, '%Y%m%d')
-                except: pass
+                try:
+                    date = datetime.strptime(date, '%Y%m%d')
+                except:
+                    pass
             if isinstance(date, datetime):
-                try: raw = raw.loc[:date]
-                except: pass
+                try:
+                    raw = raw.loc[:date]
+                except:
+                    pass
         _data = grabber(raw, field_initial)
-        if favour.upper() in ['SIMPLE', 'S']: __ = _data.rolling(period).mean()
+        if favour.upper() in ['SIMPLE', 'S']:
+            __ = _data.rolling(period).mean()
         if favour.upper() in ['W', 'WEIGHTED']:
-            __ = (_data * raw.Volume).rolling(period).sum() / raw.Volume.rolling(period).sum()
+            __ = (_data * raw.Volume).rolling(period).sum() \
+                / raw.Volume.rolling(period).sum()
         if favour.upper() in ['E', 'EXPONENTIAL']:
             __ = stepper(_data, period)
         __.name = f'{favour}ma{period:02d}'.upper()
         return __
 
     def macd(self, raw, period, date=None):
-        if date != None:
+        if date is not None:
             if isinstance(date, str):
-                try: date = datetime.strptime(date, '%Y%m%d')
-                except: pass
+                try:
+                    date = datetime.strptime(date, '%Y%m%d')
+                except:
+                    pass
             if isinstance(date, datetime):
-                try: raw = raw.loc[:date]
-                except: pass
+                try:
+                    raw = raw.loc[:date]
+                except:
+                    pass
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
         m_line = e_fast - e_slow
@@ -374,6 +386,7 @@ class Viewer(ONA):
                 if close < max(outside): hdr['sell'] = max(outside)
         _ = pd.DataFrame({date:hdr})
         return _
+
 
 def stepper(x, period, addition=None):
     data, an, hdr, _, __ = x.values, addition, [], 0, 0
