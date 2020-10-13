@@ -321,20 +321,33 @@ def entities(dbname=None, series=False):
     if series: return pd.Series(res)
     return res
 
+
 def compose(code=None):
     def grab(c):
         e = Equities(c)
         rd = e.data
-        pdhr = pd.concat([e.rsi(), rd.High.sub(rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
+        pdhr = pd.concat(
+            [e.rsi(), rd.High.sub(rd.Low),
+                rd.Close.diff(), e.atr(),
+                e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()],
+            axis=1)
         pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
         return pdhr
 
-    if code == None: code = entities(pref.db['Equities']['name'])
-    if isinstance(code, (int, float)): code = [int(code)]
+    if code is None:
+        code = entities(pref.db['Equities']['name'])
+    if isinstance(code, (int, float)):
+        code = [int(code)]
     if isinstance(code, list):
-        try: code = [int(_) for _ in code]
-        except: pass
-        return pd.concat([grab(_) for _ in tqdm(code)], keys=code, names=['Code','Data'], axis=1)
+        try:
+            code = [int(_) for _ in code]
+        except:
+            pass
+        return pd.concat(
+            [grab(_) for _ in tqdm(code)],
+            keys=code,
+            names=['Code', 'Data'],
+            axis=1)
 
 def strayed(df, date, buy=True):
     if isinstance(date, str):
