@@ -25,6 +25,7 @@ def fan(__='mhi', mt=True):
     _ = Futures(_)
     return f'{_}\n{_()}\n{_.gat()}'
 
+
 class WFutures(object):
     def __init__(self, ip=None, _=None):
         if _ is None:
@@ -138,7 +139,7 @@ class WFutures(object):
         else:
             self.goto(site)
         div = 'div[2]'
-        if  implied:
+        if implied:
             div = 'div[4]'
 
         def cxpath(_):
