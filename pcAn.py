@@ -1,16 +1,22 @@
 import multiprocessing
 from y2n import Equities, entities, pref, datetime, tqdm, gr, pd
 
+
 def grab(c):
     e = Equities(c)
     rd = e.data
-    pdhr = pd.concat([e.rsi(), rd.High.sub(rd.Low), rd.Close.diff(), e.atr(), e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()], axis=1)
+    pdhr = pd.concat(
+        [e.rsi(), rd.High.sub(rd.Low),
+            rd.Close.diff(), e.atr(),
+            e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()],
+        axis=1)
     pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
     return pdhr
 
 def mav(c, date):
     e = Equities(c).maverick(date, unbound=False)
     return e
+
 
 def compose(code=entities(pref.db['Equities']['name'])):
     with multiprocessing.Pool() as pool:
