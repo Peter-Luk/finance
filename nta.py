@@ -415,6 +415,7 @@ class ONA(object):
         return _
         return hdr
 
+
 class Viewer(ONA):
     def __init__(self, data):
         self.data = data
@@ -424,51 +425,83 @@ class Viewer(ONA):
         del(self.data)
 
     def mas(self, raw, period, date=None):
-        if date != None:
+        if date is not None:
             if isinstance(date, str):
-                try: date = datetime.strptime(date, '%Y%m%d')
-                except: pass
+                try:
+                    date = datetime.strptime(date, '%Y%m%d')
+                except:
+                    pass
             if isinstance(date, datetime):
-                try: raw = raw.loc[:date]
-                except: pass
-        _ = pd.concat([self.kama(raw, period['kama'], 'c', date).map(hsirnd), self.ma(raw, period['simple'], 'e', 'c', date).map(hsirnd), self.ma(raw, period['simple'], 's', 'c', date).map(hsirnd), self.ma(raw, period['simple'], 'w', 'c', date).map(hsirnd)], axis=1)
+                try:
+                    raw = raw.loc[:date]
+                except:
+                    pass
+        _ = pd.concat(
+                [self.kama(raw, period['kama'], 'c', date).map(hsirnd),
+                    self.ma(raw, period['simple'], 'e', 'c', date).map(hsirnd),
+                    self.ma(raw, period['simple'], 's', 'c', date).map(hsirnd),
+                    self.ma(
+                        raw,
+                        period['simple'],
+                        'w',
+                        'c',
+                        date).map(hsirnd)],
+                axis=1)
         return _
 
     def idrs(self, raw, period, date=None):
-        if date != None:
+        if date is not None:
             if isinstance(date, str):
-                try: date = datetime.strptime(date, '%Y%m%d')
-                except: pass
+                try:
+                    date = datetime.strptime(date, '%Y%m%d')
+                except:
+                    pass
             if isinstance(date, datetime):
-                try: raw = raw.loc[:date]
-                except: pass
-        _ = pd.concat([self.adx(raw, period['adx'], date)[f"ADX{period['adx']:02d}"], self.rsi(raw, period['simple'], date), self.atr(raw, period['atr'], date)], axis=1)
+                try:
+                    raw = raw.loc[:date]
+                except:
+                    pass
+        _ = pd.concat(
+            [self.adx(raw, period['adx'], date)[f"ADX{period['adx']:02d}"],
+                self.rsi(raw, period['simple'], date),
+                self.atr(raw, period['atr'], date)], axis=1)
         return _
 
     def maverick(self, raw, period, date, unbound=False, exclusive=True):
         if date != None:
             if isinstance(date, str):
-                try: date = datetime.strptime(date, '%Y%m%d').date()
-                except: pass
+                try:
+                    date = datetime.strptime(date, '%Y%m%d').date()
+                except:
+                    pass
             if isinstance(date, datetime):
-                try: raw = raw.loc[:date]
-                except: pass
+                try:
+                    raw = raw.loc[:date]
+                except:
+                    pass
         bare = self.gat(raw, period['atr'], date).apply(hsirnd, 1).unique()
         boundary = self.ovr(raw, period, date).T
         close = raw.Close.loc[date]
-        inside = [_ for _ in bare.tolist() if _ > boundary['Min'].min() and _ < boundary['Max'].max()]
+        inside = [
+            _ for _ in bare.tolist() if _ > boundary['Min'].min() and
+            _ < boundary['Max'].max()]
         outside = [_ for _ in bare.tolist() if _ not in inside]
-        hdr = {'buy':np.nan, 'sell':np.nan}
+        hdr = {'buy': np.nan, 'sell': np.nan}
         # hdr['buy'] = close
         if inside != []:
-            if close > min(inside): hdr['buy'] = min(inside)
-            if close < max(inside): hdr['sell'] = max(inside)
+            if close > min(inside):
+                hdr['buy'] = min(inside)
+            if close < max(inside):
+                hdr['sell'] = max(inside)
         if unbound:
-            if exclusive: hdr = {'buy':np.nan, 'sell':np.nan}
+            if exclusive:
+                hdr = {'buy': np.nan, 'sell': np.nan}
             if outside != []:
-                if close > min(outside): hdr['buy'] = min(outside)
-                if close < max(outside): hdr['sell'] = max(outside)
-        _ = pd.DataFrame({date:hdr})
+                if close > min(outside):
+                    hdr['buy'] = min(outside)
+                if close < max(outside):
+                    hdr['sell'] = max(outside)
+        _ = pd.DataFrame({date: hdr})
         return _
 
 
