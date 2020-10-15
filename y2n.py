@@ -288,37 +288,53 @@ class Equities(AE, Viewer):
         if date == None: date = self._date
         return self.view.maverick(self.data, period, date, unbound, exclusive)
 
+
 def bqo(el, action='buy', bound=True, adhoc=False):
     dl, il = [], []
-    if isinstance(el, (int, str)): el = [el]
+    if isinstance(el, (int, str)):
+        el = [el]
     for _ in el:
         if isinstance(_, int):
             pE = pref.db['Equities']
-            if _ in [__ for __ in entities(pE['name']) if __ not in pE['exclude']]: o_ = Equities(_, adhoc)
+            if _ in [__ for __ in entities(pE['name']) if __ not in pE['exclude']]:
+                o_ = Equities(_, adhoc)
         if isinstance(_, str):
             pF = pref.db['Futures']
-            if _.upper() in entities(pF['name']): o_ = Futures(_.upper())
+            if _.upper() in entities(pF['name']):
+                o_ = Futures(_.upper())
         val = o_.maverick(unbound=True).T[action][o_._date]
-        if bound: val = o_().T[action][o_._date]
+        if bound:
+            val = o_().T[action][o_._date]
         dl.append(val)
         il.append(o_.code)
-    _ = pd.DataFrame({action:dl}, index=il)
+    _ = pd.DataFrame({action: dl}, index=il)
     return _.T
+
 
 def entities(dbname=None, series=False):
     pF, pE = pref.db['Futures'], pref.db['Equities']
-    if not dbname: dbname = pE['name']
+    if not dbname:
+        dbname = pE['name']
     engine = db.create_engine(f'sqlite:///{filepath(dbname)}')
     meta, conn = db.MetaData(), engine.connect()
     if dbname == pF['name']:
-        rc = db.Table(pF['table'], meta, autoload=True, autoload_with=engine).columns
+        rc = db.Table(
+            pF['table'],
+            meta,
+            autoload=True,
+            autoload_with=engine).columns
         query = db.select([rc.code.distinct()]).order_by(db.asc(rc.code))
     if dbname == pE['name']:
-        rc = db.Table(pE['table'], meta, autoload=True, autoload_with=engine).columns
+        rc = db.Table(
+            pE['table'],
+            meta,
+            autoload=True,
+            autoload_with=engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
     __ = [_[0] for _ in conn.execute(query).fetchall()]
     res = [__ for __ in [_[0] for _ in conn.execute(query).fetchall()] if __ not in pE['exclude']]
-    if series: return pd.Series(res)
+    if series:
+        return pd.Series(res)
     return res
 
 
@@ -349,42 +365,62 @@ def compose(code=None):
             names=['Code', 'Data'],
             axis=1)
 
+
 def strayed(df, date, buy=True):
     if isinstance(date, str):
-        try: date = datetime.strptime(date, "%Y%m%d")
-        except: pass
+        try:
+            date = datetime.strptime(date, "%Y%m%d")
+        except:
+            pass
     if isinstance(date, datetime):
-        txr = df.reorder_levels(['Data','Code'], 1)
+        txr = df.reorder_levels(['Data', 'Code'], 1)
         rtr = txr.loc[date, 'RSI']
         hdr = []
         if buy:
-            rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
+            rl = rtr[
+                (rtr < (1 - 1 / gr) * 100) &
+                (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])
+                ].index.tolist()
             if rl:
-                hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["buy", date] for _ in tqdm(rl)])
+                hdr.extend([
+                    Equities(_).maverick(
+                        date=date, unbound=False).loc["buy", date]
+                    for _ in tqdm(rl)])
                 return pd.Series(hdr, index=rl, name='buy')
         else:
-            rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
+            rl = rtr[
+                (rtr > 1 / gr * 100) &
+                (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
             if rl:
-                hdr.extend([Equities(_).maverick(date=date, unbound=False).loc["sell", date] for _ in tqdm(rl)])
+                hdr.extend([
+                    Equities(_).maverick(
+                        date=date, unbound=False).loc["sell", date]
+                    for _ in tqdm(rl)])
                 return pd.Series(hdr, index=rl, name='sell')
+
 
 def _press(__):
     _ = Equities(__)
     return f'\n{_}\n{_()}\n{_.gat()}'
 
+
 def adhoc(__):
     _ = Equities(__, True)
     print(f'{_}\n{_()}\n{_.gat()}')
 
+
 def summary(__):
-    ae = entities()
-    if not isinstance(__, (list, tuple)): __ = list(__)
+    if __ is None:
+        __ = entities()
+    if not isinstance(__, (list, tuple)):
+        __ = list(__)
     _ = [_press(_) for _ in __]
     print('\n'.join(_))
+
 
 def A2B(_):
     _ = _.upper()
     if _ in B_scale.keys():
         __ = Equities(_)
         r = __.gat()
-        return [hsirnd(x*B_scale[_]*USHK) for x in [r[0], r[1], __._close, r[-2], r[-1]]]
+        return [hsirnd(x * B_scale[_] * USHK) for x in [r[0], r[1], __._close, r[-2], r[-1]]]
