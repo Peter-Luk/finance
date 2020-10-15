@@ -76,9 +76,7 @@ class Record(object):
                 query = update(self._table)
                 if isinstance(args[0], dict):
                     hdr = args[0]
-                    query = query.where(eval('and_(' + ',
-                        '.join([f"self._columns.{_}==hdr['{_}']" for _ in hdr.keys() if _ in self._columns.keys()]) +
-                        ')'))
+                    query = query.where(eval('and_(' + ', '.join([f"self._columns.{_}==hdr['{_}']" for _ in hdr.keys() if _ in self._columns.keys()]) + ')'))
                     return str(query)
                 # if isinstance(args[1], dict):
                 #     self._connect.execute(query, args[1])
