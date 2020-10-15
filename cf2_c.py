@@ -66,28 +66,30 @@ class Analysor(object):
                 return PI(code=contract).fdc(option= opt_value).to_html()
             return summary(code= contract, format= 'html')
 
+
 class Inputter(object):
     @cherrypy.expose
     def index(self):
         hd = HEAD(TITLE('Daily statistic recording'))
-        ops = [OPTION(_, {'value':_}) for _ in waf()]
-        if today.day == ltd(today.year, today.month): ops = [OPTION(_, {'value':_}) for _ in waf(1)]
-        sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
-        btn = BUTTON('Append', {'type':'submit'})
+        ops = [OPTION(_, {'value': _}) for _ in waf()]
+        if today.day == ltd(today.year, today.month):
+            ops = [OPTION(_, {'value': _}) for _ in waf(1)]
+        sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name': 'contract'})
+        btn = BUTTON('Append', {'type': 'submit'})
         if version_info.major == 3:
             if version_info.minor > 6:
-                sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
-                btn = BUTTON('Append', {'type':'submit'})
-                trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]), {'align':'right'})]]))]
+                sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name': 'contract'})
+                btn = BUTTON('Append', {'type': 'submit'})
+                trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]), {'align': 'right'})]]))]
                 trs.extend([TR(linesep.join([f'{_}' for _ in [TD(f'{__.capitalize()}', {'align':'right'}), TD(INPUT({'type':'text', 'name':__}))]])) for __ in ['open', 'high', 'low', 'close', 'volume']])
                 bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post','action':'append'}))
                 return str(HTML(linesep.join([f'{_}' for _ in [hd, bd]])))
             else:
-                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name':'contract'})
-                btn = BUTTON('Append', {'type':'submit'})
-                trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl, btn]]), {'align':'right'})]]))]
-                trs.extend([TR(linesep.join(['{}'.format(_) for _ in [TD(f'{__.capitalize()}', {'align':'right'}), TD(INPUT({'type':'text', 'name':__}))]])) for __ in ['open', 'high', 'low', 'close', 'volume']])
-                bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method':'post','action':'append'}))
+                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name': 'contract'})
+                btn = BUTTON('Append', {'type': 'submit'})
+                trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl, btn]]), {'align': 'right'})]]))]
+                trs.extend([TR(linesep.join(['{}'.format(_) for _ in [TD(f'{__.capitalize()}', {'align': 'right'}), TD(INPUT({'type': 'text', 'name': __}))]])) for __ in ['open', 'high', 'low', 'close', 'volume']])
+                bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method': 'post','action': 'append'}))
                 return str(HTML(linesep.join(['{}'.format(_) for _ in [hd, bd]])))
 
     @cherrypy.expose
@@ -95,15 +97,18 @@ class Inputter(object):
 #         from datetime import datetime
         today, session = datetime.today(), 'M'
         hour, minute = today.hour, today.minute
-        if hour > 12: session = 'A'
-        elif (hour == 12) and (minute > 56): session = 'A'
-        i2 = PI(code=contract)
+        if hour > 12:
+            session = 'A'
+        elif (hour == 12) and (minute > 56):
+            session = 'A'
+        i2 = PI(code= contract)
         i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
         if panda:
             opt_value = 'B'
-            if len(i2.trade_day) > i2.period: opt_value = 'I'
-            return PI(code=contract).fdc(option=opt_value).to_html()
-        return summary(code=contract, format='html')
+            if len(i2.trade_day) > i2.period:
+                opt_value = 'I'
+            return PI(code= contract).fdc(option= opt_value).to_html()
+        return summary(code= contract, format= 'html')
 
 class Estimate_Futures(object):
     @cherrypy.expose
