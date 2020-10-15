@@ -2,42 +2,49 @@ import cherrypy
 from bt import LF as lf
 from utilities import datetime, linesep, platform, ltd, waf, today, IP
 from sys import argv, version_info
-from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TEXTAREA, TR, TD, LABEL, SELECT, OPTION, BUTTON, INPUT
-
+from tags import HTML, HEAD, TITLE, BODY, FORM, TABLE, TEXTAREA, TR, TD
+from tags import LABEL, SELECT, OPTION, BUTTON, INPUT
 from y2n import Equities, entities
 
 panda = False
 try:
-    PI = getattr(__import__('pt_2'),'PI')
+    PI = getattr(__import__('pt_2'), 'PI')
     panda = True
 except:
     summary = getattr(__import__('trial01'), 'summary')
 
 server_host, server_port = str(IP()), 80
 # server_host, server_port = IP('public').address, 80
-if len(argv) > 1: server_host = argv[1]
-if platform in ('linux', 'linux2'): server_port = 2080
-cherrypy.config.update({'server.socket_host': server_host,'server.socket_port': server_port})
+if len(argv) > 1:
+    server_host = argv[1]
+if platform in ('linux', 'linux2'):
+    server_port = 2080
+cherrypy.config.update({
+    'server.socket_host': server_host,
+    'server.socket_port': server_port})
+
 
 class Analysor(object):
     @cherrypy.expose
     def index(self):
         hd = HEAD(TITLE('Analyse records'))
-        ops = [OPTION(_, {'value':_}) for _ in waf()]
-        if today.day == ltd(today.year, today.month): ops = [OPTION(_, {'value':_}) for _ in waf(1)]
+        ops = [OPTION(_, {'value': _}) for _ in waf()]
+        if today.day == ltd(today.year, today.month):
+            ops = [OPTION(_, {'value': _}) for _ in waf(1)]
         if version_info.major == 3:
             if version_info.minor > 6:
-                sl = SELECT(linesep.join([f'{_}' for _ in ops]), {'name':'contract'})
-                btn = BUTTON('Analyse', {'type':'submit'})
-                trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract: ')), TD(linesep.join([f'{__}' for __ in [sl,btn]]), {'align':'right'})]]))]
-                bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method':'post', 'action':'proceed'}))
-                return str(HTML(linesep.join([f'{_}' for _ in [hd,bd]])))
+                sl = SELECT(
+                    linesep.join([f'{_}' for _ in ops]), {'name': 'contract'})
+                btn = BUTTON('Analyse', {'type': 'submit'})
+                trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract:     ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]), {'align': 'right'})]]))]
+                bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method': 'post', 'action': 'proceed'}))
+                return str(HTML(linesep.join([f'{_}' for _ in [hd, bd]])))
             else:
-                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name':'contract'})
-                btn = BUTTON('Analyse', {'type':'submit'})
-                trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl,btn]]), {'align':'right'})]]))]
-                bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method':'post', 'action':'proceed'}))
-                return str(HTML(linesep.join(['{}'.format(_) for _ in [hd,bd]])))
+                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name': 'contract'})
+                btn = BUTTON('Analyse', {'type': 'submit'})
+                trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl, btn]]), {'align': 'right'})]]))]
+                bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method': 'post', 'action': 'proceed'}))
+                return str(HTML(linesep.join(['{}'.format(_) for _ in [hd, bd]])))
 
     @cherrypy.expose
     def proceed(self, contract):
@@ -54,9 +61,10 @@ class Analysor(object):
             if panda:
                 i2 = PI(code=contract)
                 opt_value = 'B'
-                if len(i2.trade_day) > i2.period: opt_value = 'I'
-                return PI(code=contract).fdc(option=opt_value).to_html()
-            return summary(code=contract, format='html')
+                if len(i2.trade_day) > i2.period:
+                    opt_value = 'I'
+                return PI(code=contract).fdc(option= opt_value).to_html()
+            return summary(code= contract, format= 'html')
 
 class Inputter(object):
     @cherrypy.expose
