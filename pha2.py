@@ -1,8 +1,10 @@
+import pandas as pd
 from sqlalchemy import create_engine, MetaData, Table, insert, update
 from utilities import filepath, datetime
-import pandas as pd
+
 
 class Record(object):
+
     def __init__(self, sid, iid=None, tz='Asia/Hong_Kong'):
         if not iid:
             iid = 1
@@ -10,7 +12,11 @@ class Record(object):
         if isinstance(sid, int) and isinstance(iid, int):
             self.sid, self.iid, self.tz = sid, iid, tz
             engine = create_engine(f"sqlite:///{filepath('Health')}")
-            self._table = Table('records', MetaData(), autoload=True, autoload_with=engine)
+            self._table = Table(
+                'records',
+                MetaData(),
+                autoload=True,
+                autoload_with=engine)
             self._columns = self._table.columns
             self._connect = engine.connect()
 
@@ -34,7 +40,9 @@ class Record(object):
 
         def comdt(_):
             try:
-                __ = datetime.strptime(f'{_[0]} {_[1]}', '%Y-%m-%d %H:%M:%S.%f')
+                __ = datetime.strptime(
+                    f'{_[0]} {_[1]}',
+                    '%Y-%m-%d %H:%M:%S.%f')
             except:
                 __ = datetime.strptime(f'{_[0]} {_[1]}', '%Y-%m-%d %H:%M:%S')
             return __
@@ -45,12 +53,16 @@ class Record(object):
     def append(self, *args):
         from pytz import timezone
         if args:
-            hdr, largs = {'subject_id':self.sid}, len(args)
+            hdr, largs = {'subject_id': self.sid}, len(args)
             if largs == 4:
-                if isinstance(args[0], int): hdr['sys'] = args[0]
-                if isinstance(args[1], int): hdr['dia'] = args[1]
-                if isinstance(args[2], int): hdr['pulse'] = args[2]
-                if isinstance(args[3], str): hdr['remarks'] = args[3]
+                if isinstance(args[0], int):
+                    hdr['sys'] = args[0]
+                if isinstance(args[1], int):
+                    hdr['dia'] = args[1]
+                if isinstance(args[2], int):
+                    hdr['pulse'] = args[2]
+                if isinstance(args[3], str):
+                    hdr['remarks'] = args[3]
                 hdr['instrument_id'] = self.iid
                 query = insert(self._table)
                 now = datetime.now().astimezone(timezone(self.tz))
@@ -64,10 +76,13 @@ class Record(object):
                 query = update(self._table)
                 if isinstance(args[0], dict):
                     hdr = args[0]
-                    query = query.where(eval('and_(' + ', '.join([f"self._columns.{_}==hdr['{_}']" for _ in hdr.keys() if _ in self._columns.keys()]) + ')'))
+                    query = query.where(eval('and_(' + ',
+                        '.join([f"self._columns.{_}==hdr['{_}']" for _ in hdr.keys() if _ in self._columns.keys()]) +
+                        ')'))
                     return str(query)
                 # if isinstance(args[1], dict):
                 #     self._connect.execute(query, args[1])
+
 
 if __name__ == "__main__":
     from pathlib import sys
@@ -92,7 +107,7 @@ if __name__ == "__main__":
             if rmk == '':
                 rmk = dk
             process(sd, sy, dia, pul, rmk)
-            confirm = raw_input("Continue? (Y)es/(N)o: ")
+            confirm = raw_input("Others? (Y)es/(N)o: ")
         if sys.version_info.major == 3:
             sd = input(f"Subject ID (default: {sid}): ")
             try:
@@ -106,4 +121,4 @@ if __name__ == "__main__":
             if rmk == '':
                 rmk = dk
             process(sd, sy, dia, pul, rmk)
-            confirm = input("Continue? (Y)es/(N)o: ")
+            confirm = input("Others? (Y)es/(N)o: ")
