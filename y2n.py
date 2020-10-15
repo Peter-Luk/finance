@@ -4,8 +4,10 @@ from nta import Viewer, hsirnd
 from alchemy import AF, AE
 pd, np, db, yf, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
+
 class Futures(AF, Viewer):
     periods = pref.periods['Futures']
+
     def __init__(self, code):
         self._conf = pref.db['Futures']
         rc = entities(self._conf['name'])
@@ -22,8 +24,10 @@ class Futures(AF, Viewer):
         self._close = self.data['Close'][-1]
 
     def __del__(self):
-        self._conf = self.table = self.rc = self._af = self.__conn = self.code = self.data = self.view = self._date = self._close = None
-        del(self._conf, self.table, self.rc, self._af, self.__conn, self.code, self.data, self.view, self._date, self._close)
+        self._conf = self.table = self.rc = self._af = self.__conn = None
+        self.code = self.data = self.view = self._date = self._close = None
+        del(self._conf, self.table, self.rc, self._af, self.__conn, self.code)
+        del(self.data, self.view, self._date, self._close)
 
     def __call__(self, date=None):
         if date is None:
@@ -49,98 +53,136 @@ class Futures(AF, Viewer):
         return self._af.combine(freq)
 
     def mas(self, date=None, period=periods):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.mas(self.data, period, date)
 
     def idrs(self, date=None, period=periods):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.idrs(self.data, period. date)
 
     def sma(self, date=None, period=periods['simple'], req_field='c'):
-        if date == None: date = self._date
-        return self.view.ma(self.data, period, 's', req_field, date).map(hsirnd)
+        if date is None:
+            date = self._date
+        return self.view.ma(
+            self.data,
+            period,
+            's',
+            req_field,
+            date).map(hsirnd)
 
     def ema(self, date=None, period=periods['simple'], req_field='c'):
-        if date == None: date = self._date
-        return self.view.ma(self.data, period, 'e', req_field, date).map(hsirnd)
+        if date is None:
+            date = self._date
+        return self.view.ma(
+            self.data, period,
+            'e',
+            req_field,
+            date).map(hsirnd)
 
     def wma(self, date=None, period=periods['simple'], req_field='c'):
-        if date == None: date = self._date
-        return self.view.ma(self.data, period, 'w', req_field, date).map(hsirnd)
+        if date is None:
+            date = self._date
+        return self.view.ma(
+            self.data,
+            period,
+            'w',
+            req_field,
+            date).map(hsirnd)
 
     def kama(self, date=None, period=periods['kama'], req_field='c'):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.kama(self.data, period, req_field, date).map(hsirnd)
 
     def atr(self, date=None, period=periods['atr']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.atr(self.data, period, date)
 
     def rsi(self, date=None, period=periods['rsi']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.rsi(self.data, period, date)
 
     def obv(self, date=None):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.obv(self.data, date)
 
     def ovr(self, date=None, period=periods):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.ovr(self.data, period, date)
 
     def vwap(self, date=None):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.vwap(self.data, date)
 
     def bb(self, date=None, period=periods['simple']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.bb(self.data, period, date)
 
     def apz(self, date=None, period=periods['apz']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.apz(self.data, period, date)
 
     def dc(self, date=None, period=periods['dc']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.dc(self.data, period, date)
 
     def kc(self, date=None, period=periods['kc']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.kc(self.data, period, date)
 
     def macd(self, date=None, period=periods['macd']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.macd(self.data, period, date)
 
     def adx(self, date=None, period=periods['adx']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.adx(self.data, period, date)
 
     def soc(self, date=None, period=periods['soc']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.soc(self.data, period, date)
 
     def stc(self, date=None, period=periods['stc']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.stc(self.data, period, date)
 
     def gat(self, date=None, period=periods['atr']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.gat(self.data, period, date).apply(hsirnd, 1).unique()
 
     def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.maverick(self.data, period, date, unbound, exclusive)
+
 
 class Equities(AE, Viewer):
     periods = pref.periods['Equities']
+
     def __init__(self, code, adhoc=False):
         self.foreign = False
         self._conf = pref.db['Equities']
-        if code not in entities(self._conf['name']): adhoc = True
+        if code not in entities(self._conf['name']):
+            adhoc = True
         self.code = code
         self.data = self.fetch(self.code, adhoc=adhoc)
-        if adhoc == False:
+        if adhoc is False:
             self._ae = AE(self.code)
             self.table = self._ae.table
             self.rc = self._ae.columns
@@ -150,11 +192,14 @@ class Equities(AE, Viewer):
         self._close = hsirnd(self.data['Close'][-1])
 
     def __del__(self):
-        self.foreign = self._conf = self.rc = self._ae =self.__conn = self.data = self.view = self._date = self._close = None
-        del(self.foreign, self._conf, self.rc, self._ae, self.__conn, self.data, self.view, self._date, self._close)
+        self.foreign = self._conf = self.rc = self._ae = self.__conn = None
+        self.data = self.view = self._date = self._close = None
+        del(self.foreign, self._conf, self.rc, self._ae, self.__conn)
+        del(self.data, self.view, self._date, self._close)
 
     def __call__(self, date=None):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.maverick(date=date, unbound=False)
 
     def __str__(self):
@@ -178,8 +223,10 @@ class Equities(AE, Viewer):
             # start = pd.datetime(pd.datetime.now().year - years, 12, 31)
             start = datetime(datetime.now().year - years, 12, 31)
         if code:
-            if isinstance(code, (int, float)): code = int(code)
-            if code not in [_ for _ in entities(self._conf['name']) if _ not in exclude]: adhoc = True
+            if isinstance(code, (int, float)):
+                code = int(code)
+            if code not in [_ for _ in entities(self._conf['name']) if _ not in exclude]:
+                adhoc = True
         if adhoc:
             while adhoc:
                 try:
@@ -187,7 +234,8 @@ class Equities(AE, Viewer):
                     self.foreign = True
                 except:
                     __ = yf.download(f'{code:04d}.HK', start, group_by='ticker')
-                if len(__): adhoc = not adhoc
+                if len(__):
+                    adhoc = not adhoc
                 else:
                     print('Retry in 30 seconds')
                     sleep(30)
@@ -204,88 +252,113 @@ class Equities(AE, Viewer):
         return __
 
     def mas(self, date=None, period=periods):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.mas(self.data, period, date)
 
     def idrs(self, date=None, period=periods):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.idrs(self.data, period. date)
 
     def sma(self, date=None, period=periods['simple'], req_field='c'):
-        if date == None: date = self._date
-        return self.view.ma(self.data, period, 's', req_field, date).map(hsirnd)
+        if date is None:
+            date = self._date
+        return self.view.ma(
+            self.data, period, 's', req_field, date).map(hsirnd)
 
     def ema(self, date=None, period=periods['simple'], req_field='c'):
-        if date == None: date = self._date
-        return self.view.ma(self.data, period, 'e', req_field, date).map(hsirnd)
+        if date is None:
+            date = self._date
+        return self.view.ma(
+            self.data, period, 'e', req_field, date).map(hsirnd)
 
     def wma(self, date=None, period=periods['simple'], req_field='c'):
-        if date == None: date = self._date
-        return self.view.ma(self.data, period, 'w', req_field, date).map(hsirnd)
+        if date is None:
+            date = self._date
+        return self.view.ma(
+            self.data, period, 'w', req_field, date).map(hsirnd)
 
     def kama(self, date=None, period=periods['kama'], req_field='c'):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.kama(self.data, period, req_field, date).map(hsirnd)
 
     def atr(self, date=None, period=periods['atr']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.atr(self.data, period, date)
 
     def rsi(self, date=None, period=periods['rsi']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.rsi(self.data, period, date)
 
     def obv(self, date=None):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.obv(self.data, date)
 
     def ovr(self, date=None, period=periods):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.ovr(self.data, period, date)
 
     def vwap(self, date=None):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.vwap(self.data, date)
 
     def bb(self, date=None, period=periods['simple']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.bb(self.data, period, date)
 
     def apz(self, date=None, period=periods['apz']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.apz(self.data, period, date)
 
     def dc(self, date=None, period=periods['dc']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.dc(self.data, period, date)
 
     def kc(self, date=None, period=periods['kc']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.kc(self.data, period, date)
 
     def macd(self, date=None, period=periods['macd']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.macd(self.data, period, date)
 
     def adx(self, date=None, period=periods['adx']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.adx(self.data, period, date)
 
     def soc(self, date=None, period=periods['soc']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.soc(self.data, period, date)
 
     def stc(self, date=None, period=periods['stc']):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.stc(self.data, period, date)
 
     def gat(self, date=None, period=periods['atr']):
-        if date == None: date = self._date
-        if self.foreign: return self.view.gat(self.data, period, date).round(2).unique()
+        if date is None:
+            date = self._date
+        if self.foreign:
+            return self.view.gat(self.data, period, date).round(2).unique()
         return self.view.gat(self.data, period, date).apply(hsirnd, 1).unique()
 
     def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
-        if date == None: date = self._date
+        if date is None:
+            date = self._date
         return self.view.maverick(self.data, period, date, unbound, exclusive)
 
 
