@@ -58,7 +58,7 @@ source = dict(
     SMS = 'https://messages.google.com/web',
     Gold = 'https://www.gold.org/')
 
-fields = ['open','high','low','close','volume']
+fields = ['open', 'high', 'low', 'close', 'volume']
 B_scale = dict(
     BABA = 1 / 8,
     YUMC = 1,
@@ -67,13 +67,78 @@ B_scale = dict(
     JD = 1 / 2)
 
 USHK = 7.75
-# y2n = [pandas, numpy, sqlalchemy, fix_yahoo_finance, golden_ratio, datetime, tqdm, sleep]
+public_holiday = {2015: {
+    1: (1,),
+    2: (19, 20),
+    4: (3, 6, 7),
+    5: (25,),
+    7: (1,),
+    9: (28,),
+    10: (1, 21),
+    12: (25,)}}
+public_holiday[2016] = {
+        1: (1,),
+        2: (8, 9, 10),
+        3: (25, 28),
+        4: (4,),
+        5: (2,),
+        6: (9,),
+        7: (1,),
+        9: (16,),
+        10: (10,),
+        12: (26, 27)}
+public_holiday[2017] = {
+        1: (2, 30, 31),
+        4: (4, 14, 17),
+        5:  (1, 3, 30),
+        10: (2, 5),
+        12: (25, 26)}
+public_holiday[2018] = {
+        1: (1,),
+        2: (16, 19),
+        3: (30,),
+        4: (2, 5),
+        5: (1, 22),
+        6: (18,),
+        7: (2,),
+        9: (25,),
+        10: (1, 17),
+        12: (25, 26)}
+public_holiday[2019] = {
+        1: (1,),
+        2: (5, 6, 7),
+        4: (5, 19, 20, 22),
+        5: (1, 12, 13),
+        6: (7,),
+        7: (1,),
+        9: (14,),
+        10: (1, 7),
+        12: (25, 26)}
+public_holiday[2020] = {
+        1: (1, 25, 27, 28),
+        2: (14,),
+        3: (20,),
+        4: (4, 10, 11, 12, 13, 30),
+        5: (1, 10),
+        6: (20, 21, 25),
+        7: (1,),
+        9: (22,),
+        10: (1, 2, 26),
+        12: (21, 25, 26)}
+public_holiday[2021] = {
+        1: (1,),
+        2: (12, 13, 14, 15),
+        4: (2, 3, 4, 5, 6),
+        5: (1, 19),
+        6: (14,),
+        7: (1,),
+        9: (22,),
+        10: (1, 14),
+        12: (25, 27)}
 y2n = [pandas, numpy, sqlalchemy, yfinance, golden_ratio, datetime, tqdm, sleep, B_scale, USHK]
 nta = [pandas, numpy, datetime, golden_ratio]
 alchemy = [sys.platform, os.environ, os.sep, os.listdir, Path, sqlalchemy, pandas, datetime]
-utils = [os.sep, os.environ, os.linesep, sys.platform, sys.version_info, Path, sqlalchemy, yfinance, golden_ratio, sleep, datetime, driver, functools.reduce]
-# utils = [os.sep, os.environ, os.linesep, sys.platform, sys.version_info, Path, sqlalchemy, fix_yahoo_finance, golden_ratio, sleep, datetime, functools.reduce]
-public_holiday = {2015:{1:(1,), 2:(19, 20), 4:(3, 6, 7), 5:(25,), 7:(1,), 9:(28,), 10:(1, 21), 12:(25,)}}
+utils = [os.sep, os.environ, os.linesep, sys.platform, sys.version_info, Path, sqlalchemy, yfinance, golden_ratio, sleep, datetime, driver, functools.reduce, public_holiday]
 periods = dict(
     Futures = dict(
         macd = dict(
@@ -147,9 +212,3 @@ db = dict(
         index = 'date',
         freq = 'bi-daily')
 )
-public_holiday[2016] = {1:(1,), 2:(8, 9, 10), 3:(25, 28), 4:(4,), 5:(2,), 6:(9,), 7:(1,), 9:(16,), 10:(10,), 12:(26, 27)}
-public_holiday[2017] = {1:(2, 30, 31), 4:(4, 14, 17), 5:(1, 3, 30), 10:(2, 5), 12:(25, 26)}
-public_holiday[2018] = {1:(1,), 2:(16, 19), 3:(30,), 4:(2, 5), 5:(1, 22), 6:(18,), 7:(2,), 9:(25,), 10:(1, 17), 12:(25, 26)}
-public_holiday[2019] = {1:(1,), 2:(5, 6, 7), 4:(5, 19, 20, 22), 5:(1, 12, 13), 6:(7,), 7:(1,), 9:(14,), 10:(1, 7), 12:(25, 26)}
-public_holiday[2020] = {1:(1, 25, 27, 28), 2:(14,), 3:(20,), 4:(4, 10, 11, 12, 13, 30), 5:(1, 10), 6:(20, 21, 25), 7:(1,), 9:(22,), 10:(1, 2, 26), 12:(21, 25, 26)}
-public_holiday[2021] = {1:(1,), 2:(12, 13, 14, 15), 4:(2, 3, 4, 5, 6), 5:(1, 19), 6:(14,), 7:(1,), 9:(22,), 10:(1, 14), 12:(25, 27)}
