@@ -1,34 +1,56 @@
 """
-Powerhouse for techinal analysis between frontend like pandas, matplotlib and backend namely, sqlite3.
+Powerhouse for techinal analysis between frontend like pandas, matplotlib
+and backend namely, sqlite3.
 """
 db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities': ('gr', 'filepath'), 'datetime': ('datetime',), 'statistics': ('mean', 'stdev'), 'os': ('sep', 'linesep')}, ({'sqlite3': ()}, "alias= 'lite'"), ({'tags': ('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='upper'")]
+iml = [
+        {'utilities': ('gr', 'filepath'),
+            'datetime': ('datetime',),
+            'statistics': ('mean', 'stdev'),
+            'os': ('sep', 'linesep')},
+        (
+            {'sqlite3': ()},
+            "alias= 'lite'"),
+        (
+            {'tags': ('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')},
+            "case='upper'")]
 __ = him(iml)
 for _ in list(__.keys()):
     exec("%s = __['%s']" % (_, _))
+
+
 class I2(object):
     """
-Base class to provide techinal analysis for financial derivatives. Required 'product code'.
+Base class to provide techinal analysis for financial derivatives.
+Required 'product code'.
     """
     def __init__(self, *args, **kwargs):
         self.datetime, self.trade_day = datetime, []
         self.period, self.__db, self.__table = int(round(20 / gr, 0)), db_name, db_table
         if args:
             self.code = args[0]
-            if len(args) >= 4: self.__table = args[3]
-            if len(args) >= 3: self.__db = args[2]
-            if len(args) >= 2: self.period = args[1]
-        if 'code' in kwargs.keys(): self.code = kwargs['code']
-        if 'period' in kwargs.keys(): self.period = kwargs['period']
-        if 'db_name' in kwargs.keys(): self.__db = kwargs['db_name']
-        if 'db_table' in kwargs.keys(): self.__table = kwargs['db_table']
+            if len(args) >= 4:
+                self.__table = args[3]
+            if len(args) >= 3:
+                self.__db = args[2]
+            if len(args) >= 2:
+                self.period = args[1]
+        if 'code' in kwargs.keys():
+            self.code = kwargs['code']
+        if 'period' in kwargs.keys():
+            self.period = kwargs['period']
+        if 'db_name' in kwargs.keys():
+            self.__db = kwargs['db_name']
+        if 'db_table' in kwargs.keys():
+            self.__table = kwargs['db_table']
 
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
         self.__data = self.__conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (self.__table, self.code.upper())).fetchall()
         for i in range(len(self.__data)):
-            if self.__data[i]['date'] not in self.trade_day: self.trade_day.append(self.__data[i]['date'])
+            if self.__data[i]['date'] not in self.trade_day:
+                self.trade_day.append(self.__data[i]['date'])
 
     def __del__(self):
         self.__data = self.__conn = self.code = self.period = self.__db = self.__table = self.datetime = self.trade_day = None
