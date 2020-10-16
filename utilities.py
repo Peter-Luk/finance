@@ -1,13 +1,26 @@
 import socket
 from pytz import timezone
-#from pandas_datareader import data
+# from pandas_datareader import data
 import pref
-sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, datetime, driver, reduce = pref.utils
-ph = pref.public_holiday
+sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, datetime, driver, reduce, ph = pref.utils
+# ph = pref.public_holiday
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
-futures_type, month_initial = ('HSI', 'MHI', 'HHI', 'MCH'), {'January': 'F', 'February': 'G', 'March': 'H', 'April': 'J', 'May': 'K', 'June': 'M', 'July': 'N', 'August': 'Q', 'September': 'U', 'October': 'V', 'November': 'X', 'December': 'Z'}
+futures_type = ('HSI', 'MHI', 'HHI', 'MCH')
+month_initial = {
+    'January': 'F',
+    'February': 'G',
+    'March': 'H',
+    'April': 'J',
+    'May': 'K',
+    'June': 'M',
+    'July': 'N',
+    'August': 'Q',
+    'September': 'U',
+    'October': 'V',
+    'November': 'X',
+    'December': 'Z'}
 avail_indicators, cal_month = ('wma', 'kama', 'ema', 'hv'), (3, 6, 9, 12)
 
 
