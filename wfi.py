@@ -16,10 +16,11 @@ milly = subject['Milly Ling']['whatsapp']['alias']
 if today.day == ltd(today.year, today.month):
     lf = waf(1)
 
+
 def fan(__='mhi', mt=True):
     _ = list(filter(lambda x: __.upper() in x, waf()))
     _.remove(mtf(__.upper()))
-    _  = _.pop()
+    _ = _.pop()
     if mt:
         _ = mtf(__)
     _ = Futures(_)
@@ -33,7 +34,8 @@ class WFutures(object):
         self.lip = ip
         if ip is None:
             self.lip = str(IP())
-        self.browser = eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
+        self.browser = \
+            eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         self.browser.implicitly_wait(10)
         self.browser.get(f'http://{self.lip}/futures')
         self.wait = WebDriverWait(self.browser, 600)
