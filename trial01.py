@@ -3,9 +3,10 @@ Powerhouse for techinal analysis between frontend like pandas, matplotlib and ba
 """
 db_name, db_table = 'Futures', 'records'
 him = getattr(__import__('handy'), 'him')
-iml = [{'utilities':('gr', 'filepath'),'datetime':('datetime',),'statistics':('mean', 'stdev'),'os':('sep', 'linesep')},({'sqlite3':()}, "alias='lite'"),({'tags':('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='upper'")]
+iml = [{'utilities': ('gr', 'filepath'), 'datetime': ('datetime',), 'statistics': ('mean', 'stdev'), 'os': ('sep', 'linesep')}, ({'sqlite3': ()}, "alias= 'lite'"), ({'tags': ('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')}, "case='upper'")]
 __ = him(iml)
-for _ in list(__.keys()): exec("%s = __['%s']" % (_, _))
+for _ in list(__.keys()):
+    exec("%s = __['%s']" % (_, _))
 class I2(object):
     """
 Base class to provide techinal analysis for financial derivatives. Required 'product code'.
@@ -471,14 +472,19 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if programmatic: return rdata
         return linesep.join(rstr)
 
+
 def summary(*args, **kwargs):
     o_format = 'raw'
     if args:
         f_code = args[0].upper()
-        if len(args) >= 3: o_format = args[2].lower()
-        if len(args) >= 2: date = args[1]
-    if 'format' in kwargs.keys(): o_format = kwargs['format'].lower()
-    if 'date' in kwargs.keys(): date = kwargs['date']
+        if len(args) >= 3:
+            o_format = args[2].lower()
+        if len(args) >= 2:
+            date = args[1]
+    if 'format' in kwargs.keys():
+        o_format = kwargs['format'].lower()
+    if 'date' in kwargs.keys():
+        date = kwargs['date']
     if 'code' in kwargs.keys(): f_code = kwargs['code'].upper()
     if f_code:
         if o_format == 'html':
@@ -487,20 +493,31 @@ def summary(*args, **kwargs):
         period, tday = mf.period, mf.trade_day
         ltd = len(tday)
         if 'date' in kwargs.keys():
-            if kwargs['date'] in tday: ltd = tday.index(kwargs['date']) + 1
-            elif o_format == 'html': return str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
-            else: return 'Sorry, date entry invalid!'
+            if kwargs['date'] in tday:
+                ltd = tday.index(kwargs['date']) + 1
+            elif o_format == 'html':
+                return str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, date entry invalid!']])))
+            else:
+                return 'Sorry, date entry invalid!'
         if ltd > period:
             i_fields, trs = ('Date', 'SMA', 'EMA', 'WMA', 'KAMA', 'RSI'), []
-            if o_format == 'html': th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
-            else: hdr = '\t\t'.join(i_fields)
+            if o_format == 'html':
+                th = TH(TR(linesep.join([str(TD(x)) for x in i_fields])))
+            else:
+                hdr = '\t\t'.join(i_fields)
             for i in range(period + 1, ltd):
                 i_values = []
-                for x in i_fields[1:]: i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
-                if o_format == 'html': trs.append(TR(linesep.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
-                else: hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
+                for x in i_fields[1:]:
+                    i_values.append('%0.3f' % eval('mf.%s(date="%s")' % (x, tday[i])))
+                if o_format == 'html':
+                    trs.append(TR(linesep.join([str(TD(x)) for x in (('%s:' % tday[i],) + tuple(i_values))])))
+                else:
+                    hdr += '\t'.join(('\n%s',) + tuple(['%s' for k in i_fields[1:]])) % (('%s:' % tday[i],) + tuple(i_values))
         if ltd <= period:
-            if o_format == 'html': hdr = str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, not enough data!']])))
-            else: hdr = 'Sorry, not enough data!'
-        elif o_format == 'html': hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))),{'width':'100%'})]])))
+            if o_format == 'html':
+                hdr = str(HTML(linesep.join([str(x) for x in [hdr, 'Sorry, not enough data!']])))
+            else:
+                hdr = 'Sorry, not enough data!'
+        elif o_format == 'html':
+            hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))),{'width':'100%'})]])))
         return hdr
