@@ -1,4 +1,5 @@
-from utilities import filepath, get_start, dictfcomp, datetime, platform, reduce, sep, web_collect
+from utilities import filepath, get_start, dictfcomp, datetime, platform, \
+    reduce, sep, web_collect
 from os import path, listdir, remove
 import sqlite3 as lite
 import pref
@@ -105,10 +106,13 @@ def stored_data(*args, **kwargs):
     conn.close()
     return res
 
+
 def get_stored_eid():
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
-    res = [_['eid'] for _ in conn.cursor().execute("SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format('eid', db_table)).fetchall()]
+    res = [_['eid'] for _ in conn.cursor().execute(
+        "SELECT DISTINCT {0} FROM {1} ORDER BY {0} ASC".format(
+            'eid', db_table)).fetchall()]
     conn.close()
     return res
 
@@ -139,6 +143,7 @@ def find_csv_path(*args, **kwargs):
             if cpl == 0: return False
         return cp
 
+
 def c2d(*args, **kwargs):
     lines, tmp = args[0], []
     fields = lines[0].split(',')
@@ -147,11 +152,15 @@ def c2d(*args, **kwargs):
             hdr, dl = {}, l.split(',')
             for f in fields:
                 if f != 'Adj Close':
-                    if f == 'Date': hdr[f.lower()] = '{}'.format(dl[fields.index(f)])
-                    elif f == 'Volume': hdr[f.lower()] = int(float(dl[fields.index(f)]))
-                    elif f in ['Open', 'High', 'Low', 'Close']: hdr[f.lower()] = float(dl[fields.index(f)])
+                    if f == 'Date':
+                        hdr[f.lower()] = '{}'.format(dl[fields.index(f)])
+                    elif f == 'Volume':
+                        hdr[f.lower()] = int(float(dl[fields.index(f)]))
+                    elif f in ['Open', 'High', 'Low', 'Close']:
+                        hdr[f.lower()] = float(dl[fields.index(f)])
             tmp.append(hdr)
-        except: pass
+        except:
+            pass
     return tmp
 
 
