@@ -36,25 +36,42 @@ class Analysor(object):
                 sl = SELECT(
                     linesep.join([f'{_}' for _ in ops]), {'name': 'contract'})
                 btn = BUTTON('Analyse', {'type': 'submit'})
-                trs = [TR(linesep.join([f'{_}' for _ in [TD(LABEL('Contract:     ')), TD(linesep.join([f'{__}' for __ in [sl, btn]]), {'align': 'right'})]]))]
-                bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {'method': 'post', 'action': 'proceed'}))
+                trs = [TR(linesep.join([f'{_}' for _ in [
+                    TD(LABEL('Contract:     ')),
+                    TD(linesep.join([f'{__}' for __ in [sl, btn]]), {
+                        'align': 'right'})]]))]
+                bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {
+                    'method': 'post', 'action': 'proceed'}))
                 return str(HTML(linesep.join([f'{_}' for _ in [hd, bd]])))
             else:
-                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {'name': 'contract'})
+                sl = SELECT(linesep.join(['{}'.format(_) for _ in ops]), {
+                    'name': 'contract'})
                 btn = BUTTON('Analyse', {'type': 'submit'})
-                trs = [TR(linesep.join(['{}'.format(_) for _ in [TD(LABEL('Contract: ')), TD(linesep.join(['{}'.format(__) for __ in [sl, btn]]), {'align': 'right'})]]))]
-                bd = BODY(FORM(TABLE(linesep.join(['{}'.format(_) for _ in trs])), {'method': 'post', 'action': 'proceed'}))
-                return str(HTML(linesep.join(['{}'.format(_) for _ in [hd, bd]])))
+                trs = [TR(linesep.join(['{}'.format(_) for _ in [
+                    TD(LABEL('Contract: ')),
+                    TD(linesep.join(['{}'.format(__) for __ in [sl, btn]]), {
+                        'align': 'right'})]]))]
+                bd = BODY(FORM(TABLE(
+                    linesep.join(['{}'.format(_) for _ in trs])), {
+                        'method': 'post', 'action': 'proceed'}))
+                return str(HTML(linesep.join(['{}'.format(_) for _ in [
+                    hd, bd]])))
 
     @cherrypy.expose
     def proceed(self, contract):
         try:
             s, d = lf(contract.upper()).plot(embed=True)
-            bbase = "http://cdn.pydata.org/bokeh/release/bokeh-%s.min" % bv
-            bscript = '<script type="text/javascript" scr="%s"></script>' % '.'.join((bbase, 'js'))
-            blink = '<link href="%s.css" rel="stylesheet" type="text/css" />' % bbase
-            blink += bscript + '<script type="text/javascript"> Bokeh.set_log_level="info"; </script>%s' % s
-            hd = HEAD(linesep.join(['<meta charset="utf-8">', str(TITLE(contract)), blink]))
+            bbase = f"http://cdn.pydata.org/bokeh/release/bokeh-{bv}.min"
+            _holder = '.'.join((bbase, 'js'))
+            bscript = f'<script type="text/javascript" \
+                scr="{_holder}"></script>'
+            blink = f'<link href="{bbase}.css" \
+                rel="stylesheet" type="text/css" />'
+            blink += bscript + \
+                f'<script type="text/javascript"> \
+                Bokeh.set_log_level="info"; </script>{s}'
+            hd = HEAD(linesep.join([
+                '<meta charset="utf-8">', str(TITLE(contract)), blink]))
             bd = BODY(d)
             return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
         except:
@@ -63,8 +80,8 @@ class Analysor(object):
                 opt_value = 'B'
                 if len(i2.trade_day) > i2.period:
                     opt_value = 'I'
-                return PI(code=contract).fdc(option= opt_value).to_html()
-            return summary(code= contract, format= 'html')
+                return PI(code=contract).fdc(option=opt_value).to_html()
+            return summary(code=contract, format='html')
 
 
 class Inputter(object):
@@ -112,21 +129,26 @@ class Inputter(object):
 
     @cherrypy.expose
     def append(self, contract, open, high, low, close, volume):
-#         from datetime import datetime
         today, session = datetime.today(), 'M'
         hour, minute = today.hour, today.minute
         if hour > 12:
             session = 'A'
         elif (hour == 12) and (minute > 56):
             session = 'A'
-        i2 = PI(code= contract)
-        i2.append(session=session, open=open, close=close, high=high, low=low, volume=volume)
+        i2 = PI(code=contract)
+        i2.append(
+                session=session,
+                open=open,
+                close=close,
+                high=high,
+                low=low,
+                volume=volume)
         if panda:
             opt_value = 'B'
             if len(i2.trade_day) > i2.period:
                 opt_value = 'I'
-            return PI(code= contract).fdc(option= opt_value).to_html()
-        return summary(code= contract, format= 'html')
+            return PI(code=contract).fdc(option=opt_value).to_html()
+        return summary(code=contract, format='html')
 
 
 class Estimate_Futures(object):
@@ -190,7 +212,9 @@ class Estimate_Equities(object):
                     TD(LABEL('Code: ')),
                     TD(linesep.join([f'{__}' for __ in [sl, btn]]), {
                         'align': 'right'})]]))]
-                # trs.append(TR(linesep.join([f'{_}' for _ in [TD('Pivot Point', {'align':'right'}), TD(INPUT({'type':'text','name':'pp'}))]])))
+                # trs.append(TR(linesep.join([f'{_}' for _ in [
+                #     TD('Pivot Point', {'align':'right'}),
+                #     TD(INPUT({'type':'text','name':'pp'}))]])))
                 bd = BODY(FORM(TABLE(linesep.join([f'{_}' for _ in trs])), {
                     'method': 'post', 'action': 'proceed'}))
                 return str(HTML(linesep.join([f'{_}' for _ in [hd, bd]])))
@@ -214,7 +238,7 @@ class Estimate_Equities(object):
     @cherrypy.expose
     def proceed(self, code, pp=None):
         _ = Equities(int(code))
-        hd = HEAD(TITLE(f'{code} for {today}'))
+        hd = HEAD(TITLE(f'{code} for {today}'))#6968 獲派 1,000股, 14-16 board leave
         text_attrs = {
                 'style': 'height:70px;width:650px;',
                 'disabled': True,
@@ -222,7 +246,8 @@ class Estimate_Equities(object):
         bd = BODY(TABLE(
             linesep.join([f"{TR(TD(TEXTAREA(__, text_attrs)))}" for __ in [
                 _, _(), _.gat()]])))
-        # bd = BODY(TABLE(linesep.join([f'{TR(TD(__))}' for __ in [_, _(), _.gat()]])))
+        # bd = BODY(TABLE(
+        #     linesep.join([f'{TR(TD(__))}' for __ in [_, _(), _.gat()]])))
         return str(HTML(linesep.join(['{}'.format(_) for _ in [
             hd, bd]])))
 #         i2 = PI(code=contract)
