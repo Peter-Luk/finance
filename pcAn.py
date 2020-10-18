@@ -13,6 +13,7 @@ def grab(c):
     pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
     return pdhr
 
+
 def mav(c, date):
     e = Equities(c).maverick(date, unbound=False)
     return e
@@ -24,16 +25,21 @@ def compose(code=entities(pref.db['Equities']['name'])):
         r = list(tqdm(pool.imap(grab, code), total=len(code)))
     return pd.concat(r, keys=code, names=['Code', 'Data'], axis=1)
 
+
 def strayed(df, date, buy=True):
     if isinstance(date, str):
-        try: date = datetime.strptime(date, "%Y%m%d")
-        except: pass
+        try:
+            date = datetime.strptime(date, "%Y%m%d")
+        except:
+            pass
     if isinstance(date, datetime):
-        txr = df.reorder_levels(['Data','Code'], 1)
+        txr = df.reorder_levels(['Data', 'Code'], 1)
         rtr = txr.loc[date, 'RSI']
         hdr = []
         if buy:
-            rl = rtr[(rtr < (1 - 1 / gr) * 100) & (txr.loc[date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
+            rl = rtr[
+                (rtr < (1 - 1 / gr) * 100) & (txr.loc[
+                    date, 'dpC'].abs() > txr.loc[date, 'ATR'])].index.tolist()
             if rl:
                 al = [(_, date) for _ in rl]
                 with multiprocessing.Pool() as pool:
@@ -41,7 +47,9 @@ def strayed(df, date, buy=True):
                     hdr.extend([_.loc["buy", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='buy')
         else:
-            rl = rtr[(rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[date, 'ATR'])].index.tolist()
+            rl = rtr[
+                (rtr > 1 / gr * 100) & (txr.loc[date, 'dpC'] > txr.loc[
+                    date, 'ATR'])].index.tolist()
             if rl:
                 al = [(_, date) for _ in rl]
                 with multiprocessing.Pool() as pool:
@@ -49,13 +57,16 @@ def strayed(df, date, buy=True):
                     hdr.extend([_.loc["sell", date] for _ in r])
                 return pd.Series(hdr, index=rl, name='sell')
 
+
 def press(__):
     _ = Equities(__)
     return f'{_}\n{_()}\n{_.gat()}\n'
 
+
 def summary(__):
-    ae = entities()
-    if not isinstance(__, (tuple, list)): __ = [__]
+    # ae = entities()
+    if not isinstance(__, (tuple, list)):
+        __ = [__]
     try:
         with multiprocessing.Pool() as pool:
             _ = pool.map(press, __)
