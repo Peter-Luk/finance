@@ -116,12 +116,14 @@ def get_stored_eid():
     conn.close()
     return res
 
+
 def find_csv_path(*args, **kwargs):
     folder, sd = 'csv', filepath(db_name)
     if args:
         folder = args[0]
     if 'folder' in list(kwargs.keys()):
-        if isinstance(kwargs['folder'], str): folder = kwargs['folder']
+        if isinstance(kwargs['folder'], str):
+            folder = kwargs['folder']
     sdl = str(sd).split(sep)
     cp = sdl[:-2]
     cp.append(folder)
@@ -140,7 +142,8 @@ def find_csv_path(*args, **kwargs):
             cp.append(folder)
             cp = sep.join(cp)
             cpl = len(listdir(cp))
-            if cpl == 0: return False
+            if cpl == 0:
+                return False
         return cp
 
 
@@ -327,11 +330,14 @@ Worker object for manipulate and transfer data from file system to database.
 
     def __del__(self):
         self.conn.close()
-        self.conn = self.fields = self.values = self.code = self.__data = self.__stored_data = self.__csv_fullpath = self.__db_fullpath = None
-        del self.fields, self.values, self.conn, self.code, self.__data, self.__stored_data, self.__csv_fullpath, self.__db_fullpath
+        self.conn = self.fields = self.values = self.code = self.__data = \
+            self.__stored_data = self.__csv_fullpath = \
+            self.__db_fullpath = None
+        del self.fields, self.values, self.conn, self.code, self.__data, \
+            self.__stored_data, self.__csv_fullpath, self.__db_fullpath
 
     def get(self, *args, **kwargs):
-        """ 
+        """
 Extract data in csv from file system,
 first positional or 'code' named is name in file system.
         """
@@ -387,44 +393,62 @@ first positional or 'code' named is name in file system.
 
     def store(self, *args, **kwargs):
         """
-Transfer data to first positional argument database 'table_name' (default: 'db_table').
+Transfer data to first positional argument
+database 'table_name' (default: 'db_table').
         """
         eid, table_name = int(self.code.split('.')[0]), db_table
-        if args: table_name = args[0]
-        if 'name' in list(kwargs.keys()): table_name = kwargs['name']
-        i, sd, nd = 0, [datetime.strptime(_['date'], '%Y-%m-%d').date() for _ in self.__stored_data], []
+        if args:
+            table_name = args[0]
+        if 'name' in list(kwargs.keys()):
+            table_name = kwargs['name']
+        i, sd, nd = 0, [datetime.strptime(
+            _['date'], '%Y-%m-%d').date() for _ in self.__stored_data], []
         fields = [_.lower() for _ in self.fields]
         fields.insert(0, 'eid')
-        rfields = ['%s=?'% _ for _ in fields[2:]]
-        iqstr = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(fields), ','.join(['?' for _ in fields]))
+        # rfields = ['%s=?'% _ for _ in fields[2:]]
+        iqstr = "INSERT INTO %s (%s) VALUES (%s)" % (table_name, ','.join(
+            fields), ','.join(['?' for _ in fields]))
         while i < len(self.__data):
             _, tmp = self.__data[i], {}
             if _['date'] in sd:
                 tmp['table'] = 'records'
-                hdr = self.conn.cursor().execute("SELECT * FROM {table} WHERE eid={eid} AND date='{date}'".format(**{'table':tmp['table'], 'eid':eid, 'date':_['date']})).fetchone()
+                hdr = self.conn.cursor().execute("SELECT * FROM {table} WHERE \
+                    eid={eid} AND date='{date}'".format(**{
+                        'table': tmp['table'], 'eid': eid,
+                        'date': _['date']})).fetchone()
                 tmp['id'] = hdr['id']
-                ufvd = [(j, _[j]) for j in list(_.keys()) if j not in ['eid', 'date', 'id']]
-                hd = [(j, hdr[j]) for j in list(hdr.keys()) if j not in ['eid', 'date', 'id']]
+                ufvd = [(j, _[j]) for j in list(_.keys()) if j not in [
+                    'eid', 'date', 'id']]
+                hd = [(j, hdr[j]) for j in list(hdr.keys()) if j not in [
+                    'eid', 'date', 'id']]
                 if not hd == ufvd:
                     tmp['set'] = ','.join(['{0}={1}'.format(*j) for j in ufvd])
-                    self.conn.execute("UPDATE {table} SET {set} WHERE id={id}".format(**tmp))
+                    self.conn.execute("UPDATE {table} SET {set} \
+                        WHERE id={id}".format(**tmp))
                     self.conn.commit()
-            else: nd.append(_)
+            else:
+                nd.append(_)
             i += 1
         dl = []
         for i in nd:
             tmp = (int(self.code.split('.')[0]),)
             for j in fields[1:]:
-                if j == 'date': tmp += (i[j].strftime('%Y-%m-%d'),)
-                else: tmp += (i[j],)
+                if j == 'date':
+                    tmp += (i[j].strftime('%Y-%m-%d'),)
+                else:
+                    tmp += (i[j],)
             dl.append(tmp)
         self.conn.cursor().executemany(iqstr, dl)
         self.conn.commit()
         return len(nd)
 
-def cyd(code, start_time=datetime(1900,1,1,16,25).time()):
+
+def cyd(code, start_time=datetime(1900, 1, 1, 16, 25).time()):
     import datetime, time
     if isinstance(start_time, datetime.time):
-        start = datetime.datetime.today().replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0)
-        while datetime.datetime.now() < start: time.sleep(2)
+        start = datetime.datetime.today().replace(
+            hour=start_time.hour, minute=start_time.minute, second=0,
+            microsecond=0)
+        while datetime.datetime.now() < start:
+            time.sleep(2)
         return wap(code)
