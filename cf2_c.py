@@ -238,7 +238,7 @@ class Estimate_Equities(object):
     @cherrypy.expose
     def proceed(self, code, pp=None):
         _ = Equities(int(code))
-        hd = HEAD(TITLE(f'{code} for {today}'))#6968 獲派 1,000股, 14-16 board leave
+        hd = HEAD(TITLE(f'{code} for {today}'))
         text_attrs = {
                 'style': 'height:70px;width:650px;',
                 'disabled': True,
