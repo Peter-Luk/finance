@@ -7,64 +7,64 @@ from pathlib import Path, os, sys, functools
 from time import sleep
 
 driver = dict(
-    Chrome = dict(
-        name = 'chromedriver.exe',
-        path = ['browser', 'driver']),
-    Firefox = dict(
-        name = 'geckodriver.exe',
-        path = ['browser', 'driver']),
-    Ie = dict(
-        name = 'IEDriverServer.exe',
-        path = ['browser', 'driver'])
+    Chrome=dict(
+        name='chromedriver.exe',
+        path=['browser', 'driver']),
+    Firefox=dict(
+        name='geckodriver.exe',
+        path=['browser', 'driver']),
+    Ie=dict(
+        name='IEDriverServer.exe',
+        path=['browser', 'driver'])
 )
 
 subject = {
     'Peter Luk': dict(
-        mobile = dict(
-            primary = 63344427,
-            secondary = 90757228,
-            home = 27600722),
-        whatsapp = dict(
-            input = {90757228 : '_3FRCZ'},
-            alias = '"陸永原"')),
+        mobile=dict(
+            primary=63344427,
+            secondary=90757228,
+            home=27600722),
+        whatsapp=dict(
+            input={90757228: '_3FRCZ'},
+            alias='"陸永原"')),
     'Milly Ling': dict(
-        mobile = dict(
-            primary = 90107008,
-            home = 21750098),
-        whatsapp = dict(
-            alias = '"凌月明Milly"')),
+        mobile=dict(
+            primary=90107008,
+            home=21750098),
+        whatsapp=dict(
+            alias='"凌月明Milly"')),
     'Mickey Wong': dict(
-        mobile = dict(
-            primary = '+65 83826103'),
-        whatsapp = dict(
-            alias = '"Wong Mickey"')),
+        mobile=dict(
+            primary='+65 83826103'),
+        whatsapp=dict(
+            alias='"Wong Mickey"')),
     'Chan Cheung Yiu': dict(
-        mobile = dict(
-            primary = 91031418),
-        whatsapp = dict(
-            alias = '"陳長耀"')),
+        mobile=dict(
+            primary=91031418),
+        whatsapp=dict(
+            alias='"陳長耀"')),
     'Josephine Yuen': dict(
-        mobile = dict(
-            primary = 98682629),
-        whatsapp = dict(
-            alias = '"袁淑兒Josephine"'))
+        mobile=dict(
+            primary=98682629),
+        whatsapp=dict(
+            alias='"袁淑兒Josephine"'))
     }
 
 source = dict(
-    SINA = 'http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml',
-    NIKKEI = 'https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225',
-    CNBC = 'https://www.cnbc.com/pre-markets/',
-    WhatsApp = 'https://web.whatsapp.com',
-    SMS = 'https://messages.google.com/web',
-    Gold = 'https://www.gold.org/')
+    SINA='http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml',
+    NIKKEI='https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225',
+    CNBC='https://www.cnbc.com/pre-markets/',
+    WhatsApp='https://web.whatsapp.com',
+    SMS='https://messages.google.com/web',
+    Gold='https://www.gold.org/')
 
 fields = ['open', 'high', 'low', 'close', 'volume']
 B_scale = dict(
-    BABA = 1 / 8,
-    YUMC = 1,
-    NTES = 1 / 5,
-    # NTES = 1 / 25,
-    JD = 1 / 2)
+    BABA=1 / 8,
+    YUMC=1,
+    NTES=1 / 5,
+    # NTES=1 / 25,
+    JD=1 / 2)
 
 USHK = 7.75
 public_holiday = {2015: {
@@ -135,80 +135,87 @@ public_holiday[2021] = {
         9: (22,),
         10: (1, 14),
         12: (25, 27)}
-y2n = [pandas, numpy, sqlalchemy, yfinance, golden_ratio, datetime, tqdm, sleep, B_scale, USHK]
+y2n = [
+        pandas, numpy, sqlalchemy, yfinance, golden_ratio, datetime, tqdm,
+        sleep, B_scale, USHK]
 nta = [pandas, numpy, datetime, golden_ratio]
-alchemy = [sys.platform, os.environ, os.sep, os.listdir, Path, sqlalchemy, pandas, datetime]
-utils = [os.sep, os.environ, os.linesep, sys.platform, sys.version_info, Path, sqlalchemy, yfinance, golden_ratio, sleep, datetime, driver, functools.reduce, public_holiday]
+alchemy = [
+        sys.platform, os.environ, os.sep, os.listdir, Path, sqlalchemy,
+        pandas, datetime]
+utils = [
+        os.sep, os.environ, os.linesep, sys.platform, sys.version_info,
+        Path, sqlalchemy, yfinance, golden_ratio, sleep, datetime, driver,
+        functools.reduce, public_holiday]
 periods = dict(
-    Futures = dict(
-        macd = dict(
-            fast = 5,
-            slow = 10,
-            signal = 3),
-        soc = dict(
-            K = 14,
-            D = 3),
-        stc = dict(
-            fast = 5,
-            slow = 12,
-            K = 3,
-            D = 3),
-        atr = 7,
-        rsi = 7,
-        kama = dict(
-            er = 7,
-            fast = 2,
-            slow = 12),
-        kc = dict(
-            kama = dict(
-                er = 5,
-                fast = 2,
-                slow = 12),
-            atr = 7),
-        adx = 7,
-        simple = 12,
-        dc = 12,
-        apz = 5),
-    Equities = dict(
-        macd = dict(
-            fast = 12,
-            slow = 26,
-            signal = 9),
-        soc = dict(
-            K = 14,
-            D = 3),
-        stc = dict(
-            fast = 23,
-            slow = 50,
-            K = 10,
-            D = 10),
-        atr = 14,
-        rsi = 14,
-        kama = dict(
-            er = 10,
-            fast = 2,
-            slow = 30),
-        kc = dict(
-            kama = dict(
-                er = 5,
-                fast = 2,
-                slow = 20),
-            atr = 10),
-        adx = 14,
-        simple = 20,
-        dc = 20,
-        apz = 5)
+    Futures=dict(
+        macd=dict(
+            fast=5,
+            slow=10,
+            signal=3),
+        soc=dict(
+            K=14,
+            D=3),
+        stc=dict(
+            fast=5,
+            slow=12,
+            K=3,
+            D=3),
+        atr=7,
+        rsi=7,
+        kama=dict(
+            er=7,
+            fast=2,
+            slow=12),
+        kc=dict(
+            kama=dict(
+                er=5,
+                fast=2,
+                slow=12),
+            atr=7),
+        adx=7,
+        simple=12,
+        dc=12,
+        apz=5),
+    Equities=dict(
+        macd=dict(
+            fast=12,
+            slow=26,
+            signal=9),
+        soc=dict(
+            K=14,
+            D=3),
+        stc=dict(
+            fast=23,
+            slow=50,
+            K=10,
+            D=10),
+        atr=14,
+        rsi=14,
+        kama=dict(
+            er=10,
+            fast=2,
+            slow=30),
+        kc=dict(
+            kama=dict(
+                er=5,
+                fast=2,
+                slow=20),
+            atr=10),
+        adx=14,
+        simple=20,
+        dc=20,
+        apz=5)
 )
 db = dict(
-    Equities = dict(
-        name = 'Securities',
-        table = 'records',
-        index = 'date',
-        freq = 'daily',
-        exclude = [122, 368, 805, 1828, 8509]),
-    Futures = dict(
-        name = 'Futures',
-        table = 'records',
-        index = 'date',
-        freq = 'bi-daily')
+    Equities=dict(
+        name='Securities',
+        table='records',
+        index='date',
+        freq='daily',
+        exclude=[122, 368, 805, 1828, 8509]),
+    Futures=dict(
+        name='Futures',
+        table='records',
+        index='date',
+        freq='bi-daily')
 )
