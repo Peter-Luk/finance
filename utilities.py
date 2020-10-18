@@ -1,9 +1,8 @@
 import socket
 from pytz import timezone
-# from pandas_datareader import data
 import pref
-sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, datetime, driver, reduce, ph = pref.utils
-# ph = pref.public_holiday
+sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, \
+    datetime, driver, reduce, ph = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
