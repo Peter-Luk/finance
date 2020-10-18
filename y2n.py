@@ -218,14 +218,18 @@ class Equities(AE, Viewer):
     def acquire(self, conditions, ):
         return self._ae.acquire(conditions)
 
-    def fetch(self, code=None, start=None, table=pref.db['Equities']['table'], exclude=pref.db['Equities']['exclude'], years=4, adhoc=False):
+    def fetch(
+            self, code=None, start=None, table=pref.db['Equities']['table'],
+            exclude=pref.db['Equities']['exclude'], years=4, adhoc=False):
         if not start:
             # start = pd.datetime(pd.datetime.now().year - years, 12, 31)
             start = datetime(datetime.now().year - years, 12, 31)
         if code:
             if isinstance(code, (int, float)):
                 code = int(code)
-            if code not in [_ for _ in entities(self._conf['name']) if _ not in exclude]:
+            if code not in [
+                    _ for _ in entities(self._conf['name'])
+                    if _ not in exclude]:
                 adhoc = True
         if adhoc:
             while adhoc:
@@ -233,7 +237,8 @@ class Equities(AE, Viewer):
                     __ = yf.download(code.upper(), start, group_by='ticker')
                     self.foreign = True
                 except:
-                    __ = yf.download(f'{code:04d}.HK', start, group_by='ticker')
+                    __ = yf.download(
+                            f'{code:04d}.HK', start, group_by='ticker')
                 if len(__):
                     adhoc = not adhoc
                 else:
@@ -242,11 +247,13 @@ class Equities(AE, Viewer):
             __.drop('Adj Close', 1, inplace=True)
         else:
             from alchemy import AS
-            fields = ['date', 'open', 'high', 'low', 'close', 'volume']
+            fields = ['date'] + pref.fields
             sfc = ', '.join([f'{_} as {_.capitalize()}' for _ in fields])
-            qtext = f"SELECT {sfc} FROM records WHERE eid={code:d} AND date>{start:'%Y-%m-%d'}"
+            qtext = f"SELECT {sfc} FROM records WHERE eid={code:d} AND \
+                    date>{start:'%Y-%m-%d'}"
             conn = AS(self._conf['name']).connect
-            __ = pd.read_sql(qtext, conn, index_col='Date', parse_dates=['Date'])
+            __ = pd.read_sql(
+                    qtext, conn, index_col='Date', parse_dates=['Date'])
             # __.columns = [_.capitalize() for _ in __.columns]
             # __.index.name = __.index.name.capitalize()
         return __
