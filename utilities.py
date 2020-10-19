@@ -8,7 +8,7 @@ today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
 futures_type = ('HSI', 'MHI', 'HHI', 'MCH')
 month_initial = dict(list(zip(
-    [datetime(2020, _+1, 1).strftime('%B') for _ in list(range(12))],
+    [datetime(year, _+1, 1).strftime('%B') for _ in list(range(12))],
     [_.upper() for _ in list('fghjkmnquvxz')])))
 avail_indicators, cal_month = ('wma', 'kama', 'ema', 'hv'), (3, 6, 9, 12)
 
