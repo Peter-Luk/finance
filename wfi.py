@@ -128,7 +128,7 @@ class WFutures(object):
             group_title = self.wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
             group_title.click()
             _ = sender['whatsapp']['input'][mobile]
-            inp_xpath = f'//div[@class="{_} copyable-text selectable-text"][@contenteditable="true"][@data-tab="1"]'
+            inp_xpath = f'//div[@class="{_} copyable-text selectable-text"][@data-tab="6"][@dir="ltr"][@spellcheck="true"][@contenteditable="true"]'
             input_box = self.wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
             input_box.send_keys(message + Keys.ENTER)
             return f'Message successfully sent to {recipent} @ {datetime.now()}'
