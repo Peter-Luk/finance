@@ -8,7 +8,8 @@ from pytz import timezone
 from y2n import Futures
 import re, random
 
-from pref import source, fields, subject
+# from pref import source, fields, subject
+from pref import source, fields, div_input, subject
 from pt_2 import festi
 lf, preference = waf(), 'Firefox'
 # __author = subject['Peter Luk']
@@ -128,20 +129,23 @@ class WFutures(object):
             change = '0'
         return self.__status(price, change, last)
 
-    def whatsend(self, recipent, message, sender=subject['Peter Luk']):
+    def whatsend(self, recipent, message, sender='Peter Luk'):
+    # def whatsend(self, recipent, message, sender=subject['Peter Luk']):
         try:
             self.goto('WhatsApp')
-            mobile = sender['mobile']['secondary']
+            # mobile = sender['mobile']['secondary']
             x_arg = f'//span[contains(@title, {recipent})]'
             group_title = self.wait.until(EC.presence_of_element_located((
                 By.XPATH, x_arg)))
             group_title.click()
-            _ = sender['whatsapp']['input'][mobile]
-            inp_xpath = f'//div[@class="{_} copyable-text selectable-text"]\
-                    [@data-tab="6"][@dir="ltr"][@spellcheck="true"]\
-                    [@contenteditable="true"]'
+            # _ = sender['whatsapp']['input'][mobile]
+            # inp_xpath = f'//div[@class="{_} copyable-text selectable-text"]\
+            #         [@data-tab="6"][@dir="ltr"][@spellcheck="true"]\
+            #         [@contenteditable="true"]'
+            # input_box = self.wait.until(EC.presence_of_element_located((
+            #     By.XPATH, inp_xpath)))
             input_box = self.wait.until(EC.presence_of_element_located((
-                By.XPATH, inp_xpath)))
+                By.XPATH, f'//div{div_input(sender)}')))
             input_box.send_keys(message + Keys.ENTER)
             return f'Message successfully sent to {recipent} @ \
                     {datetime.now()}'
