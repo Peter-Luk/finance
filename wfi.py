@@ -40,7 +40,8 @@ class WFutures(object):
         self.browser.get(f'http://{self.lip}/futures')
         self.wait = WebDriverWait(self.browser, 600)
         self.window0 = self.browser.window_handles[0]
-        self.browser.execute_script(f"window.open('http://{self.lip}/equities','Local');")
+        self.browser.execute_script(f"window.open( \
+            'http://{self.lip}/equities','Local');")
         self.__load(lf)
         self.refresh(self.window0)
 
@@ -57,7 +58,9 @@ class WFutures(object):
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
         if not isinstance(_, (list, tuple)):
             _ = [_]
-        [self.browser.execute_script(f"window.open('{source[__]}', '{__}');") for __ in _ if __ in source.keys()]
+        [self.browser.execute_script(
+            f"window.open('{source[__]}', '{__}');") for __ in _ if __ in
+            source.keys()]
 
     def kill(self):
         self.browser.quit()
@@ -80,7 +83,9 @@ class WFutures(object):
             self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(timezone('Asia/Shanghai'))
+        last = datetime.strptime(self.browser.find_element_by_xpath(
+            '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(
+                timezone('Asia/Shanghai'))
         if change == '--':
             change = '0'
         return self.__status(price, change, last)
@@ -98,7 +103,8 @@ class WFutures(object):
         else:
             self.goto(site)
         try:
-            _ = self.browser.find_element_by_xpath('//*[@id="block-wgcheadergoldspotprice"]')
+            _ = self.browser.find_element_by_xpath(
+                '//*[@id="block-wgcheadergoldspotprice"]')
             price = _.find_element_by_xpath('./h2/span[1]').text
             return float(price.replace(',', ''))
         except:
@@ -115,7 +121,9 @@ class WFutures(object):
             self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = datetime.strptime(self.browser.find_element_by_xpath('//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(timezone('Asia/Shanghai'))
+        last = datetime.strptime(self.browser.find_element_by_xpath(
+            '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(
+                timezone('Asia/Shanghai'))
         if change == '--':
             change = '0'
         return self.__status(price, change, last)
@@ -152,22 +160,31 @@ class WFutures(object):
         def cxpath(_):
             idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
             if _ in idx:
-                return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
-                # return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
+                return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/\
+                        div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
+                # return f'/html/body/div[2]/div[2]/div[1]/div[3]/div[2]/div/\
+                #   div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
 
         _ = self.browser.find_element_by_xpath(cxpath(idx))
-        price = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[2]').text
-        change = _.find_element_by_xpath(f'./{div}/div/div/table/tbody/tr/td[3]').text
-        l = ''.join(re.split('\: |\|', _.find_element_by_xpath('./div[5]').text)[1:])
+        price = _.find_element_by_xpath(
+            f'./{div}/div/div/table/tbody/tr/td[2]').text
+        change = _.find_element_by_xpath(
+            f'./{div}/div/div/table/tbody/tr/td[3]').text
+        l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
+            './div[5]').text)[1:])
         try:
-            last = datetime.strptime(l, '%a %b %d %Y %I:%M %p EDT').astimezone(timezone('America/New_York'))
+            last = datetime.strptime(l, '%a %b %d %Y %I:%M %p EDT').astimezone(
+                timezone('America/New_York'))
         except:
-            last = datetime.strptime(l, '%a %b %d %Y').astimezone(timezone('America/New_York'))
+            last = datetime.strptime(l, '%a %b %d %Y').astimezone(
+                timezone('America/New_York'))
         return self.__status(price, change, last)
 
     def nk225(self, site='NIKKEI'):
-        if self.browser.current_url == source[site]: self.refresh(site)
-        else: self.goto(site)
+        if self.browser.current_url == source[site]:
+            self.refresh(site)
+        else:
+            self.goto(site)
         def convert(_):
             rstring  = '\([0-2][0-9]\:[0-5][0-9]\)'
             if re.search(rstring, _):
@@ -177,7 +194,8 @@ class WFutures(object):
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
         t = change.split(' ')[0].split(',')
-        last = convert(self.browser.find_element_by_xpath('//*[@id="datedtime"]').text)
+        last = convert(self.browser.find_element_by_xpath(
+            '//*[@id="datedtime"]').text)
         return self.__status(price, t[0], last)
 
     def reset(self, tabs=lf):
@@ -191,7 +209,8 @@ class WFutures(object):
             self.refresh(tabs)
 
     def set_open(self, tab, _):
-        if tab.upper() in lf: self.__update(tab.upper(), 'open', _)
+        if tab.upper() in lf:
+            self.__update(tab.upper(), 'open', _)
         if tab == self.window0:
             self.goto(tab)
             self.pivot.clear()
@@ -206,11 +225,13 @@ class WFutures(object):
 
     def update_high(self, tab, _):
         tab = tab.upper()
-        if tab in lf: self.__update(tab, 'high', _)
+        if tab in lf:
+            self.__update(tab, 'high', _)
 
     def update_low(self, tab, _):
         tab = tab.upper()
-        if tab in lf: self.__update(tab, 'low', _)
+        if tab in lf:
+            self.__update(tab, 'low', _)
 
     def __cfm(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
@@ -255,7 +276,8 @@ class WFutures(object):
             self.eb = self.browser.find_element_by_tag_name('button')
 
     def analyse(self, code):
-        if isinstance(code, (int, float)): code = str(int(code))
+        if isinstance(code, (int, float)):
+            code = str(int(code))
         self.reset('Local')
         for _ in self.browser.find_elements_by_tag_name('option'):
             if _.text == code:
@@ -265,16 +287,20 @@ class WFutures(object):
 
     def __load(self, tabs):
         for _ in [__ for __ in tabs if __ in lf]:
-            self.browser.execute_script(f"window.open('http://{self.lip}','{_}');")
+            self.browser.execute_script(
+                f"window.open('http://{self.lip}','{_}');")
             self.goto(_)
             for __ in self.browser.find_elements_by_tag_name('option'):
                 if __.text == _:
                     __.click()
                     break
-            self.wait.until(EC.presence_of_element_located((By.TAG_NAME, 'button')))
+            self.wait.until(EC.presence_of_element_located(
+                (By.TAG_NAME, 'button')))
             t = (_[0] + _[-2] + 'b').lower()
             exec(f"self.{t}=self.browser.find_element_by_tag_name('button')")
-            # exec(f"self.{t}={self.wait.until(EC.presence_of_element_located((By.TAG_NAME, 'button')))}")
+            # exec(
+            #     f"self.{t}={self.wait.until(EC.presence_of_element_located((
+            #     By.TAG_NAME, 'button')))}")
             for __ in fields:
                 t = (_[0] + _[-2] + __[0]).lower()
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
