@@ -125,13 +125,18 @@ class WFutures(object):
             self.goto('WhatsApp')
             mobile = sender['mobile']['secondary']
             x_arg = f'//span[contains(@title, {recipent})]'
-            group_title = self.wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
+            group_title = self.wait.until(EC.presence_of_element_located((
+                By.XPATH, x_arg)))
             group_title.click()
             _ = sender['whatsapp']['input'][mobile]
-            inp_xpath = f'//div[@class="{_} copyable-text selectable-text"][@data-tab="6"][@dir="ltr"][@spellcheck="true"][@contenteditable="true"]'
-            input_box = self.wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
+            inp_xpath = f'//div[@class="{_} copyable-text selectable-text"]\
+                    [@data-tab="6"][@dir="ltr"][@spellcheck="true"]\
+                    [@contenteditable="true"]'
+            input_box = self.wait.until(EC.presence_of_element_located((
+                By.XPATH, inp_xpath)))
             input_box.send_keys(message + Keys.ENTER)
-            return f'Message successfully sent to {recipent} @ {datetime.now()}'
+            return f'Message successfully sent to {recipent} @ \
+                    {datetime.now()}'
         except:
             pass
 
