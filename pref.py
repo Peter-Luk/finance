@@ -50,17 +50,6 @@ subject = {
             alias='"袁淑兒Josephine"'))
     }
 
-
-def div_input(_):
-    mb = subject[_]['mobile']['secondary']
-    keys = ['class', 'data-tab', 'dir', 'spellcheck', 'contenteditable']
-    values = [
-        f"{subject[_]['whatsapp']['input'][mb]} copyable-text selectable-text",
-        '6', 'ltr', 'true', 'true']
-    return ''.join(
-        [f'[@{k}="{v}"]' for k, v in dict(zip(keys, values)).items()])
-
-
 source = dict(
     SINA='http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml',
     NIKKEI='https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225',
@@ -230,3 +219,13 @@ db = dict(
         index='date',
         freq='bi-daily')
 )
+
+
+def div_input(_):
+    mb = subject[_]['mobile']['secondary']
+    keys = ['class', 'data-tab', 'dir', 'spellcheck', 'contenteditable']
+    values = [
+        f"{subject[_]['whatsapp']['input'][mb]} copyable-text selectable-text",
+        '6', 'ltr', 'true', 'true']
+    return ''.join(
+        [f'[@{k}="{v}"]' for k, v in dict(zip(keys, values)).items()])
