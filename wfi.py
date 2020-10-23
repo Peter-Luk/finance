@@ -145,7 +145,6 @@ class WFutures(object):
         except:
             pass
 
-
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]:
             self.refresh(site)
