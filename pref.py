@@ -59,6 +59,9 @@ source = dict(
     Gold='https://www.gold.org/')
 
 fields = ['open', 'high', 'low', 'close', 'volume']
+in_tab_keys = ['class', 'data-tab', 'dir', 'spellcheck', 'contenteditable']
+in_tab_values = ['6', 'ltr', 'true', 'true']
+        f"{subject[_]['whatsapp']['input'][mb]} copyable-text selectable-text",
 B_scale = dict(
     BABA=1 / 8,
     YUMC=1,
@@ -223,9 +226,9 @@ db = dict(
 
 def div_input(_):
     mb = subject[_]['mobile']['secondary']
-    keys = ['class', 'data-tab', 'dir', 'spellcheck', 'contenteditable']
-    values = [
-        f"{subject[_]['whatsapp']['input'][mb]} copyable-text selectable-text",
-        '6', 'ltr', 'true', 'true']
+    in_tab_values.insert(
+        0,
+        f"{subject[_]['whatsapp']['input'][mb]} copyable-text selectable-text")
     return ''.join(
-        [f'[@{k}="{v}"]' for k, v in dict(zip(keys, values)).items()])
+        [f'[@{k}="{v}"]' for k, v in dict(zip(
+            in_tab_keys, in_tab_values)).items()])
