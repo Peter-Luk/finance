@@ -61,7 +61,6 @@ source = dict(
 fields = ['open', 'high', 'low', 'close', 'volume']
 in_tab_keys = ['class', 'data-tab', 'dir', 'spellcheck', 'contenteditable']
 in_tab_values = ['6', 'ltr', 'true', 'true']
-        f"{subject[_]['whatsapp']['input'][mb]} copyable-text selectable-text",
 B_scale = dict(
     BABA=1 / 8,
     YUMC=1,
