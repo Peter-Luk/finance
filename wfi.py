@@ -139,9 +139,9 @@ class WFutures(object):
             input_box = self.wait.until(EC.presence_of_element_located((
                 By.XPATH, f'//div{div_input(sender)}')))
             input_box.send_keys(message + Keys.ENTER)
-            hdr = ' @ '.join((f'Message successfully sent to {recipent}',
+            return ' @ '.join((
+                f'Message successfully sent to {recipent}',
                 f'{datetime.now():"%H:%M:%S"}'))
-            return hdr
         except:
             pass
 
