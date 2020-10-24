@@ -1,4 +1,4 @@
-from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
+from utilities import div_input, driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,8 +8,7 @@ from pytz import timezone
 from y2n import Futures
 import re, random
 
-# from pref import source, fields, subject
-from pref import source, fields, div_input, subject
+from pref import source, fields, subject
 from pt_2 import festi
 lf, preference = waf(), 'Firefox'
 # __author = subject['Peter Luk']
