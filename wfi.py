@@ -18,9 +18,10 @@ if today.day == ltd(today.year, today.month):
 
 
 def fan(__='mhi', mt=True):
-    _ = list(filter(lambda x: __.upper() in x, waf()))
-    _.remove(mtf(__.upper()))
-    _ = _.pop()
+    _ = [x for x in lf if __.upper() in x and mtf(__) not in x].pop()
+    # _ = list(filter(lambda x: __.upper() in x, waf()))
+    # _.remove(mtf(__.upper()))
+    # _ = _.pop()
     if mt:
         _ = mtf(__)
     _ = Futures(_)
