@@ -28,7 +28,8 @@ class Record(object):
         del(self.sid, engine, self._table, self._columns, self._connect)
 
     def grab(self):
-        qstr = f"SELECT date, time, sys, dia, pulse FROM records WHERE subject_id={self.sid}"
+        qstr = f"SELECT date, time, sys, dia, pulse FROM records \
+                WHERE subject_id={self.sid}"
         rd = pd.read_sql(qstr, self._connect)
 #         def stime(_):
 #             if isinstance(_, str):
@@ -43,7 +44,7 @@ class Record(object):
                 __ = datetime.strptime(
                     f'{_[0]} {_[1]}',
                     '%Y-%m-%d %H:%M:%S.%f')
-            except:
+            except Exception:
                 __ = datetime.strptime(f'{_[0]} {_[1]}', '%Y-%m-%d %H:%M:%S')
             return __
         rd.index = rd.apply(comdt, axis=1)
@@ -76,7 +77,10 @@ class Record(object):
                 query = update(self._table)
                 if isinstance(args[0], dict):
                     hdr = args[0]
-                    query = query.where(eval('and_(' + ', '.join([f"self._columns.{_}==hdr['{_}']" for _ in hdr.keys() if _ in self._columns.keys()]) + ')'))
+                    query = query.where(eval('and_(' + ', '.join(
+                        [f"self._columns.{_}==hdr['{_}']"
+                            for _ in hdr.keys() if _ in self._columns.keys()]
+                        ) + ')'))
                     return str(query)
                 # if isinstance(args[1], dict):
                 #     self._connect.execute(query, args[1])
@@ -110,7 +114,7 @@ if __name__ == "__main__":
             sd = input(f"Subject ID (default: {sid}): ")
             try:
                 sd = int(sd)
-            except:
+            except Exception:
                 sd = sid
             sy = input("Systolic: ")
             dia = input("Diastolic: ")
