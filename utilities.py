@@ -151,7 +151,7 @@ def get_start(*args, **kwargs):
         elif isinstance(kwargs['end_date'], str):
             try:
                 end = datetime.strptime(kwargs['end_date'], '%Y-%m-%d')
-            except:
+            except Exception:
                 pass
     if 'mode' in lk:
         if isinstance(kwargs['mode'], str):
@@ -164,7 +164,7 @@ def get_start(*args, **kwargs):
         elif isinstance(kwargs['period'], str):
             try:
                 period = int(float(kwargs['period']))
-            except:
+            except Exception:
                 pass
     if mode == 'y':
         period = int(round(period * 12, 0))
@@ -209,17 +209,23 @@ def web_collect(*args, **kwargs):
     if 'pandas' in lk:
         if isinstance(kwargs['pandas'], bool):
             efor = kwargs['pandas']
+
     def stored_eid():
         pE = pref.db['Equities']
         s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
         s_conn = s_engine.connect()
-        rc = db.Table(pE['table'], db.MetaData(), autoload=True, autoload_with=s_engine).columns
+        rc = db.Table(
+            pE['table'],
+            db.MetaData(),
+            autoload=True,
+            autoload_with=s_engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
-        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()] if __ not in pE['exclude']]
+        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()]
+                if __ not in pE['exclude']]
 
     try:
         code
-    except:
+    except Exception:
         code = stored_eid()
     if src == 'yahoo':
         code = [f'{_:04d}.HK' for _ in code]
@@ -259,7 +265,8 @@ def dex(n=0):
         n_month, n_year = month + n, today.year
         if n_month > 12 and n_month != n_month % 12:
             n_month, n_year = n_month % 12, n_year + 1
-        return f"{month_initial[datetime(n_year, n_month, 1).strftime('%B')]}{f'{n_year}'[-1]}"
+        _ = f"{month_initial[datetime(n_year, n_month, 1).strftime('%B')]}{f'{n_year}'[-1]}"
+        return _
     else:
         print("Out of range (0 - 11)")
 
@@ -301,13 +308,13 @@ def mtf(*args, **kwargs):
             if _.upper() in __:
                 aft.append(__)
         try:
-            nfv = f_conn.execute(query.where(rc.code==aft[1])).fetchall()[0]
-            cfv = f_conn.execute(query.where(rc.code==aft[0])).fetchall()[0]
+            nfv = f_conn.execute(query.where(rc.code == aft[1])).fetchall()[0]
+            cfv = f_conn.execute(query.where(rc.code == aft[0])).fetchall()[0]
             if cfv > nfv:
                 fi.append(aft[0])
             else:
                 fi.append(aft[1])
-        except:
+        except Exception:
             fi.append(aft[0])
     if len(fi) == 1:
         return fi.pop()
@@ -322,7 +329,7 @@ def rnd(n, decimal_place=0):
             return round(n)
         else:
             return int(round(n))
-    except:
+    except Exception:
         pass
 
 
@@ -336,11 +343,14 @@ def gratio(n1, n2, ratio=None, enhanced=False):
         try:
             t.reverse()
             n1, n2 = t
-        except:
+        except Exception:
             pass
         delta = n2 - n1
         if enhanced:
-            trange = [rnd(delta / ratio), rnd(delta * (1 - 1 / ratio)), -rnd(delta * (1 - 1 / ratio))]
+            trange = [
+                    rnd(delta / ratio),
+                    rnd(delta * (1 - 1 / ratio)),
+                    -rnd(delta * (1 - 1 / ratio))]
             res += [n1 - i for i in trange]
             res += [n2 + i for i in trange]
             res.sort()
@@ -348,7 +358,7 @@ def gratio(n1, n2, ratio=None, enhanced=False):
             trange = [rnd(delta * (1 - 1 / ratio)), rnd(delta / ratio)]
             res += [n1 + i for i in trange]
         return tuple(res)
-    except:
+    except Exception:
         pass
 
 

@@ -236,7 +236,7 @@ class Equities(AE, Viewer):
                 try:
                     __ = yf.download(code.upper(), start, group_by='ticker')
                     self.foreign = True
-                except:
+                except Exception:
                     __ = yf.download(
                             f'{code:04d}.HK', start, group_by='ticker')
                 if len(__):
@@ -374,7 +374,9 @@ def bqo(el, action='buy', bound=True, adhoc=False):
     for _ in el:
         if isinstance(_, int):
             pE = pref.db['Equities']
-            if _ in [__ for __ in entities(pE['name']) if __ not in pE['exclude']]:
+            if _ in [
+                    __ for __ in entities(pE['name'])
+                    if __ not in pE['exclude']]:
                 o_ = Equities(_, adhoc)
         if isinstance(_, str):
             pF = pref.db['Futures']
@@ -409,8 +411,10 @@ def entities(dbname=None, series=False):
             autoload=True,
             autoload_with=engine).columns
         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
-    __ = [_[0] for _ in conn.execute(query).fetchall()]
-    res = [__ for __ in [_[0] for _ in conn.execute(query).fetchall()] if __ not in pE['exclude']]
+    # __ = [_[0] for _ in conn.execute(query).fetchall()]
+    res = [
+            __ for __ in [_[0] for _ in conn.execute(query).fetchall()]
+            if __ not in pE['exclude']]
     if series:
         return pd.Series(res)
     return res
@@ -435,7 +439,7 @@ def compose(code=None):
     if isinstance(code, list):
         try:
             code = [int(_) for _ in code]
-        except:
+        except Exception:
             pass
         return pd.concat(
             [grab(_) for _ in tqdm(code)],
@@ -448,7 +452,7 @@ def strayed(df, date, buy=True):
     if isinstance(date, str):
         try:
             date = datetime.strptime(date, "%Y%m%d")
-        except:
+        except Exception:
             pass
     if isinstance(date, datetime):
         txr = df.reorder_levels(['Data', 'Code'], 1)
@@ -501,4 +505,9 @@ def A2B(_):
     if _ in B_scale.keys():
         __ = Equities(_)
         r = __.gat()
-        return [hsirnd(x * B_scale[_] * USHK) for x in [r[0], r[1], __._close, r[-2], r[-1]]]
+        return [hsirnd(x * B_scale[_] * USHK) for x in [
+            r[0],
+            r[1],
+            __._close,
+            r[-2],
+            r[-1]]]
