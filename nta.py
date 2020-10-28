@@ -19,12 +19,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         _data = grabber(raw, field_initial)
         if favour.upper() in ['SIMPLE', 'S']:
@@ -42,12 +42,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
@@ -63,12 +63,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         ml = raw.Low.rolling(period['K']).min()
         mh = raw.High.rolling(period['K']).max()
@@ -87,12 +87,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         e_slow = self.ma(raw, period['slow'], 'e', 'hl')
         e_fast = self.ma(raw, period['fast'], 'e', 'hl')
@@ -113,12 +113,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         tr = pd.DataFrame(
             [raw.High - raw.Low,
@@ -157,17 +157,19 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         atr = self.atr(raw, period, date)
         hcp, lpc = raw.High.diff(1), -(raw.Low.diff(1))
+
         def _hgl(_):
-            if _[0] > _[-1] and _[0] > 0: return _[0]
+            if _[0] > _[-1] and _[0] > 0:
+                return _[0]
             return 0
         dm_plus = pd.concat([hcp, lpc], axis=1).apply(_hgl, axis=1)
         dm_minus = pd.concat([lpc, hcp], axis=1).apply(_hgl, axis=1)
@@ -188,12 +190,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         _data = grabber(raw, field_initial)
         change = (_data - _data.shift(period['er'])).abs()
@@ -211,12 +213,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         ehl = self.ma(raw, period, 'e', 'hl')
         volatility = stepper(ehl, period)
@@ -237,12 +239,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         pax = raw.High.rolling(period).max()
         pin = raw.Low.rolling(period).min()
@@ -266,12 +268,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         middle_line = self.kama(raw, period['kama'], 'hl')
         atr = self.atr(raw, period['atr'])
@@ -286,12 +288,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         middle_line = self.ma(raw, period, 's', 'c')
         width = raw.Close.rolling(period).std()
@@ -306,12 +308,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         hdr, _ = [raw.Volume.iloc[0]], 1
         dcp = raw.Close.diff(1)
@@ -332,12 +334,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw.Volume
         _ = pd.Series(
@@ -351,12 +353,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
 
         def _patr(period, raw, date):
@@ -383,12 +385,12 @@ class ONA(object):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         if date not in raw.index:
             date = raw.index[-1]
@@ -429,12 +431,12 @@ class Viewer(ONA):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         _ = pd.concat(
                 [self.kama(raw, period['kama'], 'c', date).map(hsirnd),
@@ -454,12 +456,12 @@ class Viewer(ONA):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         _ = pd.concat(
             [self.adx(raw, period['adx'], date)[f"ADX{period['adx']:02d}"],
@@ -472,12 +474,12 @@ class Viewer(ONA):
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d').date()
-                except:
+                except Exception:
                     pass
             if isinstance(date, datetime):
                 try:
                     raw = raw.loc[:date]
-                except:
+                except Exception:
                     pass
         bare = self.gat(raw, period['atr'], date).apply(hsirnd, 1).unique()
         boundary = self.ovr(raw, period, date).T
