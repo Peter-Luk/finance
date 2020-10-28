@@ -10,7 +10,7 @@ panda = False
 try:
     PI = getattr(__import__('pt_2'), 'PI')
     panda = True
-except:
+except Exception:
     summary = getattr(__import__('trial01'), 'summary')
 
 server_host, server_port = str(IP()), 80
@@ -74,7 +74,7 @@ class Analysor(object):
                 '<meta charset="utf-8">', str(TITLE(contract)), blink]))
             bd = BODY(d)
             return str(HTML(linesep.join([str(v) for v in [hd, bd]])))
-        except:
+        except Exception:
             if panda:
                 i2 = PI(code=contract)
                 opt_value = 'B'
