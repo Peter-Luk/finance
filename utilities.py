@@ -43,15 +43,19 @@ def filepath(*args, **kwargs):
     if platform in ('linux', 'linux2'):
         if version_info.major > 2 and version_info.minor > 3:
             if 'EXTERNAL_STORAGE' in environ.keys():
-                return sep.join((str(Path.home()), 'storage', 'external-1', file_type, data_path, name))
+                return sep.join((
+                    str(Path.home()), 'storage', 'external-1', file_type,
+                    data_path, name))
             return sep.join((str(Path.home()), file_type, data_path, name))
         else:
             place = 'shared'
             if 'ACTUAL_HOME' in environ.keys():
                 file_path = sep.join((str(Path.home()), file_type, data_path))
-            elif ('EXTERNAL_STORAGE' in environ.keys()) and ('/' in environ['EXTERNAL_STORAGE']):
+            elif (('EXTERNAL_STORAGE' in environ.keys())
+                    and ('/' in environ['EXTERNAL_STORAGE'])):
                 place = 'external-1'
-                file_path = sep.join((str(Path.home()), 'storage', place, file_type, data_path))
+                file_path = sep.join(
+                    (str(Path.home()), 'storage', place, file_type, data_path))
     return sep.join((file_path, name))
 
 
@@ -70,7 +74,7 @@ def gslice(*args):
         lag.sort()
         diff = lag[-1] - lag[0]
         return [lag[0] + diff * (1 - 1 / gr), lag[0] + diff / gr]
-    except:
+    except Exception:
         pass
 
 
@@ -85,13 +89,13 @@ def in_limit(*args, **kwargs):
                 limits = kwargs['limits']
         ll = len(limits)
         if ll == 2:
-            u, l = limits
+            u, _ = limits
             if limits[0] < limits[-1]:
-                l, u = limits
-            if num < u and num > l:
+                _, u = limits
+            if num < u and num > _:
                 return True
         return False
-    except:
+    except Exception:
         pass
 
 
@@ -105,9 +109,10 @@ def dictfcomp(*args, **kwargs):
         try:
             if not reduce(
                 (lambda x, y: x and y),
-                ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__]) for __ in list(rd[_].keys())]):
+                ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__])
+                    for __ in list(rd[_].keys())]):
                 res[_] = ad[_]
-        except:
+        except Exception:
             pass
     return res
 
