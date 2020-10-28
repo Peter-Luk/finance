@@ -35,7 +35,7 @@ class Record(object):
 #             if isinstance(_, str):
 #                 try:
 #                     __ = datetime.strptime(_, '%H:%M:%S').time()
-#                 except:
+#                 except Exception:
 #                     __ = datetime.strptime(_, '%H%M%S').time()
 #             return __
 
@@ -88,6 +88,7 @@ class Record(object):
 
 if __name__ == "__main__":
     from pathlib import sys
+
     def process(i, s, d, p, r):
         _ = Record(i)
         _.append(int(s), int(d), int(p), r)
@@ -100,7 +101,7 @@ if __name__ == "__main__":
             sd = raw_input("Subject ID")
             try:
                 sd = int(sd)
-            except:
+            except Exception:
                 sd = sid
             sy = raw_input("Systolic: ")
             dia = raw_input("Diastolic: ")
