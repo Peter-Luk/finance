@@ -254,8 +254,6 @@ class Equities(AE, Viewer):
             conn = AS(self._conf['name']).connect
             __ = pd.read_sql(
                     qtext, conn, index_col='Date', parse_dates=['Date'])
-            # __.columns = [_.capitalize() for _ in __.columns]
-            # __.index.name = __.index.name.capitalize()
         return __
 
     def mas(self, date=None, period=periods):
