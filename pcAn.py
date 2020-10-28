@@ -30,7 +30,7 @@ def strayed(df, date, buy=True):
     if isinstance(date, str):
         try:
             date = datetime.strptime(date, "%Y%m%d")
-        except:
+        except Exception:
             pass
     if isinstance(date, datetime):
         txr = df.reorder_levels(['Data', 'Code'], 1)
@@ -71,6 +71,6 @@ def summary(__):
         with multiprocessing.Pool() as pool:
             _ = pool.map(press, __)
             # _ = pool.map(press, [_ for _ in __ if _ in ae])
-    except:
+    except Exception:
         _ = [press(___) for ___ in __]
     print('\n'.join(_))
