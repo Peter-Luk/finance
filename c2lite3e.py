@@ -37,7 +37,7 @@ Update SQLite db with dict object, all three arguments are compulsory,
             conn.cursor().execute(qstr.format(', '.join(sl), _))
             counter += 1
             conn.commit()
-        except:
+        except Exception:
             pass
     return counter
 
@@ -47,7 +47,7 @@ def pstored(*args, **kwargs):
         if isinstance(args[0], str):
             try:
                 a0 = int(args[0])
-            except:
+            except Exception:
                 pass
         if isinstance(args[0], int):
             a0 = args[0]
@@ -80,7 +80,7 @@ def stored_data(*args, **kwargs):
             a0 = int(float(a0))
         if isinstance(a0, int):
             where.append('eid={:d}'.format(a0))
-    except:
+    except Exception:
         pass
     lk = list(kwargs.keys())
     if 'where' in lk:
@@ -93,7 +93,7 @@ def stored_data(*args, **kwargs):
             try:
                 where.extend(['{}={{{}}}'.format(_, _).format(
                     **kwargs['where']) for _ in lkw])
-            except:
+            except Exception:
                 pass
     conn = lite.connect(filepath(db_name))
     conn.row_factory = lite.Row
@@ -162,7 +162,7 @@ def c2d(*args, **kwargs):
                     elif f in ['Open', 'High', 'Low', 'Close']:
                         hdr[f.lower()] = float(dl[fields.index(f)])
             tmp.append(hdr)
-        except:
+        except Exception:
             pass
     return tmp
 
@@ -187,7 +187,7 @@ update 'local' database.
         elif isinstance(args[0], str):
             try:
                 aid = [int(float(args[0]))]
-            except:
+            except Exception:
                 pass
         elif isinstance(args[0], float):
             aid = [int(args[0])]
@@ -199,7 +199,7 @@ update 'local' database.
         elif isinstance(kwargs['equities_id'], str):
             try:
                 aid = [int(float(kwargs['equities_id']))]
-            except:
+            except Exception:
                 pass
         elif isinstance(kwargs['equities_id'], float):
             aid = [int(kwargs['equities_id'])]
@@ -237,7 +237,7 @@ update 'local' database.
                                     **im))
                         conn.commit()
                         ic += 1
-                except:
+                except Exception:
                     pass
     conn.close()
     return ic
@@ -275,7 +275,7 @@ finance.yahoo.com search to 'Download' folder, file will automatically
             folder = kwargs['folder']
         if 'wipe' in lkkeys:
             wipe = kwargs['wipe']
-    except:
+    except Exception:
         pass
     cp = find_csv_path()
     if cp:
@@ -318,7 +318,7 @@ Worker object for manipulate and transfer data from file system to database.
                         self.__db_fullpath = kpath['db']
                     if 'csv' in list(kpath.keys()):
                         self.__csv_fullpath = kpath['csv']
-        except:
+        except Exception:
             pass
         self.conn = lite.connect(self.__db_fullpath)
         self.conn.row_factory = lite.Row
@@ -352,7 +352,7 @@ first positional or 'code' named is name in file system.
                     '.'.join((code, 'csv')))))
                 rdata = [_[:-1] for _ in tmp.readlines()]
                 tmp.close()
-            except:
+            except Exception:
                 pass
         fields = rdata[0].split(',')
         i, values = 1, []
@@ -366,7 +366,7 @@ first positional or 'code' named is name in file system.
                     tmp[j] = float(tmp[j])
                     j += 1
                 values.append(tmp)
-            except:
+            except Exception:
                 pass
             i += 1
         el = ['Adj Close']
