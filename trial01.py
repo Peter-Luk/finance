@@ -447,21 +447,33 @@ Accept 'two' and 'only two' variables (i.e. field and value)
     def estimate(self, *args, **kwargs):
         if args:
             pivot_point = args[0]
-            if len(args) >= 5: concise = args[4]
-            if len(args) >= 4: o_format = args[3]
-            if len(args) >= 3: programmatic = args[2]
-            if len(args) >= 2: t_date = args[1]
-        if 'pivot_point' in kwargs.keys(): pivot_point = int(kwargs['pivot_point'])
-        if not pivot_point: return "Essential value 'pivot _point' is obmitted"
-        t_date, programmatic, o_format, concise = self.trade_day[-1], False, 'raw', False
-        if 'date' in kwargs.keys(): t_date = kwargs['date']
-        if 'programmatic'in kwargs.keys(): programmatic = kwargs['programmatic']
-        if 'format'in kwargs.keys(): o_format = kwargs['format'].lower()
-        if 'concise'in kwargs.keys(): concise = kwargs['concise']
+            if len(args) >= 5:
+                concise = args[4]
+            if len(args) >= 4:
+                o_format = args[3]
+            if len(args) >= 3:
+                programmatic = args[2]
+            if len(args) >= 2:
+                t_date = args[1]
+        if 'pivot_point' in kwargs.keys():
+            pivot_point = int(kwargs['pivot_point'])
+        if not pivot_point:
+            return "Essential value 'pivot _point' is obmitted"
+        t_date, programmatic = self.trade_day[-1], False
+        o_format, concise = 'raw', False
+        if 'date' in kwargs.keys():
+            t_date = kwargs['date']
+        if 'programmatic' in kwargs.keys():
+            programmatic = kwargs['programmatic']
+        if 'format' in kwargs.keys():
+            o_format = kwargs['format'].lower()
+        if 'concise' in kwargs.keys():
+            concise = kwargs['concise']
 
         hdr = self.__rangefinder(field='date', value=t_date)
         dr, gap = hdr['D']['delta'], abs(pivot_point - hdr['D']['close'])
-        if 'A' in hdr.keys(): sr = hdr['A']['delta']
+        if 'A' in hdr.keys():
+            sr = hdr['A']['delta']
         elif 'M' in hdr.keys():
             sr = hdr['M']['delta']
             i_date = self.trade_day[self.trade_day.index(t_date) - 1]
@@ -485,13 +497,15 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         if o_format == 'html':
 #             from tags import HTML, TITLE, TABLE, TR, TD
             title = TITLE("Estimate of %s with reference on '%s' base on Pivot Point: %i" % (self.code.upper(), t_date, pivot_point))
-            if concise: trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
+            if concise:
+                trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
             else:
                 trs = [TR(linesep.join([str(TD(x)) for x in [TD('Session delta (est.):'), TD(sru[0]), TD('to'), TD(sru[-1]), TD(sep), TD(srl[0]), TD('to'), TD(srl[-1])]]))]
                 trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Daily delta (est.):'), TD(dru[0]), TD('to'), TD(dru[-1]), TD(sep), TD(drl[0]), TD('to'), TD(drl[-1])]])))
                 trs.append(TR(linesep.join([str(TD(x)) for x in [TD('Gap (est.):'), TD(gru[0]), TD('to'), TD(gru[-1]), TD(sep), TD(grl[0]), TD('to'), TD(grl[-1])]])))
             return str(HTML(linesep.join([str(x) for x in [title, TABLE(linesep.join(str(y) for y in trs))]])))
-        if programmatic: return rdata
+        if programmatic:
+            return rdata
         return linesep.join(rstr)
 
 
