@@ -521,7 +521,8 @@ def summary(*args, **kwargs):
         o_format = kwargs['format'].lower()
     if 'date' in kwargs.keys():
         date = kwargs['date']
-    if 'code' in kwargs.keys(): f_code = kwargs['code'].upper()
+    if 'code' in kwargs.keys():
+        f_code = kwargs['code'].upper()
     if f_code:
         if o_format == 'html':
             hdr = TITLE("`%s` analyse" % f_code)
