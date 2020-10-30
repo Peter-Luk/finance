@@ -47,18 +47,13 @@ Required 'product code'.
 
         self.__conn = lite.connect(filepath(self.__db))
         self.__conn.row_factory = lite.Row
-        self.__data = self.__conn.cursor().execute(
-                "SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, \
-                        session DESC" % (
-                            self.__table,
-                            self.code.upper())).fetchall()
+        self.__data = self.__conn.cursor().execute("SELECT * FROM %s WHERE code='%s' ORDER BY date ASC, session DESC" % (self.__table, self.code.upper())).fetchall()
         for i in range(len(self.__data)):
             if self.__data[i]['date'] not in self.trade_day:
                 self.trade_day.append(self.__data[i]['date'])
 
     def __del__(self):
-        self.__data = self.__conn = self.code = self.period = self.__db = None
-        self.__table = self.datetime = self.trade_day = None
+        self.__data = self.__conn = self.code = self.period = self.__db = self.__table = self.datetime = self.trade_day = None
         del self.__data
         del self.__conn
         del self.code
@@ -72,12 +67,9 @@ Required 'product code'.
         """
 Accept 'two' and 'only two' variables (i.e. field and value)
         """
-        if args:
-            field, value = args[0], args[1]
-        if 'field' in kwargs.keys():
-            field = kwargs['field']
-        if 'value' in kwargs.keys():
-            value = kwargs['value']
+        if args: field, value = args[0], args[1]
+        if 'field' in kwargs.keys(): field = kwargs['field']
+        if 'value' in kwargs.keys(): value = kwargs['value']
         res, hdr ={}, []
         for i in self.__data:
             if value == i[field]: hdr.append(i)
@@ -90,131 +82,88 @@ Accept 'two' and 'only two' variables (i.e. field and value)
                         if i['high'] > dh:dh = i['high']
                         if i['low'] < dl:dl = i['low']
                 else:
-                    do, sh = i['open'], i['high']
-                    sl, sv = i['low'], i['volume']
+                    do, sh, sl, sv = i['open'], i['high'], i['low'], i['volume']
                     sr = sh - sl
             dr = dh - dl
-            res['A'] = {
-                    'delta': sr, 'open': so, 'close': sc, 'volume': sv,
-                    'high': sh, 'low': sl}
+            res['A'] = {'delta':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
         else:
-            so, sc, sh = hdr[0]['open'], hdr[0]['close'], hdr[0]['high']
-            sl, sv = hdr[0]['low'], hdr[0]['volume']
-            do, dc, sr, dv = so, sc, sh - sl, sv
+            so, sc, sh, sl, sv = hdr[0]['open'], hdr[0]['close'], hdr[0]['high'], hdr[0]['low'], hdr[0]['volume']
+            do, dc, sr, dv = so, sc, sh -sl, sv
             dr, dh, dl = sr, sh, sl
-            res['M'] = {
-                    'delta': sr, 'open': so, 'close': sc, 'volume': sv,
-                    'high': sh, 'low': sl}
-            res['D'] = {
-                    'delta': dr, 'open': do, 'close': dc, 'volume': dv,
-                    'high': dh, 'low': dl}
+            res['M'] = {'delta':sr, 'open':so, 'close':sc, 'volume':sv, 'high':sh, 'low':sl}
+        res['D'] = {'delta':dr, 'open':do, 'close':dc, 'volume':dv, 'high':dh, 'low':dl}
         return res
 
     def append(self, *args, **kwargs):
         date = self.datetime.today().strftime('%Y-%m-%d')
         if args:
             date = args[0]
-            if len(args) == 2:
-                volume = int(args[1])
-        if 'date' not in kwargs.keys():
-            kwargs['date'] = date
-        if 'volume' in kwargs.keys():
-            volume = int(kwargs['volume'])
-        kt, vt = ('date', 'session', 'code'), (
-                kwargs['date'], kwargs['session'], self.code.upper())
+            if len(args) == 2: volume = int(args[1])
+        if 'date' not in kwargs.keys(): kwargs['date'] = date
+        if 'volume' in kwargs.keys(): volume = int(kwargs['volume'])
+        kt, vt = ('date', 'session', 'code'), (kwargs['date'], kwargs['session'], self.code.upper())
         for k, v in kwargs.items():
             if k not in ['date', 'session', 'code', 'volume']:
                 kt += (k,)
                 vt += (int(v),)
         if kwargs['session'] == 'A':
             hdr = self.__rangefinder(field='date', value=date)
-            if 'M' in hdr.keys():
-                volume -= hdr['M']['volume']
+            if 'M' in hdr.keys(): volume -= hdr['M']['volume']
         sq_str = "INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s, %s) VALUES ('%s', '%s', '%s', %i, %i, %i, %i, %i)" % ((self.__table,) + kt + ('volume',) + vt + (volume,))
         try:
             self.__conn.cursor().execute(sq_str)
             self.__conn.commit()
-        except:
-            self.__conn.rollback()
+        except: self.__conn.rollback()
 
     def ATR(self, *args, **kwargs):
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
-            if len(args) < 3:
-                period = args[1]
-        if 'date' in kwargs.keys():
-            date = kwargs['date']
-        if 'period' in kwargs.keys():
-            period = kwargs['period']
+            if len(args) < 3: period = args[1]
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
         res, r_date, tr, i, hdr = {}, self.trade_day, [], 0, {}
 
-        tr.append([
-            self.__data[0]['date'], self.__data[0]['session'],
-            self.__data[0]['high'] - self.__data[0]['low']])
+        tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
         i += 1
         while i < len(self.__data):
             if self.__data[i]['date'] == self.__data[i - 1]['date']:
-                if self.__data[i]['high'] > self.__data[i - 1]['high']:
-                    ma = self.__data[i]['high']
-                else:
-                    ma = self.__data[i - 1]['high']
-                if self.__data[i]['low'] < self.__data[i - 1]['low']:
-                    mi = self.__data[i]['low']
-                else:
-                    mi = self.__data[i - 1]['low']
+                if self.__data[i]['high'] > self.__data[i - 1]['high']: ma = self.__data[i]['high']
+                else: ma = self.__data[i - 1]['high']
+                if self.__data[i]['low'] < self.__data[i - 1]['low']: mi = self.__data[i]['low']
+                else: mi = self.__data[i - 1]['low']
             else:
-                if self.__data[i]['high'] > self.__data[i - 1]['close']:
-                    ma, mi = self.__data[i]['high'],
-                    self.__data[i - 1]['close']
-                elif self.__data[i]['low'] < self.__data[i - 1]['close']:
-                    mi, ma = self.__data[i]['low'], self.__data[i - 1]['close']
-            tr.append([
-                self.__data[i]['date'],
-                self.__data[i]['session'], ma - mi])
+                if self.__data[i]['high'] > self.__data[i - 1]['close']: ma, mi = self.__data[i]['high'], self.__data[i - 1]['close']
+                elif self.__data[i]['low'] < self.__data[i - 1]['close']: mi, ma = self.__data[i]['low'], self.__data[i - 1]['close']
+            tr.append([self.__data[i]['date'], self.__data[i]['session'], ma - mi])
             i += 1
 
-        for i in range(len(tr)):
-            hdr[tr[i][0]] = tr[i][-1]
+        for i in range(len(tr)): hdr[tr[i][0]] = tr[i][-1]
 
         res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
-        for d in r_date[period:]:
-            res[d] = (
-                    res[r_date[r_date.index(d) - 1]] *
-                    (period - 1) + hdr[d]) / period
+        for d in r_date[period:]: res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys:
-            return res[date]
+        if date in rkeys: return res[date]
         return res[rkeys[-1]]
 
     def EMA(self, *args, **kwargs):
-        data, date = self.__data, self.datetime.today().strftime('%Y-%m-%d')
-        period, option = self.period, 'C'
+        data, date, period, option = self.__data, self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
-            if len(args) == 2:
-                period = args[1]
-            if len(args) == 3:
-                period, data = args[1:3]
-            if len(args) == 4:
-                period, data, option = args[1:]
-        if 'data' in kwargs.keys():
-            data = kwargs['data']
-        if 'date' in kwargs.keys():
-            date = kwargs['date']
-        if 'period' in kwargs.keys():
-            period = kwargs['period']
-        if 'option' in kwargs.keys():
-            option = kwargs['option']
+            if len(args) == 2: period = args[1]
+            if len(args) == 3: period, data = args[1:3]
+            if len(args) == 4: period, data, option = args[1:]
+        if 'data' in kwargs.keys(): data = kwargs['data']
+        if 'date' in kwargs.keys(): date = kwargs['date']
+        if 'period' in kwargs.keys(): period = kwargs['period']
+        if 'option' in kwargs.keys(): option = kwargs['option']
         if type(data[0]) in (int, float):
             res, kratio = [], 2. / (1 + period)
             for i in range(len(data)):
-                if i == 0:
-                    res.append(data[i])
-                else:
-                    res.append(data[i] * kratio + res[-1] * (1. - kratio))
+                if i == 0: res.append(data[i])
+                else: res.append(data[i] * kratio + res[-1] * (1. - kratio))
             return res[-1]
         else:
             res, r_date, hdr = {}, self.trade_day, {}
