@@ -16,8 +16,8 @@ iml = [
             {'tags': ('HTML', 'TITLE', 'TABLE', 'TH', 'TR', 'TD')},
             "case='upper'")]
 __ = him(iml)
-for _ in list(__.keys()):
-    exec("%s = __['%s']" % (_, _))
+for _ in __.keys():
+    exec(f"{_} = __['{_}']")
 
 
 class I2(object):
