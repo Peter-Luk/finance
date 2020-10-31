@@ -225,7 +225,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
     def KAMA(self, *args, **kwargs):
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
-#        fast, slow = int(round(period / gr ** 2, 0)), period
         fast, slow = 2, period
         if args:
             largs, date = len(args), args[0]
@@ -249,7 +248,6 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
         i = period
         while i < len(trade_day):
-        # for i in range(period, len(trade_day)):
             ch = abs(tr[trade_day[i]] - tr[trade_day[i - period]])
             vo = sum([
                 abs(tr[trade_day[x]] - tr[trade_day[x - 1]])
@@ -259,18 +257,17 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
         i = slow
         while i < len(trade_day):
-        # for i in range(slow, len(trade_day)):
             sfc, ssc = 2. / (fast + 1), 2. / (slow + 1)
             sc[trade_day[i]] = (er[trade_day[i]] * (sfc - ssc) + ssc) ** 2
             i += 1
 
         i = slow
         while i < len(trade_day):
-        # for i in range(slow, len(trade_day)):
             if i == slow:
                 res[trade_day[i]] = self.EMA(date=trade_day[i])
             else:
-                res[trade_day[i]] = res[trade_day[i - 1]] + sc[trade_day[i]] * (tr[trade_day[i]] - res[trade_day[i - 1]])
+                res[trade_day[i]] = res[trade_day[i - 1]] + sc[trade_day[i]]
+                * (tr[trade_day[i]] - res[trade_day[i - 1]])
             i += 1
 
         rkeys = list(res.keys())
