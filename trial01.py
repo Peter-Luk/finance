@@ -119,69 +119,108 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
-            if len(args) < 3: period = args[1]
-        if 'date' in kwargs.keys(): date = kwargs['date']
-        if 'period' in kwargs.keys(): period = kwargs['period']
+            if len(args) < 3:
+                period = args[1]
+        if 'date' in kwargs.keys():
+            date = kwargs['date']
+        if 'period' in kwargs.keys():
+            period = kwargs['period']
         res, r_date, tr, i, hdr = {}, self.trade_day, [], 0, {}
 
-        tr.append([self.__data[0]['date'], self.__data[0]['session'], self.__data[0]['high'] - self.__data[0]['low']])
+        tr.append([
+            self.__data[0]['date'],
+            self.__data[0]['session'],
+            self.__data[0]['high'] - self.__data[0]['low']])
         i += 1
         while i < len(self.__data):
             if self.__data[i]['date'] == self.__data[i - 1]['date']:
-                if self.__data[i]['high'] > self.__data[i - 1]['high']: ma = self.__data[i]['high']
-                else: ma = self.__data[i - 1]['high']
-                if self.__data[i]['low'] < self.__data[i - 1]['low']: mi = self.__data[i]['low']
-                else: mi = self.__data[i - 1]['low']
+                if self.__data[i]['high'] > self.__data[i - 1]['high']:
+                    ma = self.__data[i]['high']
+                else:
+                    ma = self.__data[i - 1]['high']
+                if self.__data[i]['low'] < self.__data[i - 1]['low']:
+                    mi = self.__data[i]['low']
+                else:
+                    mi = self.__data[i - 1]['low']
             else:
-                if self.__data[i]['high'] > self.__data[i - 1]['close']: ma, mi = self.__data[i]['high'], self.__data[i - 1]['close']
-                elif self.__data[i]['low'] < self.__data[i - 1]['close']: mi, ma = self.__data[i]['low'], self.__data[i - 1]['close']
-            tr.append([self.__data[i]['date'], self.__data[i]['session'], ma - mi])
+                if self.__data[i]['high'] > self.__data[i - 1]['close']:
+                    ma = self.__data[i]['high']
+                    mi = self.__data[i - 1]['close']
+                elif self.__data[i]['low'] < self.__data[i - 1]['close']:
+                    mi, ma = self.__data[i]['low'], self.__data[i - 1]['close']
+            tr.append([
+                self.__data[i]['date'],
+                self.__data[i]['session'],
+                ma - mi])
             i += 1
 
-        for i in range(len(tr)): hdr[tr[i][0]] = tr[i][-1]
+        for i in range(len(tr)):
+            hdr[tr[i][0]] = tr[i][-1]
 
         res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
-        for d in r_date[period:]: res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
+        for d in r_date[period:]:
+            res[d] = (res[
+                r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys: return res[date]
+        if date in rkeys:
+            return res[date]
         return res[rkeys[-1]]
 
     def EMA(self, *args, **kwargs):
         data, date, period, option = self.__data, self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
         if args:
             date = args[0]
-            if len(args) == 2: period = args[1]
-            if len(args) == 3: period, data = args[1:3]
-            if len(args) == 4: period, data, option = args[1:]
-        if 'data' in kwargs.keys(): data = kwargs['data']
-        if 'date' in kwargs.keys(): date = kwargs['date']
-        if 'period' in kwargs.keys(): period = kwargs['period']
-        if 'option' in kwargs.keys(): option = kwargs['option']
+            if len(args) == 2:
+                period = args[1]
+            if len(args) == 3:
+                period, data = args[1:3]
+            if len(args) == 4:
+                period, data, option = args[1:]
+        if 'data' in kwargs.keys():
+            data = kwargs['data']
+        if 'date' in kwargs.keys():
+            date = kwargs['date']
+        if 'period' in kwargs.keys():
+            period = kwargs['period']
+        if 'option' in kwargs.keys():
+            option = kwargs['option']
         if type(data[0]) in (int, float):
             res, kratio = [], 2. / (1 + period)
             for i in range(len(data)):
-                if i == 0: res.append(data[i])
-                else: res.append(data[i] * kratio + res[-1] * (1. - kratio))
+                if i == 0:
+                    res.append(data[i])
+                else:
+                    res.append(data[i] * kratio + res[-1] * (1. - kratio))
             return res[-1]
         else:
             res, r_date, hdr = {}, self.trade_day, {}
 
             for d in r_date:
                 tmp = self.__rangefinder(field='date', value=d)['D']
-                if option.upper() == 'C': hdr[d] = tmp['close']
-                elif option.upper() == 'H': hdr[d] = tmp['high']
-                elif option.upper() == 'L': hdr[d] = tmp['low']
-                elif option.upper() == 'HL': hdr[d] = mean([tmp['high'], tmp['low']])
-                elif option.upper() == 'F': hdr[d] = mean([tmp['open'], tmp['close'], tmp['high'], tmp['low']])
+                if option.upper() == 'C':
+                    hdr[d] = tmp['close']
+                elif option.upper() == 'H':
+                    hdr[d] = tmp['high']
+                elif option.upper() == 'L':
+                    hdr[d] = tmp['low']
+                elif option.upper() == 'HL':
+                    hdr[d] = mean([tmp['high'], tmp['low']])
+                elif option.upper() == 'F':
+                    hdr[d] = mean([
+                        tmp['open'], tmp['close'], tmp['high'], tmp['low']])
 
             res[r_date[period - 1]] = mean([hdr[x] for x in r_date[:period]])
-            for d in r_date[period:]: res[d] = (res[r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]) / period
+            for d in r_date[period:]:
+                res[d] = (res[
+                    r_date[r_date.index(d) - 1]] * (period - 1) + hdr[d]
+                    ) / period
 
             rkeys = list(res.keys())
             rkeys.sort()
-            if date in rkeys: return res[date]
+            if date in rkeys:
+                return res[date]
             return res[rkeys[-1]]
 
     def KAMA(self, *args, **kwargs):
@@ -190,12 +229,18 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         fast, slow = 2, period
         if args:
             largs, date = len(args), args[0]
-            if largs == 2: period = args[1]
-            if largs == 4: period, fast, slow = args[1:]
-        if 'date' in kwargs.keys(): date = kwargs['date']
-        if 'period' in kwargs.keys(): period = kwargs['period']
-        if 'slow' in kwargs.keys(): slow = kwargs['slow']
-        if 'fast' in kwargs.keys(): fast = kwargs['fast']
+            if largs == 2:
+                period = args[1]
+            if largs == 4:
+                period, fast, slow = args[1:]
+        if 'date' in kwargs.keys():
+            date = kwargs['date']
+        if 'period' in kwargs.keys():
+            period = kwargs['period']
+        if 'slow' in kwargs.keys():
+            slow = kwargs['slow']
+        if 'fast' in kwargs.keys():
+            fast = kwargs['fast']
         res, trade_day, tr, hdr, er, sc = {}, self.trade_day, {}, {}, {}, {}
 
         for d in trade_day:
@@ -205,7 +250,10 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         i = period
         while i < len(trade_day):
         # for i in range(period, len(trade_day)):
-            ch, vo = abs(tr[trade_day[i]] - tr[trade_day[i - period]]), sum([abs(tr[trade_day[x]] - tr[trade_day[x - 1]]) for x in range(i - period, i)])
+            ch = abs(tr[trade_day[i]] - tr[trade_day[i - period]])
+            vo = sum([
+                abs(tr[trade_day[x]] - tr[trade_day[x - 1]])
+                for x in range(i - period, i)])
             er[trade_day[i]] = ch / float(vo)
             i += 1
 
@@ -219,13 +267,16 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         i = slow
         while i < len(trade_day):
         # for i in range(slow, len(trade_day)):
-            if i == slow: res[trade_day[i]] = self.EMA(date=trade_day[i])
-            else: res[trade_day[i]] = res[trade_day[i - 1]] + sc[trade_day[i]] * (tr[trade_day[i]] - res[trade_day[i - 1]])
+            if i == slow:
+                res[trade_day[i]] = self.EMA(date=trade_day[i])
+            else:
+                res[trade_day[i]] = res[trade_day[i - 1]] + sc[trade_day[i]] * (tr[trade_day[i]] - res[trade_day[i - 1]])
             i += 1
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys: return res[date]
+        if date in rkeys:
+            return res[date]
         return res[rkeys[-1]]
 
     def RSI(self, *args, **kwargs):
