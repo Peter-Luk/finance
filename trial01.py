@@ -356,23 +356,38 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         date, period = self.datetime.today().strftime('%Y-%m-%d'), self.period
         if args:
             date = args[0]
-            if len(args) < 3: period = args[1]
-        if 'date' in kwargs.keys(): date = kwargs['date']
-        if 'period' in kwargs.keys(): period = kwargs['period']
+            if len(args) < 3:
+                period = args[1]
+        if 'date' in kwargs.keys():
+            date = kwargs['date']
+        if 'period' in kwargs.keys():
+            period = kwargs['period']
         res, r_date = {}, self.trade_day
 
         for i in range(period, len(r_date)):
-            eh = [self.EMA(date=r_date[i - j], period=period, option='H') for j in range(period)]
-            el = [self.EMA(date=r_date[i - j], period=period, option='L') for j in range(period)]
-            vv = self.EMA(data=[eh[j] for j in range(len(eh))], period=len(eh)) - self.EMA(data=[el[j] for j in range(len(el))], period=len(el))
+            eh = [self.EMA(
+                date=r_date[i - j],
+                period=period,
+                option='H') for j in range(period)]
+            el = [
+                    self.EMA(date=r_date[i - j], period=period, option='L')
+                    for j in range(period)]
+            vv = self.EMA(
+                    data=[eh[j] for j in range(len(eh))],
+                    period=len(eh)) - self.EMA(
+                            data=[el[j] for j in range(
+                                len(el))],
+                            period=len(el))
             ema = self.EMA(date=r_date[i], option='HL', period=period)
-            res[r_date[i]] = int(round(ema - vv * gr, 0)), int(round(ema + vv * gr, 0))
+            res[r_date[i]] = int(round(ema - vv * gr, 0)),
+            int(round(ema + vv * gr, 0))
 #            kama = self.KAMA(date=r_date[i], option='HL', period=period)
 #            res[r_date[i]] = int(round(kama - vv * gr, 0)), int(round(kama + vv * gr, 0))
 
         rkeys = list(res.keys())
         rkeys.sort()
-        if date in rkeys: return res[date]
+        if date in rkeys:
+            return res[date]
         return res[rkeys[-1]]
 
     def BB(self, *args, **kwargs):
@@ -422,27 +437,39 @@ Accept 'two' and 'only two' variables (i.e. field and value)
         return res[rkeys[-1]]
 
     def KC(self, *args, **kwargs):
-        date, period, option = self.datetime.today().strftime('%Y-%m-%d'), self.period, 'C'
+        date = self.datetime.today().strftime('%Y-%m-%d')
+        period, option = self.period, 'C'
         if args:
             date = args[0]
-            if len(args) == 2: period = args[1]
-            if len(args) == 3: period, option = args[1:]
-        if 'date' in kwargs.keys(): date = kwargs['date']
-        if 'period' in kwargs.keys(): period = kwargs['period']
-        if 'option' in kwargs.keys(): option = kwargs['option']
-        width, base = self.ATR(date=date, period=period), self.KAMA(date=date, period=period, option=option)
-#        return (int(round(base - width * gr / 2, 0)), int(round(base + width * gr / 2, 0)))
-        return (int(round(base - width * gr, 0)), int(round(base + width * gr, 0)))
+            if len(args) == 2:
+                period = args[1]
+            if len(args) == 3:
+                period, option = args[1:]
+        if 'date' in kwargs.keys():
+            date = kwargs['date']
+        if 'period' in kwargs.keys():
+            period = kwargs['period']
+        if 'option' in kwargs.keys():
+            option = kwargs['option']
+        width = self.ATR(date=date, period=period)
+        base = self.KAMA(date=date, period=period, option=option)
+        return (int(round(base - width * gr, 0)),
+                int(round(base + width * gr, 0)))
 
     def daatr(self, *args, **kwargs):
         date, period = None, 5
         if args:
             date = args[0]
-            if len(args) >= 2: period = args[1]
-        if 'date' in kwargs.keys(): date = kwargs['date']
-        if 'period' in kwargs.keys(): period = kwargs['period']
-        if date: return self.ATR(date=date, period=period) - self.ATR(date=date)
-        else: return self.ATR(period=period) - self.ATR()
+            if len(args) >= 2:
+                period = args[1]
+        if 'date' in kwargs.keys():
+            date = kwargs['date']
+        if 'period' in kwargs.keys():
+            period = kwargs['period']
+        if date:
+            return self.ATR(date=date, period=period) - self.ATR(date=date)
+        else:
+            return self.ATR(period=period) - self.ATR()
 
     def estimate(self, *args, **kwargs):
         if args:
@@ -481,21 +508,33 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             dr = hdr2['D']['delta']
 
         ogr = 1. / gr
-        sru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-ogr)*sr, ogr*sr]])
-        srl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-ogr)*sr, ogr*sr]])
-        dru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-ogr)*dr, ogr*dr]])
-        drl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-ogr)*dr, ogr*dr]])
-        gru = tuple([int(round(float(pivot_point)+x, 0)) for x in [(1-ogr)*gap, ogr*gap]])
-        grl = tuple([int(round(float(pivot_point)-x, 0)) for x in [(1-ogr)*gap, ogr*gap]])
+        sru = tuple([
+            int(round(float(pivot_point)+x, 0))
+            for x in [(1-ogr)*sr, ogr*sr]])
+        srl = tuple([
+            int(round(float(pivot_point)-x, 0))
+            for x in [(1-ogr)*sr, ogr*sr]])
+        dru = tuple([
+            int(round(float(pivot_point)+x, 0))
+            for x in [(1-ogr)*dr, ogr*dr]])
+        drl = tuple([
+            int(round(float(pivot_point)-x, 0))
+            for x in [(1-ogr)*dr, ogr*dr]])
+        gru = tuple([
+            int(round(float(pivot_point) + x, 0))
+            for x in [(1 - ogr) * gap, ogr * gap]])
+        grl = tuple([
+            int(round(float(pivot_point) - x, 0))
+            for x in [(1 - ogr) * gap, ogr * gap]])
 
-        rstr, rdata = ['Session delta (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [sru, srl]])], {'Session':{'upper':sru, 'lower':srl}}
+        rstr, rdata = ['Session delta (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [sru, srl]])], {'Session': {'upper': sru, 'lower': srl}}
         rstr.append('Daily delta (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [dru, drl]]))
-        rdata['Daily'] = {'upper':dru, 'lower':drl}
+        rdata['Daily'] = {'upper': dru, 'lower': drl}
         rstr.append('Gap (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [gru, grl]]))
-        rdata['Gap'] = {'upper':gru, 'lower':grl}
+        rdata['Gap'] = {'upper': gru, 'lower': grl}
 
         if o_format == 'html':
-#             from tags import HTML, TITLE, TABLE, TR, TD
+            # from tags import HTML, TITLE, TABLE, TR, TD
             title = TITLE("Estimate of %s with reference on '%s' base on Pivot Point: %i" % (self.code.upper(), t_date, pivot_point))
             if concise:
                 trs = [linesep.join([str(TR(TD(x))) for x in rstr])]
@@ -556,5 +595,5 @@ def summary(*args, **kwargs):
             else:
                 hdr = 'Sorry, not enough data!'
         elif o_format == 'html':
-            hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))),{'width':'100%'})]])))
+            hdr = str(HTML(linesep.join([str(x) for x in [hdr, TABLE(linesep.join(str(y) for y in ((th,) + tuple([str(z) for z in trs]))),{'width': '100%'})]])))
         return hdr
