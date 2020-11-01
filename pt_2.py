@@ -29,8 +29,9 @@ if version_info.major == 3:
     __ = him([({
         'threading': ('Thread',),
         'queue': ('Queue',)}, "case='capitalize'")])
-for _ in list(__.keys()):
-    exec("%s=__['%s']" % (_, _))
+for _ in __.keys():
+    # exec("%s=__['%s']" % (_, _))
+    exec(f"{_} = __['{_}']")
 q = Queue()
 
 
