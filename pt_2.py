@@ -9,18 +9,6 @@ from sys import version_info
 from os import linesep
 
 him = getattr(__import__('handy'), 'him')
-# __ = him({
-#     'utilities': ('dvs', 'gr', 'get_month', 'mtf', 'datetime')})
-# for _ in list(__.keys()):
-#     exec("%s=__['%s']" % (_, _))
-# __ = him({
-#     'trial01': ('I2',),
-#     'pandas': (),
-#     'sys': ('version_info',),
-#     'os': ('linesep',)}, "alias={'I2':'I2', 'pandas':'pd'}")
-# for _ in list(__.keys()):
-#     exec("%s=__['%s']" % (_, _))
-# # from sys import version_info
 if version_info.major == 2:
     __ = him([({
         'threading': ('Thread',),
@@ -30,7 +18,6 @@ if version_info.major == 3:
         'threading': ('Thread',),
         'queue': ('Queue',)}, "case='capitalize'")])
 for _ in __.keys():
-    # exec("%s=__['%s']" % (_, _))
     exec(f"{_} = __['{_}']")
 q = Queue()
 
@@ -353,8 +340,13 @@ Extreme finder for indicator(s), required parameter: 'option'. Valid choice: (A)
         if programmatic == True: return res
         return rest
 
+
 def festi(_, __='mhi'):
     i2, p, g = PI(mtf(__)), 'Daily', ''
-    if datetime.now().hour > 12: p, g = 'Session', 'afternoon '
+    if datetime.now().hour > 12:
+        p, g = 'Session', 'afternoon '
     r = i2.estimate(_, programmatic=True)[p]
-    return linesep.join([f'{mtf(__)} estimate base on {g}opening @ {_},', i2.estimate(_), f"range between {max(r['upper'])} and {min(r['lower'])}", ''])
+    return linesep.join([
+        f'{mtf(__)} estimate base on {g}opening @ {_},',
+        i2.estimate(_),
+        f"range between {max(r['upper'])} and {min(r['lower'])}", ''])
