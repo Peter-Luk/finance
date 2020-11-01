@@ -1,13 +1,39 @@
 """
-Local Futures (sqlite) analysis using pandas, matplotlib (visualize) via pyplot.
+Local Futures (sqlite) analysis using pandas, \
+matplotlib (visualize) via pyplot.
 """
+from utilities import dvs, gr, get_month, mtf, datetime
+from trial01 import I2
+import pandas as pd
+from sys import version_info
+from os import linesep
+
 him = getattr(__import__('handy'), 'him')
-__ = him([{'utilities':('dvs', 'gr', 'get_month', 'mtf', 'datetime')}, ({'trial01':('I2',), 'pandas':(), 'sys':('version_info',), 'os':('linesep',)}, "alias={'I2':'I2', 'pandas':'pd'}")])
-for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
-if version_info.major == 2: __ = him([({'threading':('Thread',), 'Queue':('Queue',)}, "case='capitalize'")])
-if version_info.major == 3: __ = him([({'threading':('Thread',), 'queue':('Queue',)}, "case='capitalize'")])
-for _ in list(__.keys()): exec("%s=__['%s']" % (_, _))
+# __ = him({
+#     'utilities': ('dvs', 'gr', 'get_month', 'mtf', 'datetime')})
+# for _ in list(__.keys()):
+#     exec("%s=__['%s']" % (_, _))
+# __ = him({
+#     'trial01': ('I2',),
+#     'pandas': (),
+#     'sys': ('version_info',),
+#     'os': ('linesep',)}, "alias={'I2':'I2', 'pandas':'pd'}")
+# for _ in list(__.keys()):
+#     exec("%s=__['%s']" % (_, _))
+# # from sys import version_info
+if version_info.major == 2:
+    __ = him([({
+        'threading': ('Thread',),
+        'Queue': ('Queue',)}, "case='capitalize'")])
+if version_info.major == 3:
+    __ = him([({
+        'threading': ('Thread',),
+        'queue': ('Queue',)}, "case='capitalize'")])
+for _ in list(__.keys()):
+    exec("%s=__['%s']" % (_, _))
 q = Queue()
+
+
 class PI(I2):
     """
 Base class to create Pandas DataFrame object for analyse local Futures data.
@@ -16,12 +42,17 @@ Require parameter: 'code'
     def __init__(self, *args, **kwargs):
         if args:
             self.code = args[0]
-            if len(args) >= 2: self.period = args[1]
-        if 'code' in kwargs.keys(): self.code = kwargs['code']
-        if 'period' in kwargs.keys(): self.period = kwargs['period']
+            if len(args) >= 2:
+                self.period = args[1]
+        if 'code' in kwargs.keys():
+            self.code = kwargs['code']
+        if 'period' in kwargs.keys():
+            self.period = kwargs['period']
         if (len(args) <= 2) or ('code' in kwargs.keys()):
-            if (len(args) == 2) or ('period' in kwargs.keys()): super(PI, self).__init__(self.code, self.period)
-            else: super(PI, self).__init__(self.code)
+            if (len(args) == 2) or ('period' in kwargs.keys()):
+                super(PI, self).__init__(self.code, self.period)
+            else:
+                super(PI, self).__init__(self.code)
         self.__queue = Queue()
         self.__fdc = {}
 
@@ -40,16 +71,21 @@ Valid choice: 'B'asic (default), 'I'ndicators or 'O'verlays.
         # from utilities import dvs
         # import pandas as pd
         def ma_order(*args, **kwargs):
-            if args: date = args[0]
-            if 'date' in kwargs.keys(): date = kwargs['date']
+            if args:
+                date = args[0]
+            if 'date' in kwargs.keys():
+                date = kwargs['date']
             hdr, ti = {}, self.fdc(option='I')
             res = ti[ti.Date == pd.Timestamp(date)]
-            for i in ['EMA', 'WMA', 'SMA', 'KAMA']: hdr[i] = eval("res.%s.values[0]" % i)
+            for i in ['EMA', 'WMA', 'SMA', 'KAMA']:
+                hdr[i] = eval("res.%s.values[0]" % i)
             return dvs(hdr)
 
         option, dd = 'B', {}
-        if args: option = args[0]
-        elif 'option' in kwargs.keys(): option = kwargs['option']
+        if args:
+            option = args[0]
+        elif 'option' in kwargs.keys():
+            option = kwargs['option']
 
         if option in ['B', 'b']:
             if 'b' in list(self.__fdc.keys()):
