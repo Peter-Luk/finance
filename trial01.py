@@ -597,10 +597,15 @@ Accept 'two' and 'only two' variables (i.e. field and value)
             int(round(float(pivot_point) - x, 0))
             for x in [(1 - ogr) * gap, ogr * gap]])
 
-        rstr, rdata = ['Session delta (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [sru, srl]])], {'Session': {'upper': sru, 'lower': srl}}
-        rstr.append('Daily delta (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [dru, drl]]))
+        rdata = {'Session': {'upper': sru, 'lower': srl}}
+        rstr = ['Session delta (est.):\t' + (f' {sep} ').join([
+            f'{x} to {x}' for x in [sru, srl]])]
+            # '%i to %i' % x for x in [sru, srl]])]
+        rstr.append('Daily delta (est.):\t' + (f' {sep} ').join([
+            f'{x} to {x}' for x in [dru, drl]]))
         rdata['Daily'] = {'upper': dru, 'lower': drl}
-        rstr.append('Gap (est.):\t' + (' %s ' % sep).join(['%i to %i' % x for x in [gru, grl]]))
+        rstr.append('Gap (est.):\t' + (f' {sep} ').join([
+            f'{x} to {x}' for x in [gru, grl]]))
         rdata['Gap'] = {'upper': gru, 'lower': grl}
 
         if o_format == 'html':
