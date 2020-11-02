@@ -105,7 +105,7 @@ class WFutures(object):
                 '//*[@id="block-wgcheadergoldspotprice"]')
             price = _.find_element_by_xpath('./h2/span[1]').text
             return float(price.replace(',', ''))
-        except:
+        except Exception:
             pass
         return 'Market (probably) close.'
 
@@ -139,7 +139,7 @@ class WFutures(object):
             return ' @ '.join((
                 f'Message successfully sent to {recipent}',
                 f'{datetime.now():"%H:%M:%S"}'))
-        except:
+        except Exception:
             pass
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
