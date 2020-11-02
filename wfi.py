@@ -155,7 +155,6 @@ class WFutures(object):
         def cxpath(_):
             idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
             if _ in idx:
-/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[1]/div/div[4]/div/div/table/tbody/tr/td[3]
                 # return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/\
                 #         div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
                 return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[1]/div/div[{1+idx.index(_)}]'
