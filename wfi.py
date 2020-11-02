@@ -164,8 +164,10 @@ class WFutures(object):
         l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
             './div[5]').text)[1:])
         try:
-            last = datetime.strptime(l, '%a %b %d %Y %I:%M %p EST').astimezone(
-                timezone('America/New_York'))
+            last = datetime.strptime(
+                    l,
+                    '%a %b %d %Y %I:%M %p EST').astimezone(timezone(
+                        'America/New_York'))
         except Exception:
             last = datetime.strptime(l, '%a %b %d %Y').astimezone(
                 timezone('America/New_York'))
