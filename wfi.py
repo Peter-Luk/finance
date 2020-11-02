@@ -8,7 +8,7 @@ from pytz import timezone
 from y2n import Futures
 import re, random
 
-from pref import source, fields, subject
+from pref import source, fields, subject, xp
 from pt_2 import festi
 lf, preference = waf(), 'Firefox'
 # __author = subject['Peter Luk']
@@ -23,7 +23,6 @@ def fan(__='mhi', mt=True):
         _ = mtf(__)
     _ = Futures(_)
     return f'{_}\n{_()}\n{_.gat()}'
-
 
 
 class WFutures(object):
@@ -155,7 +154,7 @@ class WFutures(object):
         def cxpath(_):
             idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
             if _ in idx:
-                return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
+                return f'{xp["CNBC"]}div[{1+idx.index(_)}]/div'
 
         _ = self.browser.find_element_by_xpath(cxpath(idx))
         price = _.find_element_by_xpath(

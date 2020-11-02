@@ -6,6 +6,10 @@ from tqdm import tqdm
 from pathlib import Path, os, sys, functools
 from time import sleep
 
+xp = dict(
+    CNBC='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]')
+xp['CNBC'] += '/div/div[1]/'
+
 driver = dict(
     Chrome=dict(
         name='chromedriver.exe',
