@@ -157,8 +157,7 @@ class WFutures(object):
             if _ in idx:
                 # return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/\
                 #         div[3]/div[1]/div/div[1]/div[{1+idx.index(_)}]/div'
-                return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/\
-                        div/div[3]/div[1]/div/div[1]/div[1]/div/div[{1+idx.index(_)}]/div'
+                return f'/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]/div/div[1]/div[1]/div/div[{1+idx.index(_)}]/div'
 
         _ = self.browser.find_element_by_xpath(cxpath(idx))
         price = _.find_element_by_xpath(
