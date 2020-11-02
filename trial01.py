@@ -599,7 +599,7 @@ Accept 'two' and 'only two' variables (i.e. field and value)
 
         rdata = {'Session': {'upper': sru, 'lower': srl}}
         rstr = ['Session delta (est.):\t' + (f' {sep} ').join([
-            '%i to %i' * x for x in [sru, srl]])]
+            '%i to %i' % x for x in [sru, srl]])]
             # '%i to %i' % x for x in [sru, srl]])]
         rstr.append('Daily delta (est.):\t' + (f' {sep} ').join([
             '%i to %i' % x for x in [dru, drl]]))
