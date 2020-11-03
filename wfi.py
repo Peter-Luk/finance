@@ -169,14 +169,15 @@ class WFutures(object):
         l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
             './div[5]').text)[1:])
         try:
-            last = datetime.strptime(
-                    l,
-                    '%a %b %d %Y %I:%M %p EST')
-# default_tzinfo(parse('2014-01-01 12:30 UTC'), dflt_tz)
-                    # '%a %b %d %Y %I:%M %p EST').astimezone(timezone(
-                    #     'America/New_York'))
+            last = default_tzinfo(
+                    datetime.strptime(l, '%a %b %d %Y %I:%M %p EST'),
+                    gettz('America/New_York'))
+            # '%a %b %d %Y %I:%M %p EST').astimezone(timezone(
+            #     'America/New_York'))
         except Exception:
-            last = datetime.strptime(l, '%a %b %d %Y')
+            last = default_tzinfo(
+                    datetime.strptime(l, '%a %b %d %Y'),
+                    gettz('America/New_York'))
             # last = datetime.strptime(l, '%a %b %d %Y').astimezone(
             #     timezone('America/New_York'))
         return self.__status(price, change, last)
