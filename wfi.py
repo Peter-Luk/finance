@@ -84,8 +84,10 @@ class WFutures(object):
             self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = datetime.strptime(self.browser.find_element_by_xpath(
-            '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
+        last = default_tzinfo(
+            datetime.strptime(self.browser.find_element_by_xpath(
+                '//*[@id="hqTime"]').text,
+                '%Y-%m-%d %H:%M:%S'), gettz('Asia/Shanghai'))
             # '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(
             #     timezone('Asia/Shanghai'))
         if change == '--':
@@ -198,8 +200,8 @@ class WFutures(object):
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
         t = change.split(' ')[0].split(',')
-        last = convert(self.browser.find_element_by_xpath(
-            '//*[@id="datedtime"]').text)
+        last = default_tzinfo(convert(self.browser.find_element_by_xpath(
+            '//*[@id="datedtime"]').text), gettz('Asia/Tokyo'))
         return self.__status(price, t[0], last)
 
     def reset(self, tabs=lf):
