@@ -5,9 +5,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from dateutil.tz import gettz
-from dateutil.parser import parse
 from dateutil.utils import default_tzinfo
-from pytz import timezone
+# from dateutil.parser import parse
+# from pytz import timezone
 from y2n import Futures
 import re, random
 
