@@ -189,8 +189,9 @@ class WFutures(object):
             self.refresh(site)
         else:
             self.goto(site)
+
         def convert(_):
-            rstring  = '\([0-2][0-9]\:[0-5][0-9]\)'
+            rstring = '\([0-2][0-9]\:[0-5][0-9]\)'
             if re.search(rstring, _):
                 return datetime.strptime(_, '%b/%d/%Y(%H:%M)')
             return datetime.strptime(_.split('(')[0], '%b/%d/%Y')
