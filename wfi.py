@@ -4,6 +4,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from dateutil.tz import gettz
+from dateutil.parser import parse
+from dateutil.utils import default_tzinfo
 from pytz import timezone
 from y2n import Futures
 import re, random
@@ -169,6 +172,7 @@ class WFutures(object):
             last = datetime.strptime(
                     l,
                     '%a %b %d %Y %I:%M %p EST')
+# default_tzinfo(parse('2014-01-01 12:30 UTC'), dflt_tz)
                     # '%a %b %d %Y %I:%M %p EST').astimezone(timezone(
                     #     'America/New_York'))
         except Exception:
