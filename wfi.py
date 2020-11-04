@@ -88,8 +88,6 @@ class WFutures(object):
             datetime.strptime(self.browser.find_element_by_xpath(
                 '//*[@id="hqTime"]').text,
                 '%Y-%m-%d %H:%M:%S'), gettz('Asia/Shanghai'))
-            # '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(
-            #     timezone('Asia/Shanghai'))
         if change == '--':
             change = '0'
         return self.__status(price, change, last)
@@ -127,8 +125,6 @@ class WFutures(object):
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
         last = datetime.strptime(self.browser.find_element_by_xpath(
             '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
-            # '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(
-            #     timezone('Asia/Shanghai'))
         if change == '--':
             change = '0'
         return self.__status(price, change, last)
@@ -174,14 +170,10 @@ class WFutures(object):
             last = default_tzinfo(
                     datetime.strptime(l, '%a %b %d %Y %I:%M %p EST'),
                     gettz('America/New_York'))
-            # '%a %b %d %Y %I:%M %p EST').astimezone(timezone(
-            #     'America/New_York'))
         except Exception:
             last = default_tzinfo(
                     datetime.strptime(l, '%a %b %d %Y'),
                     gettz('America/New_York'))
-            # last = datetime.strptime(l, '%a %b %d %Y').astimezone(
-            #     timezone('America/New_York'))
         return self.__status(price, change, last)
 
     def nk225(self, site='NIKKEI'):
@@ -195,8 +187,6 @@ class WFutures(object):
             if re.search(rstring, _):
                 return datetime.strptime(_, '%b/%d/%Y(%H:%M)')
             return datetime.strptime(_.split('(')[0], '%b/%d/%Y')
-            #     return datetime.strptime(_, '%b/%d/%Y(%H:%M)').astimezone(timezone('Asia/Tokyo'))
-            # return datetime.strptime(_.split('(')[0], '%b/%d/%Y').astimezone(timezone('Asia/Tokyo'))
 
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
