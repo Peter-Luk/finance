@@ -4,10 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from dateutil.tz import gettz
-from dateutil.utils import default_tzinfo
-# from dateutil.parser import parse
-# from pytz import timezone
+import pytz
 from y2n import Futures
 import re, random
 
@@ -84,15 +81,12 @@ class WFutures(object):
             self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = default_tzinfo(
-            datetime.strptime(self.browser.find_element_by_xpath(
-                '//*[@id="hqTime"]').text,
-                '%Y-%m-%d %H:%M:%S'), gettz('Asia/Shanghai'))
-            # '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(
-            #     timezone('Asia/Shanghai'))
+        last = pytz.timezone('Asia/Shanghai').localize(datetime.strptime(
+            self.browser.find_element_by_xpath('//*[@id="hqTime"]').text,
+            '%Y-%m-%d %H:%M:%S'))
         if change == '--':
             change = '0'
-        return self.__status(price, change, last)
+        return self.__status(price, change, last.astimezone(pytz.timezone('Asia/Hong_Kong')))
 
     def load_A_share(self, code, site='SINA'):
         if isinstance(code, int):
@@ -125,18 +119,17 @@ class WFutures(object):
             self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = datetime.strptime(self.browser.find_element_by_xpath(
-            '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S')
-            # '//*[@id="hqTime"]').text, '%Y-%m-%d %H:%M:%S').astimezone(
-            #     timezone('Asia/Shanghai'))
+        last = pytz.timezone('Asia/Shanghai').localize(datetime.strptime(
+            self.browser.find_element_by_xpath('//*[@id="hqTime"]').text,
+            '%Y-%m-%d %H:%M:%S'))
         if change == '--':
             change = '0'
-        return self.__status(price, change, last)
+        return self.__status(price, change, last.astimezone(pytz.timezone('Asia/Hong_Kong')))
 
     def whatsend(self, recipent, message, sender='Peter Luk'):
         try:
             self.goto('WhatsApp')
-            x_arg = f'//span[contains(@title, {recipent})]'
+            x_arg = f'//span[contains(@title, {recipegcnt})]'
             group_title = self.wait.until(EC.presence_of_element_located((
                 By.XPATH, x_arg)))
             group_title.click()
@@ -170,19 +163,12 @@ class WFutures(object):
             f'./{div}/div/div/table/tbody/tr/td[3]').text
         l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
             './div[5]').text)[1:])
+        usetz = pytz.timezone('US/Eastern')
         try:
-            last = default_tzinfo(
-                    datetime.strptime(l, '%a %b %d %Y %I:%M %p EST'),
-                    gettz('America/New_York'))
-            # '%a %b %d %Y %I:%M %p EST').astimezone(timezone(
-            #     'America/New_York'))
+            last = usetz.localize(datetime.strptime(l, '%a %b %d %Y %I:%M %p EST'))
         except Exception:
-            last = default_tzinfo(
-                    datetime.strptime(l, '%a %b %d %Y'),
-                    gettz('America/New_York'))
-            # last = datetime.strptime(l, '%a %b %d %Y').astimezone(
-            #     timezone('America/New_York'))
-        return self.__status(price, change, last)
+            last = usetz.localize(datetime.strptime(l, '%a %b %d %Y'))
+        return self.__status(price, change, last.astimezone(pytz.timezone("Asia/Hong_Kong")))
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]:
@@ -192,18 +178,17 @@ class WFutures(object):
 
         def convert(_):
             rstring = '\([0-2][0-9]\:[0-5][0-9]\)'
+            jptz = pytz.timezone('Asia/Tokyo')
             if re.search(rstring, _):
-                return datetime.strptime(_, '%b/%d/%Y(%H:%M)')
-            return datetime.strptime(_.split('(')[0], '%b/%d/%Y')
-            #     return datetime.strptime(_, '%b/%d/%Y(%H:%M)').astimezone(timezone('Asia/Tokyo'))
-            # return datetime.strptime(_.split('(')[0], '%b/%d/%Y').astimezone(timezone('Asia/Tokyo'))
+                return jptz.localize(datetime.strptime(_, '%b/%d/%Y(%H:%M)'))
+            return jptz.localize(datetime.strptime(_.split('(')[0], '%b/%d/%Y'))
 
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
         t = change.split(' ')[0].split(',')
         last = default_tzinfo(convert(self.browser.find_element_by_xpath(
             '//*[@id="datedtime"]').text), gettz('Asia/Tokyo'))
-        return self.__status(price, t[0], last)
+        return self.__status(price, t[0], last.astimezone(pytz.timezone('Asia/Hong_Kong')))
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
