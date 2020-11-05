@@ -163,6 +163,7 @@ class WFutures(object):
             f'./{div}/div/div/table/tbody/tr/td[3]').text
         l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
             './div[5]').text)[1:])
+        usetz = pytz.timezone('US/Eastern')
         try:
             last = usetz.localize(datetime.strptime(l, '%a %b %d %Y %I:%M %p EST'))
         except Exception:
@@ -187,7 +188,7 @@ class WFutures(object):
         t = change.split(' ')[0].split(',')
         last = convert(self.browser.find_element_by_xpath(
             '//*[@id="datedtime"]').text)
-        return self.__status(price, t[0], last.astimezon(pytz.timezone('Asia/Hong_Kong')))
+        return self.__status(price, t[0], last.astimezone(pytz.timezone('Asia/Hong_Kong')))
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
