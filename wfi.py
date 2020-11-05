@@ -10,6 +10,8 @@ import re, random
 
 from pref import source, fields, subject, xp
 from pt_2 import festi
+
+hktz = pytz.timezone('Asia/Hong_Kong')
 lf, preference = waf(), 'Firefox'
 # __author = subject['Peter Luk']
 milly = subject['Milly Ling']['whatsapp']['alias']
@@ -86,7 +88,7 @@ class WFutures(object):
             '%Y-%m-%d %H:%M:%S'))
         if change == '--':
             change = '0'
-        return self.__status(price, change, last.astimezone(pytz.timezone('Asia/Hong_Kong')))
+        return self.__status(price, change, last.astimezone(hktz))
 
     def load_A_share(self, code, site='SINA'):
         if isinstance(code, int):
@@ -124,7 +126,7 @@ class WFutures(object):
             '%Y-%m-%d %H:%M:%S'))
         if change == '--':
             change = '0'
-        return self.__status(price, change, last.astimezone(pytz.timezone('Asia/Hong_Kong')))
+        return self.__status(price, change, last.astimezone(hktz))
 
     def whatsend(self, recipent, message, sender='Peter Luk'):
         try:
@@ -168,7 +170,7 @@ class WFutures(object):
             last = usetz.localize(datetime.strptime(l, '%a %b %d %Y %I:%M %p EST'))
         except Exception:
             last = usetz.localize(datetime.strptime(l, '%a %b %d %Y'))
-        return self.__status(price, change, last.astimezone(pytz.timezone("Asia/Hong_Kong")))
+        return self.__status(price, change, last.astimezone(hktz))
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]:
@@ -188,7 +190,7 @@ class WFutures(object):
         t = change.split(' ')[0].split(',')
         last = convert(self.browser.find_element_by_xpath(
             '//*[@id="datedtime"]').text)
-        return self.__status(price, t[0], last.astimezone(pytz.timezone('Asia/Hong_Kong')))
+        return self.__status(price, t[0], last.astimezone(hktz))
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
