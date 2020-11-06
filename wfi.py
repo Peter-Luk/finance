@@ -11,7 +11,7 @@ import re, random
 from pref import source, fields, subject, xp
 from pt_2 import festi
 
-hktz = pytz.timezone('Asia/Hong_Kong')
+local_tz = pytz.timezone('Asia/Hong_Kong')
 lf, preference = waf(), 'Firefox'
 # __author = subject['Peter Luk']
 milly = subject['Milly Ling']['whatsapp']['alias']
@@ -49,18 +49,19 @@ class WFutures(object):
         self.lip = self.browser = self.wait = self.pivot = self.eb = None
         del self.lip, self.browser, self.wait, self.pivot, self.eb
 
-    def __status(self, p, c, l):
+    def __status(self, p, c, last):
         _ = [float(_.replace(',', '')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
-        _.extend([float(f'{__:0.3f}'), l])
+        _.extend([float(f'{__:0.3f}'), last.astimezone(local_tz)])
         return _
 
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
         if not isinstance(_, (list, tuple)):
             _ = [_]
+        hdr = source
         [self.browser.execute_script(
-            f"window.open('{source[__]}', '{__}');") for __ in _ if __ in
-            source.keys()]
+            f"window.open('{source[__][''hyperlink'']}', '{__}');")
+            for __ in _ if __ in source.keys()]
 
     def kill(self):
         self.browser.quit()
@@ -77,28 +78,29 @@ class WFutures(object):
         self.browser.switch_to.window(_)
 
     def shanghai_composite(self, site='SINA'):
-        if self.browser.current_url == source[site]:
+        if self.browser.current_url == source[site]['hyperlink']:
             self.refresh(site)
         else:
             self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = pytz.timezone('Asia/Shanghai').localize(datetime.strptime(
+        # last = pytz.timezone('Asia/Shanghai').localize(datetime.strptime(
+        last = source[site]['tz'].localize(datetime.strptime(
             self.browser.find_element_by_xpath('//*[@id="hqTime"]').text,
             '%Y-%m-%d %H:%M:%S'))
         if change == '--':
             change = '0'
-        return self.__status(price, change, last.astimezone(hktz))
+        return self.__status(price, change, last)
 
     def load_A_share(self, code, site='SINA'):
         if isinstance(code, int):
             code = f'{code:06}'
-        __ = source[site].replace('000001', code)
+        __ = source[site]['hyperlink'].replace('000001', code)
         self.browser.execute_script(f"window.open('{__}', 'sh{code}');")
         self.goto(f'sh{code}')
 
     def gold(self, site='Gold'):
-        if self.browser.current_url == source[site]:
+        if self.browser.current_url == source[site]['hyperlink']:
             self.refresh(site)
         else:
             self.goto(site)
@@ -114,19 +116,20 @@ class WFutures(object):
     def shanghai_A(self, code, site='SINA'):
         if isinstance(code, int):
             code = f'{code:06}'
-        __ = source[site].replace('000001', code)
+        __ = source[site]['hyperlink'].replace('000001', code)
         if self.browser.current_url == __:
             self.refresh(f'sh{code}')
         else:
             self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        last = pytz.timezone('Asia/Shanghai').localize(datetime.strptime(
+        # last = pytz.timezone('Asia/Shanghai').localize(datetime.strptime(
+        last = source[site]['tz'].localize(datetime.strptime(
             self.browser.find_element_by_xpath('//*[@id="hqTime"]').text,
             '%Y-%m-%d %H:%M:%S'))
         if change == '--':
             change = '0'
-        return self.__status(price, change, last.astimezone(hktz))
+        return self.__status(price, change, last)
 
     def whatsend(self, recipent, message, sender='Peter Luk'):
         try:
@@ -145,7 +148,7 @@ class WFutures(object):
             pass
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
-        if self.browser.current_url == source[site]:
+        if self.browser.current_url == source[site]['hyperlink']:
             self.refresh(site)
         else:
             self.goto(site)
@@ -165,32 +168,34 @@ class WFutures(object):
             f'./{div}/div/div/table/tbody/tr/td[3]').text
         l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
             './div[5]').text)[1:])
-        usetz = pytz.timezone('US/Eastern')
         try:
-            last = usetz.localize(datetime.strptime(l, '%a %b %d %Y %I:%M %p EST'))
+            last = source[site]['tz'].localize(datetime.strptime(
+                l, '%a %b %d %Y %I:%M %p EST'))
         except Exception:
-            last = usetz.localize(datetime.strptime(l, '%a %b %d %Y'))
-        return self.__status(price, change, last.astimezone(hktz))
+            last = source[site]['tz'].localize(datetime.strptime(
+                l, '%a %b %d %Y'))
+        return self.__status(price, change, last)
 
     def nk225(self, site='NIKKEI'):
-        if self.browser.current_url == source[site]:
+        if self.browser.current_url == source[site]['hyperlink']:
             self.refresh(site)
         else:
             self.goto(site)
 
         def convert(_):
             rstring = '\([0-2][0-9]\:[0-5][0-9]\)'
-            jptz = pytz.timezone('Asia/Tokyo')
             if re.search(rstring, _):
-                return jptz.localize(datetime.strptime(_, '%b/%d/%Y(%H:%M)'))
-            return jptz.localize(datetime.strptime(_.split('(')[0], '%b/%d/%Y'))
+                return source[site]['tz'].localize(
+                        datetime.strptime(_, '%b/%d/%Y(%H:%M)'))
+            return source[site]['tz'].localize(
+                    datetime.strptime(_.split('(')[0], '%b/%d/%Y'))
 
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
         t = change.split(' ')[0].split(',')
         last = convert(self.browser.find_element_by_xpath(
             '//*[@id="datedtime"]').text)
-        return self.__status(price, t[0], last.astimezone(hktz))
+        return self.__status(price, t[0], last)
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:

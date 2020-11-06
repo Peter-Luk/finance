@@ -1,5 +1,5 @@
 # import pandas, numpy, sqlalchemy, fix_yahoo_finance
-import pandas, numpy, sqlalchemy, yfinance
+import pandas, pytz, numpy, sqlalchemy, yfinance
 from scipy.constants import golden_ratio
 from datetime import datetime
 from tqdm import tqdm
@@ -55,12 +55,23 @@ subject = {
     }
 
 source = dict(
-    SINA='http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml',
-    NIKKEI='https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225',
-    CNBC='https://www.cnbc.com/pre-markets/',
-    WhatsApp='https://web.whatsapp.com',
-    SMS='https://messages.google.com/web',
-    Gold='https://www.gold.org/')
+    SINA=dict(
+        hyperlink='http://finance.sina.com.cn/realstock/company/' +
+        'sh000001/nc.shtml',
+        tz=pytz.timezone('Asia/Shanghai')),
+    NIKKEI=dict(
+        hyperlink='https://indexes.nikkei.co.jp/en/nkave/index/' +
+        'profile?idx=nk225',
+        tz=pytz.timezone('Asia/Tokyo')),
+    CNBC=dict(
+        hyperlink='https://www.cnbc.com/pre-markets/',
+        tz=pytz.timezone('America/Eastern')),
+    WhatsApp=dict(
+        hyperlink='https://web.whatsapp.com'),
+    SMS=dict(
+        hyperlink='https://messages.google.com/web'),
+    Gold=dict(
+        hyperlink='https://www.gold.org/'))
 
 fields = ['open', 'high', 'low', 'close', 'volume']
 xvsa = dict(zip(
