@@ -1,3 +1,4 @@
+import re, random
 from utilities import div_input, driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -5,15 +6,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from y2n import Futures
-import pytz
-import re, random
-
-from pref import source, fields, subject, xp
+from pref import source, fields, subject, pytz
 from pt_2 import festi
 
 local_tz = pytz.timezone('Asia/Hong_Kong')
 lf, preference = waf(), 'Firefox'
-# __author = subject['Peter Luk']
 milly = subject['Milly Ling']['whatsapp']['alias']
 if today.day == ltd(today.year, today.month):
     lf = waf(1)
@@ -159,7 +156,7 @@ class WFutures(object):
         def cxpath(_):
             idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
             if _ in idx:
-                return f'{xp["CNBC"]}div[{1+idx.index(_)}]/div'
+                return f'{source[site]["xpath_base"]}div[{1+idx.index(_)}]/div'
 
         _ = self.browser.find_element_by_xpath(cxpath(idx))
         price = _.find_element_by_xpath(

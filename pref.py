@@ -6,9 +6,9 @@ from tqdm import tqdm
 from pathlib import Path, os, sys, functools
 from time import sleep
 
-xp = dict(
-    CNBC='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]')
-xp['CNBC'] += '/div/div[1]/'
+# xp = dict(
+#     CNBC='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]')
+# xp['CNBC'] += '/div/div[1]/'
 
 driver = dict(
     Chrome=dict(
@@ -42,9 +42,9 @@ subject = {
             primary='+65 83826103'),
         whatsapp=dict(
             alias='"Wong Mickey"')),
-    'Chan Cheung Yiu': dict(
-        mobile=dict(
-            primary=91031418),
+    'Chan Cheung Yiu?!?jedi=1, ': dict(?!? (*_*iterable: Iterable[Tuple[_KT, _VT]]*_*, **kwargs: _VT) ?!?jedi?!?'
+        mobile=dict(?!?jedi=0, ?!? (*_*map: Mapping[_KT, _VT]*_*, **kwargs: _VT) ?!?jedi?!?
+            primary=?!?jedi=0, 91031418),?!? (*_***kwargs: _VT*_*) ?!?jedi?!?
         whatsapp=dict(
             alias='"陳長耀"')),
     'Josephine Yuen': dict(
@@ -65,7 +65,9 @@ source = dict(
         tz=pytz.timezone('Asia/Tokyo')),
     CNBC=dict(
         hyperlink='https://www.cnbc.com/pre-markets/',
-        tz=pytz.timezone('US/Eastern')),
+        tz=pytz.timezone('US/Eastern'),
+        xpath_base='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/' +
+        'div[3]/div[1]/div/div[1]/'),
     WhatsApp=dict(
         hyperlink='https://web.whatsapp.com'),
     SMS=dict(
