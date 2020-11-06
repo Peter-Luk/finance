@@ -42,9 +42,9 @@ subject = {
             primary='+65 83826103'),
         whatsapp=dict(
             alias='"Wong Mickey"')),
-    'Chan Cheung Yiu?!?jedi=1, ': dict(?!? (*_*iterable: Iterable[Tuple[_KT, _VT]]*_*, **kwargs: _VT) ?!?jedi?!?'
-        mobile=dict(?!?jedi=0, ?!? (*_*map: Mapping[_KT, _VT]*_*, **kwargs: _VT) ?!?jedi?!?
-            primary=?!?jedi=0, 91031418),?!? (*_***kwargs: _VT*_*) ?!?jedi?!?
+    'Chan Cheung Yiu': dict(
+        mobile=dict(
+            primary=91031418),
         whatsapp=dict(
             alias='"陳長耀"')),
     'Josephine Yuen': dict(

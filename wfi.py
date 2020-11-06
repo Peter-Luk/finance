@@ -55,9 +55,10 @@ class WFutures(object):
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
         if not isinstance(_, (list, tuple)):
             _ = [_]
-        hdr = source
+            # f"window.open('{source[__]['hyperlink']}', '{__}');")
+        hdr = '{source[__]["hyperlink"]}'
         [self.browser.execute_script(
-            f"window.open('{source[__][''hyperlink'']}', '{__}');")
+            f"window.open(hdr, '{__}');")
             for __ in _ if __ in source.keys()]
 
     def kill(self):
