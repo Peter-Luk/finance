@@ -1,14 +1,9 @@
-# import pandas, numpy, sqlalchemy, fix_yahoo_finance
 import pandas, pytz, numpy, sqlalchemy, yfinance
 from scipy.constants import golden_ratio
 from datetime import datetime
 from tqdm import tqdm
 from pathlib import Path, os, sys, functools
 from time import sleep
-
-# xp = dict(
-#     CNBC='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/div[3]/div[1]')
-# xp['CNBC'] += '/div/div[1]/'
 
 driver = dict(
     Chrome=dict(
@@ -19,8 +14,7 @@ driver = dict(
         path=['browser', 'driver']),
     Ie=dict(
         name='IEDriverServer.exe',
-        path=['browser', 'driver'])
-)
+        path=['browser', 'driver']))
 
 subject = {
     'Peter Luk': dict(
@@ -83,7 +77,6 @@ B_scale = dict(
     BABA=1 / 8,
     YUMC=1,
     NTES=1 / 5,
-    # NTES=1 / 25,
     JD=1 / 2)
 
 USHK = 7.75
