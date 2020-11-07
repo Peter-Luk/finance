@@ -55,13 +55,10 @@ class WFutures(object):
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
         if not isinstance(_, (list, tuple)):
             _ = [_]
-            # f"window.open('{source[__]['hyperlink']}', '{__}');")
         for __ in _:
             if __ in source.keys():
                 hdr = source[__]["hyperlink"]
                 self.browser.execute_script(f"window.open('{hdr}', '{__}');")
-        # [self.browser.execute_script(
-        #     f"window.open({hdr}, '{__}');") for __ in _ if __ in source.keys()]
 
     def kill(self):
         self.browser.quit()
@@ -84,7 +81,6 @@ class WFutures(object):
             self.goto(site)
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        # last = pytz.timezone('Asia/Shanghai').localize(datetime.strptime(
         last = source[site]['tz'].localize(datetime.strptime(
             self.browser.find_element_by_xpath('//*[@id="hqTime"]').text,
             '%Y-%m-%d %H:%M:%S'))
@@ -123,7 +119,6 @@ class WFutures(object):
             self.goto(f'sh{code}')
         price = self.browser.find_element_by_xpath('//*[@id="price"]').text
         change = self.browser.find_element_by_xpath('//*[@id="change"]').text
-        # last = pytz.timezone('Asia/Shanghai').localize(datetime.strptime(
         last = source[site]['tz'].localize(datetime.strptime(
             self.browser.find_element_by_xpath('//*[@id="hqTime"]').text,
             '%Y-%m-%d %H:%M:%S'))
@@ -297,9 +292,6 @@ class WFutures(object):
                 (By.TAG_NAME, 'button')))
             t = (_[0] + _[-2] + 'b').lower()
             exec(f"self.{t}=self.browser.find_element_by_tag_name('button')")
-            # exec(
-            #     f"self.{t}={self.wait.until(EC.presence_of_element_located((
-            #     By.TAG_NAME, 'button')))}")
             for __ in fields:
                 t = (_[0] + _[-2] + __[0]).lower()
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
