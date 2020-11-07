@@ -59,8 +59,7 @@ class WFutures(object):
         for __ in _:
             if __ in source.keys():
                 # hdr = '{source[__]["hyperlink"]}'
-                self.browser.execute_script(
-                        f"window.open({source[__]['hyperlink']}, {__});")
+                self.browser.execute_script(f"window.open({source[__]['hyperlink']}, {__});")
         # [self.browser.execute_script(
         #     f"window.open({hdr}, '{__}');") for __ in _ if __ in source.keys()]
 
