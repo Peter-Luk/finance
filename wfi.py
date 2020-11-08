@@ -51,7 +51,7 @@ class WFutures(object):
         _ = [float(_.replace(',', '')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
         l_ = last.astimezone(local_tz)
-        delta = relativedelta.relativedelta(datetime.now(), l_)
+        delta = relativedelta.relativedelta(datetime.now().astimezone(local_tz), l_)
         _.extend([f'{__:0.3f}%', ' '.join((
             l_.strftime('%b %d, %Y %H:%M:%S'), l_.tzname()))])
         return _
