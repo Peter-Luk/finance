@@ -47,9 +47,11 @@ class WFutures(object):
         del self.lip, self.browser, self.wait, self.pivot, self.eb
 
     def __status(self, p, c, last):
+        from dateutil import relativedelta
         _ = [float(_.replace(',', '')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
         l_ = last.astimezone(local_tz)
+        delta = relativedelta(datetime.now(), l_)
         _.extend([f'{__:0.3f}%', ' '.join((
             l_.strftime('%b %d, %Y %H:%M:%S'), l_.tzname()))])
         return _
