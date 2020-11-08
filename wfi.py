@@ -49,7 +49,8 @@ class WFutures(object):
     def __status(self, p, c, last):
         _ = [float(_.replace(',', '')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
-        _.extend([float(f'{__:0.3f}'), last.astimezone(local_tz)])
+        l_ = last.astimezone(local_tz)
+        _.extend([float(f'{__:0.3f}'), ' '.join((l_.strftime('%b %d, %Y %H:%M:%S'), l_.tzname()))])
         return _
 
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
