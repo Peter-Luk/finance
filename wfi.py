@@ -163,14 +163,14 @@ class WFutures(object):
             f'./{div}/div/div/table/tbody/tr/td[2]').text
         change = _.find_element_by_xpath(
             f'./{div}/div/div/table/tbody/tr/td[3]').text
-        l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
+        _l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
             './div[5]').text)[1:])
         try:
             last = source[site]['tz'].localize(datetime.strptime(
-                l, '%a %b %d %Y %I:%M %p EST'))
+                _l, '%a %b %d %Y %I:%M %p EST'))
         except Exception:
             last = source[site]['tz'].localize(datetime.strptime(
-                l, '%a %b %d %Y'))
+                _l, '%a %b %d %Y'))
         return self.__status(price, change, last)
 
     def nk225(self, site='NIKKEI'):
