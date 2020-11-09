@@ -54,6 +54,7 @@ class WFutures(object):
         def _dstr(delta):
             now = datetime.now().astimezone(local_tz)
             r = relativedelta.relativedelta(now, delta)
+            # tf = ['year', 'month', 'day', 'hour', 'minute', 'second']
             # t_ = [f"f'{{r.{_}s}} {_}(s)'" for _ in tf]
             # ts = [eval(__) for __ in t_]
             # tsd = dict(zip(tf, ts))
