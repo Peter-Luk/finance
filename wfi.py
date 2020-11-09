@@ -61,7 +61,7 @@ class WFutures(object):
                     if r.days == 0:
                         hstr = f'{r.hours} hour(s)'
                         if r.hours == 0:
-                            hstr = f'{f.minutes} minutes(s)'
+                            hstr = f'{r.minutes} minutes(s)'
                             if r.minutes == 0:
                                 hstr = f'{r.seconds} second(s)'
                             else:
@@ -74,12 +74,11 @@ class WFutures(object):
                     hstr += f' {r.days} days(s) {r.hours} hour(s) {r.minutes} minute(s) {r.seconds} second(s)'
             else:
                 hstr += f' {r.months} month(s) {r.days} day(s) {r.hours} hour(s) {r.minutes} minute(s) {r.seconds} second(s)'
-        return hstr
+            return hstr
 
         l_ = last.astimezone(local_tz)
-        delta = _dstr(l_)
         _.extend([f'{__:0.3f}%', ' '.join((
-            l_.strftime('%b %d, %Y %H:%M:%S'), l_.tzname()))])
+            l_.strftime('%b %d, %Y %H:%M:%S'), l_.tzname())), f'Delta: {_dstr(l_)}'])
         return _
 
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
