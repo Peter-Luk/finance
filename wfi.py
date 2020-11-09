@@ -50,6 +50,7 @@ class WFutures(object):
         from dateutil import relativedelta
         _ = [float(_.replace(',', '')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
+
         def _dstr(delta):
             now = datetime.now().astimezone(local_tz)
             r = relativedelta.relativedelta(now, delta)
@@ -67,18 +68,25 @@ class WFutures(object):
                             else:
                                 hstr += f' {r.seconds} second(s)'
                         else:
-                            hstr += f' {r.minutes} minute(s) {r.seconds} second(s)'
+                            hstr += f' {r.minutes} minute(s) {r.seconds}'
+                            + ' second(s)'
                     else:
-                        hstr += f' {r.hours} hour(s) {r.minutes} minute(s) {r.seconds} second(s)'
+                        hstr += f' {r.hours} hour(s) {r.minutes} minute(s)'
+                        + f' {r.seconds} second(s)'
                 else:
-                    hstr += f' {r.days} days(s) {r.hours} hour(s) {r.minutes} minute(s) {r.seconds} second(s)'
+                    hstr += f' {r.days} days(s) {r.hours} hour(s)'
+                    + f' {r.minutes} minute(s) {r.seconds} second(s)'
             else:
-                hstr += f' {r.months} month(s) {r.days} day(s) {r.hours} hour(s) {r.minutes} minute(s) {r.seconds} second(s)'
+                hstr += f' {r.months} month(s) {r.days} day(s)'
+                + f' {r.hours} hour(s) {r.minutes} minute(s) {r.seconds}'
+                + ' second(s)'
             return hstr
 
         l_ = last.astimezone(local_tz)
         _.extend([f'{__:0.3f}%', ' '.join((
-            l_.strftime('%b %d, %Y %H:%M:%S'), l_.tzname())), f'Delta: {_dstr(l_)}'])
+            l_.strftime('%b %d, %Y %H:%M:%S'),
+            l_.tzname())),
+            f'Delta: {_dstr(l_)}'])
         return _
 
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
