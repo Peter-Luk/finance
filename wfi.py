@@ -88,7 +88,7 @@ class WFutures(object):
         _.extend([f'{__:0.3f}%', ' '.join((
             l_.strftime('%b %d, %Y %H:%M:%S'),
             l_.tzname())),
-            f'Delay: {_dstr(l_)}'])
+            f'Delta: {_dstr(l_)}'])
         return _
 
     def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
