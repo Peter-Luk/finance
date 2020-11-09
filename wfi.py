@@ -50,8 +50,34 @@ class WFutures(object):
         from dateutil import relativedelta
         _ = [float(_.replace(',', '')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
+        def _dstr(delta):
+            now = datetime.now().astimezone(local_tz)
+            r = relativedelta.relativedelta(now, delta)
+            hstr = f'{r.years} year(s)'
+            if r.years == 0:
+                hstr = f'{r.months} months(s)'
+                if r.months == 0:
+                    hstr = f'{r.days} day(s)'
+                    if r.days == 0:
+                        hstr = f'{r.hours} hour(s)'
+                        if r.hours == 0:
+                            hstr = f'{f.minutes} minutes(s)'
+                            if r.minutes == 0:
+                                hstr = f'{r.seconds} second(s)'
+                            else:
+                                hstr += f' {r.seconds} second(s)'
+                        else:
+                            hstr += f' {r.minutes} minute(s) {r.seconds} second(s)'
+                    else:
+                        hstr += f' {r.hours} hour(s) {r.minutes} minute(s) {r.seconds} second(s)'
+                else:
+                    hstr += f' {r.days} days(s) {r.hours} hour(s) {r.minutes} minute(s) {r.seconds} second(s)'
+            else:
+                hstr += f' {r.months} month(s) {r.days} day(s) {r.hours} hour(s) {r.minutes} minute(s) {r.seconds} second(s)'
+        return hstr
+
         l_ = last.astimezone(local_tz)
-        delta = relativedelta.relativedelta(datetime.now().astimezone(local_tz), l_)
+        delta = _dstr(l_)
         _.extend([f'{__:0.3f}%', ' '.join((
             l_.strftime('%b %d, %Y %H:%M:%S'), l_.tzname()))])
         return _
