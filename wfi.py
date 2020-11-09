@@ -47,41 +47,43 @@ class WFutures(object):
         del self.lip, self.browser, self.wait, self.pivot, self.eb
 
     def __status(self, p, c, last):
+        from dateutil import relativedelta
         _ = [float(_.replace(',', '')) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
 
         def _dstr(delta):
-            from dateutil import relativedelta
-            tf = ['year', 'month', 'day', 'hour', 'minute', 'second']
             now = datetime.now().astimezone(local_tz)
             r = relativedelta.relativedelta(now, delta)
-            t_ = [f"f'{{r.{_}s}} {_}(s)'" for _ in tf]
-            ts = [eval(__) for __ in t_]
-            tsd = dict(zip(tf, ts))
-            hstr = tsd['year']
+            # t_ = [f"f'{{r.{_}s}} {_}(s)'" for _ in tf]
+            # ts = [eval(__) for __ in t_]
+            # tsd = dict(zip(tf, ts))
+            # hstr = tsd['year']
+            hstr = f'{r.years} year(s)'
             if r.years == 0:
-                hstr = tsd['month']
+                hstr = f'{r.months} month(s)'
                 if r.months == 0:
-                    hstr = tsd['day']
+                    hstr = f'{r.days} day(s)'
                     if r.days == 0:
-                        hstr = tsd['hour']
+                        hstr = f'{r.hours} hour(s)'
                         if r.hours == 0:
-                            hstr = tsd['minute']
+                            hstr = f'{r.minutes} minute(s)'
                             if r.minutes == 0:
-                                hstr = tsd['second']
+                                hstr = f'{r.seconds} second(s)'
                             else:
-                                hstr += tsd['second']
+                                hstr += f' {r.seconds} second(s)'
                         else:
-                            hstr += f' {tsd["minute"]} {tsd["second"]}'
+                            hstr += f' {r.minutes} minute(s) {r.seconds}'
+                            + ' second(s)'
                     else:
-                        hstr += f' {tsd["hour"]} {tsd["minute"]}'
-                        + f' {tsd["second"]}'
+                        hstr += f' {r.hours} hour(s) {r.minutes} minute(s)'
+                        + f' {r.seconds} second(s)'
                 else:
-                    hstr += f' {tsd["day"]} {tsd["hour"]} {tsd["minute"]}'
-                    + f' {tsd["second"]}'
+                    hstr += f' {r.days} day(s) {r.hours} hour(s)'
+                    + f' {r.minutes} minute(s) {r.seconds} second(s)'
             else:
-                hstr += f' {tsd["month"]} {tsd["day"]} {tsd["hour"]}'
-                + f' {tsd["minute"]} {tsd["second"]}'
+                hstr += f' {r.months} month(s) {r.days} day(s)'
+                + f' {r.hours} hour(s) {r.minutes} minute(s) {r.seconds}'
+                + ' second(s)'
             return hstr
 
         l_ = last.astimezone(local_tz)
