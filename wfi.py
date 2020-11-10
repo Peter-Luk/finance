@@ -54,10 +54,10 @@ class WFutures(object):
         __ = _[-1] / (_[0] - _[-1]) * 100
 
         def _dstr(delta):
-            now = datetime.now().astimezone(local_tz)
-            tf = ['year', 'month', 'day', 'hour', 'minute', 'second']
-            r = relativedelta(now, delta)
             ts = []
+            tf = ['year', 'month', 'day', 'hour', 'minute', 'second']
+            now = datetime.now().astimezone(local_tz)
+            r = relativedelta(now, delta)
             for i in tf:
                 _ = "f'{{r.{i}s}} {i}(s)'"
                 ts.append(eval(_))
@@ -66,8 +66,8 @@ class WFutures(object):
             # t_ = [f"f'{{r.{_}s}} {_}(s)'" for _ in tf]
             # ts = [eval(__) for __ in t_]
             # tsd = dict(zip(tf, ts))
-            # hstr = tsd['year']
-            hstr = f'{r.years} year(s)'
+            hstr = tsd['year']
+            # hstr = f'{r.years} year(s)'
             if r.years == 0:
                 hstr = f'{r.months} month(s)'
                 if r.months == 0:
