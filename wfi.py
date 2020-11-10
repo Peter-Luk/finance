@@ -25,6 +25,8 @@ def fan(__='mhi', mt=True):
 
 
 class WFutures(object):
+    from dateutil import relativedelta
+
     def __init__(self, ip=None, _=None):
         if _ is None:
             _ = preference
