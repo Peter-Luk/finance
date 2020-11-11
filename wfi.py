@@ -59,9 +59,9 @@ class WFutures(object):
             now = datetime.now().astimezone(local_tz)
             r = relativedelta(now, delta)
             # for i in tf:
-            _t = [f"f'{{r.{i}s}} {i}(s)'" for i in tf]
+            # _t = [f"f'{{r.{i}s}} {i}(s)'" for i in tf]
             # ts.append(eval(_))
-            ts = [eval(j) for j in _t]
+            ts = [eval(f'f\'{{r.{j}s}} {j}(s)\'') for j in tf]
             tsd = dict(zip(tf, ts))
             hstr = tsd['year']
             if r.years == 0:
