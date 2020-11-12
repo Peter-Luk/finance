@@ -77,7 +77,7 @@ class WFutures(object):
                             else:
                                 hstr += f' {tsd["second"]}'
                         else:
-                            hstr += f' {tsd["minute"]} {tsd["seconds"]}'
+                            hstr += f' {tsd["minute"]} {tsd["second"]}'
                     else:
                         hstr += f' {tsd["hour"]} {tsd["minute"]}'
                         + f' {tsd["second"]}'
