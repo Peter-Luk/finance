@@ -61,7 +61,6 @@ class WFutures(object):
             for i in tf:
                 _t = f'f\'{{r.{i}s}} {i}(s)\''
                 ts.append(eval(_t))
-            # ts = [eval(f'f\'{{r.{j}s}} {j}(s)\'') for j in tf]
             tsd = dict(zip(tf, ts))
             hstr = tsd['year']
             if r.years == 0:
