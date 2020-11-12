@@ -27,7 +27,7 @@ def fan(__='mhi', mt=True):
 class WFutures(object):
     from dateutil import relativedelta
 
-    def __init__(self, ip=None, _=None):
+    def __init__(self, purpose='input', ip=None, _=None):
         if _ is None:
             _ = preference
         self.lip = ip
@@ -41,7 +41,10 @@ class WFutures(object):
         self.window0 = self.browser.window_handles[0]
         self.browser.execute_script(f"window.open( \
             'http://{self.lip}/equities','Local');")
-        self.__load(lf)
+        if purpose == 'input':
+            self.__load(lf)
+        if purpose == 'auxiliary':
+            self.auxiliary_load()
         self.refresh(self.window0)
 
     def __del__(self):
