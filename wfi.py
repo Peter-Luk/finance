@@ -98,7 +98,8 @@ class WFutures(object):
             f'Delay: {_dstr(l_)}'])
         return _
 
-    def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
+    # def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
+    def auxiliary_load(self, _=['CNBC', 'NIKKEI', 'SINA', 'Gold']):
         if not isinstance(_, (list, tuple)):
             _ = [_]
         for __ in _:
