@@ -60,7 +60,8 @@ source = dict(
     CNBC=dict(
         hyperlink='https://www.cnbc.com/pre-markets/',
         tz=pytz.timezone('US/Eastern'),
-        xpath_base='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/' +
+        # xpath_base='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/' +
+        xpath_base='/html/body/div[2]/div/div[1]/div[3]/div/div/div/' +
         'div[3]/div[1]/div/div[1]/'),
     WhatsApp=dict(
         hyperlink='https://web.whatsapp.com'),
