@@ -342,3 +342,28 @@ class WFutures(object):
             for __ in fields:
                 t = (_[0] + _[-2] + __[0]).lower()
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
+
+
+def dow(wf, _=True):
+    return wf.usif('Dow', implied=_)
+
+
+def nk(wf):
+    return wf.nk225()
+
+
+def sc(wf):
+    return wf.shanghai_composite()
+
+
+def display(wf, interval=50):
+    from time import sleep
+    while True:
+        try:
+            _d, _n, _s = dow(wf), nk(wf), sc(wf)
+            print(f'Dow:\t{_d[0]}\t{_d[1]}\t{_d[2]}\t{_d[-1]}')
+            print(f'Nikkei:\t{_n[0]}\t{_n[1]}\t{_n[2]}\t{_n[-1]}')
+            print(f'Sha C.:\t{_s[0]}\t{_s[1]}\t{_s[2]}\t{_s[-1]}\n')
+            sleep(interval)
+        except Exception:
+            break
