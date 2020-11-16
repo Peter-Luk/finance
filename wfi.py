@@ -53,7 +53,7 @@ class WFutures(object):
 
     def __status(self, p, c, last):
         from dateutil.relativedelta import relativedelta
-        _ = [float(_.replace(',', '')) for _ in [p, c]]
+        _ = [round(float(_.replace(',', '')), 1) for _ in [p, c]]
         __ = _[-1] / (_[0] - _[-1]) * 100
 
         def _dstr(delta):
