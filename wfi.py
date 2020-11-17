@@ -1,4 +1,6 @@
-import re, random
+import re
+import random
+import copy
 from utilities import div_input, driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -345,19 +347,32 @@ class WFutures(object):
 
 
 def dow(wf, _=True):
-    return wf.usif('Dow', implied=_)
+    _wf = copy.copy(wf)
+    return _wf.usif('Dow', implied=_)
+
+
+def nq(wf, _=True):
+    _wf = copy.copy(wf)
+    return _wf.usif('Nasdaq', implied=_)
+
+
+def sp(wf, _=True):
+    _wf = copy.copy(wf)
+    return _wf.usif('S&P', implied=_)
 
 
 def nk(wf):
-    return wf.nk225()
+    _wf = copy.copy(wf)
+    return _wf.nk225()
 
 
 def sc(wf):
-    return wf.shanghai_composite()
+    _wf = copy.copy(wf)
+    return _wf.shanghai_composite()
 
 
 def display(wf, interval=50):
-    import copy
+    # import copy
     from time import sleep
     _wf = copy.copy(wf)
     while True:
