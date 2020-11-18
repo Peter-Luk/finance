@@ -187,7 +187,7 @@ class WFutures(object):
             input_box.send_keys(message + Keys.ENTER)
             return ' @ '.join((
                 f'Message successfully sent to {recipent}',
-                f'{datetime.now():"%H:%M:%S"}'))
+                f'{datetime.now():%H:%M:%S}'))
         except Exception:
             pass
 
