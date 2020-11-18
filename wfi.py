@@ -176,20 +176,20 @@ class WFutures(object):
         return self.__status(price, change, last)
 
     def whatsend(self, recipent, message, sender='Peter Luk'):
-        try:
-            self.goto('WhatsApp')
-            x_arg = f'//span[contains(@title, {recipent})]'
-            group_title = self.wait.until(EC.presence_of_element_located((
-                By.XPATH, x_arg)))
-            group_title.click()
-            input_box = self.wait.until(EC.presence_of_element_located((
-                By.XPATH, f'//div{div_input(sender)}')))
-            input_box.send_keys(message + Keys.ENTER)
-            return ' @ '.join((
-                f'Message successfully sent to {recipent}',
-                f'{datetime.now():%H:%M:%S}'))
-        except Exception:
-            pass
+        # try:
+        self.goto('WhatsApp')
+        x_arg = f'//span[contains(@title, {recipent})]'
+        group_title = self.wait.until(EC.presence_of_element_located((
+            By.XPATH, x_arg)))
+        group_title.click()
+        input_box = self.wait.until(EC.presence_of_element_located((
+            By.XPATH, f'//div{div_input(sender)}')))
+        input_box.send_keys(message + Keys.ENTER)
+        return ' @ '.join((
+            f'Message successfully sent to {recipent}',
+            f'{datetime.now():%H:%M:%S}'))
+        # except Exception:
+        #     pass
 
     def usif(self, idx='Dow', site='CNBC', implied=True):
         if self.browser.current_url == source[site]['hyperlink']:
