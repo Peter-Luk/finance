@@ -39,7 +39,7 @@ class WFutures(object):
             eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         self.browser.implicitly_wait(10)
         self.browser.get(f'http://{self.lip}/futures')
-        self.wait = WebDriverWait(self.browser, 600)
+        self.wait = WebDriverWait(self.browser, 10800)
         self.window0 = self.browser.window_handles[0]
         self.browser.execute_script(f"window.open( \
             'http://{self.lip}/equities','Local');")
@@ -100,7 +100,6 @@ class WFutures(object):
             f'Delay: {_dstr(l_)}'])
         return _
 
-    # def auxiliary_load(self, _=['WhatsApp', 'CNBC', 'NIKKEI', 'SINA', 'Gold']):
     def auxiliary_load(self, _=['CNBC', 'NIKKEI', 'SINA', 'Gold']):
         if not isinstance(_, (list, tuple)):
             _ = [_]
