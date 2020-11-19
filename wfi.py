@@ -39,7 +39,7 @@ class WFutures(object):
             eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         self.browser.implicitly_wait(10)
         self.browser.get(f'http://{self.lip}/futures')
-        self.wait = WebDriverWait(self.browser, 10800)
+        self.wait = WebDriverWait(self.browser, 14400)
         self.window0 = self.browser.window_handles[0]
         self.browser.execute_script(f"window.open( \
             'http://{self.lip}/equities','Local');")
