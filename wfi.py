@@ -39,7 +39,7 @@ class WFutures(object):
             eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         self.browser.implicitly_wait(10)
         self.browser.get(f'http://{self.lip}/futures')
-        self.wait = WebDriverWait(self.browser, 14400)
+        self.wait = WebDriverWait(self.browser, 600)
         self.window0 = self.browser.window_handles[0]
         self.browser.execute_script(f"window.open( \
             'http://{self.lip}/equities','Local');")
@@ -340,6 +340,11 @@ class WFutures(object):
             for __ in fields:
                 t = (_[0] + _[-2] + __[0]).lower()
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
+
+
+def msend(wf, msg, rect=milly):
+    _wf = copy.copy(wf)
+    return _wf.whatsend(rect, msg)
 
 
 def dow(wf, _=True):
