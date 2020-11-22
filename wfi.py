@@ -346,9 +346,11 @@ class WFutures(object):
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
 
 
-def msend(wf, msg, rect=milly):
-    _wf = copy.copy(wf)
-    return _wf.whatsend(rect, msg)
+def msend(msg, rect=milly):
+    _wf = WFutures('WhatsApp')
+    res = _wf.whatsend(rect, msg)
+    _wf.kill()
+    return res
 
 
 def dow(wf, _=True):
