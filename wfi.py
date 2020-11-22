@@ -32,17 +32,21 @@ class WFutures(object):
     def __init__(self, purpose='input', ip=None, _=None):
         if _ is None:
             _ = preference
-        self.lip = ip
-        if ip is None:
-            self.lip = str(IP())
         self.browser = \
             eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         self.browser.implicitly_wait(10)
-        self.browser.get(f'http://{self.lip}/futures')
-        self.wait = WebDriverWait(self.browser, 600)
-        self.window0 = self.browser.window_handles[0]
-        self.browser.execute_script(f"window.open( \
-            'http://{self.lip}/equities','Local');")
+        if ip in source.keys():
+            self.lip = source[ip]['hyperlink']
+            self.browser.get(source[ip['hyperlink']])
+            self.wait = WebDriverWait(self.browser, 600)
+            self.window0 = self.browser.window_handles[0]
+        if ip is None:
+            self.lip = str(IP())
+            self.browser.get(f'http://{self.lip}/futures')
+            self.wait = WebDriverWait(self.browser, 600)
+            self.window0 = self.browser.window_handles[0]
+            self.browser.execute_script(f"window.open( \
+                'http://{self.lip}/equities','Local');")
         if purpose == 'input':
             self.__load(lf)
         if purpose == 'auxiliary':
