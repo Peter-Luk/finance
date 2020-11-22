@@ -346,10 +346,12 @@ class WFutures(object):
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
 
 
-def msend(msg, rect=milly):
-    _wf = WFutures('WhatsApp')
+# def msend(msg, rect=milly):
+def msend(wf, msg, rect=milly):
+    _wf = wf
+    # _wf = WFutures('WhatsApp')
     res = _wf.whatsend(rect, msg)
-    _wf.kill()
+    # _wf.kill()
     return res
 
 
