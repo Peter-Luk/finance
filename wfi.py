@@ -33,7 +33,7 @@ class WFutures(object):
         if _ is None:
             _ = preference
         self.browser = \
-            eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
+            eval(f"webdriver.{_}(executable_path=driver_path({_}))")
         self.browser.implicitly_wait(10)
         if ip in source.keys():
             self.lip = source[ip]['hyperlink']
