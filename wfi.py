@@ -382,9 +382,11 @@ def sc(wf):
 
 def display(wf, interval=50):
     from time import sleep
+    # _wf = copy.copy(wf)
     while True:
         try:
             print(f'Time: {datetime.now():%H:%M:%S}')
+            # _d, _n, _s = dow(_wf), nk(_wf), sc(_wf)
             _d, _n, _s = dow(wf), nk(wf), sc(wf)
             print(f'Dow:\t{_d[0]}\t{_d[1]}\t{_d[2]}\t{_d[-1]}')
             print(f'Nikkei:\t{_n[0]}\t{_n[1]}\t{_n[2]}\t{_n[-1]}')
