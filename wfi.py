@@ -38,10 +38,11 @@ class WFutures(object):
         self.browser.implicitly_wait(10)
         if isinstance(ip, (list, tuple)):
             self.browser.get(f'http://{str(IP())}/equities')
+            self.window0 = self.browser.window_handles[0]
             for i in ip:
-                 if i in source.keys():
-                     hdr = source[i]['hyperlink']
-                     self.browser.execute_script(f"window.open({'hdr'},'{i}')")
+                if i in source.keys():
+                    hdr = source[i]['hyperlink']
+                    self.browser.execute_script(f"window.open('{hdr}','{i}')")
         if ip in source.keys():
             self.lip = source[ip]['hyperlink']
             self.browser.get(self.lip)
