@@ -49,9 +49,12 @@ class WFutures(object):
                 'http://{self.lip}/equities','Local');")
         if purpose == 'input':
             self.__load(lf)
+            self.refresh(self.window0)
         if purpose == 'auxiliary':
             self.auxiliary_load()
-        self.refresh(self.window0)
+            self.refresh(self.window0)
+        if purpose == 'whatsapp'
+            self.auxiliary_load('WhatsApp')
 
     def __del__(self):
         self.lip = self.browser = self.wait = self.pivot = self.eb = None
