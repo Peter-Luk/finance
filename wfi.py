@@ -29,15 +29,22 @@ def fan(__='mhi', mt=True):
 class WFutures(object):
     from dateutil import relativedelta
 
-    def __init__(self, purpose='input', ip=None, _=None):
+    # def __init__(self, purpose='input', ip=None, _=None):
+    def __init__(self, ip=None, _=None):
         if _ is None:
             _ = preference
         self.browser = \
             eval(f"webdriver.{_}(executable_path=driver_path('{_}'))")
         self.browser.implicitly_wait(10)
+        if isinstance(ip, (list, tuple)):
+            self.browser.get(f'http://{str(IP())}/equities')
+            for i in ip:
+                 if i in source.keys():
+                     hdr = source[i]['hyperlink']
+                     self.browser.execute_script(f"window.open({'hdr'},'{i}')")
         if ip in source.keys():
             self.lip = source[ip]['hyperlink']
-            self.browser.get(source[ip['hyperlink']])
+            self.browser.get(self.lip)
             self.wait = WebDriverWait(self.browser, 600)
             self.window0 = self.browser.window_handles[0]
         if ip is None:
@@ -47,14 +54,14 @@ class WFutures(object):
             self.window0 = self.browser.window_handles[0]
             self.browser.execute_script(f"window.open( \
                 'http://{self.lip}/equities','Local');")
-        if purpose == 'input':
-            self.__load(lf)
-            self.refresh(self.window0)
-        if purpose == 'auxiliary':
-            self.auxiliary_load()
-            self.refresh(self.window0)
-        if purpose == 'whatsapp':
-            self.auxiliary_load('WhatsApp')
+        # if purpose == 'input':
+        #     self.__load(lf)
+        #     self.refresh(self.window0)
+        # if purpose == 'auxiliary':
+        #     self.auxiliary_load()
+        #     self.refresh(self.window0)
+        # if purpose == 'whatsapp':
+        #     self.auxiliary_load('WhatsApp')
 
     def __del__(self):
         self.lip = self.browser = self.wait = self.pivot = self.eb = None
