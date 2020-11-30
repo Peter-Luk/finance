@@ -14,6 +14,8 @@ from pt_2 import festi
 local_tz = pytz.timezone('Asia/Hong_Kong')
 lf, preference = waf(), 'Firefox'
 milly = subject['Milly Ling']['whatsapp']['alias']
+fds = list(source.keys())
+[fds.remove(_) for _ in ['SMS', 'WhatsApp']]
 if today.day == ltd(today.year, today.month):
     lf = waf(1)
 
