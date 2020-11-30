@@ -42,7 +42,7 @@ class WFutures(object):
             for i in ip:
                 if i in source.keys():
                     hdr = source[i]['hyperlink']
-                    self.browser.execute_script(f"window.open('{hdr}','{i}')")
+                    self.browser.execute_script(f"window.open('{hdr}','{i}');")
         if ip in source.keys():
             self.lip = source[ip]['hyperlink']
             self.browser.get(self.lip)
