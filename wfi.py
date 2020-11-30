@@ -53,7 +53,7 @@ class WFutures(object):
         if purpose == 'auxiliary':
             self.auxiliary_load()
             self.refresh(self.window0)
-        if purpose == 'whatsapp'
+        if purpose == 'whatsapp':
             self.auxiliary_load('WhatsApp')
 
     def __del__(self):
