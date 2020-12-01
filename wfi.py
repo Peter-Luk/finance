@@ -348,7 +348,7 @@ class WFutures(object):
 
 
 def msend(wf, msg, rect=milly):
-    _wf = wf
+    _wf = copy.copy(wf)
     res = _wf.whatsend(rect, msg)
     return res
 
