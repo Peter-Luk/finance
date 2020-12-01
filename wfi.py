@@ -185,8 +185,10 @@ class WFutures(object):
         return self.__status(price, change, last)
 
     def whatsend(self, recipent, message, sender='Peter Luk'):
-        # self.goto('WhatsApp')
-        self.goto(self.window0)
+        try:
+            self.goto('WhatsApp')
+        except Exception:
+            self.goto(self.window0)
         x_arg = f'//span[contains(@title, {recipent})]'
         group_title = self.wait.until(EC.presence_of_element_located((
             By.XPATH, x_arg)))
