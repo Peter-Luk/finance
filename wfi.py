@@ -348,39 +348,39 @@ class WFutures(object):
 
 
 def msend(wf, msg, rect=milly):
-    _wf = copy.copy(wf)
+    _wf = copy.deepcopy(wf)
     res = _wf.whatsend(rect, msg)
     return res
 
 
 def dow(wf, _=True):
-    _wf = copy.copy(wf)
+    _wf = copy.deepcopy(wf)
     return _wf.usif('Dow', implied=_)
 
 
 def nq(wf, _=True):
-    _wf = copy.copy(wf)
+    _wf = copy.deepcopy(wf)
     return _wf.usif('Nasdaq', implied=_)
 
 
 def sp(wf, _=True):
-    _wf = copy.copy(wf)
+    _wf = copy.deepcopy(wf)
     return _wf.usif('S&P', implied=_)
 
 
 def nk(wf):
-    _wf = copy.copy(wf)
+    _wf = copy.deepcopy(wf)
     return _wf.nk225()
 
 
 def sc(wf):
-    _wf = copy.copy(wf)
+    _wf = copy.deepcopy(wf)
     return _wf.shanghai_composite()
 
 
 def display(wf, interval=50):
     from time import sleep
-    _wf = copy.copy(wf)
+    _wf = copy.deepcopy(wf)
     while True:
         try:
             print(f'Time: {datetime.now():%H:%M:%S}')
