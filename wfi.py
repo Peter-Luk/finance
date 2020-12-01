@@ -31,7 +31,6 @@ def fan(__='mhi', mt=True):
 class WFutures(object):
     from dateutil import relativedelta
 
-    # def __init__(self, purpose='input', ip=None, _=None):
     def __init__(self, ip=None, _=None):
         if _ is None:
             _ = preference
@@ -44,7 +43,8 @@ class WFutures(object):
             for i in ip:
                 if i in list(source.keys()):
                     hdr = source[i]['hyperlink']
-                    self.browser.execute_script(f"window.open('{hdr}','{i}');")
+                    self.browser.execute_script(
+                        f"window.open('{hdr}','{i}');")
         if ip in list(source.keys()):
             self.lip = source[ip]['hyperlink']
             self.browser.get(self.lip)
@@ -58,14 +58,6 @@ class WFutures(object):
             self.__load(lf)
             self.browser.execute_script(f"window.open( \
                 'http://{self.lip}/equities','Local');")
-        # if purpose == 'input':
-        #     self.__load(lf)
-        #     self.refresh(self.window0)
-        # if purpose == 'auxiliary':
-        #     self.auxiliary_load()
-        #     self.refresh(self.window0)
-        # if purpose == 'whatsapp':
-        #     self.auxiliary_load('WhatsApp')
 
     def __del__(self):
         self.lip = self.browser = self.wait = self.pivot = self.eb = None
@@ -361,12 +353,9 @@ class WFutures(object):
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
 
 
-# def msend(msg, rect=milly):
 def msend(wf, msg, rect=milly):
     _wf = wf
-    # _wf = WFutures('WhatsApp')
     res = _wf.whatsend(rect, msg)
-    # _wf.kill()
     return res
 
 
