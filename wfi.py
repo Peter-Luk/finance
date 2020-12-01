@@ -110,14 +110,6 @@ class WFutures(object):
             f'Delay: {_dstr(l_)}'])
         return _
 
-    # def auxiliary_load(self, _=['CNBC', 'NIKKEI', 'SINA', 'Gold']):
-    #     if not isinstance(_, (list, tuple)):
-    #         _ = [_]
-    #     for __ in _:
-    #         if __ in source.keys():
-    #             hdr = source[__]["hyperlink"]
-    #             self.browser.execute_script(f"window.open('{hdr}', '{__}');")
-
     def kill(self):
         self.browser.quit()
         del self.browser
