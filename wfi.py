@@ -42,10 +42,10 @@ class WFutures(object):
             self.browser.get(f'http://{str(IP())}/equities')
             self.window0 = self.browser.window_handles[0]
             for i in ip:
-                if i in source.keys():
+                if i in list(source.keys()):
                     hdr = source[i]['hyperlink']
                     self.browser.execute_script(f"window.open('{hdr}','{i}');")
-        if ip in source.keys():
+        if ip in list(source.keys()):
             self.lip = source[ip]['hyperlink']
             self.browser.get(self.lip)
             self.wait = WebDriverWait(self.browser, 600)
@@ -55,6 +55,7 @@ class WFutures(object):
             self.browser.get(f'http://{self.lip}/futures')
             self.wait = WebDriverWait(self.browser, 600)
             self.window0 = self.browser.window_handles[0]
+            self.__load(lf)
             self.browser.execute_script(f"window.open( \
                 'http://{self.lip}/equities','Local');")
         # if purpose == 'input':
@@ -192,7 +193,8 @@ class WFutures(object):
         return self.__status(price, change, last)
 
     def whatsend(self, recipent, message, sender='Peter Luk'):
-        self.goto('WhatsApp')
+        # self.goto('WhatsApp')
+        self.goto(self.window0)
         x_arg = f'//span[contains(@title, {recipent})]'
         group_title = self.wait.until(EC.presence_of_element_located((
             By.XPATH, x_arg)))
