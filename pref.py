@@ -1,4 +1,5 @@
-import pandas, pytz, numpy, sqlalchemy, yfinance
+# import pandas, pytz, numpy, sqlalchemy, yfinance
+import pandas, pytz, numpy, sqlalchemy
 from scipy.constants import golden_ratio
 from datetime import datetime
 from tqdm import tqdm
@@ -150,7 +151,8 @@ public_holiday[2021] = {
         10: (1, 14),
         12: (25, 27)}
 y2n = [
-        pandas, numpy, sqlalchemy, yfinance, golden_ratio, datetime, tqdm,
+        # pandas, numpy, sqlalchemy, yfinance, golden_ratio, datetime, tqdm,
+        pandas, numpy, sqlalchemy, golden_ratio, datetime, tqdm,
         sleep, B_scale, USHK]
 nta = [pandas, numpy, datetime, golden_ratio]
 alchemy = [
@@ -158,7 +160,8 @@ alchemy = [
         pandas, datetime]
 utils = [
         os.sep, os.environ, os.linesep, sys.platform, sys.version_info,
-        Path, sqlalchemy, yfinance, golden_ratio, sleep, datetime, driver,
+        # Path, sqlalchemy, yfinance, golden_ratio, sleep, datetime, driver,
+        Path, sqlalchemy, golden_ratio, sleep, datetime, driver,
         functools.reduce, public_holiday, subject, xvsa]
 periods = dict(
     Futures=dict(

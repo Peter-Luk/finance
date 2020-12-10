@@ -1,7 +1,8 @@
 import socket
 from pytz import timezone
 import pref
-sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, \
+# sep, environ, linesep, platform, version_info, Path, db, yf, gr, sleep, \
+sep, environ, linesep, platform, version_info, Path, db, gr, sleep, \
     datetime, driver, reduce, ph, subject, xvsa = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
@@ -185,6 +186,7 @@ def get_start(*args, **kwargs):
 
 
 def web_collect(*args, **kwargs):
+    import yfinance as yf
     src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 7, \
         datetime.today(), False, {}
     if args:

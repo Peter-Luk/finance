@@ -2,7 +2,8 @@ import pref
 from utilities import filepath
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
-pd, np, db, yf, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
+# pd, np, db, yf, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
+pd, np, db, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
 
 class Futures(AF, Viewer):
@@ -221,6 +222,7 @@ class Equities(AE, Viewer):
     def fetch(
             self, code=None, start=None, table=pref.db['Equities']['table'],
             exclude=pref.db['Equities']['exclude'], years=4, adhoc=False):
+        import yfinance as yf
         if not start:
             # start = pd.datetime(pd.datetime.now().year - years, 12, 31)
             start = datetime(datetime.now().year - years, 12, 31)
