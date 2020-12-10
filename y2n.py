@@ -2,7 +2,6 @@ import pref
 from utilities import filepath
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
-# pd, np, db, yf, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 pd, np, db, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
 
