@@ -119,7 +119,7 @@ def dictfcomp(*args, **kwargs):
 
 def ltd(year=year, month=month, excluded={}):
     t, ld = 0, [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    if not(year % 4):
+    if not year % 4:
         ld[1] += 1
     day = ld[month - 1]
     if excluded:
@@ -335,7 +335,7 @@ def rnd(n, decimal_place=0):
 
 
 def gratio(n1, n2, ratio=None, enhanced=False):
-    if not(ratio):
+    if not ratio:
         ratio = gr
     try:
         res = []
