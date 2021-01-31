@@ -10,7 +10,6 @@ start = datetime(datetime.today().year - 4, 12, 31).date()
 dir_, db_name, platform = '~', db['Equities']['name'], pathlib.sys.platform
 if platform in ['linux']:
     import yfinance as yf
-    ; import fix_yahoo_finance as yf
     dir_ = '~/storage/shared'
     if 'EXTERNAL_STORAGE' in pathlib.os.environ.keys():
         dir_ = '~/storage/external-1'
