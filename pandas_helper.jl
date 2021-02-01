@@ -13,6 +13,8 @@ if platform in ['linux']:
     dir_ = '~/storage/shared'
     if 'EXTERNAL_STORAGE' in pathlib.os.environ.keys():
         dir_ = '~/storage/external-1'
+    else:
+        dir_ = '~'
 dir_ += f'/data/sqlite3/{db_name}'
 path = pathlib.Path(dir_)
 engine = sqa.create_engine(f'sqlite:///{path.expanduser()}')
