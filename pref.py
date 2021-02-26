@@ -23,7 +23,8 @@ subject = {
             secondary=90757228,
             home=27600722),
         whatsapp=dict(
-            input={90757228: '_1awRl'},
+            # input={90757228: '_1awRl'},
+            input={90757228: '_2_1wd'},
             alias='"陸永原"')),
     'Milly Ling': dict(
         mobile=dict(
