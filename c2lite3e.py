@@ -325,8 +325,7 @@ Worker object for manipulate and transfer data from file system to database.
         self.fields, self.values = [], []
         self.__data = self.get(self.code)
         self.__stored_data = self.conn.cursor().execute(
-            f"SELECT * FROM {db_table} \
-    WHERE eid={int(self.code.split('.')[0]):%i} ORDER BY date ASC").fetchall()
+            f"SELECT * FROM {db_table} WHERE eid={int(self.code.split('.')[0])} ORDER BY date ASC").fetchall()
 
     def __del__(self):
         self.conn.close()
