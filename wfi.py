@@ -377,7 +377,7 @@ def sc(wf):
     return _wf.shanghai_composite()
 
 
-def display(wf, interval=50):
+def display(wf, interval=47):
     from time import sleep
     while True:
         print(f'Time: {datetime.now():%H:%M:%S}')
