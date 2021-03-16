@@ -77,6 +77,7 @@ xvsa = dict(zip(
     ['copyable-text selectable-text', '6', 'ltr', 'true', 'true']))
 B_scale = dict(
     BABA=1 / 8,
+    BIDU=1 / 8,
     YUMC=1,
     NTES=1 / 5,
     JD=1 / 2)

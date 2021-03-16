@@ -215,7 +215,7 @@ class WFutures(object):
             './div[5]').text)[1:])
         try:
             last = source[site]['tz'].localize(datetime.strptime(
-                _l, '%a %b %d %Y %I:%M %p EST'))
+                _l, '%a %b %d %Y %I:%M %p EDT'))
         except Exception:
             last = source[site]['tz'].localize(datetime.strptime(
                 _l, '%a %b %d %Y'))
@@ -384,6 +384,11 @@ def display(wf, interval=47):
         try:
             _d = dow(wf)
             print(f'Dow:\t{_d[0]}\t{_d[1]}\t{_d[2]}\t{_d[-1]}')
+        except Exception:
+            pass
+        try:
+            _d = nq(wf)
+            print(f'Nasdaq:\t{_d[0]}\t{_d[1]}\t{_d[2]}\t{_d[-1]}')
         except Exception:
             pass
         try:
