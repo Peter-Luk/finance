@@ -78,6 +78,7 @@ xvsa = dict(zip(
 B_scale = dict(
     BABA=1 / 8,
     BIDU=1 / 8,
+    BILI=1,
     YUMC=1,
     NTES=1 / 5,
     JD=1 / 2)
