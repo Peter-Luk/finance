@@ -27,9 +27,16 @@ class Record(object):
         self.sid = engine = self._table = self._columns = self._connect = None
         del(self.sid, engine, self._table, self._columns, self._connect)
 
-    def grab(self):
-        qstr = f"SELECT date, time, sys, dia, pulse FROM records \
-                WHERE subject_id={self.sid}"
+    def grab(self, criteria={}):
+        rf = ['date', 'time', 'sys', 'dia', 'pulse']
+        criteria['subject_id'] = self.sid
+        clist = []
+        for k, v in criteria.items():
+            _ = f"{k}='{v}'"
+            if isinstance(v, int): _ = f'{k}={v}'
+            clist.append(_)
+        qstr = f"SELECT {', '.join(rf)} FROM records \
+                WHERE {' and '.join(clist)}"
         rd = pd.read_sql(qstr, self._connect)
 #         def stime(_):
 #             if isinstance(_, str):
@@ -50,6 +57,29 @@ class Record(object):
         rd.index = rd.apply(comdt, axis=1)
         rd.drop(['date', 'time'], axis=1, inplace=True)
         return rd
+
+    def alter_time(self, correct, criteria, backward=True):
+        import datetime
+
+        def idtime(criteria=criteria):
+            if isinstance(criteria, dict):
+                criteria['subject_id'] = self.sid
+                clist = []
+                for k, v in criteria.items():
+                    __ = f"{k}='{v}'"
+                    if isinstance(v, int): __ = f'{k}={v}'
+                clist.append(__)
+            return pd.read_sql(f"SELECT id, time FROM records WHERE {' and '.join(clist)}", self.connect)
+
+        if isinstance(collect, (tuple, list)):
+            idt = idtime()
+            if len(collect) == 2:
+                sec = float(idt['time'][0].split(':')[-1])
+                _ = datetime.time(collect[0], collect[1], sec)
+            if len(collect) == 3:
+                _ = datetime.time(collect[0], collect[1], collect[2])
+        qstr = f"UPDATE records SET time={_} WHERE id={int(idt['id'][0])}"
+        pd.read_sql(qstr, self.connect)
 
     def append(self, *args):
         from pytz import timezone
