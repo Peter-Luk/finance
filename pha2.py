@@ -74,7 +74,7 @@ class Record(object):
         if isinstance(correct, (tuple, list)):
             _d = idtime()
             if _d:
-                _dt = _d[1].split(':')
+                _dt = [int(float(x)) for x in _d[1].split(':')]
                 idt = datetime.time(_dt[0], _dt[1], _dt[2])
                 if len(correct) == 2:
                     _ = datetime.time(correct[0], correct[1], idt.second)
