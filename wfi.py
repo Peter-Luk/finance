@@ -377,7 +377,7 @@ def sc(wf):
     return _wf.shanghai_composite()
 
 
-def display(wf, interval=47):
+def display(wf, interval=0):
     from time import sleep
     while True:
         print(f'Time: {datetime.now():%H:%M:%S}')
@@ -401,4 +401,6 @@ def display(wf, interval=47):
             print(f'Sha C.:\t{_s[0]}\t{_s[1]}\t{_s[2]}\t{_s[-1]}\n')
         except Exception:
             pass
-        sleep(interval)
+        itv = interval
+        if interval <= 0: itv = random.randint(47,59)
+        sleep(itv)
