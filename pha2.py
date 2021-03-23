@@ -69,17 +69,19 @@ class Record(object):
                     __ = f"{k}='{v}'"
                     if isinstance(v, int): __ = f'{k}={v}'
                 clist.append(__)
-            return pd.read_sql(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}", self._connect)
+            return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchone()
 
         if isinstance(correct, (tuple, list)):
-            _dt = idtime()['time'][0].split(':')
-            idt = datetime.time(_dt[0], _dt[1], _dt[2])
-            if len(correct) == 2:
-                _ = datetime.time(correct[0], correct[1], idt.second)
-            if len(correct) == 3:
-                _ = datetime.time(correct[0], correct[1], correct[2])
-        qstr = f"UPDATE records SET time={_} WHERE id={int(_dt['id'][0])}"
-        self._connect.execute(qstr)
+            _d = idtime()
+            if _d:
+                _dt = _d[1].split(':')
+                idt = datetime.time(_dt[0], _dt[1], _dt[2])
+                if len(correct) == 2:
+                    _ = datetime.time(correct[0], correct[1], idt.second)
+                if len(correct) == 3:
+                    _ = datetime.time(correct[0], correct[1], correct[2])
+            qstr = f"UPDATE records SET time={_} WHERE id={int(_d[0])}"
+            self._connect.execute(qstr)
 
     def append(self, *args):
         from pytz import timezone
