@@ -82,7 +82,7 @@ class Record(object):
                     _ = datetime.time(correct[0], correct[1], idt.second)
                 if len(correct) == 3:
                     _ = datetime.time(correct[0], correct[1], correct[2])
-            qstr = f"UPDATE records SET time={_} WHERE id={int(_d[0])}"
+            qstr = f"UPDATE records SET time='{_}' WHERE id={int(_d[0])}"
             self._connect.execute(qstr)
 
     def append(self, *args):
