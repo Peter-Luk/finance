@@ -77,11 +77,11 @@ class Record(object):
                 _dt = _d[1].split(':')[:-1]
                 _dt.extend(_d[1].split(':')[-1].split('.'))
                 _dt = [int(x) for x in _dt]
-                idt = datetime.time(_dt[0], _dt[1], _dt[2])
+                idt = datetime.time(_dt[0], _dt[1], _dt[2], _dt[-1])
                 if len(correct) == 2:
-                    _ = datetime.time(correct[0], correct[1], idt.second)
+                    _ = datetime.time(correct[0], correct[1], idt.second, _dt[-1])
                 if len(correct) == 3:
-                    _ = datetime.time(correct[0], correct[1], correct[2])
+                    _ = datetime.time(correct[0], correct[1], correct[2], _dt[-1])
             qstr = f"UPDATE records SET time='{_}' WHERE id={int(_d[0])}"
             self._connect.execute(qstr)
 
