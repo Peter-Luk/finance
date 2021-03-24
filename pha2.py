@@ -77,7 +77,7 @@ class Record(object):
                 _dt = _d[1].split(':')[:-1]
                 _dt.extend(_d[1].split(':')[-1].split('.'))
                 _dt = [int(x) for x in _dt]
-                idt = datetime.time(_dt[0], _dt[1], _dt[2], _dt[3])
+                idt = datetime.time(_dt[0], _dt[1], _dt[2])
                 if len(correct) == 2:
                     _ = datetime.time(correct[0], correct[1], idt.second)
                 if len(correct) == 3:
