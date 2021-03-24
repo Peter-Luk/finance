@@ -69,13 +69,15 @@ class Record(object):
                     __ = f"{k}='{v}'"
                     if isinstance(v, int): __ = f'{k}={v}'
                 clist.append(__)
-            return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchone()
+            return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchall()[-1]
 
         if isinstance(correct, (tuple, list)):
             _d = idtime()
             if _d:
-                _dt = [int(float(x)) for x in _d[1].split(':')]
-                idt = datetime.time(_dt[0], _dt[1], _dt[2])
+                _dt = _d[1].split(':')[:-1]
+                _dt.extend(_d[1].split(':')[-1].split('.'))
+                _dt = [int(x) for x in _dt]
+                idt = datetime.time(_dt[0], _dt[1], _dt[2], _dt[3])
                 if len(correct) == 2:
                     _ = datetime.time(correct[0], correct[1], idt.second)
                 if len(correct) == 3:
