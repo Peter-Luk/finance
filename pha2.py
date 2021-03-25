@@ -74,15 +74,19 @@ class Record(object):
         if isinstance(correct, (tuple, list)):
             _d = idtime()
             if _d:
-                _dt = _d[1].split(':')[:-1]
-                _dt.extend(_d[1].split(':')[-1].split('.'))
-                _dt = [int(x) for x in _dt]
-                idt = datetime.time(_dt[0], _dt[1], _dt[2], _dt[-1])
+                yr, mt, dy = [int(_) for _ in _d[-1].split('-')]
+                rd = datetime.date(yr, mt, dy)
+                rt = _d[1].split(':')[:-1]
+                rt.extend(_d[1].split(':')[-1].split('.'))
+                rt = [int(x) for x in rt]
+                idt = datetime.time(rt[0], rt[1], rt[2], rt[-1])
                 if len(correct) == 2:
-                    _ = datetime.time(correct[0], correct[1], idt.second, _dt[-1])
+                    _ = datetime.time(correct[0], correct[1], idt.second, idt.microsecond)
                 if len(correct) == 3:
-                    _ = datetime.time(correct[0], correct[1], correct[2], _dt[-1])
-            qstr = f"UPDATE records SET time='{_}' WHERE id={int(_d[0])}"
+                    _ = datetime.time(correct[0], correct[1], correct[2], idt.microsecond)
+                if backward and (_ > idt):
+                    rd = rd.fromordinal(rd.toordinal() - 1)
+            qstr = f"UPDATE records SET time='{_}', date='{rd}' WHERE id={int(_d[0])}"
             self._connect.execute(qstr)
 
     def append(self, *args):
