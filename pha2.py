@@ -72,7 +72,7 @@ class Record(object):
             return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchall()[-1]
 
         if isinstance(correct, (tuple, list)):
-            _d = idtime()
+            c_dict, _d = {}, idtime()
             if _d:
                 yr, mt, dy = [int(_) for _ in _d[-1].split('-')]
                 rd = datetime.date(yr, mt, dy)
@@ -86,7 +86,10 @@ class Record(object):
                     _ = datetime.time(correct[0], correct[1], correct[2], idt.microsecond)
                 if backward and (_ > idt):
                     rd = rd.fromordinal(rd.toordinal() - 1)
-            qstr = f"UPDATE records SET time='{_}', date='{rd}' WHERE id={int(_d[0])}"
+            c_dict['time'] = _
+            c_dict['date'] = rd
+            cstr = ', '.join([f"{k}='{v}'" for k, v in c_dict.items()])
+            qstr = f"UPDATE records SET {c_dict} WHERE id={int(_d[0])}"
             self._connect.execute(qstr)
 
     def append(self, *args):
