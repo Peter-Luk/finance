@@ -118,3 +118,45 @@ class Record(object):
                 now = datetime.now().astimezone(timezone(self.tz))
                 hdr['date'], hdr['time'] = now.date(), now.time()
                 self._connect.execute(query, [hdr])
+
+
+if __name__ == "__main__":
+    from pathlib import sys
+
+    def process(i, s, d, p, r):
+        _ = Record(i)
+        _.append(int(s), int(d), int(p), r)
+
+    sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
+    if datetime.today().hour < 13:
+        dk = 'wake up, washed before breakfast'
+
+    while confirm.upper() != 'N':
+        if sys.version_info.major == 2:
+            sd = raw_input("Subject ID")
+            try:
+                sd = int(sd)
+            except Exception:
+                sd = sid
+            sy = raw_input("Systolic: ")
+            dia = raw_input("Diastolic: ")
+            pul = raw_input("Pulse: ")
+            rmk = raw_input("Remark: ")
+            if rmk == '':
+                rmk = dk
+            process(sd, sy, dia, pul, rmk)
+            confirm = raw_input("Others? (Y)es/(N)o: ")
+        if sys.version_info.major == 3:
+            sd = input(f"Subject ID (default: {sid}): ")
+            try:
+                sd = int(sd)
+            except Exception:
+                sd = sid
+            sy = input("Systolic: ")
+            dia = input("Diastolic: ")
+            pul = input("Pulse: ")
+            rmk = input(f"Remark (default: {dk}): ")
+            if rmk == '':
+                rmk = dk
+            process(sd, sy, dia, pul, rmk)
+            confirm = input("Others? (Y)es/(N)o: ")
