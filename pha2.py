@@ -65,7 +65,7 @@ class Record(object):
                 clist.append(__)
             return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchall()[-1]
 
-        if vars.has_key('time') and isinstance(vars['time'], (tuple, list)):
+        if 'time' in vars.keys() and isinstance(vars['time'], (tuple, list)):
             c_dict, _d = {}, idtime()
             if _d:
                 yr, mt, dy = [int(_) for _ in _d[-1].split('-')]
