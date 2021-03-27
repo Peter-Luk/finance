@@ -68,7 +68,7 @@ class Record(object):
         for  i in  ['sys', 'dia', 'pulse']:
             if i in values.keys():
                 if isinstance(values[i], int):
-                c_dict[i] = values[i]
+                    c_dict[i] = values[i]
 
         if 'remarks' in values.keys() and isinstance(values['remarks'], str):
             c_dict['remarks'] = values['remarks']
