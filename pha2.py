@@ -80,11 +80,11 @@ class Record(object):
                     _ = datetime.time(vars['time'][0], vars['time'][1], vars['time'][2], idt.microsecond)
                 if backward and (_ > idt):
                     rd = rd.fromordinal(rd.toordinal() - 1)
-            c_dict['time'] = _
-            c_dict['date'] = rd
-            cstr = ', '.join([f"{k}='{v}'" for k, v in c_dict.items()])
-            qstr = f"UPDATE records SET {c_dict} WHERE id={int(_d[0])}"
-            self._connect.execute(qstr)
+                c_dict['time'] = _
+                c_dict['date'] = rd
+        cstr = ', '.join([f"{k}='{v}'" for k, v in c_dict.items()])
+        qstr = f"UPDATE records SET {c_dict} WHERE id={int(_d[0])}"
+        self._connect.execute(qstr)
 
     def append(self, *args):
         from pytz import timezone
