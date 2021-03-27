@@ -74,23 +74,28 @@ class Record(object):
             c_dict['remarks'] = values['remarks']
 
         if 'time' in values.keys():
+            _d = idtime()
+            if _d:
+                yr, mt, dy = [int(_) for _ in _d[-1].split('-')]
+                rd = datetime.date(yr, mt, dy)
+                rt = _d[1].split(':')[:-1]
+                rt.extend(_d[1].split(':')[-1].split('.'))
+                rt = [int(x) for x in rt]
+                idt = datetime.time(rt[0], rt[1], rt[2], rt[-1])
+
+            if isinstance(values['time'], datetime.time):
+                _ = values['time']
+
             if isinstance(values['time'], (tuple, list)):
-                _d = idtime()
-                if _d:
-                    yr, mt, dy = [int(_) for _ in _d[-1].split('-')]
-                    rd = datetime.date(yr, mt, dy)
-                    rt = _d[1].split(':')[:-1]
-                    rt.extend(_d[1].split(':')[-1].split('.'))
-                    rt = [int(x) for x in rt]
-                    idt = datetime.time(rt[0], rt[1], rt[2], rt[-1])
-                    if len(values['time']) == 2:
-                        _ = datetime.time(values['time'][0], values['time'][1], idt.second, idt.microsecond)
-                    if len(values['time']) == 3:
-                        _ = datetime.time(values['time'][0], values['time'][1], values['time'][2], idt.microsecond)
-                    if backward and (_ > idt):
-                        rd = rd.fromordinal(rd.toordinal() - 1)
-                c_dict['time'] = _
-                c_dict['date'] = rd
+                if len(values['time']) == 2:
+                    _ = datetime.time(values['time'][0], values['time'][1], idt.second, idt.microsecond)
+                if len(values['time']) == 3:
+                    _ = datetime.time(values['time'][0], values['time'][1], values['time'][2], idt.microsecond)
+
+            if backward and (_ > idt):
+                rd = rd.fromordinal(rd.toordinal() - 1)
+            c_dict['time'] = _
+            c_dict['date'] = rd
         cstr = ', '.join([f"{k}='{v}'" for k, v in c_dict.items()])
         qstr = f"UPDATE records SET {c_dict} WHERE id={int(_d[0])}"
         self._connect.execute(qstr)
