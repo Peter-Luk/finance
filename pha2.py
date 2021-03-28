@@ -77,7 +77,7 @@ class Record(object):
             if isinstance(values['date'], datetime.date):
                 c_dict['date'] = values['date']
             if isinstance(values['date'], (tuple, list)):
-                yr, mn, dy = values['date']
+                yr, mn, dy = [int(_) for _ in values['date']]
                 c_dict['date'] = datetime.date(yr, mn, dy)
 
         if 'time' in values.keys():
