@@ -73,6 +73,13 @@ class Record(object):
         if 'remarks' in values.keys() and isinstance(values['remarks'], str):
             c_dict['remarks'] = values['remarks']
 
+        if 'date' in values.keys():
+            if isinstance(values['date'], datetime.date):
+                c_dict['date'] = values['date']
+            if isinstance(values['date'], (tuple, list)):
+                yr, mn, dy = values['date']
+                c_dict['date'] = datetime.date(yr, mn, dy)
+
         if 'time' in values.keys():
             _d = idtime()
             if _d:
