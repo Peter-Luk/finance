@@ -104,7 +104,7 @@ class Record(object):
             c_dict['time'] = f"{_}"
             c_dict['date'] = f"{rd}"
             if isinstance(values['date'], datetime.date):
-                c_dict['date'] = values['date']
+                c_dict['date'] = f"{values['date']}"
 
         cstr = ', '.join([f"{k}='{v}'" for k, v in c_dict.items()])
         qstr = f"UPDATE records SET {c_dict} WHERE id={int(_d[0])}"
