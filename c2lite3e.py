@@ -173,7 +173,9 @@ Original obtain daily update thru API (Yahoo) via Pandas DataReader
 but depicted since 0.6, cuurently using 'fix yahoo finance' to scrape data and
 update 'local' database.
     """
-    ic, aid = 0, [_ for _ in get_stored_eid() if _ not in [805, 1828]]
+    # ic, aid = 0, [_ for _ in get_stored_eid() if _ not in [805, 1828]]
+    ic = 0
+    aid = [_ for _ in get_stored_eid() if _ not in pref.db['Equities']['exclude']]
     period = 20
     lkw = list(kwargs.keys())
     if 'period' in lkw:
