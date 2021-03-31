@@ -103,11 +103,11 @@ class Record(object):
                 rd = rd.fromordinal(rd.toordinal() - 1)
             c_dict['time'] = f"{_}"
             c_dict['date'] = f"{rd}"
-            if isinstance(values['date'], datetime.date):
-                c_dict['date'] = f"{values['date']}"
+            # if isinstance(values['date'], datetime.date):
+            #     c_dict['date'] = f"{values['date']}"
 
         cstr = ', '.join([f"{k}='{v}'" for k, v in c_dict.items()])
-        qstr = f"UPDATE records SET {c_dict} WHERE id={int(_d[0])}"
+        qstr = f"UPDATE records SET {cstr} WHERE id={int(_d[0])}"
         self._connect.execute(qstr)
 
     def append(self, *args):
