@@ -187,7 +187,7 @@ class WFutures(object):
             By.XPATH, x_arg)))
         group_title.click()
         input_box = self.wait.until(EC.presence_of_element_located((
-            By.XPATH, "//div[contains(@class, 'copyable-text selectable-text') and contains(@contenteditable,'true')]")))
+            By.XPATH, "//div[contains(@class, 'copyable-text selectable-text') and contains(@data-tab,'6') and contains(@contenteditable,'true')]")))
             # By.XPATH, f'//div{div_input(sender)}')))
         input_box.send_keys(message + Keys.ENTER)
         return ' @ '.join((
