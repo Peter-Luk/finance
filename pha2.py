@@ -70,14 +70,32 @@ class Record(object):
                 if isinstance(values[i], int):
                     c_dict[i] = values[i]
 
-        if 'sys' in values.keys() and isinstance(values['sys'], int):
-            c_dict['sys'] = values['sys']
+        if 'sys' in values.keys():
+            if isinstance(values['sys'], int):
+                c_dict['sys'] = values['sys']
+            if isinstance(values['sys'], str):
+                try:
+                    c_dict['sys'] = int(values['sys'])
+                except Exception:
+                    pass
 
-        if 'dia' in values.keys() and isinstance(values['dia'], int):
-            c_dict['dia'] = values['dia']
+        if 'dia' in values.keys():
+            if isinstance(values['dia'], int):
+                c_dict['dia'] = values['dia']
+            if isinstance(values['dia'], str):
+                try:
+                    c_dict['dia'] = int(values['dia'])
+                except Exception:
+                    pass
 
-        if 'pulse' in values.keys() and isinstance(values['pulse'], int):
-            c_dict['pulse'] = values['pulse']
+        if 'pulse' in values.keys():
+            if isinstance(values['pulse'], int):
+                c_dict['pulse'] = values['pulse']
+            if isinstance(values['pulse'], str):
+                try:
+                    c_dict['pulse'] = int(values['pulse'])
+                except Exception:
+                    pass
 
         if 'remarks' in values.keys() and isinstance(values['remarks'], str):
             c_dict['remarks'] = values['remarks']
