@@ -13,11 +13,11 @@ month_initial = dict(zip(
 avail_indicators, cal_month = ('wma', 'kama', 'ema', 'hv'), (3, 6, 9, 12)
 
 
-def div_input(_):
-    mb = subject[_]['mobile']['secondary']
-    xvsa['class'] = ' '.join((
-        subject[_]['whatsapp']['input'][mb], xvsa['class']))
-    return ''.join([f'[@{k}="{v}"]' for k, v in xvsa.items()])
+# def div_input(_):
+#     mb = subject[_]['mobile']['secondary']
+#     xvsa['class'] = ' '.join((
+#         subject[_]['whatsapp']['input'][mb], xvsa['class']))
+#     return ''.join([f'[@{k}="{v}"]' for k, v in xvsa.items()])
 
 
 def driver_path(browser):
