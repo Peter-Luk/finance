@@ -1,14 +1,16 @@
 import re
 import random
 import copy
-from utilities import div_input, driver_path, today, ltd, waf, mtf, IP, datetime
+from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
+# from utilities import div_input, driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from y2n import Futures
-from pref import source, fields, subject, pytz
+from pref import xvsa, source, fields, subject, pytz
+# from pref import source, fields, subject, pytz
 from pt_2 import festi
 
 local_tz = pytz.timezone('Asia/Hong_Kong')
@@ -184,8 +186,10 @@ class WFutures(object):
         group_title = self.wait.until(EC.presence_of_element_located((
             By.XPATH, x_arg)))
         group_title.click()
+        sxv = ' and '.join([f"contains(@{k}, '{v}')" for k, v in xvsa.items()])
         input_box = self.wait.until(EC.presence_of_element_located((
-            By.XPATH, "//div[contains(@class, 'copyable-text selectable-text') and contains(@data-tab,'6') and contains(@contenteditable,'true')]")))
+            By.XPATH, f"//div[{sxv}]")))
+            # By.XPATH, "//div[contains(@class, 'copyable-text selectable-text') and contains(@data-tab,'6') and contains(@contenteditable,'true')]")))
             # By.XPATH, f'//div{div_input(sender)}')))
         input_box.send_keys(message + Keys.ENTER)
         return ' @ '.join((

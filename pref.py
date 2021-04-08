@@ -23,7 +23,6 @@ subject = {
             secondary=90757228,
             home=27600722),
         whatsapp=dict(
-            # input={90757228: '_1awRl'},
             input={90757228: '_2_1wd'},
             alias='"陸永原"')),
     'Milly Ling': dict(
@@ -79,6 +78,7 @@ B_scale = dict(
     BABA=1 / 8,
     BIDU=1 / 8,
     BILI=1,
+    TCOM=1,
     YUMC=1,
     NTES=1 / 5,
     JD=1 / 2)
