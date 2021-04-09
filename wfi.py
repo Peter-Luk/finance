@@ -187,7 +187,6 @@ class WFutures(object):
         sxv = ' and '.join([f"contains(@{k}, '{v}')" for k, v in xvsa.items()])
         input_box = self.wait.until(EC.presence_of_element_located((
             By.XPATH, f"//div[{sxv}]")))
-            # By.XPATH, f'//div{div_input(sender)}')))
         input_box.send_keys(message + Keys.ENTER)
         return ' @ '.join((
             f'Message successfully sent to {recipent}',

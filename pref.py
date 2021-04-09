@@ -162,7 +162,7 @@ alchemy = [
 utils = [
         os.sep, os.environ, os.linesep, sys.platform, sys.version_info,
         Path, sqlalchemy, golden_ratio, sleep, datetime, driver,
-        functools.reduce, public_holiday, subject, xvsa]
+        functools.reduce, public_holiday, subject]
 periods = dict(
     Futures=dict(
         macd=dict(
