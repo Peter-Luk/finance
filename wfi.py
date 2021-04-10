@@ -175,7 +175,7 @@ class WFutures(object):
             change = '0'
         return self.__status(price, change, last)
 
-    def whatsend(self, recipent, message, sender='Peter Luk'):
+    def whatsend(self, recipent, message):
         try:
             self.goto('WhatsApp')
         except Exception:
