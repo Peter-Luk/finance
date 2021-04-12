@@ -25,6 +25,12 @@ subject = {
         whatsapp=dict(
             input={90757228: '_2_1wd'},
             alias='"陸永原"')),
+    'Grace Wu': dict(
+        mobile=dict(
+            primary=54761657,
+            home=26150456),
+        whatsapp=dict(
+            alias='"胡碧茜Grace"')),
     'Milly Ling': dict(
         mobile=dict(
             primary=90107008,
