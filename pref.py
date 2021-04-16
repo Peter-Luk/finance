@@ -42,6 +42,11 @@ subject = {
             primary='+65 83826103'),
         whatsapp=dict(
             alias='"Wong Mickey"')),
+    'Niana Mak': dict(
+        mobile=dict(
+            primary=91096866),
+        whatsapp=dict(
+            alias='"Ms Niana Siu Chu Mak"')),
     'Vincent Wong': dict(
         mobile=dict(
             primary=66501982),
