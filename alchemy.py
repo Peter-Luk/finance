@@ -289,7 +289,7 @@ class AF(AS):
     def combine(self, freq='bi-daily'):
         if freq.lower() == 'bi-daily':
             rd = {}
-            qstr = f"select date, session, open, high, low, close, volume from records where code='{self.code}' order by session desc"
+            qstr = f"select date, open, high, low, close, volume from records where code='{self.code}' order by session desc"
             _ = pd.read_sql(qstr, self.connect)
             for i in _.date.unique():
                 td = {}
