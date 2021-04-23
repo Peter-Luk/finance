@@ -287,7 +287,6 @@ class AF(AS):
         trans.commit()
 
     def combine(self, freq='bi-daily'):
-#         code = self.code
         if freq.lower() == 'bi-daily':
             rd = {}
             qstr = f"select date, session, open, high, low, close, volume from records where code='{self.code}' order by session desc"
@@ -304,39 +303,4 @@ class AF(AS):
             p_ = pd.DataFrame.from_dict(rd, orient='index')
             p_.index = p_.index.astype('datetime64[ns]')
             p_.index.name = 'Date'
-#             res = []
-#             for _ in [__[0] for __ in self.connect.execute(db.select([self.columns.date.distinct()]).where(self.columns.code == code).order_by(db.asc(self.columns.date))).fetchall()]:
-#                 tmp = {}
-#                 __ = self.connect.execute(db.select([self.columns.session, self.columns.open, self.columns.high, self.columns.low, self.columns.close, self.columns.volume]).where(db.and_(self.columns.code == code, self.columns.date == _))).fetchall()
-#                 p_ = pd.DataFrame(__)
-#                 p_.columns = __[0].keys()
-#                 p_.set_index('session', inplace=True)
-#                 if len(p_) == 1:
-#                     try:
-#                         tmp['open'] = p_['open']['M']
-#                         tmp['high'] = p_['high']['M']
-#                         tmp['low'] = p_['low']['M']
-#                         tmp['close'] = p_['close']['M']
-#                         tmp['volume'] = p_['volume']['M']
-#                     except Exception:
-#                         tmp['open'] = p_['open']['A']
-#                         tmp['high'] = p_['high']['A']
-#                         tmp['low'] = p_['low']['A']
-#                         tmp['close'] = p_['close']['A']
-#                         tmp['volume'] = p_['volume']['A']
-#                 elif len(p_) == 2:
-#                     tmp['open'] = p_['open']['M']
-#                     tmp['high'] = p_['high'].max()
-#                     tmp['low'] = p_['low'].min()
-#                     tmp['close'] = p_['close']['A']
-#                     tmp['volume'] = p_['volume'].sum()
-#                 tmp['date'] = _
-#                 res.append(tmp)
-#             _ = pd.DataFrame(res)
-#             _.set_index(self._conf['index'], inplace=True)
-#             p_ = pd.DataFrame([
-#                 _['open'], _['high'], _['low'], _['close'], _['volume']]).T
-#             p_.index = p_.index.astype('datetime64[ns]')
-#             p_.index.name = p_.index.name.capitalize()
-#             p_.columns = [_.capitalize() for _ in p_.columns]
             return p_
