@@ -291,7 +291,7 @@ class AF(AS):
             rd = {}
             sc = self.columns
             fl = [db.column('date'), sc.open, sc.high, sc.low, sc.close, sc.volume]
-            qstr =db.select(fl).where(sc.code==self.code).order_by(db.desc(sc.session))
+            qstr = db.select(fl).where(sc.code==self.code).order_by(db.desc(sc.session))
             _ = pd.read_sql(qstr, self.connect)
             for i in _.date.unique():
                 td = {}
