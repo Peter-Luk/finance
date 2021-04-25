@@ -138,7 +138,7 @@ class Record(object):
 
 
 def rome(data, field, period=14):
-    if field in data.columns:
+    if isinstance(data, pd.core.frame.DataFrame) and field in data.columns:
         return data[field].rolling(period).mean()
 
 
