@@ -113,6 +113,10 @@ class Record(object):
         qstr = f"UPDATE records SET {cstr} WHERE id={int(_d[0])}"
         self._connect.execute(qstr)
 
+    def rome(self, field, period=14):
+        data = self.grab()
+        return rome(data, field, period)
+
     def append(self, *args):
         from pytz import timezone
         if args:
@@ -131,6 +135,11 @@ class Record(object):
                 now = datetime.now().astimezone(timezone(self.tz))
                 hdr['date'], hdr['time'] = now.date(), now.time()
                 self._connect.execute(query, [hdr])
+
+
+def rome(data, field, period=14):
+    if field in data.columns:
+        return data[field].rolling(period).mean()
 
 
 if __name__ == "__main__":
