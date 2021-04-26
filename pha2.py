@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine, MetaData, Table, insert, update
+from sqlalchemy import create_engine, MetaData, Table, insert, update, text, select
 from utilities import filepath, datetime
 
 
@@ -28,15 +28,16 @@ class Record(object):
         del(self.sid, engine, self._table, self._columns, self._connect)
 
     def grab(self, criteria={}):
-        rf = ['date', 'time', 'sys', 'dia', 'pulse']
+        sc = self._columns
         criteria['subject_id'] = self.sid
         clist = []
         for k, v in criteria.items():
             _ = f"{k}='{v}'"
             if isinstance(v, int): _ = f'{k}={v}'
             clist.append(_)
-        qstr = f"SELECT {', '.join(rf)} FROM records \
-                WHERE {' and '.join(clist)}"
+        qstr = select([sc.date, sc.time, sc.sys, sc.dia, sc.pulse])
+        for i in clist:
+            qstr = qstr.where(text(i))
         rd = pd.read_sql(qstr, self._connect)
 
         def comdt(_):
