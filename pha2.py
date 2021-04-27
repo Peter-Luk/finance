@@ -29,15 +29,15 @@ class Record(object):
 
     def grab(self, criteria={}):
         sc = self._columns
-        criteria['subject_id'] = self.sid
+        rl = [sc.date, sc.time, sc.sys, sc.dia, sc.pulse]
         clist = []
         for k, v in criteria.items():
             _ = f"{k}='{v}'"
             if isinstance(v, int): _ = f'{k}={v}'
             clist.append(_)
-        qstr = select([sc.date, sc.time, sc.sys, sc.dia, sc.pulse])
+        qstr = select(rl).filter(sc.subject_id==self.sid)
         for i in clist:
-            qstr = qstr.where(text(i))
+            qstr = qstr.filter(text(i))
         rd = pd.read_sql(qstr, self._connect)
 
         def comdt(_):
