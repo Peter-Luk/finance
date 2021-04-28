@@ -58,45 +58,33 @@ class Record(object):
         def idtime(criteria=criteria):
             if isinstance(criteria, dict):
                 criteria['subject_id'] = self.sid
-#                 clist = []
-#                 for k, v in criteria.items():
-#                     __ = f"{k}='{v}'"
-#                     if isinstance(v, int): __ = f'{k}={v}'
-#                 clist.append(__)
-                qstr = select([self._columns.id, self._columns.time, self._columns.date])
+                clist = []
                 for k, v in criteria.items():
-                    if k == 'date':
-                        qstr = qstr.filter(self._columns[k]==DateTime(datetime.datetime.strptime(v, '%Y-%m-%d')))
-                    else:
-                        qstr = qstr.filter(self._columns[k]==v)
-            return self._connect.execute(qstr).fetchall()[-1]
-#             return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchall()[-1]
+                    __ = f"{k}='{v}'"
+                    if isinstance(v, int): __ = f'{k}={v}'
+                clist.append(__)
+            return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchall()[-1]
 
         c_dict = {}
         for i in ['sys', 'dia', 'pulse']:
             if i in values.keys():
                 if isinstance(values[i], int):
                     c_dict[self._columns[i]] = values[i]
-#                     c_dict[i] = values[i]
                 if isinstance(values[i], str):
                     try:
                         c_dict[self._columns[i]] = int(values[i])
-#                         c_dict[i] = int(values[i])
                     except Exception:
                         pass
 
         if 'remarks' in values.keys() and isinstance(values['remarks'], str):
             c_dict[self._columns['remarks']] = text(values['remarks'])
-#             c_dict['remarks'] = values['remarks']
 
         if 'date' in values.keys():
             if isinstance(values['date'], datetime.date):
                 c_dict[self._columns['date']] = DateTime(values['date'])
-#                 c_dict['date'] = values['date']
             if isinstance(values['date'], (tuple, list)):
                 yr, mn, dy = [int(_) for _ in values['date']]
                 c_dict[self._columns['date']] = DateTime(datetime.date(yr, mn, dy))
-#                 c_dict['date'] = datetime.date(yr, mn, dy)
 
         if 'time' in values.keys():
             _d = idtime()
@@ -119,14 +107,9 @@ class Record(object):
 
             if backward and (_ > idt):
                 rd = rd.fromordinal(rd.toordinal() - 1)
-            c_dict[self._columns['time']] = DateTime(_)
-            c_dict[self._columns['date']] = DateTime(rd)
-#             c_dict['time'] = f"{_}"
-#             c_dict['date'] = f"{rd}"
-
-#         cstr = ', '.join([f"{k}='{v}'" for k, v in c_dict.items()])
+            c_dict[self._columns['time']] = DateTime(_).timezone
+            c_dict[self._columns['date']] = DateTime(rd).timezone
         qstr = self._table.update().values(c_dict).filter(self._columns.id==_d[0])
-#         qstr = f"UPDATE records SET {cstr} WHERE id={int(_d[0])}"
         self._connect.execute(qstr)
 
     def rome(self, field, period=14):
