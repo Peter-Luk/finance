@@ -1,5 +1,5 @@
 import pandas as pd
-from sqlalchemy import create_engine, MetaData, Table, insert, update, text, select, DateTime
+from sqlalchemy import create_engine, MetaData, Table, insert, text, select, DateTime
 from utilities import filepath, datetime
 
 
