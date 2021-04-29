@@ -72,12 +72,6 @@ class Record(object):
                     else:
                         qstr = qstr.filter(text(f"{sc[k]}={v}"))
             return self._connect.execute(str(qstr)).fetchall()[-1]
-            #     clist = []
-            #     for k, v in criteria.items():
-            #         __ = f"{k}='{v}'"
-            #         if isinstance(v, int): __ = f'{k}={v}'
-            #     clist.append(__)
-            # return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchall()[-1]
 
         c_dict = {}
         for i in ['sys', 'dia', 'pulse']:
