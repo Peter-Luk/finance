@@ -58,12 +58,26 @@ class Record(object):
         def idtime(criteria=criteria):
             if isinstance(criteria, dict):
                 criteria['subject_id'] = self.sid
-                clist = []
+                sc = self._columns
+                qstr = select([sc.id, sc.time, sc.date])
                 for k, v in criteria.items():
-                    __ = f"{k}='{v}'"
-                    if isinstance(v, int): __ = f'{k}={v}'
-                clist.append(__)
-            return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchall()[-1]
+                    if k == 'date':
+                        dd = datetime.datetime.strptime(v, '%Y-%m-%d').date()
+                        qstr = qstr.filter(text(f"{sc[k]}='{dd}'"))
+                    elif k == 'time':
+                        dd = datetime.datetime.strptime(v, '%H:%M:%S').time()
+                        qstr = qstr.filter(text(f"{sc[k]}='{dd}'"))
+                    elif k == 'remarks':
+                        qstr = qstr.filter(text(f"{s[k]}='{v}'"))
+                    else:
+                        qstr = qstr.filter(text(f"{sc[k]}={v}"))
+            return self._connect.execute(str(qstr)).fetchall()[-1]
+            #     clist = []
+            #     for k, v in criteria.items():
+            #         __ = f"{k}='{v}'"
+            #         if isinstance(v, int): __ = f'{k}={v}'
+            #     clist.append(__)
+            # return self._connect.execute(f"SELECT id, time, date FROM records WHERE {' and '.join(clist)}").fetchall()[-1]
 
         c_dict = {}
         for i in ['sys', 'dia', 'pulse']:
