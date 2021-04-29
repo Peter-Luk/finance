@@ -138,10 +138,9 @@ class Record(object):
                 if isinstance(args[3], str):
                     hdr['remarks'] = args[3]
                 hdr['instrument_id'] = self.iid
-                query = insert(self._table)
                 now = datetime.now().astimezone(timezone(self.tz))
                 hdr['date'], hdr['time'] = now.date(), now.time()
-                self._connect.execute(query, [hdr])
+                self._connect.execute(insert(self._table), [hdr])
 
 
 def rome(data, field, period=14):
