@@ -75,19 +75,28 @@ def load(*args):
 
 
 class AS(object):
-    def __init__(self, name):
+    def __init__(self, name, prefer='records'):
         self.db = name
         engine = db.create_engine(f"sqlite:///{filepath(self.db)}")
-        self.__meta = db.MetaData()
-        if self.db == fb['name']:
-            self.table = db.Table(
-                    fb['table'], self.__meta, autoload=True,
-                    autoload_with=engine)
-        else:
-            self.table = db.Table(
-                    eb['table'], self.__meta, autoload=True,
-                    autoload_with=engine)
-        self.columns = self.table.columns
+        def tables():
+            table = db.Table('sqlite_master', db.MetaData(), autoload=True, autoload_with=engine)
+            mc = table.columns
+            qry = db.select(mc.name).filter(mc.type==db.text("'table'")).filter(db.text(f"{mc.name} not like 'sqlite_%'")).filter(db.text(f"{mc.name} not like 'android_%'"))
+            return [_[0] for _ in engine.connect().execute(qry).fetchall()]
+
+        if prefer in tables():
+            self.table = db.Table(prefer, db.MetaData(), autoload=True, autoload_with=engine)
+        # self.__meta = db.MetaData()
+        # if self.db == fb['name']:
+        #     self.table = db.Table(
+        #             fb['table'], self.__meta, autoload=True,
+        #             autoload_with=engine)
+        # else:
+        #     self.table = db.Table(
+        #             eb['table'], self.__meta, autoload=True,
+        #             autoload_with=engine)
+        # self.columns = self.table.columns
+            self.columns = self.table.columns
         self.connect = engine.connect()
 
     def __del__(self):
