@@ -81,21 +81,11 @@ class AS(object):
         def tables():
             table = db.Table('sqlite_master', db.MetaData(), autoload=True, autoload_with=engine)
             mc = table.columns
-            qry = db.select(mc.name).filter(mc.type==db.text("'table'")).filter(db.text(f"{mc.name} not like 'sqlite_%'")).filter(db.text(f"{mc.name} not like 'android_%'"))
+            qry = db.select(mc.name).filter(mc.type==db.text("'table'")).filter(mc.name.notlike('sqlite_%')).filter(mc.name.notlike('android_%'))
             return [_[0] for _ in engine.connect().execute(qry).fetchall()]
 
         if prefer in tables():
             self.table = db.Table(prefer, db.MetaData(), autoload=True, autoload_with=engine)
-        # self.__meta = db.MetaData()
-        # if self.db == fb['name']:
-        #     self.table = db.Table(
-        #             fb['table'], self.__meta, autoload=True,
-        #             autoload_with=engine)
-        # else:
-        #     self.table = db.Table(
-        #             eb['table'], self.__meta, autoload=True,
-        #             autoload_with=engine)
-        # self.columns = self.table.columns
             self.columns = self.table.columns
         self.connect = engine.connect()
 
