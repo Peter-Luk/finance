@@ -90,14 +90,14 @@ class AS(object):
         self.connect = engine.connect()
 
     def __del__(self):
-        self.__meta = self.table = self.columns = self.connect = None
-        del(self.__meta, self.table, self.columns, self.connect)
+        self.table = self.columns = self.connect = None
+        del(self.table, self.columns, self.connect)
 
 
 class AE(AS):
     def __init__(self, eid):
         pE = pref.db['Equities']
-        ae = AS(pE['name'])
+        ae = AS(pE['name'], pE['table'])
         self.columns = ae.columns
         self.connect = ae.connect
         self.table = ae.table
@@ -203,8 +203,8 @@ class AE(AS):
 
 class AF(AS):
     def __init__(self, code):
-        self._conf = pref.db['Futures']
-        ae = AS(self._conf['name'])
+        pF = pref.db['Futures']
+        ae = AS(pF['name'], pF['table'])
         self.columns = ae.columns
         self.connect = ae.connect
         self.table = ae.table
