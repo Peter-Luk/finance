@@ -1,24 +1,20 @@
 import pandas as pd
-from sqlalchemy import create_engine, MetaData, Table, insert, text, select, DateTime
+from alchemy import AS
+from sqlalchemy import insert, text, select, DateTime
 from utilities import filepath, datetime
 
 
-class Record(object):
+class Record(AS):
 
     def __init__(self, sid, iid=None, tz='Asia/Hong_Kong'):
         if not iid:
             iid = 1
-        # self.iid = iid
         if isinstance(sid, int) and isinstance(iid, int):
             self.sid, self.iid, self.tz = sid, iid, tz
-            engine = create_engine(f"sqlite:///{filepath('Health')}")
-            self._table = Table(
-                'records',
-                MetaData(),
-                autoload=True,
-                autoload_with=engine)
+            ae = AS('Health', 'records')
+            self._table = ae.table
             self._columns = self._table.columns
-            self._connect = engine.connect()
+            self._connect = ae.connect
 
     def __call__(self):
         return self.grab()
