@@ -1,8 +1,11 @@
 import pref
 platform, environ, sep, listdir, Path, db, pd, datetime = pref.alchemy
 from utilities import filepath
-from sqlalchemy.orm import mapper, sessionmaker
+from sqlalchemy.orm import mapper, sessionmaker, declarative_base
+from sqlalchemy import Column, Integer, String, DateTime, text
 
+Base = declarative_base()
+Session = sessionmaker()
 eb, fb = pref.db['Equities'], pref.db['Futures']
 if platform == 'win32':
     home = str(Path.home())
