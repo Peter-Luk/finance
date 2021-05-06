@@ -27,7 +27,7 @@ class Subject(Base):
 
 
 class Health(Subject):
-    def __init__(self, db):
+    def __init__(self, db='Health'):
         self.engine = create_engine(f"sqlite:///{filepath(db)}")
         Session.configure(bind=self.engine)
         self.session = Session()
