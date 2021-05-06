@@ -1,17 +1,18 @@
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
 from utilities import filepath
-
+import datetime
+now = datetime.datetime.now()
 Session = sessionmaker()
 Base = declarative_base()
 
 class Subject(Base):
     __tablename__ = 'records'
-    id = Column(Integer, primary_key=True)
-    instrument_id = Column(Integer)
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    instrument_id = Column(Integer, default=1, server_default=text('1'))
     subject_id = Column(Integer)
-    date = Column(Date)
-    time = Column(Time)
+    date = Column(Date, default=now.date(), server_default=text(str(now.date())))
+    time = Column(Time, default=now.time(), server_default=text(str(now.time())))
     sys = Column(Integer)
     dia = Column(Integer)
     pulse = Column(Integer)
