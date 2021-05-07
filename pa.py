@@ -15,8 +15,6 @@ class Subject(Base):
     subject_id = Column(Integer)
     date = Column(String, default=now.date(), server_default=text(str(now.date())))
     time = Column(String, default=now.time(), server_default=text(str(now.time())))
-    # date = Column(Date, default=now.date())
-    # time = Column(Time, default=now.time())
     sys = Column(Integer)
     dia = Column(Integer)
     pulse = Column(Integer)
@@ -42,6 +40,7 @@ class Person(Health):
     def __init__(self, subject_id):
         self.session = Health('Health').session
         self.query = self.session.query(Subject).filter_by(subject_id=subject_id)
+        self.subject_id = subject_id
 
     def __call__(self, fields=None):
         format = '%Y-%m-%d %H:%M:%S'
@@ -52,3 +51,62 @@ class Person(Health):
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
         _ = _.drop(['id', 'date','time', 'Datetime'], axis=1)
         return _
+
+
+if __name__ == "__main__":
+    from pathlib import sys
+
+    # def process(i, s, d, p, r):
+    #     _ = Record(i)
+    #     _.append(int(s), int(d), int(p), r)
+    sj = Subject()
+
+    sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
+    if datetime.today().hour < 13:
+        dk = 'wake up, washed before breakfast'
+
+    while confirm.upper() != 'N':
+        if sys.version_info.major == 2:
+            sd = raw_input("Subject ID")
+            try:
+                sj.subject_id = int(sd)
+                pn = Person(sj.subject_id)
+            except Exception:
+                sj.subject_id = sid
+                pn = Person(sj.subject_id)
+            sj.sys = raw_input("Systolic: ")
+            sj.dia = raw_input("Diastolic: ")
+            sj.pulse = raw_input("Pulse: ")
+            rmk = raw_input("Remark: ")
+            if rmk == '':
+                rmk = dk
+            self.remarks = rmk
+            now = datetime.datetime.now()
+            sj.date = str(now.date())
+            sj.time = str(now.time())
+            pn.session.add(sj)
+            pn.session.commit()
+            # process(sd, sy, dia, pul, rmk)
+            confirm = raw_input("Others? (Y)es/(N)o: ")
+        if sys.version_info.major == 3:
+            sd = input(f"Subject ID (default: {sid}): ")
+            try:
+                sj.subject_id = int(sd)
+                pn = Person(sj.subject_id)
+            except Exception:
+                sj.subject_id = sid
+                pn = Person(sj.subject_id)
+            sj.sys = input("Systolic: ")
+            sj.dia = input("Diastolic: ")
+            sj.pulse = input("Pulse: ")
+            rmk = input(f"Remark (default: {dk}): ")
+            if rmk == '':
+                rmk = dk
+            sj.remarks = rmk
+            now = datetime.datetime.now()
+            sj.date = str(now.date())
+            sj.time = str(now.time())
+            pn.session.add(sj)
+            pn.session.commit()
+            # process(sd, sy, dia, pul, rmk)
+            confirm = input("Others? (Y)es/(N)o: ")
