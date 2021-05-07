@@ -36,6 +36,7 @@ class Health(Subject):
         self.session = Session()
         self.query = self.session.query(Subject)
 
+
 class Person(Health):
     def __init__(self, subject_id):
         self.session = Health('Health').session
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     sj = Subject()
 
     sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
-    if datetime.today().hour < 13:
+    if datetime.datetime.today().hour < 13:
         dk = 'wake up, washed before breakfast'
 
     while confirm.upper() != 'N':
