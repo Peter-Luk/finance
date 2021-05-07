@@ -1,5 +1,5 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
-from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, text
 from utilities import filepath
 import datetime
 import pandas as pd
@@ -13,10 +13,10 @@ class Subject(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     instrument_id = Column(Integer, default=1, server_default=text('1'))
     subject_id = Column(Integer)
-#     date = Column(Date, default=now.date(), server_default=text(str(now.date())))
-#     time = Column(Time, default=now.time(), server_default=text(str(now.time())))
-    date = Column(String, default=now.date())
-    time = Column(String, default=now.time())
+    date = Column(String, default=now.date(), server_default=text(str(now.date())))
+    time = Column(String, default=now.time(), server_default=text(str(now.time())))
+    # date = Column(Date, default=now.date())
+    # time = Column(Time, default=now.time())
     sys = Column(Integer)
     dia = Column(Integer)
     pulse = Column(Integer)
@@ -44,8 +44,11 @@ class Person(Health):
         self.query = self.session.query(Subject).filter_by(subject_id=subject_id)
 
     def __call__(self, fields=None):
+        format = '%Y-%m-%d %H:%M:%S'
         if fields == None:
             fields = ['date', 'time', 'sys', 'dia', 'pulse']
         _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[['date', 'time']])
-        _ = _.set_index('id')
+        _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=format)
+        _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
+        _ = _.drop(['id', 'date','time', 'Datetime'], axis=1)
         return _
