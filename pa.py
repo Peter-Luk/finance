@@ -80,7 +80,7 @@ if __name__ == "__main__":
             rmk = raw_input("Remark: ")
             if rmk == '':
                 rmk = dk
-            self.remarks = rmk
+            sj.remarks = rmk
             now = datetime.datetime.now()
             sj.date = str(now.date())
             sj.time = str(now.time())
