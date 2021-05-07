@@ -4,7 +4,6 @@ from utilities import filepath
 import datetime
 import pandas as pd
 
-now = datetime.datetime.now()
 Session = sessionmaker()
 Base = declarative_base()
 
@@ -13,6 +12,7 @@ class Subject(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     instrument_id = Column(Integer, default=1, server_default=text('1'))
     subject_id = Column(Integer)
+    now = datetime.datetime.now()
     date = Column(String, default=now.date(), server_default=text(str(now.date())))
     time = Column(String, default=now.time(), server_default=text(str(now.time())))
     sys = Column(Integer)
@@ -59,13 +59,13 @@ if __name__ == "__main__":
     # def process(i, s, d, p, r):
     #     _ = Record(i)
     #     _.append(int(s), int(d), int(p), r)
-    sj = Subject()
 
     sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
     if datetime.datetime.today().hour < 13:
         dk = 'wake up, washed before breakfast'
 
     while confirm.upper() != 'N':
+        sj = Subject()
         if sys.version_info.major == 2:
             sd = raw_input("Subject ID")
             try:
