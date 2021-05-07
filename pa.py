@@ -1,5 +1,5 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
-from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
+from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text, DateTime
 from utilities import filepath
 import datetime
 import pandas as pd
@@ -13,8 +13,10 @@ class Subject(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     instrument_id = Column(Integer, default=1, server_default=text('1'))
     subject_id = Column(Integer)
-    date = Column(Date, default=now.date(), server_default=text(str(now.date())))
-    time = Column(Time, default=now.time(), server_default=text(str(now.time())))
+#     date = Column(Date, default=now.date(), server_default=text(str(now.date())))
+#     time = Column(Time, default=now.time(), server_default=text(str(now.time())))
+    date = Column(String, default=now.date())
+    time = Column(String, default=now.time())
     sys = Column(Integer)
     dia = Column(Integer)
     pulse = Column(Integer)
