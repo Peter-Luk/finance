@@ -42,10 +42,9 @@ class Person(Health):
         self.query = self.session.query(Subject).filter_by(subject_id=subject_id)
         self.subject_id = subject_id
 
-    def __call__(self, fields=None):
+    def __call__(self):
         format = '%Y-%m-%d %H:%M:%S'
-        if fields == None:
-            fields = ['date', 'time', 'sys', 'dia', 'pulse']
+        fields = ['date', 'time', 'sys', 'dia', 'pulse']
         _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[['date', 'time']])
         _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=format)
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
