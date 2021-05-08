@@ -40,8 +40,8 @@ class Health(Subject):
 class Person(Health):
     def __init__(self, subject_id):
         self.session = Health('Health').session
-        self.query = self.session.query(Subject).filter_by(subject_id=subject_id)
         self.subject_id = subject_id
+        self.query = self.session.query(Subject).filter_by(subject_id=self.subject_id)
 
     def __call__(self):
         format = '%Y-%m-%d %H:%M:%S'
