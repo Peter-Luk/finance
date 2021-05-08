@@ -1,5 +1,5 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
-from sqlalchemy import create_engine, Column, Integer, String, text
+from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
 from utilities import filepath
 import datetime
 import pandas as pd
@@ -13,8 +13,8 @@ class Subject(Base):
     instrument_id = Column(Integer, default=1, server_default=text('1'))
     subject_id = Column(Integer)
     now = datetime.datetime.now()
-    date = Column(String, default=now.date(), server_default=text(str(now.date())))
-    time = Column(String, default=now.time(), server_default=text(str(now.time())))
+    date = Column(Date, default=now.date(), server_default=text(str(now.date())))
+    time = Column(Time, default=now.time(), server_default=text(str(now.time())))
     sys = Column(Integer)
     dia = Column(Integer)
     pulse = Column(Integer)
@@ -46,7 +46,10 @@ class Person(Health):
     def __call__(self):
         format = '%Y-%m-%d %H:%M:%S'
         fields = ['date', 'time', 'sys', 'dia', 'pulse']
-        _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[['date', 'time']])
+        cols = ['date', 'time']
+        _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[cols])
+        _ = _.convert_dtypes()
+        _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
         _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=format)
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
         _ = _.drop(['id', 'date','time', 'Datetime'], axis=1)
@@ -55,11 +58,6 @@ class Person(Health):
 
 if __name__ == "__main__":
     from pathlib import sys
-
-    # def process(i, s, d, p, r):
-    #     _ = Record(i)
-    #     _.append(int(s), int(d), int(p), r)
-
     sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
     if datetime.datetime.today().hour < 13:
         dk = 'wake up, washed before breakfast'
@@ -82,11 +80,10 @@ if __name__ == "__main__":
                 rmk = dk
             sj.remarks = rmk
             now = datetime.datetime.now()
-            sj.date = str(now.date())
-            sj.time = str(now.time())
+            sj.date = now.date()
+            sj.time = now.time()
             pn.session.add(sj)
             pn.session.commit()
-            # process(sd, sy, dia, pul, rmk)
             confirm = raw_input("Others? (Y)es/(N)o: ")
         if sys.version_info.major == 3:
             sd = input(f"Subject ID (default: {sid}): ")
@@ -104,9 +101,8 @@ if __name__ == "__main__":
                 rmk = dk
             sj.remarks = rmk
             now = datetime.datetime.now()
-            sj.date = str(now.date())
-            sj.time = str(now.time())
+            sj.date = now.date()
+            sj.time = now.time()
             pn.session.add(sj)
             pn.session.commit()
-            # process(sd, sy, dia, pul, rmk)
             confirm = input("Others? (Y)es/(N)o: ")
