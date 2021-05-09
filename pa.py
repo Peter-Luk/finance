@@ -16,9 +16,9 @@ class Subject(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     instrument_id = Column(Integer, default=1, server_default=text('1'))
     subject_id = Column(Integer)
-    _created@ = datetime.datetime.now()
-    date = Column(Date, default=_created@.date(), server_default=text(str(_created@.date())))
-    time = Column(Time, default=_created@.time(), server_default=text(str(_created@.time())))
+    _created_at = datetime.datetime.now()
+    date = Column(Date, default=_created_at.date(), server_default=text(str(_created_at.date())))
+    time = Column(Time, default=_created_at.time(), server_default=text(str(_created_at.time())))
     sys = Column(Integer)
     dia = Column(Integer)
     pulse = Column(Integer)
@@ -82,9 +82,9 @@ if __name__ == "__main__":
             if rmk == '':
                 rmk = dk
             sj.remarks = rmk
-            _modify@ = datetime.datetime.now()
-            sj.date = _modify@.date()
-            sj.time = _modify@.time()
+            _modify_at = datetime.datetime.now()
+            sj.date = _modify_at.date()
+            sj.time = _modify_at.time()
             pn.session.add(sj)
             pn.session.commit()
             confirm = raw_input("Others? (Y)es/(N)o: ")
@@ -103,9 +103,9 @@ if __name__ == "__main__":
             if rmk == '':
                 rmk = dk
             sj.remarks = rmk
-            _modify@ = datetime.datetime.now()
-            sj.date = _modify@.date()
-            sj.time = _modify@.time()
+            _modify_at = datetime.datetime.now()
+            sj.date = _modify_at.date()
+            sj.time = _modify_at.time()
             pn.session.add(sj)
             pn.session.commit()
             confirm = input("Others? (Y)es/(N)o: ")
