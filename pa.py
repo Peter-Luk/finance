@@ -7,14 +7,18 @@ import pandas as pd
 Session = sessionmaker()
 Base = declarative_base()
 
+def rome(data, field, period=14):
+    if isinstance(data, pd.core.frame.DataFrame) and field in data.columns:
+        return data[field].rolling(period).mean()
+
 class Subject(Base):
     __tablename__ = 'records'
     id = Column(Integer, autoincrement=True, primary_key=True)
     instrument_id = Column(Integer, default=1, server_default=text('1'))
     subject_id = Column(Integer)
-    now = datetime.datetime.now()
-    date = Column(Date, default=now.date(), server_default=text(str(now.date())))
-    time = Column(Time, default=now.time(), server_default=text(str(now.time())))
+    _created@ = datetime.datetime.now()
+    date = Column(Date, default=_created@.date(), server_default=text(str(_created@.date())))
+    time = Column(Time, default=_created@.time(), server_default=text(str(_created@.time())))
     sys = Column(Integer)
     dia = Column(Integer)
     pulse = Column(Integer)
@@ -22,7 +26,6 @@ class Subject(Base):
 
     def __repr__(self):
         _ = f"<Subject(instrument_id={self.instrument_id}, "
- #        _ = f"<Subject(id={self.id}, "
         _ += f"subject_id={self.subject_id}, date='{self.date}', time='{self.time}', "
         _ += f"sys={self.sys}, dia={self.dia}, pulse={self.pulse}, "
         _ += f"remarks='{self.remarks}')>"
@@ -79,9 +82,9 @@ if __name__ == "__main__":
             if rmk == '':
                 rmk = dk
             sj.remarks = rmk
-            now = datetime.datetime.now()
-            sj.date = now.date()
-            sj.time = now.time()
+            _modify@ = datetime.datetime.now()
+            sj.date = _modify@.date()
+            sj.time = _modify@.time()
             pn.session.add(sj)
             pn.session.commit()
             confirm = raw_input("Others? (Y)es/(N)o: ")
@@ -100,9 +103,9 @@ if __name__ == "__main__":
             if rmk == '':
                 rmk = dk
             sj.remarks = rmk
-            now = datetime.datetime.now()
-            sj.date = now.date()
-            sj.time = now.time()
+            _modify@ = datetime.datetime.now()
+            sj.date = _modify@.date()
+            sj.time = _modify@.time()
             pn.session.add(sj)
             pn.session.commit()
             confirm = input("Others? (Y)es/(N)o: ")
