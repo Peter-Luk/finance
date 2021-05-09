@@ -44,7 +44,7 @@ class Person(Health):
     def __init__(self, subject_id):
         self.session = Health('Health').session
         self.subject_id = subject_id
-        self.query = self.session.query(Subject).filter_by(subject_id=self.subject_id)
+        self.query = self.session.query(Subject).filter(Subject.subject_id==self.subject_id)
 
     def __call__(self):
         format = '%Y-%m-%d %H:%M:%S'
@@ -57,6 +57,33 @@ class Person(Health):
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
         _ = _.drop(['id', 'date','time', 'Datetime'], axis=1)
         return _
+
+    def update(values, criteria):
+        q = self.query
+        if 'date' in criteria.keys():
+            if isinstance(criteria['date'], (datetime.date, str)):
+                q = q.filter(Subject.date == criteria['date'])
+        if 'time' in criteria.keys() and 'lesser' in criteria.keys():
+            if criteria['lesser']:
+                q = q.filter(Subject.time < criteria['time'])
+        if 'time' in criteria.keys() and 'greater' in criteria.keys():
+            if criteria['greater']:
+                q = q.filter(Subject.time < criteria['time'])
+        if 'time' in criteria.keys() and 'lesser' not in criteria.keys() and 'greater' not in criteria.keys():
+            q = q.filter(Subject.time == criteria['time'])
+        sr = q.one()
+        if 'time' in values.keys():
+            if isinstance(values['time'], (list, tuple)):
+                if len(values['time']) == 2:
+                    rt = datetime.time(values[0], values[-1], sr.time.second, sr.time.microsecond)
+                elif len(values['time']) == 3:
+                    rt = datetime.time(values[0], values[1], values[-1], sr.time.microsecond)
+            elif isinstance(values['time'], (str, datetime.time)):
+                rt = values['time']
+            if sr.time < rt:
+                sr.date = datetime.date.fromordinal(sr.date.toordinal() - 1)
+            sr.time = rt
+        self.session.commit()
 
 
 if __name__ == "__main__":
