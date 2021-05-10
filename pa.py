@@ -72,6 +72,15 @@ class Person(Health):
         if 'time' in criteria.keys() and 'lesser' not in criteria.keys() and 'greater' not in criteria.keys():
             q = q.filter(Subject.time == criteria['time'])
         sr = q.one()
+        if 'sys' in values.keys():
+            if isinstance(values['sys'], int):
+                sr.sys = values['sys']
+        if 'dia' in values.keys():
+            if isinstance(values['dia'], int):
+                sr.dia = values['dia']
+        if 'pulse' in values.keys():
+            if isinstance(values['pulse'], int):
+                sr.pulse = values['pulse']
         if 'date' in values.keys():
             if isinstance(values['date'], (str, datetime.date)):
                 sr.date = values['date']
