@@ -58,11 +58,11 @@ class Person(Health):
         _ = _.drop(['id', 'date','time', 'Datetime'], axis=1)
         return _
 
-    def update(values, criteria):
+    def update(self, values, criteria):
         q = self.query
         if 'date' in criteria.keys():
             if isinstance(criteria['date'], (datetime.date, str)):
-                q = q.filter(Subject.date == criteria['date'])
+                q = q.filter(Subject.date==criteria['date'])
         if 'time' in criteria.keys() and 'lesser' in criteria.keys():
             if criteria['lesser']:
                 q = q.filter(Subject.time < criteria['time'])
@@ -84,7 +84,7 @@ class Person(Health):
         if 'date' in values.keys():
             if isinstance(values['date'], (str, datetime.date)):
                 sr.date = values['date']
-        if 'remarks' in value.keys():
+        if 'remarks' in values.keys():
             if isinstance(values['remarks'], str):
                 sr.remarks = values['remarks']
         if 'time' in values.keys():
