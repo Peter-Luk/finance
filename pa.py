@@ -72,6 +72,12 @@ class Person(Health):
         if 'time' in criteria.keys() and 'lesser' not in criteria.keys() and 'greater' not in criteria.keys():
             q = q.filter(Subject.time == criteria['time'])
         sr = q.one()
+        if 'date' in values.keys():
+            if isinstance(values['date'], (str, datetime.date)):
+                sr.date = values['date']
+        if 'remarks' in value.keys():
+            if isinstance(values['remarks'], str):
+                sr.remarks = values['remarks']
         if 'time' in values.keys():
             if isinstance(values['time'], (list, tuple)):
                 if len(values['time']) == 2:
