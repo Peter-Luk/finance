@@ -62,7 +62,7 @@ class Person(Health):
         q = self.query
         if 'date' in criteria.keys():
             if isinstance(criteria['date'], (datetime.date, str)):
-                q = q.filter(Subject.date==criteria['date'])
+                q = q.filter(Subject.date == criteria['date'])
         if 'time' in criteria.keys() and 'lesser' in criteria.keys():
             if criteria['lesser']:
                 q = q.filter(Subject.time < criteria['time'])
@@ -71,33 +71,36 @@ class Person(Health):
                 q = q.filter(Subject.time < criteria['time'])
         if 'time' in criteria.keys() and 'lesser' not in criteria.keys() and 'greater' not in criteria.keys():
             q = q.filter(Subject.time == criteria['time'])
-        sr = q.one()
-        if 'sys' in values.keys():
-            if isinstance(values['sys'], int):
-                sr.sys = values['sys']
-        if 'dia' in values.keys():
-            if isinstance(values['dia'], int):
-                sr.dia = values['dia']
-        if 'pulse' in values.keys():
-            if isinstance(values['pulse'], int):
-                sr.pulse = values['pulse']
-        if 'date' in values.keys():
-            if isinstance(values['date'], (str, datetime.date)):
-                sr.date = values['date']
-        if 'remarks' in values.keys():
-            if isinstance(values['remarks'], str):
-                sr.remarks = values['remarks']
-        if 'time' in values.keys():
-            if isinstance(values['time'], (list, tuple)):
-                if len(values['time']) == 2:
-                    rt = datetime.time(values[0], values[-1], sr.time.second, sr.time.microsecond)
-                elif len(values['time']) == 3:
-                    rt = datetime.time(values[0], values[1], values[-1], sr.time.microsecond)
-            elif isinstance(values['time'], (str, datetime.time)):
-                rt = values['time']
-            if sr.time < rt:
-                sr.date = datetime.date.fromordinal(sr.date.toordinal() - 1)
-            sr.time = rt
+        try:
+            sr = q.one()
+            if 'sys' in values.keys():
+                if isinstance(values['sys'], int):
+                    sr.sys = values['sys']
+            if 'dia' in values.keys():
+                if isinstance(values['dia'], int):
+                    sr.dia = values['dia']
+            if 'pulse' in values.keys():
+                if isinstance(values['pulse'], int):
+                    sr.pulse = values['pulse']
+            if 'date' in values.keys():
+                if isinstance(values['date'], (str, datetime.date)):
+                    sr.date = values['date']
+            if 'remarks' in values.keys():
+                if isinstance(values['remarks'], str):
+                    sr.remarks = values['remarks']
+            if 'time' in values.keys():
+                if isinstance(values['time'], (list, tuple)):
+                    if len(values['time']) == 2:
+                        rt = datetime.time(values[0], values[-1], sr.time.second, sr.time.microsecond)
+                    elif len(values['time']) == 3:
+                        rt = datetime.time(values[0], values[1], values[-1], sr.time.microsecond)
+                elif isinstance(values['time'], (str, datetime.time)):
+                    rt = values['time']
+                if sr.time < rt:
+                    sr.date = datetime.date.fromordinal(sr.date.toordinal() - 1)
+                sr.time = rt
+        except Exception:
+            pass
         self.session.commit()
 
 
