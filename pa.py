@@ -100,7 +100,7 @@ class Person(Health):
                     sr.date = datetime.date.fromordinal(sr.date.toordinal() - 1)
                 sr.time = rt
         except Exception:
-            return "Intent for unique record only"
+            return "Intend for unique record only"
         self.session.commit()
 
 
