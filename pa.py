@@ -89,13 +89,14 @@ class Person(Health):
                 if isinstance(values['remarks'], str):
                     sr.remarks = values['remarks']
             if 'time' in values.keys():
-                if isinstance(values['time'], (list, tuple)):
-                    if len(values['time']) == 2:
-                        rt = datetime.time(values['time'][0], values['time'][-1], sr.time.second, sr.time.microsecond)
-                    elif len(values['time']) == 3:
-                        rt = datetime.time(values['time'][0], values['time'][1], values['time'][-1], sr.time.microsecond)
-                elif isinstance(values['time'], (str, datetime.time)):
-                    rt = values['time']
+                vt = values['time']
+                if isinstance(vt, (list, tuple)):
+                    if len(vt) == 2:
+                        rt = datetime.time(vt[0], vt[-1], sr.time.second, sr.time.microsecond)
+                    elif len(vt) == 3:
+                        rt = datetime.time(vt[0], vt[1], vt[-1], sr.time.microsecond)
+                elif isinstance(vt, (str, datetime.time)):
+                    rt = vt
                 if sr.time < rt:
                     sr.date = datetime.date.fromordinal(sr.date.toordinal() - 1)
                 sr.time = rt
