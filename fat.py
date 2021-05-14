@@ -49,5 +49,5 @@ class Index(Futures):
 
 def commit(values):
     _ = Index(waf()[-1]).session
-    _.all_all(values)
+    _.add_all(values)
     _.commit()
