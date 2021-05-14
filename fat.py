@@ -46,6 +46,51 @@ class Index(Futures):
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
 
+    def convert(self):
+        def unique_date():
+            res = []
+            for _ in self.query.all():
+                if _.date not in res:
+                    res.append(_.date)
+            return res
+        res = []
+        for _ in unique_date():
+            try:
+                md = self.query.filter(Record.date==_).filter(Record.session=='M').one()
+                open = md.open
+                high = md.high
+                low = md.low
+                close = md.close
+                volume = md.volume
+                try:
+                    ad = self.query.filter(Record.date==_).filter(Record.session=='A').one()
+                    if ad.high > high:
+                        high = ad.high
+                    if ad.low < low:
+                        low = ad.low
+                    close = ad.close
+                    volume += ad.volume
+                except Exception:
+                    pass
+            except:
+                try:
+                    ad = self.query.filter(Record.date==_).filter(Record.session=='A').one()
+                    open = ad.open
+                    high = ad.high
+                    low = ad.low
+                    close = ad.close
+                    volume = ad.volume
+                except Exception:
+                    pass
+            res.append({'date':_, 'open':open,'high':high, 'low':low, 'close':close, 'volume':volume})
+        _ = pd.DataFrame(res)
+        _ = _.convert_dtypes()
+        _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
+        _.date = pd.to_datetime(_.date, format='%Y-%m-%d')
+        _ = _.set_index(pd.DatetimeIndex(_.date))
+        _ = _.drop('date', axis=1)
+        return _
+
 
 def commit(values):
     _ = Index(waf()[-1]).session
