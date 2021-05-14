@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
-from utilities import filepath
+from utilities import filepath, waf
 import datetime
 import pandas as pd
 
@@ -45,3 +45,9 @@ class Index(Futures):
         self.session = Futures('Futures').session
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
+
+
+def commit(values):
+    _ = Index(waf()[-1]).session
+    _.all_all(values)
+    _.commit()
