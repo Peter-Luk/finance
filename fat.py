@@ -47,6 +47,9 @@ class Index(Futures):
         self.query = self.session.query(Record).filter(Record.code==self.code)
 
     def __call__(self):
+        return self.compose()
+
+    def compose(self):
         def unique_date():
             res = []
             for _ in self.query.all():
