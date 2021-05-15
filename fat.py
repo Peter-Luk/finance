@@ -94,6 +94,12 @@ class Index(Futures):
         _ = _.drop('date', axis=1)
         return _
 
+    def sma(self, period=7):
+        return self.compose().rolling(period).mean()
+
+    def wma(self, period=7):
+        _ = self.compose()
+        return (_.close * _.volume).rolling(period).sum() / _.volume.rolling(period).sum()
 
 def commit(values):
     _ = Index(waf()[-1]).session
