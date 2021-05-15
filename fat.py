@@ -95,7 +95,7 @@ class Index(Futures):
         return _
 
     def sma(self, period=7):
-        return self.compose().rolling(period).mean()
+        return self.compose().close.rolling(period).mean()
 
     def wma(self, period=7):
         _ = self.compose()
