@@ -95,11 +95,33 @@ class Index(Futures):
         return _
 
     def sma(self, period=7):
-        return self.compose().close.rolling(period).mean()
+        tmp = self.compose().close.rolling(period).mean()
+        tmp.name = 'sma'
+        return tmp
 
     def wma(self, period=7):
         _ = self.compose()
-        return (_.close * _.volume).rolling(period).sum() / _.volume.rolling(period).sum()
+        tmp = (_.close * _.volume).rolling(period).sum() / _.volume.rolling(period).sum()
+        tmp.name = 'wma'
+        return tmp
+
+    def ema(self, period=7):
+        _ = self.compose()
+        sma = self.sma(period)
+        dp = pd.concat([_.close, sma], axis=1)
+        tmp = []
+        for i in range(len(dp)):
+            try:
+                if pd.isna(tmp[i-1]):
+                    v = dp.iloc[i].sma
+                else:
+                    v = (tmp[-1] * (period - 1) + dp.iloc[i].close) / period
+            except Exception:
+                v = dp.iloc[i].sma
+            tmp.append(v)
+        dp['ema'] = tmp
+        return dp.ema
+
 
 def commit(values):
     _ = Index(waf()[-1]).session
