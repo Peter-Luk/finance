@@ -122,6 +122,34 @@ class Index(Futures):
         dp['ema'] = tmp
         return dp.ema
 
+    def rsi(self, period=7):
+        from numpy import nan
+        _ = self.compose()
+        fd = _.close.diff()
+        ag, al, tmp = [], [], []
+        for i in range(len(fd)):
+            if i < period:
+                ag.append(nan)
+                al.append(nan)
+                tmp.append(nan)
+            elif i == period:
+                tv = fd[:period]
+                ag.append(tv.gt(0).sum() / period)
+                al.append(tv.lt(0).abs().sum() / period)
+                tmp.append(100 - 100 / (1 + ag[i] / al[i]))
+            else:
+                __ = ag[i - 1]
+                if fd.iloc[i] > 0:
+                    __ = (ag[i - 1] * (period - 1) + fd.iloc[i]) / period
+                ag.append(__)
+                __ = al[i - 1]
+                if fd.iloc[i] < 0:
+                    __ = (al[i - 1] * (period - 1) + abs(fd.iloc[i])) / period
+                al.append(__)
+                tmp.append(100 - 100 / (1 + ag[i] / al[i]))
+        _['rsi'] = tmp
+        return _.rsi
+
 
 def commit(values):
     _ = Index(waf()[-1]).session
