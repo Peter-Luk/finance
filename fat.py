@@ -131,12 +131,12 @@ class Index(Futures):
             if i < period:
                 ag.append(nan)
                 al.append(nan)
-                tmp.append(nan)
+                t_ = nan
             elif i == period:
                 tv = fd[:period]
                 ag.append(tv[tv.gt(0)].sum() / period)
                 al.append(tv[tv.lt(0)].abs().sum() / period)
-                tmp.append(100 - 100 / (1 + ag[i] / al[i]))
+                t_ = 100 - 100 / (1 + ag[i] / al[i])
             else:
                 __ = ag[i - 1]
                 if fd.iloc[i] > 0:
@@ -146,7 +146,8 @@ class Index(Futures):
                 if fd.iloc[i] < 0:
                     __ = (al[i - 1] * (period - 1) + abs(fd.iloc[i])) / period
                 al.append(__)
-                tmp.append(100 - 100 / (1 + ag[i] / al[i]))
+                t_ = 100 - 100 / (1 + ag[i] / al[i])
+            tmp.append(t_)
         _['rsi'] = tmp
         return _.rsi
 
