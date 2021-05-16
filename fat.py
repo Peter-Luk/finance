@@ -134,8 +134,8 @@ class Index(Futures):
                 tmp.append(nan)
             elif i == period:
                 tv = fd[:period]
-                ag.append(tv.gt(0).sum() / period)
-                al.append(tv.lt(0).abs().sum() / period)
+                ag.append(tv[tv.gt(0)].sum() / period)
+                al.append(tv[tv.lt(0)].abs().sum() / period)
                 tmp.append(100 - 100 / (1 + ag[i] / al[i]))
             else:
                 __ = ag[i - 1]
