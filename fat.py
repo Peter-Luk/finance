@@ -124,15 +124,16 @@ class Index(Futures):
         return dp.ema
 
     def rsi(self, period=periods['Futures']['rsi']):
-        from numpy import nan
+        import numpy as np
         _ = self.compose()
         fd = _.close.diff()
         ag, al, tmp = [], [], []
+        lenrange = range(len(fd))
 
-        for i in range(len(fd)):
+        for i in lenrange:
             if i < period:
-                ag.append(nan)
-                al.append(nan)
+                ag.append(np.nan)
+                al.append(np.nan)
             elif i == period:
                 tv = fd[:period]
                 ag.append(tv[tv.gt(0)].sum() / period)
@@ -147,8 +148,8 @@ class Index(Futures):
                     __ = (__ * (period - 1) + abs(fd.iloc[i])) / period
                 al.append(__)
 
-        for i in range(len(fd)):
-            t_ = nan
+        for i in lenrange:
+            t_ = np.nan
             if i >= period:
                 t_ = 100 - 100 / (1 + ag[i] / al[i])
             tmp.append(t_)
