@@ -128,25 +128,28 @@ class Index(Futures):
         _ = self.compose()
         fd = _.close.diff()
         ag, al, tmp = [], [], []
+
         for i in range(len(fd)):
             if i < period:
                 ag.append(nan)
                 al.append(nan)
-                t_ = nan
             elif i == period:
                 tv = fd[:period]
                 ag.append(tv[tv.gt(0)].sum() / period)
                 al.append(tv[tv.lt(0)].abs().sum() / period)
-                t_ = 100 - 100 / (1 + ag[i] / al[i])
             else:
                 __ = ag[i - 1]
                 if fd.iloc[i] > 0:
-                    __ = (ag[i - 1] * (period - 1) + fd.iloc[i]) / period
+                    __ = (__ * (period - 1) + fd.iloc[i]) / period
                 ag.append(__)
                 __ = al[i - 1]
                 if fd.iloc[i] < 0:
-                    __ = (al[i - 1] * (period - 1) + abs(fd.iloc[i])) / period
+                    __ = (__ * (period - 1) + abs(fd.iloc[i])) / period
                 al.append(__)
+
+        for i in range(len(fd)):
+            t_ = nan
+            if i >= period:
                 t_ = 100 - 100 / (1 + ag[i] / al[i])
             tmp.append(t_)
         _['rsi'] = tmp
