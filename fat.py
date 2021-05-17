@@ -1,6 +1,7 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf
+from pref import periods
 import datetime
 import pandas as pd
 
@@ -122,7 +123,7 @@ class Index(Futures):
         dp['ema'] = tmp
         return dp.ema
 
-    def rsi(self, period=7):
+    def rsi(self, period=periods['Futures']['rsi']):
         from numpy import nan
         _ = self.compose()
         fd = _.close.diff()
