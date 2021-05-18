@@ -127,33 +127,31 @@ class Index(Futures):
         import numpy as np
         _ = self.compose()
         fd = _.close.diff()
-        ag, al, tmp = [], [], []
-        lenrange = range(len(fd))
 
-        for i in lenrange:
-            if i < period:
-                ag.append(np.nan)
-                al.append(np.nan)
-            elif i == period:
-                tv = fd[:period]
-                ag.append(tv[tv.gt(0)].sum() / period)
-                al.append(tv[tv.lt(0)].abs().sum() / period)
-            else:
-                __ = ag[i - 1]
-                if fd.iloc[i] > 0:
-                    __ = (__ * (period - 1) + fd.iloc[i]) / period
-                ag.append(__)
-                __ = al[i - 1]
-                if fd.iloc[i] < 0:
-                    __ = (__ * (period - 1) + abs(fd.iloc[i])) / period
-                al.append(__)
+        def avgstep(source, direction, period):
+            res = []
+            for i in range(len(source)):
+                if i < period:
+                    _ = np.nan
+                elif i == period:
+                    hdr = source[:i]
+                    if direction == '+':
+                        _ = hdr[hdr.gt(0)].sum() / period
+                    if direction == '-':
+                        _ = hdr[hdr.lt(0)].abs().sum() / period
+                else:
+                    _ = res[i - 1]
+                    if direction == '+' and source[i] > 0:
+                        _ = (_ * (period - 1) + source[i]) / period
+                    if direction == '-' and source[i] < 0:
+                        _ = (_ * (period - 1) + abs(source[i])) / period
+                res.append(_)
+            return res
 
-        for i in lenrange:
-            t_ = np.nan
-            if i >= period:
-                t_ = 100 - 100 / (1 + ag[i] / al[i])
-            tmp.append(t_)
-        _['rsi'] = tmp
+        ag = avgstep(fd, '+', period)
+        al = avgstep(fd, '-', period)
+
+        _['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
         return _.rsi
 
 
