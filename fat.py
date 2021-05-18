@@ -46,6 +46,7 @@ class Index(Futures):
         self.session = Futures('Futures').session
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
+        self.__data = self.compose()
 
     def __call__(self):
         return self.compose()
@@ -95,39 +96,44 @@ class Index(Futures):
         _ = _.drop('date', axis=1)
         return _
 
-    def sma(self, period=7):
-        tmp = self.compose().close.rolling(period).mean()
-        tmp.name = 'sma'
-        return tmp
+    def sma(self, period=periods['Futures']['simple'], data=None):
+        if data == None:
+            data = self.__data
+        _ = data.close.rolling(period).mean()
+        _.name = 'sma'
+        return _
 
-    def wma(self, period=7):
-        _ = self.compose()
-        tmp = (_.close * _.volume).rolling(period).sum() / _.volume.rolling(period).sum()
-        tmp.name = 'wma'
-        return tmp
+    def wma(self, period=periods['Futures']['simple'], data=None):
+        if data == None:
+            data = self.__data
+        _ = (data.close * data.volume).rolling(period).sum() / data.volume.rolling(period).sum()
+        _.name = 'wma'
+        return _
 
-    def ema(self, period=7):
-        _ = self.compose()
+    def ema(self, period=periods['Futures']['simple'], data=None):
+        if data == None:
+            data = self.__data
         sma = self.sma(period)
-        dp = pd.concat([_.close, sma], axis=1)
+        _ = pd.concat([data.close, sma], axis=1)
         i, tmp = 0, []
-        while i < len(dp):
+        while i < len(_):
             try:
                 if pd.isna(tmp[i-1]):
-                    v = dp.iloc[i].sma
+                    v = _.iloc[i].sma
                 else:
-                    v = (tmp[-1] * (period - 1) + dp.iloc[i].close) / period
+                    v = (tmp[-1] * (period - 1) + _.iloc[i].close) / period
             except Exception:
-                v = dp.iloc[i].sma
+                v = _.iloc[i].sma
             tmp.append(v)
             i += 1
-        dp['ema'] = tmp
-        return dp.ema
+        _['ema'] = tmp
+        return _.ema
 
-    def rsi(self, period=periods['Futures']['rsi']):
+    def rsi(self, period=periods['Futures']['rsi'], data=None):
+        if data == None:
+            data = self.__data
         import numpy as np
-        _ = self.compose()
-        fd = _.close.diff()
+        fd = data.close.diff()
 
         def avgstep(source, direction, period):
             i, res = 0, []
@@ -153,8 +159,8 @@ class Index(Futures):
         ag = avgstep(fd, '+', period)
         al = avgstep(fd, '-', period)
 
-        _['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
-        return _.rsi
+        data['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
+        return data.rsi
 
 
 def commit(values):
