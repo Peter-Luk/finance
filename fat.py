@@ -110,8 +110,8 @@ class Index(Futures):
         _ = self.compose()
         sma = self.sma(period)
         dp = pd.concat([_.close, sma], axis=1)
-        tmp = []
-        for i in range(len(dp)):
+        i, tmp = 0, []
+        while i < len(dp):
             try:
                 if pd.isna(tmp[i-1]):
                     v = dp.iloc[i].sma
@@ -120,6 +120,7 @@ class Index(Futures):
             except Exception:
                 v = dp.iloc[i].sma
             tmp.append(v)
+            i += 1
         dp['ema'] = tmp
         return dp.ema
 
@@ -129,8 +130,8 @@ class Index(Futures):
         fd = _.close.diff()
 
         def avgstep(source, direction, period):
-            res = []
-            for i in range(len(source)):
+            i, res = 0, []
+            while i < len(source):
                 if i < period:
                     _ = np.nan
                 elif i == period:
@@ -146,6 +147,7 @@ class Index(Futures):
                     if direction == '-' and source[i] < 0:
                         _ = (_ * (period - 1) + abs(source[i])) / period
                 res.append(_)
+                i += 1
             return res
 
         ag = avgstep(fd, '+', period)
