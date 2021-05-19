@@ -1,10 +1,10 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf
+from pafintools import FOA
 from pref import periods
 import datetime
 import pandas as pd
-import numpy as np
 
 Session = sessionmaker()
 Base = declarative_base()
@@ -42,12 +42,13 @@ class Futures(Record):
         self.query = self.session.query(Record)
 
 
-class Index(Futures):
+class Index(Futures, FOA):
     def __init__(self, code):
         self.session = Futures('Futures').session
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
+        self.analyser = FOA(self.__data)
 
     def __call__(self):
         return self.compose()
@@ -97,102 +98,23 @@ class Index(Futures):
         _ = _.drop('date', axis=1)
         return _
 
-    def sma(self, period=periods['Futures']['simple'], data=None):
-        if isinstance(data, type(None)):
-            data = self.__data.close
-        _ = data.rolling(period).mean()
-        _.name = 'sma'
-        return _
+    def sma(self, period=periods['Futures']['simple']):
+        return self.analyser.sma(period)
 
-    def wma(self, period=periods['Futures']['simple'], data=None):
-        if isinstance(data, type(None)):
-            data = self.__data
-        _ = (data.close * data.volume).rolling(period).sum() / data.volume.rolling(period).sum()
-        _.name = 'wma'
-        return _
+    def wma(self, period=periods['Futures']['simple']):
+        return self.analyser.wma(period)
 
-    def ema(self, period=periods['Futures']['simple'], data=None):
-        if isinstance(data, type(None)):
-            data = self.__data.close
-        sma = self.sma(period, data)
-        _ = pd.concat([data, sma], axis=1)
-        i, tmp = 0, []
-        while i < len(_):
-            try:
-                if pd.isna(tmp[-1]):
-                    v = _.iloc[i, 1]
-                else:
-                    v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
-            except Exception:
-                v = _.iloc[i, 1]
-            tmp.append(v)
-            i += 1
-        _['ema'] = tmp
-        return _.ema
+    def ema(self, period=periods['Futures']['simple']):
+        return self.analyser.ema(period)
 
-    def rsi(self, period=periods['Futures']['rsi'], data=None):
-        if isinstance(data, type(None)):
-            data = self.__data
-        fd = data.close.diff()
+    def rsi(self, period=periods['Futures']['rsi']):
+        return self.analyser.rsi(period)
 
-        def avgstep(source, direction, period):
-            i, res = 0, []
-            while i < len(source):
-                if i < period:
-                    _ = np.nan
-                elif i == period:
-                    hdr = source[:i]
-                    if direction == '+':
-                        _ = hdr[hdr.gt(0)].sum() / period
-                    if direction == '-':
-                        _ = hdr[hdr.lt(0)].abs().sum() / period
-                else:
-                    _ = res[i - 1]
-                    if direction == '+' and source[i] > 0:
-                        _ = (_ * (period - 1) + source[i]) / period
-                    if direction == '-' and source[i] < 0:
-                        _ = (_ * (period - 1) + abs(source[i])) / period
-                res.append(_)
-                i += 1
-            return res
+    def atr(self, period=periods['Futures']['atr']):
+        return self.analyser.atr(period)
 
-        ag = avgstep(fd, '+', period)
-        al = avgstep(fd, '-', period)
-
-        data['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
-        return data.rsi
-
-    def atr(self, period=periods['Futures']['atr'], data=None):
-        if isinstance(data, type(None)):
-            data = self.__data
-        pc = data.close.shift()
-        _ = pd.concat([data.high - data.low, (data.high - pc).abs(), (data.low - pc).abs()], axis=1).max(axis=1)
-        _['atr'] = self.ema(period, _)
-        _.atr.name = 'atr'
-        return _.atr
-
-    def kama(self, period=periods['Futures']['kama'], data=None):
-        if isinstance(data, type(None)):
-            data = self.__data.close
-        sma = self.sma(period['er'], data)
-        acp = data.diff(period['er']).fillna(0).abs()
-        vot = data.diff().fillna(0).abs().rolling(period['er']).sum()
-        er = acp / vot
-        sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
-        _ = pd.concat([data, sma, sc], axis=1)
-        i, tmp = 0, []
-        while i < len(_):
-            try:
-                if pd.isna(tmp[-1]):
-                    v = _.iloc[i, 1]
-                else:
-                    v = tmp[-1] + _.iloc[i, 2] * (_.iloc[i, 0] - tmp[-1])
-            except Exception:
-                v = _.iloc[i, 1]
-            tmp.append(v)
-            i += 1
-        _['kama'] = tmp
-        return _.kama
+    def kama(self, period=periods['Futures']['kama']):
+        return self.analyser.kama(period)
 
 
 def commit(values):
