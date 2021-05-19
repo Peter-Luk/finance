@@ -97,40 +97,40 @@ class Index(Futures):
         return _
 
     def sma(self, period=periods['Futures']['simple'], data=None):
-        if data == None:
-            data = self.__data
-        _ = data.close.rolling(period).mean()
+        if isinstance(data, type(None)):
+            data = self.__data.close
+        _ = data.rolling(period).mean()
         _.name = 'sma'
         return _
 
     def wma(self, period=periods['Futures']['simple'], data=None):
-        if data == None:
+        if isinstance(data, type(None)):
             data = self.__data
         _ = (data.close * data.volume).rolling(period).sum() / data.volume.rolling(period).sum()
         _.name = 'wma'
         return _
 
     def ema(self, period=periods['Futures']['simple'], data=None):
-        if data == None:
-            data = self.__data
-        sma = self.sma(period)
-        _ = pd.concat([data.close, sma], axis=1)
+        if isinstance(data, type(None)):
+            data = self.__data.close
+        sma = self.sma(period, data)
+        _ = pd.concat([data, sma], axis=1)
         i, tmp = 0, []
         while i < len(_):
             try:
                 if pd.isna(tmp[i-1]):
-                    v = _.iloc[i].sma
+                    v = _.iloc[i, 1]
                 else:
-                    v = (tmp[-1] * (period - 1) + _.iloc[i].close) / period
+                    v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
             except Exception:
-                v = _.iloc[i].sma
+                v = _.iloc[i, 1]
             tmp.append(v)
             i += 1
         _['ema'] = tmp
         return _.ema
 
     def rsi(self, period=periods['Futures']['rsi'], data=None):
-        if data == None:
+        if isinstance(data, type(None)):
             data = self.__data
         import numpy as np
         fd = data.close.diff()
@@ -161,6 +161,15 @@ class Index(Futures):
 
         data['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
         return data.rsi
+
+    def atr(self, period=periods['Futures']['atr'], data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        pc = data.close.shift()
+        _ = pd.concat([data.high - data.low, (data.high - pc).abs(), (data.low - pc).abs()], axis=1).max(axis=1)
+        _['atr'] = self.ema(period, _)
+        _.atr.name = 'atr'
+        return _.atr
 
 
 def commit(values):
