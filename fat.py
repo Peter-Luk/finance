@@ -4,6 +4,7 @@ from utilities import filepath, waf
 from pref import periods
 import datetime
 import pandas as pd
+import numpy as np
 
 Session = sessionmaker()
 Base = declarative_base()
@@ -132,7 +133,6 @@ class Index(Futures):
     def rsi(self, period=periods['Futures']['rsi'], data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        import numpy as np
         fd = data.close.diff()
 
         def avgstep(source, direction, period):
@@ -170,6 +170,29 @@ class Index(Futures):
         _['atr'] = self.ema(period, _)
         _.atr.name = 'atr'
         return _.atr
+
+    def kama(self, period=periods['Futures']['kama'], data=None):
+        if isinstance(data, type(None)):
+            data = self.__data.close
+        sma = self.sma(period['er'], data)
+        acp = data.diff(period['er']).fillna(0).abs()
+        vot = data.diff().fillna(0).abs().rolling(period['er']).sum()
+        er = acp / vot
+        sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
+        _ = pd.concat([data, sma, sc], axis=1)
+        i, tmp = 0, []
+        while i < len(_):
+            try:
+                if pd.isna(tmp[-1]):
+                    v = _.iloc[i, 1]
+                else:
+                    v = tmp[-1] + _.iloc[i, 2] * (_.iloc[i, 0] - tmp[-1])
+            except Exception:
+                v = _.iloc[i, 1]
+            tmp.append(v)
+            i += 1
+        _['kama'] = tmp
+        return _.kama
 
 
 def commit(values):
