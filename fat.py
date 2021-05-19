@@ -42,6 +42,14 @@ class Futures(Record):
         self.query = self.session.query(Record)
 
 
+class Securities(Record):
+    def __init__(self, db='Securities'):
+        self.engine = create_engine(f"sqlite:///{filepath(db)}")
+        Session.configure(bind=self.engine)
+        self.session = Session()
+        self.query = self.session.query(Record)
+
+
 class Index(Futures, FOA):
     def __init__(self, code):
         self.session = Futures('Futures').session
