@@ -119,7 +119,7 @@ class Index(Futures):
         i, tmp = 0, []
         while i < len(_):
             try:
-                if pd.isna(tmp[i-1]):
+                if pd.isna(tmp[-1]):
                     v = _.iloc[i, 1]
                 else:
                     v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
