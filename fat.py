@@ -1,4 +1,4 @@
-from sqlalchemy.orm import sessionmaker, declarative_base, deferred
+from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf
 from pafintools import FOA
@@ -48,7 +48,7 @@ class Securities(Record):
         Session.configure(bind=self.engine)
         self.session = Session()
         query = self.session.query(Record.code.label('code')).subquery()
-        self.query = self.session.query(query.c.code.label('eid'))
+        self.query = self.session.query(query.c.code.label('eid')).options(defer('session'))
 
 
 class Index(Futures, FOA):
@@ -123,6 +123,43 @@ class Index(Futures, FOA):
         return self.analyser.atr(period)
 
     def kama(self, period=periods['Futures']['kama']):
+        return self.analyser.kama(period)
+
+
+class Equity(Securities, FOA):
+    def __init__(self, code):
+        self.session = Securities('Securities').session
+        self.code = code
+        fields = [Record.date, Record.open, Record.high, Record.low, Record.close, Record.volume]
+        self.query = self.session.query(*fields).filter(text(f"eid={self.code}"))
+        self.__data = self.compose()
+        self.analyser = FOA(self.__data)
+
+    def __call__(self):
+        return self.compose()
+
+    def compose(self):
+        _ = pd.read_sql(self.query.statement, self.session.bind, parse_dates=['date'])
+        _ = _.set_index(pd.DatetimeIndex(_.date))
+        _ = _.drop('date', axis=1)
+        return _
+
+    def sma(self, period=periods['Equities']['simple']):
+        return self.analyser.sma(period)
+
+    def wma(self, period=periods['Equities']['simple']):
+        return self.analyser.wma(period)
+
+    def ema(self, period=periods['Equities']['simple']):
+        return self.analyser.ema(period)
+
+    def rsi(self, period=periods['Equities']['rsi']):
+        return self.analyser.rsi(period)
+
+    def atr(self, period=periods['Equities']['atr']):
+        return self.analyser.atr(period)
+
+    def kama(self, period=periods['Equities']['kama']):
         return self.analyser.kama(period)
 
 
