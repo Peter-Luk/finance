@@ -1,4 +1,4 @@
-from sqlalchemy.orm import sessionmaker, declarative_base, load_only
+from sqlalchemy.orm import sessionmaker, declarative_base, deferred
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf
 from pafintools import FOA
@@ -17,9 +17,9 @@ class Record(Base):
     date = Column(Date, default=_create_at.date(),
             server_default=text(str(_create_at.date())))
     if _create_at.time() < datetime.time(12,25,0):
-        session = Column(String, default='M', server_default=text('M'))
+        session = deferred(Column(String, default='M', server_default=text('M')))
     else:
-        session = Column(String, default='A', server_default=text('A'))
+        session = deferred(Column(String, default='A', server_default=text('A')))
     open = Column(Integer)
     high = Column(Integer)
     low = Column(Integer)
@@ -47,7 +47,8 @@ class Securities(Record):
         self.engine = create_engine(f"sqlite:///{filepath(db)}")
         Session.configure(bind=self.engine)
         self.session = Session()
-        self.query = self.session.query(Record)
+        query = self.session.query(Record.code.label('code')).subquery()
+        self.query = self.session.query(query.c.code.label('eid'))
 
 
 class Index(Futures, FOA):
