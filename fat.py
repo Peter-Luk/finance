@@ -162,6 +162,24 @@ class Equity(Securities, FOA):
     def kama(self, period=periods['Equities']['kama']):
         return self.analyser.kama(period)
 
+    def soc(self, period=periods['Equities']['soc']):
+        return self.analyser.soc(period)
+
+    def stc(self, period=periods['Equities']['stc']):
+        return self.analyser.stc(period)
+
+    def adx(self, period=periods['Equities']['adx']):
+        return self.analyser.adx(period)
+
+    def kc(self, period=periods['Equities']['kc']):
+        return self.analyser.kc(period)
+
+    def apz(self, period=periods['Equities']['apz']):
+        return self.analyser.apz(period)
+
+    def dc(self, period=periods['Equities']['dc']):
+        return self.analyser.dc(period)
+
 
 def commit(values):
     _ = Index(waf()[-1]).session

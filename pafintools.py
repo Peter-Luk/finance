@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.constants import golden_ratio as gr
 
 class FOA(object):
     def __init__(self, data):
@@ -101,3 +102,98 @@ class FOA(object):
             i += 1
         _['kama'] = tmp
         return _.kama
+
+    def soc(self, period, data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        ml = data.low.rolling(period['K']).min()
+        mh = data.high.rolling(period['K']).max()
+        data['kseries'] = np.apply_along_axis(lambda a, b, c: (a - c) /(b - c) * 100, 0, data.close, mh, ml)
+        k = data.kseries.rolling(period['D']).mean()
+        k.name = '%K'
+        d = k.rolling(period['D']).mean()
+        d.name = '%D'
+        _ = pd.concat([k, d], axis=1)
+        _.name = 'SOC'.lower()
+        return _
+
+    def stc(self, period, data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        hl = (data.high + data.low) / 2
+        e_slow = self.ema(period['slow'], hl)
+        e_fast = self.ema(period['fast'], hl)
+        m_line = e_fast.sub(e_slow)
+        mh = m_line.rolling(period['K']).max()
+        ml = m_line.rolling(period['K']).min()
+        kseries = (m_line - ml) / (mh - ml)
+        k = kseries.rolling(period['D']).mean()
+        k.name = '%K'
+        d = k.rolling(period['D']).mean()
+        d.name = '%D'
+        _ = (m_line - k) / (d - k)
+        _.name = 'STC'.lower()
+        return _
+
+    def adx(self period, data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        atr = self.atr(period)
+        hcp, lpc = data.high.diff(1), -(data.low.diff(1))
+
+        def _hgl(_):
+            if _[0] > _[-1] and _[0] > 0:
+                return _[0]
+            return 0
+        dm_plus = pd.concat([hcp, lpc], axis=1).apply(_hgl, axis=1)
+        dm_minus = pd.concat([lpc, hcp], axis=1).apply(_hgl, axis=1)
+        di_plus = self.ema(period, dm_plus) / atr * 100
+        di_plus.name = f'+DI{period:02d}'
+
+        di_minus = self.ema(period, dm_minus) / atr * 100
+        di_minus.name = f'-DI{period:02d}'
+
+        dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
+        _ = self.ema(period, dx)
+        _.name = f'ADX{period:02d}'
+        __ = pd.concat([di_plus, di_minus, _], axis=1)
+        return __
+
+    def kc(self, period, data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        hl = (data.high + data.low) / 2
+        middle_line = self.kama(period['kama'], hl)
+        atr = self.atr(period['atr'], data)
+        upper = middle_line + (gr * atr)
+        lower = middle_line - (gr * atr)
+        _ = pd.concat([upper, lower], axis=1)
+        _.columns = ['Upper', 'Lower']
+        return _
+
+    def apz(self, period, data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        hl = (data.high + data.low) / 2
+        ehl = self.ema(period, hl)
+        volatility = self.ema(period, ehl)
+        tr = pd.DataFrame(
+            [data.high - data.low,
+                (data.high - data.close.shift(1)).abs(),
+                (data.low - data.close.shift(1)).abs()]).max()
+
+        upper = volatility + tr * gr
+        lower = volatility - tr * gr
+        _ = pd.concat([upper, lower], axis=1)
+        _.columns = ['Upper', 'Lower']
+        return _
+
+    def dc(self, period, data=None):
+        # Donchian Channel
+        if isinstance(data, type(None)):
+            data = self.__data
+        pax = data.high.rolling(period).max()
+        pin = data.low.rolling(period).min()
+        _ = pd.concat([pax, pin], axis=1)
+        _.columns = ['Upper', 'Lower']
+        return _
