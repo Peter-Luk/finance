@@ -135,7 +135,7 @@ class FOA(object):
         _.name = 'STC'.lower()
         return _
 
-    def adx(self period, data=None):
+    def adx(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
         atr = self.atr(period)
