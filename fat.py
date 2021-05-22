@@ -1,10 +1,9 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf
-from pafintools import FOA
+from pafintools import FOA, pd, np
 from pref import periods
 import datetime
-import pandas as pd
 
 Session = sessionmaker()
 Base = declarative_base()
@@ -199,10 +198,42 @@ class Equity(Securities, FOA):
         return self.analyser.kc(period)
 
     def apz(self, period=periods['Equities']['apz']):
-        return self.analyser.apz(period)
+        _ = self.analyser.apz(period)
+        _.Upper = _.Upper.apply(roundup, 1)
+        _.Lower = _.Lower.apply(roundup, 1)
+        return _
 
     def dc(self, period=periods['Equities']['dc']):
         return self.analyser.dc(period)
+
+
+def roundup(value):
+    if np.isnan(value) or not value > 0:
+        return np.nan
+    _ = int(np.floor(np.log10(value)))
+    __ = np.divmod(value, 10 ** (_ - 1))[0]
+    if _ < 0:
+        if __ < 25:
+            return np.round(value, 3)
+        if __ < 50:
+            return np.round(value * 2, 2) / 2
+        return np.round(value, 2)
+    if _ == 0:
+        return np.round(value, 2)
+    if _ > 3:
+        return np.round(value, 0)
+    if _ > 1:
+        if __ < 20:
+            return np.round(value, 1)
+        if __ < 50:
+            return np.round(value * 5, 0) / 5
+        return np.round(value * 2, 0) / 2
+    if _ > 0:
+        if __ < 10:
+            return np.round(value, 2)
+        if __ < 20:
+            return np.round(value * 5, 1) / 5
+        return np.round(value * 2, 1) / 2
 
 
 def commit(values):
