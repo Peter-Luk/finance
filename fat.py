@@ -125,6 +125,24 @@ class Index(Futures, FOA):
     def kama(self, period=periods['Futures']['kama']):
         return self.analyser.kama(period)
 
+    def soc(self, period=periods['Futures']['soc']):
+        return self.analyser.soc(period)
+
+    def stc(self, period=periods['Futures']['stc']):
+        return self.analyser.stc(period)
+
+    def adx(self, period=periods['Futures']['adx']):
+        return self.analyser.adx(period)
+
+    def kc(self, period=periods['Futures']['kc']):
+        return self.analyser.kc(period)
+
+    def apz(self, period=periods['Futures']['apz']):
+        return self.analyser.apz(period)
+
+    def dc(self, period=periods['Futures']['dc']):
+        return self.analyser.dc(period)
+
 
 class Equity(Securities, FOA):
     def __init__(self, code):
