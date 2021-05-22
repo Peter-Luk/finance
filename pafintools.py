@@ -71,6 +71,20 @@ class FOA(object):
         data['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
         return data.rsi
 
+
+    def macd(self, period, data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        hl = (data.high + data.low) / 2
+        e_slow = self.ema(period['slow'], hl)
+        e_fast = self.ema(period['fast'], hl)
+        m_line = e_fast - e_slow
+        s_line = self.ema(period['signal'], m_line)
+        m_hist = m_line - s_line
+        _ = pd.concat([m_line, s_line, m_hist], axis=1)
+        _.columns = ['M Line', 'Signal', 'Histogram']
+        return _
+
     def atr(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
