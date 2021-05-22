@@ -209,3 +209,31 @@ class FOA(object):
         _ = pd.concat([pax, pin], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
+
+    def bb(self, period, data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        middle_line = self.sma(period, data)
+        width = data.close.rolling(period).std()
+        upper = middle_line + width
+        lower = middle_line - width
+        _ = pd.concat([upper, lower], axis=1)
+        _.columns = ['Upper', 'Lower']
+        return _
+
+    def obv(self, data=None):
+        if isinstance(data, type(None)):
+            data = self.__data
+        hdr, _ = [data.volume.iloc[0]], 1
+        dcp = data.close.diff(1)
+        while _ < dcp.size:
+            val = 0
+            if dcp[_] > 0:
+                val = data.volume.iloc[_]
+            if dcp[_] < 0:
+                val = -data.volume.iloc[_]
+            hdr.append(hdr[-1] + val)
+            _ += 1
+        _ = pd.Series(hdr, index=dcp.index)
+        _.name = 'OBV'
+        return _

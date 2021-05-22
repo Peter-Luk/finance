@@ -145,6 +145,9 @@ class Index(Futures, FOA):
     def dc(self, period=periods['Futures']['dc']):
         return self.analyser.dc(period)
 
+    def obv(self):
+        return self.analyser.obv()
+
 
 class Equity(Securities, FOA):
     def __init__(self, code):
@@ -165,13 +168,13 @@ class Equity(Securities, FOA):
         return _
 
     def sma(self, period=periods['Equities']['simple']):
-        return self.analyser.sma(period)
+        return self.analyser.sma(period).apply(roundup)
 
     def wma(self, period=periods['Equities']['simple']):
-        return self.analyser.wma(period)
+        return self.analyser.wma(period).apply(roundup)
 
     def ema(self, period=periods['Equities']['simple']):
-        return self.analyser.ema(period)
+        return self.analyser.ema(period).apply(roundup)
 
     def macd(self, period=periods['Equities']['macd']):
         return self.analyser.macd(period)
@@ -183,7 +186,7 @@ class Equity(Securities, FOA):
         return self.analyser.atr(period)
 
     def kama(self, period=periods['Equities']['kama']):
-        return self.analyser.kama(period)
+        return self.analyser.kama(period).apply(roundup)
 
     def soc(self, period=periods['Equities']['soc']):
         return self.analyser.soc(period)
@@ -195,16 +198,25 @@ class Equity(Securities, FOA):
         return self.analyser.adx(period)
 
     def kc(self, period=periods['Equities']['kc']):
-        return self.analyser.kc(period)
+        _ = self.analyser.kc(period)
+        _.Upper = _.Upper.apply(roundup)
+        _.Lower = _.Lower.apply(roundup)
+        return _
 
     def apz(self, period=periods['Equities']['apz']):
         _ = self.analyser.apz(period)
-        _.Upper = _.Upper.apply(roundup, 1)
-        _.Lower = _.Lower.apply(roundup, 1)
+        _.Upper = _.Upper.apply(roundup)
+        _.Lower = _.Lower.apply(roundup)
         return _
 
     def dc(self, period=periods['Equities']['dc']):
-        return self.analyser.dc(period)
+        _ = self.analyser.dc(period)
+        _.Upper = _.Upper.apply(roundup)
+        _.Lower = _.Lower.apply(roundup)
+        return _
+
+    def obv(self):
+        return self.analyser.obv()
 
 
 def roundup(value):
