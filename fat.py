@@ -116,7 +116,7 @@ class Index(Futures, FOA):
     def ema(self, period=periods['Futures']['simple']):
         return self.analyser.ema(period)
 
-    def macd(self, period=periods['Futures']['mcad']):
+    def macd(self, period=periods['Futures']['macd']):
         return self.analyser.macd(period)
 
     def rsi(self, period=periods['Futures']['rsi']):
@@ -174,7 +174,7 @@ class Equity(Securities, FOA):
     def ema(self, period=periods['Equities']['simple']):
         return self.analyser.ema(period)
 
-    def macd(self, period=periods['Equities']['mcad']):
+    def macd(self, period=periods['Equities']['macd']):
         return self.analyser.macd(period)
 
     def rsi(self, period=periods['Equities']['rsi']):
