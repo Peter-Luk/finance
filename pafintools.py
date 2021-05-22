@@ -139,14 +139,12 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         atr = self.atr(period)
-        hcp, lpc = data.high.diff(1), -(data.low.diff(1))
-
-        def _hgl(_):
-            if _[0] > _[-1] and _[0] > 0:
-                return _[0]
-            return 0
-        dm_plus = pd.concat([hcp, lpc], axis=1).apply(_hgl, axis=1)
-        dm_minus = pd.concat([lpc, hcp], axis=1).apply(_hgl, axis=1)
+        _ = data.high.diff()
+        _[_<0] = 0
+        dm_plus = _.fillna(0)
+        _ = data.low.diff()
+        _[_<0] = 0
+        dm_minus = _.fillna(0)
         di_plus = self.ema(period, dm_plus) / atr * 100
         di_plus.name = f'+DI{period:02d}'
 
