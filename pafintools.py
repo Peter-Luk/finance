@@ -71,7 +71,6 @@ class FOA(object):
         data['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
         return data.rsi
 
-
     def macd(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
