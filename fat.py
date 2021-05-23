@@ -125,7 +125,7 @@ class Index(Futures, FOA):
         return self.analyser.atr(period)
 
     def kama(self, period=periods['Futures']['kama']):
-        return self.analyser.kama(period)
+        return self.analyser.kama(period).apply(roundup).astype('Int32')
 
     def soc(self, period=periods['Futures']['soc']):
         return self.analyser.soc(period)
@@ -217,6 +217,12 @@ class Equity(Securities, FOA):
 
     def obv(self):
         return self.analyser.obv()
+
+    def bb(self, period=periods['Equities']['simple']):
+        _ = self.analyser.bb(period)
+        _.Upper = _.Upper.apply(roundup)
+        _.Lower = _.Lower.apply(roundup)
+        return _
 
 
 def roundup(value):

@@ -27,13 +27,17 @@ class FOA(object):
         _ = pd.concat([data, sma], axis=1)
         i, tmp = 0, []
         while i < len(_):
-            try:
-                if pd.isna(tmp[-1]):
-                    v = _.iloc[i, 1]
-                else:
-                    v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
-            except Exception:
+            if i <= period:
                 v = _.iloc[i, 1]
+            else:
+                v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
+            # try:
+            #     if pd.isna(tmp[-1]):
+            #         v = _.iloc[i, 1]
+            #     else:
+            #         v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
+            # except Exception:
+            #     v = _.iloc[i, 1]
             tmp.append(v)
             i += 1
         _['ema'] = tmp
@@ -186,12 +190,12 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         hl = (data.high + data.low) / 2
-        ehl = self.ema(period, hl)
-        volatility = self.ema(period, ehl)
-        tr = pd.DataFrame(
+        ehl = self.ema(period, hl).fillna(0)
+        volatility = self.ema(2 * period, ehl)
+        tr = pd.concat(
             [data.high - data.low,
                 (data.high - data.close.shift(1)).abs(),
-                (data.low - data.close.shift(1)).abs()]).max()
+                (data.low - data.close.shift(1)).abs()], 1).max(axis=1)
 
         upper = volatility + tr * gr
         lower = volatility - tr * gr
@@ -211,12 +215,12 @@ class FOA(object):
 
     def bb(self, period, data=None):
         if isinstance(data, type(None)):
-            data = self.__data
-        middle_line = self.sma(period, data)
-        width = data.close.rolling(period).std()
-        upper = middle_line + width
-        lower = middle_line - width
-        _ = pd.concat([upper, lower], axis=1)
+            data = self.__data.close
+        ml = self.sma(period, data)
+        wd = data.rolling(period).std()
+        # data['upper'] = middle_line + width
+        # data['lower'] = middle_line - width
+        _ = pd.concat([ml + wd, ml - wd], 1)
         _.columns = ['Upper', 'Lower']
         return _
 
