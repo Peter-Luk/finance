@@ -224,16 +224,16 @@ class FOA(object):
     def obv(self, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        hdr, _ = [data.volume.iloc[0]], 1
-        dcp = data.close.diff(1)
-        while _ < dcp.size:
-            val = 0
-            if dcp[_] > 0:
-                val = data.volume.iloc[_]
-            if dcp[_] < 0:
-                val = -data.volume.iloc[_]
-            hdr.append(hdr[-1] + val)
-            _ += 1
-        _ = pd.Series(hdr, index=dcp.index)
-        _.name = 'OBV'
-        return _
+        data['zero'] = np.zeros(len(data))
+        dcp = data.close.diff()
+        vp = data.volume[dcp.gt(0)]
+        vm = -data.volume[dcp.lt(0)]
+        ve = data.zero[dcp.eq(0)]
+        data['obv'] = pd.concat([vp, vm, ve], 0).sort_index().cumsum()
+        return data['obv']
+
+    def vwap(self, data=None):
+        if isinstance(data, type(None)):
+            pv = data.drop(['open', 'volume'], 1).mean(axis=1) * data.volume
+        data['vwap'] = pv.cumsum() / data.volume.cumsum()
+        return data['vwap']
