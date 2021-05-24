@@ -31,13 +31,6 @@ class FOA(object):
                 v = _.iloc[i, 1]
             else:
                 v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
-            # try:
-            #     if pd.isna(tmp[-1]):
-            #         v = _.iloc[i, 1]
-            #     else:
-            #         v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
-            # except Exception:
-            #     v = _.iloc[i, 1]
             tmp.append(v)
             i += 1
         _['ema'] = tmp
@@ -218,8 +211,6 @@ class FOA(object):
             data = self.__data.close
         ml = self.sma(period, data)
         wd = data.rolling(period).std()
-        # data['upper'] = middle_line + width
-        # data['lower'] = middle_line - width
         _ = pd.concat([ml + wd, ml - wd], 1)
         _.columns = ['Upper', 'Lower']
         return _
