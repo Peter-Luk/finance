@@ -148,6 +148,12 @@ class Index(Futures, FOA):
     def obv(self):
         return self.analyser.obv()
 
+    def bb(self, period=periods['Futures']['simple']):
+        _ = self.analyser.bb(period)
+        _.Upper = _.Upper.apply(roundup)
+        _.Lower = _.Lower.apply(roundup)
+        return _
+
 
 class Equity(Securities, FOA):
     def __init__(self, code):
