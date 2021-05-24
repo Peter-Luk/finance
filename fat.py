@@ -107,13 +107,14 @@ class Index(Futures, FOA):
         return _
 
     def sma(self, period=periods['Futures']['simple']):
-        return self.analyser.sma(period)
+        return self.analyser.sma(period).apply(roundup).astype('Int32')
 
     def wma(self, period=periods['Futures']['simple']):
-        return self.analyser.wma(period)
+        return self.analyser.wma(period).apply(roundup).astype('Int32')
+
 
     def ema(self, period=periods['Futures']['simple']):
-        return self.analyser.ema(period)
+        return self.analyser.ema(period).apply(roundup).astype('Int32')
 
     def macd(self, period=periods['Futures']['macd']):
         return self.analyser.macd(period)
@@ -137,10 +138,16 @@ class Index(Futures, FOA):
         return self.analyser.adx(period)
 
     def kc(self, period=periods['Futures']['kc']):
-        return self.analyser.kc(period)
+        _ = self.analyser.kc(period)
+        _.Upper = _.Upper.apply(roundup)
+        _.Lower = _.Lower.apply(roundup)
+        return _
 
     def apz(self, period=periods['Futures']['apz']):
-        return self.analyser.apz(period)
+        _ = self.analyser.apz(period)
+        _.Upper = _.Upper.apply(roundup)
+        _.Lower = _.Lower.apply(roundup)
+        return _
 
     def dc(self, period=periods['Futures']['dc']):
         return self.analyser.dc(period)
