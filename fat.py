@@ -139,14 +139,14 @@ class Index(Futures, FOA):
 
     def kc(self, period=periods['Futures']['kc']):
         _ = self.analyser.kc(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
+        _.Upper = _.Upper.apply(roundup).astype('Int32')
+        _.Lower = _.Lower.apply(roundup).astype('Int32')
         return _
 
     def apz(self, period=periods['Futures']['apz']):
         _ = self.analyser.apz(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
+        _.Upper = _.Upper.apply(roundup).astype('Int32')
+        _.Lower = _.Lower.apply(roundup).astype('Int32')
         return _
 
     def dc(self, period=periods['Futures']['dc']):
@@ -157,8 +157,8 @@ class Index(Futures, FOA):
 
     def bb(self, period=periods['Futures']['simple']):
         _ = self.analyser.bb(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
+        _.Upper = _.Upper.apply(roundup).astype('Int32')
+        _.Lower = _.Lower.apply(roundup).astype('Int32')
         return _
 
 
