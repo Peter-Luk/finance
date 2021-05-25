@@ -75,7 +75,7 @@ class FOA(object):
         e_slow = self.ema(period['slow'], hl)
         e_fast = self.ema(period['fast'], hl)
         m_line = e_fast - e_slow
-        s_line = self.ema(period['signal'], m_line.fillna(0))
+        s_line = self.ema(period['signal'], m_line[period['slow']:])
         m_hist = m_line - s_line
         _ = pd.concat([m_line, s_line, m_hist], axis=1)
         _.columns = ['M Line', 'Signal', 'Histogram']
@@ -162,7 +162,7 @@ class FOA(object):
         di_minus.name = f'-DI{period:02d}'
 
         dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
-        _ = self.ema(period, dx.fillna(0))
+        _ = self.ema(period, dx[period:])
         _.name = f'ADX{period:02d}'
         __ = pd.concat([di_plus, di_minus, _], axis=1)
         return __
@@ -183,8 +183,8 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         hl = (data.high + data.low) / 2
-        ehl = self.ema(period, hl).fillna(0)
-        volatility = self.ema(2 * period, ehl)
+        ehl = self.ema(period, hl)
+        volatility = self.ema(2 * period, ehl[period:])
         tr = pd.concat(
             [data.high - data.low,
                 (data.high - data.close.shift(1)).abs(),
