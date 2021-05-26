@@ -112,7 +112,6 @@ class Index(Futures, FOA):
     def wma(self, period=periods['Futures']['simple']):
         return self.analyser.wma(period).apply(roundup).astype('Int32')
 
-
     def ema(self, period=periods['Futures']['simple']):
         return self.analyser.ema(period).apply(roundup).astype('Int32')
 
@@ -154,6 +153,9 @@ class Index(Futures, FOA):
 
     def obv(self):
         return self.analyser.obv()
+
+    def vwap(self):
+        return self.analyser.vwap()
 
     def bb(self, period=periods['Futures']['simple']):
         _ = self.analyser.bb(period)
@@ -230,6 +232,9 @@ class Equity(Securities, FOA):
 
     def obv(self):
         return self.analyser.obv()
+
+    def vwap(self):
+        return self.analyser.vwap()
 
     def bb(self, period=periods['Equities']['simple']):
         _ = self.analyser.bb(period)
