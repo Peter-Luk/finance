@@ -218,12 +218,21 @@ class FOA(object):
     def obv(self, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        data['zero'] = np.zeros(len(data))
         dcp = data.close.diff()
-        vp = data.volume[dcp.gt(0)]
-        vm = -data.volume[dcp.lt(0)]
-        ve = data.zero[dcp.eq(0)]
-        data['obv'] = pd.concat([vp, vm, ve], 0).sort_index().cumsum()
+        tmp, i = [], 0
+        while i < len(data.volume):
+            if i == 0:
+                _ = data.volume.iloc[i]
+            else:
+                if dcp.iloc[i] > 0:
+                    _ = tmp[i - 1] + data.volume.iloc[i]
+                elif dcp.iloc[i] < 0:
+                    _ = tmp[i - 1] - data.volume.iloc[i]
+                else:
+                    _ = tmp[i - 1]
+            tmp.append(_)
+            i += 1
+        data['obv'] = tmp
         return data['obv']
 
     def vwap(self, data=None):
