@@ -227,7 +227,7 @@ class FOA(object):
                 _ = tmp[i - 1]
                 if dcp.iloc[i] > 0:
                     _ += data.volume.iloc[i]
-                elif dcp.iloc[i] < 0:
+                if dcp.iloc[i] < 0:
                     _ -= data.volume.iloc[i]
             tmp.append(_)
             i += 1
