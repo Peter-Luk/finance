@@ -224,12 +224,11 @@ class FOA(object):
             if i == 0:
                 _ = data.volume.iloc[i]
             else:
+                _ = tmp[i - 1]
                 if dcp.iloc[i] > 0:
-                    _ = tmp[i - 1] + data.volume.iloc[i]
+                    _ += data.volume.iloc[i]
                 elif dcp.iloc[i] < 0:
-                    _ = tmp[i - 1] - data.volume.iloc[i]
-                else:
-                    _ = tmp[i - 1]
+                    _ -= data.volume.iloc[i]
             tmp.append(_)
             i += 1
         data['obv'] = tmp
