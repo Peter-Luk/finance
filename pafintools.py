@@ -101,7 +101,7 @@ class FOA(object):
         i, tmp = 0, []
         while i < len(_):
             v = _.iloc[i, 1]
-            if pd.notna(tmp[-1]):
+            if i > 0 and pd.notna(tmp[-1]):
                 v = tmp[-1] + _.iloc[i, 2] * (_.iloc[i, 0] - tmp[-1])
             #
             # try:
