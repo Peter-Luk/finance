@@ -221,9 +221,8 @@ class FOA(object):
         dcp = data.close.diff()
         tmp, i = [], 0
         while i < len(data.volume):
-            if i == 0:
-                _ = data.volume.iloc[i]
-            else:
+            _ = data.volume.iloc[i]
+            if i > 0:
                 _ = tmp[i - 1]
                 if dcp.iloc[i] > 0:
                     _ += data.volume.iloc[i]
