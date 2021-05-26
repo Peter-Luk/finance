@@ -27,9 +27,8 @@ class FOA(object):
         _ = pd.concat([data, sma], axis=1)
         i, tmp = 0, []
         while i < len(_):
-            if i <= period:
-                v = _.iloc[i, 1]
-            else:
+            v = _.iloc[i, 1]
+            if i > period:
                 v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
             tmp.append(v)
             i += 1
@@ -101,13 +100,17 @@ class FOA(object):
         _ = pd.concat([data, sma, sc], axis=1)
         i, tmp = 0, []
         while i < len(_):
-            try:
-                if pd.isna(tmp[-1]):
-                    v = _.iloc[i, 1]
-                else:
-                    v = tmp[-1] + _.iloc[i, 2] * (_.iloc[i, 0] - tmp[-1])
-            except Exception:
-                v = _.iloc[i, 1]
+            v = _.iloc[i, 1]
+            if pd.notna(tmp[-1]):
+                v = tmp[-1] + _.iloc[i, 2] * (_.iloc[i, 0] - tmp[-1])
+            #
+            # try:
+            #     if pd.isna(tmp[-1]):
+            #         v = _.iloc[i, 1]
+            #     else:
+            #         v = tmp[-1] + _.iloc[i, 2] * (_.iloc[i, 0] - tmp[-1])
+            # except Exception:
+            #     v = _.iloc[i, 1]
             tmp.append(v)
             i += 1
         _['kama'] = tmp
@@ -235,6 +238,7 @@ class FOA(object):
 
     def vwap(self, data=None):
         if isinstance(data, type(None)):
-            pv = data.drop(['open', 'volume'], 1).mean(axis=1) * data.volume
+            data = self.__data
+        pv = data.drop(['open', 'volume'], 1).mean(axis=1) * data.volume
         data['vwap'] = pv.cumsum() / data.volume.cumsum()
         return data['vwap']
