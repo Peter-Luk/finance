@@ -93,8 +93,8 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data.close
         sma = self.sma(period['er'], data)
-        acp = data.diff(period['er']).fillna(0).abs()
-        vot = data.diff().fillna(0).abs().rolling(period['er']).sum()
+        acp = data.diff(period['er']).abs()[period['er']:]
+        vot = data.diff(1).abs()[1:].rolling(period['er']).sum()
         er = acp / vot
         sc = (er * (2 / (period['fast'] + 1) - 2 / (period['slow'] + 1)) + 2 / (period['slow'] + 1)) ** 2
         _ = pd.concat([data, sma, sc], axis=1)
