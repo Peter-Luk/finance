@@ -144,12 +144,12 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         atr = self.atr(period)
-        _ = data.high.diff()
+        _ = data.high.diff(1)
         _[_<0] = 0
-        dm_plus = _.fillna(0)
-        _ = data.low.diff()
+        dm_plus = _[1:]
+        _ = data.low.diff(1)
         _[_<0] = 0
-        dm_minus = _.fillna(0)
+        dm_minus = _[1:]
         di_plus = self.ema(period, dm_plus) / atr * 100
         di_plus.name = f'+DI{period:02d}'
 
