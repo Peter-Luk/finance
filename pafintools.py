@@ -42,30 +42,23 @@ class FOA(object):
 
         def avgstep(source, direction, period):
             i, res = 0, []
-            if direction == '+':
-                while i < len(source):
-                    _, hdr = np.nan, source[:i]
-                    if i == period:
+
+            while i < len(source):
+                _, hdr = np.nan, source[:i]
+                if i == period:
+                    if direction == '+':
                         _ = hdr[hdr.gt(0)].sum() / period
-                    if i > period:
-                        _, hdr = res[-1], 0
-                        if source[i] > 0:
-                            hdr = source[i]
-                        _ = (_ * (period - 1) + hdr) / period
-                    res.append(_)
-                    i += 1
-            if direction == '-':
-                while i < len(source):
-                    _, hdr = np.nan, source[:i]
-                    if i == period:
+                    if direction == '-':
                         _ = hdr[hdr.lt(0)].abs().sum() / period
-                    if i > period:
-                        _, hdr = res[-1], 0
-                        if source[i] < 0:
-                            hdr = abs(source[i])
-                        _ = (_ * (period - 1) + hdr) / period
-                    res.append(_)
-                    i += 1
+                if i > period:
+                    _, hdr = res[-1], 0
+                    if direction == '+' and source[i] > 0:
+                        hdr = source[i]
+                    if direction == '-' and source[i] < 0:
+                        hdr = abs(source[i])
+                    _ = (_ * (period - 1) + hdr) / period
+                res.append(_)
+                i += 1
             return res
 
         ag = avgstep(fd, '+', period)
