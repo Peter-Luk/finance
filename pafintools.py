@@ -42,23 +42,46 @@ class FOA(object):
 
         def avgstep(source, direction, period):
             i, res = 0, []
-            while i < len(source):
-                if i < period:
-                    _ = np.nan
-                elif i == period:
-                    hdr = source[:i]
-                    if direction == '+':
+            if direction == '+':
+                while i < len(source):
+                    _, hdr = np.nan, source[:i]
+                    if i == period:
                         _ = hdr[hdr.gt(0)].sum() / period
-                    if direction == '-':
+                    if i > period:
+                        _ = res[-1]
+                        if source[i] > 0:
+                            _ = (_ * (period - 1) + source[i]) / period
+                    res.append(_)
+                    i += 1
+            if direction == '-':
+                while i < len(source):
+                    _, hdr = np.nan, source[:i]
+                    if i == period:
                         _ = hdr[hdr.lt(0)].abs().sum() / period
-                else:
-                    _ = res[i - 1]
-                    if direction == '+' and source[i] > 0:
-                        _ = (_ * (period - 1) + source[i]) / period
-                    if direction == '-' and source[i] < 0:
-                        _ = (_ * (period - 1) + abs(source[i])) / period
-                res.append(_)
-                i += 1
+                    if i > period:
+                        _ = res[-1]
+                        if source[i] < 0:
+                            _ = (_ * (period - 1) + abs(source[i])) / period
+                    res.append(_)
+                    i += 1
+
+            # while i < len(source):
+            #     if i < period:
+            #         _ = np.nan
+            #     elif i == period:
+            #         hdr = source[:i]
+            #         if direction == '+':
+            #             _ = hdr[hdr.gt(0)].sum() / period
+            #         if direction == '-':
+            #             _ = hdr[hdr.lt(0)].abs().sum() / period
+            #     else:
+            #         _ = res[i - 1]
+            #         if direction == '+' and source[i] > 0:
+            #             _ = (_ * (period - 1) + source[i]) / period
+            #         if direction == '-' and source[i] < 0:
+            #             _ = (_ * (period - 1) + abs(source[i])) / period
+            #     res.append(_)
+            #     i += 1
             return res
 
         ag = avgstep(fd, '+', period)
