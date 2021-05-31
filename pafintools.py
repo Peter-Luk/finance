@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from numba import jit
 from scipy.constants import golden_ratio as gr
 
 class FOA(object):
@@ -23,16 +24,21 @@ class FOA(object):
     def ema(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data.close
-        sma = self.sma(period, data)
-        _ = pd.concat([data, sma], axis=1)
-        i, tmp = 0, []
-        while i < len(_):
-            v = _.iloc[i, 1]
-            if i > period:
-                v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
-            tmp.append(v)
-            i += 1
-        _['ema'] = tmp
+        # if jit:
+        _ = data.to_frame()
+        y = stepper(period, data.to_numpy())
+        _['ema'] = y
+        # else:
+        #     sma = self.sma(period, data)
+        #     _ = pd.concat([data, sma], axis=1)
+        #     i, tmp = 0, []
+        #     while i < len(_):
+        #         v = _.iloc[i, 1]
+        #         if i > period:
+        #             v = (tmp[-1] * (period - 1) + _.iloc[i, 0]) / period
+        #         tmp.append(v)
+        #         i += 1
+        #     _['ema'] = tmp
         return _.ema
 
     def rsi(self, period, data=None):
@@ -157,7 +163,7 @@ class FOA(object):
         di_minus.name = f'-DI{period:02d}'
 
         dx = (di_plus - di_minus).abs() / (di_plus + di_minus) * 100
-        _ = self.ema(period, dx[period:])
+        _ = self.ema(period, dx[period + 1:])
         _.name = f'ADX{period:02d}'
         __ = pd.concat([di_plus, di_minus, _], axis=1)
         return __
@@ -234,3 +240,14 @@ class FOA(object):
         pv = data.drop(['open', 'volume'], 1).mean(axis=1) * data.volume
         data['vwap'] = pv.cumsum() / data.volume.cumsum()
         return data['vwap']
+
+@jit(nopython=True)
+def stepper(period, x):
+    y = np.empty(x.size)
+    y[:] = np.nan
+    for i in range(x.size):
+        if i == period:
+            y[i] = x[:i].mean()
+        if i > period:
+            y[i] = (y[i - 1] * (period - 1) + x[i]) / period
+    return y
