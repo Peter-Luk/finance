@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 from scipy.constants import golden_ratio as gr
 from sys import platform
-if platform == 'linux':
-    from numba import jit
 
 class FOA(object):
     def __init__(self, data):
@@ -244,13 +242,16 @@ class FOA(object):
         return data['vwap']
 
 if platform == 'linux':
+    from numba import jit
     @jit(nopython=True)
     def stepper(period, x):
         y = np.empty(x.size)
         y[:] = np.nan
-        for i in range(x.size):
-            if i == period:
-                y[i] = x[:i].mean()
+        i = 0
+        while i < x.size:
             if i > period:
                 y[i] = (y[i - 1] * (period - 1) + x[i]) / period
+            elif i == period:
+                y[i] = x[:i].mean()
+            i += 1
         return y
