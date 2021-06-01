@@ -1,29 +1,27 @@
 import numpy as np
 from sys import platform
 
-if platform == 'linux':
-    from numba import jit
-    @jit(nopython=True)
-    def stepper(period, x):
-        y = np.empty(x.size)
-        y[:] = np.nan
-        i = 0
-        while i < x.size:
-            if i > period:
-                y[i] = (y[i - 1] * (period - 1) + x[i]) / period
-            elif i == period:
-                y[i] = x[:i].mean()
-            i += 1
-        return y
+use_numba = True
+try:
+    import numba as nb
+except Exception:
+    use_numba = False
+
+def _stepper(period, x):
+    y = np.empty(x.size)
+    y[:] = np.nan
+    i = 0
+    while i < x.size:
+        if i > period:
+            y[i] = (y[i - 1] * (period - 1) + x[i]) / period
+        elif i == period:
+            y[i] = x[:i].mean()
+        i += 1
+    return y
+
+if use_numba:
+    # print('Using numba')
+    stepper = nb.jit()(_stepper)
 else:
-    def stepper(period, x):
-        y = np.empty(x.size)
-        y[:] = np.nan
-        i = 0
-        while i < x.size:
-            if i > period:
-                y[i] = (y[i - 1] * (period - 1) + x[i]) / period
-            elif i == period:
-                y[i] = x[:i].mean()
-            i += 1
-        return y
+    # print('Falling back to python')
+    stepper = _stepper
