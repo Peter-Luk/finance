@@ -1,7 +1,6 @@
 import pandas as pd
-import numpy as np
 from scipy.constants import golden_ratio as gr
-from finaux import stepper
+from finaux import np, stepper
 
 class FOA(object):
     def __init__(self, data):
