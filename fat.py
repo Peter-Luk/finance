@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf
-from pafintools import FOA, pd, np
+from fintools import FOA, pd, np
 from pref import periods
 import datetime
 
