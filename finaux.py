@@ -11,10 +11,10 @@ else:
         use_numba = False
 
 def _stepper(period, x):
-    y = np.empty(x.size)
+    y = np.empty(len(x))
     y[:] = np.nan
     i = 0
-    while i < x.size:
+    while i < len(x):
         if i > period:
             y[i] = (y[i - 1] * (period - 1) + x[i]) / period
         elif i == period:
@@ -23,8 +23,8 @@ def _stepper(period, x):
     return y
 
 if use_numba:
-    # print('Using numba')
+    print('Using numba')
     stepper = nb.jit()(_stepper)
 else:
-    # print('Falling back to python')
+    print('Falling back to python')
     stepper = _stepper
