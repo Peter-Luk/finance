@@ -1,11 +1,14 @@
 import numpy as np
 from sys import platform
 
-use_numba = True
-try:
-    import numba as nb
-except Exception:
+if platform == 'win32':
     use_numba = False
+else:
+    try:
+        import numba as nb
+        use_numba = True
+    except Exception:
+        use_numba = False
 
 def _stepper(period, x):
     y = np.empty(x.size)
