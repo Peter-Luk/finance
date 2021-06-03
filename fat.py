@@ -165,22 +165,31 @@ class Index(Futures, FOA):
 
 
 class Equity(Securities, FOA):
-    def __init__(self, code):
+    def __init__(self, code, static=True):
         self.session = Securities('Securities').session
         self.code = code
         fields = [Record.date, Record.open, Record.high, Record.low, Record.close, Record.volume]
         self.query = self.session.query(*fields).filter(text(f"eid={self.code}"))
-        self.__data = self.compose()
+        self.__data = self.compose(static)
         self.analyser = FOA(self.__data)
 
     def __call__(self):
         return self.compose()
 
-    def compose(self):
-        _ = pd.read_sql(self.query.statement, self.session.bind, parse_dates=['date'])
-        _ = _.set_index(pd.DatetimeIndex(_.date))
-        _ = _.drop('date', axis=1)
-        return _
+    def compose(self, static):
+        if static:
+            __ = pd.read_sql(self.query.statement, self.session.bind, parse_dates=['date'])
+            __ = __.set_index(pd.DatetimeIndex(__.date))
+            __.drop('date', axis=1, inplace=True)
+        else:
+            import yfinance as yf
+            today = datetime.datetime.today()
+            start = today.replace(2000,1,1)
+            __ = yf.download(f"{self.code:04}.HK", start, today, group_by='ticker')
+            __.drop('Adj Close', axis=1, inplace=True)
+            __.columns = [_.lower() for _ in __.columns]
+            __.index.name = __.index.name.lower()
+        return __
 
     def sma(self, period=periods['Equities']['simple']):
         return self.analyser.sma(period).apply(roundup)
