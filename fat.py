@@ -196,13 +196,13 @@ class Equity(Securities, FOA):
         return __
 
     def sma(self, period=periods['Equities']['simple']):
-        return self.analyser.sma(period).apply(roundup)
+        return self.analyser.sma(period)
 
     def wma(self, period=periods['Equities']['simple']):
-        return self.analyser.wma(period).apply(roundup)
+        return self.analyser.wma(period)
 
     def ema(self, period=periods['Equities']['simple']):
-        return self.analyser.ema(period).apply(roundup)
+        return self.analyser.ema(period)
 
     def macd(self, period=periods['Equities']['macd']):
         return self.analyser.macd(period)
@@ -214,7 +214,7 @@ class Equity(Securities, FOA):
         return self.analyser.atr(period)
 
     def kama(self, period=periods['Equities']['kama']):
-        return self.analyser.kama(period).apply(roundup)
+        return self.analyser.kama(period)
 
     def soc(self, period=periods['Equities']['soc']):
         return self.analyser.soc(period)
@@ -227,20 +227,14 @@ class Equity(Securities, FOA):
 
     def kc(self, period=periods['Equities']['kc']):
         _ = self.analyser.kc(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
         return _
 
     def apz(self, period=periods['Equities']['apz']):
         _ = self.analyser.apz(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
         return _
 
     def dc(self, period=periods['Equities']['dc']):
         _ = self.analyser.dc(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
         return _
 
     def obv(self):
@@ -251,8 +245,6 @@ class Equity(Securities, FOA):
 
     def bb(self, period=periods['Equities']['simple']):
         _ = self.analyser.bb(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
         return _
 
 
