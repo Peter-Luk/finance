@@ -166,8 +166,6 @@ class Index(Futures, FOA):
 
 class Equity(Securities, FOA):
     def __init__(self, code, static=True):
-        if not static:
-            import yfinance as yf
         self.session = Securities('Securities').session
         self.code = code
         fields = [Record.date, Record.open, Record.high, Record.low, Record.close, Record.volume]
@@ -175,8 +173,8 @@ class Equity(Securities, FOA):
         self.__data = self.compose(static)
         self.analyser = FOA(self.__data)
 
-    def __call__(self):
-        return self.compose()
+    def __call__(self, static=True):
+        return self.compose(static)
 
     def compose(self, static):
         if static:
@@ -184,6 +182,7 @@ class Equity(Securities, FOA):
             __ = __.set_index(pd.DatetimeIndex(__.date))
             __.drop('date', axis=1, inplace=True)
         else:
+            import yfinance as yf
             today = datetime.datetime.today()
             start = today.replace(2000, 1, 1)
             __ = yf.download(getcode(self.code), start, today, group_by='ticker')
