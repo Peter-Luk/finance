@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
-from utilities import filepath, waf
+from utilities import filepath, waf, getcode
 from fintools import FOA, pd, np
 from pref import periods
 import datetime
@@ -185,7 +185,7 @@ class Equity(Securities, FOA):
             import yfinance as yf
             today = datetime.datetime.today()
             start = today.replace(2000,1,1)
-            __ = yf.download(f"{self.code:04}.HK", start, today, group_by='ticker')
+            __ = yf.download(getcode(self.code), start, today, group_by='ticker')
             __.drop('Adj Close', axis=1, inplace=True)
             __.columns = [_.lower() for _ in __.columns]
             __.index.name = __.index.name.lower()
