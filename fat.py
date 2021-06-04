@@ -165,11 +165,13 @@ class Index(Futures, FOA):
 
 
 class Equity(Securities, FOA):
-    def __init__(self, code, static=True):
+    def __init__(self, code, static=True, exchange='HKEx'):
         self.session = Securities('Securities').session
         self.code = code
+        self.exchange = exchange
         fields = [Record.date, Record.open, Record.high, Record.low, Record.close, Record.volume]
-        self.query = self.session.query(*fields).filter(text(f"eid={self.code}"))
+        if exchange == 'HKEx':
+            self.query = self.session.query(*fields).filter(text(f"eid={self.code}"))
         self.__data = self.compose(static)
         self.analyser = FOA(self.__data)
 
@@ -177,6 +179,8 @@ class Equity(Securities, FOA):
         return self.compose(static)
 
     def compose(self, static):
+        if self.exchange != 'HKEx':
+            static = False
         if static:
             __ = pd.read_sql(self.query.statement, self.session.bind, parse_dates=['date'])
             __ = __.set_index(pd.DatetimeIndex(__.date))
@@ -185,7 +189,7 @@ class Equity(Securities, FOA):
             import yfinance as yf
             today = datetime.datetime.today()
             start = today.replace(2000, 1, 1)
-            __ = yf.download(getcode(self.code), start, today, group_by='ticker')
+            __ = yf.download(getcode(self.code, self.exchange), start, today, group_by='ticker')
             __.drop('Adj Close', axis=1, inplace=True)
             __.columns = [_.lower() for _ in __.columns]
             __.index.name = __.index.name.lower()
