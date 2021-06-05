@@ -57,6 +57,10 @@ class Index(Futures, FOA):
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
         self.analyser = FOA(self.__data)
+        self.date = self.__data.index[-1].to_pydatetime()
+        __ = self.__data.iloc[-1]
+        for _ in self.__data.columns:
+            exec(f"self.{_}=__.{_}")
 
     def __call__(self):
         return self.compose()
