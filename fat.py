@@ -169,12 +169,14 @@ class Equity(Securities, FOA):
         self.session = Securities('Securities').session
         self.code = code
         self.exchange = exchange
-        fields = ['date', 'open', 'high', 'low', 'close', 'volume']
+        self.__fields = ['date', 'open', 'high', 'low', 'close', 'volume']
         if exchange == 'HKEx':
-            self.query = self.session.query(*[eval(f"Record.{_}") for _ in fields]).filter(text(f"eid={self.code}"))
+            self.query = self.session.query(*[eval(f"Record.{_}") for _ in self.__fields]).filter(text(f"eid={self.code}"))
         self.__data = self.compose(static)
         self.analyser = FOA(self.__data)
-        self.close = self.__data.close[-1]
+        __ = self.__data.iloc[-1]
+        for _ in self.__data.columns:
+            exec(f"self.{_}=__.{_}")
 
     def __call__(self, static=True):
         return self.__data
