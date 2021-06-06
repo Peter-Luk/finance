@@ -24,7 +24,7 @@ def _stepper(period, x):
 
 if use_numba:
     print('Using numba')
-    stepper = nb.jit()(_stepper)
+    stepper = nb.jit(forceobj=True)(_stepper)
 else:
     print('Falling back to python')
     stepper = _stepper
