@@ -57,7 +57,7 @@ class Index(Futures, FOA):
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
         self.analyser = FOA(self.__data)
-        self.pct_change = self.__data.close.diff(1).pct_change()[-1]
+        self.pct_change = self.__data.close.diff(1)[-1] / self.__data.close[-2] * 100
         self.date = self.__data.index[-1].to_pydatetime()
         __ = self.__data.iloc[-1]
         for _ in self.__data.columns:
@@ -179,7 +179,7 @@ class Equity(Securities, FOA):
             self.query = self.session.query(*[eval(f"Record.{_}") for _ in self.__fields]).filter(text(f"eid={self.code}"))
         self.__data = self.compose(static)
         self.analyser = FOA(self.__data)
-        self.pct_change = self.__data.close.diff(1).pct_change()[-1]
+        self.pct_change = self.__data.close.diff(1)[-1] / self.__data.close[-2] * 100
         self.date = self.__data.index[-1].to_pydatetime()
         __ = self.__data.iloc[-1]
         for _ in self.__data.columns:
