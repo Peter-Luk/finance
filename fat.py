@@ -168,6 +168,17 @@ class Index(Futures, FOA):
         _.Lower = _.Lower.apply(roundup).astype('Int32')
         return _
 
+    def mas(self, period={'simple':periods['Futures']['simple'], 'kama':periods['Futures']['kama']}):
+        sma = self.sma(period['simple'])
+        wma = self.wma(period['simple'])
+        ema = self.ema(period['simple'])
+        kama = self.kama(period['kama'])
+        __ = pd.concat([sma, wma, ema, kama], axis=1)
+        __['high'] = __.max(axis=1)
+        __['low'] = __.min(axis=1)
+        __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
+        return __
+
 
 class Equity(Securities, FOA):
     def __init__(self, code, static=True, exchange='HKEx'):
