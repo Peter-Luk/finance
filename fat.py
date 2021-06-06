@@ -108,7 +108,7 @@ class Index(Futures, FOA):
         _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
         _.date = pd.to_datetime(_.date, format='%Y-%m-%d')
         _ = _.set_index(pd.DatetimeIndex(_.date))
-        _ = _.drop('date', axis=1)
+        _.drop('date', axis=1, inplace=True)
         return _
 
     def sma(self, period=periods['Futures']['simple']):
@@ -256,6 +256,17 @@ class Equity(Securities, FOA):
     def bb(self, period=periods['Equities']['simple']):
         _ = self.analyser.bb(period)
         return _
+
+    def mas(self, period={'simple':periods['Equities']['simple'], 'kama':periods['Equities']['kama']}):
+        sma = self.sma(period['simple'])
+        wma = self.wma(period['simple'])
+        ema = self.ema(period['simple'])
+        kama = self.kama(period['kama'])
+        __ = pd.concat([sma, wma, ema, kama], axis=1)
+        __['high'] = __.max(axis=1)
+        __['low'] = __.min(axis=1)
+        __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
+        return __
 
 
 def roundup(value):
