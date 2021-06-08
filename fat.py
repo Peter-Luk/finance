@@ -195,6 +195,8 @@ class Equity(Securities, FOA):
         __ = self.__data.iloc[-1]
         for _ in self.__data.columns:
             exec(f"self.{_}=__.{_}")
+            if self.exchange == 'HKEx':
+                exec(f"self.{_}=roundup(__.{_})")
 
     def __call__(self, static=True):
         return self.__data
@@ -235,7 +237,10 @@ class Equity(Securities, FOA):
         return self.analyser.atr(period)
 
     def kama(self, period=periods['Equities']['kama']):
-        return self.analyser.kama(period)
+        _ = self.analyser.kama(period)
+        if self.exchange == 'HKEx':
+            return _.apply(roundup)
+        return _
 
     def soc(self, period=periods['Equities']['soc']):
         return self.analyser.soc(period)
@@ -248,10 +253,16 @@ class Equity(Securities, FOA):
 
     def kc(self, period=periods['Equities']['kc']):
         _ = self.analyser.kc(period)
+        if self.exchange == 'HKEx':
+            _.Upper = _.Upper.apply(roundup)
+            _.Lower = _.Lower.apply(roundup)
         return _
 
     def apz(self, period=periods['Equities']['apz']):
         _ = self.analyser.apz(period)
+        if self.exchange == 'HKEx':
+            _.Upper = _.Upper.apply(roundup)
+            _.Lower = _.Lower.apply(roundup)
         return _
 
     def dc(self, period=periods['Equities']['dc']):
@@ -266,6 +277,9 @@ class Equity(Securities, FOA):
 
     def bb(self, period=periods['Equities']['simple']):
         _ = self.analyser.bb(period)
+        if self.exchange == 'HKEx':
+            _.Upper = _.Upper.apply(roundup)
+            _.Lower = _.Lower.apply(roundup)
         return _
 
     def mas(self, period={'simple':periods['Equities']['simple'], 'kama':periods['Equities']['kama']}):
@@ -276,6 +290,9 @@ class Equity(Securities, FOA):
         __ = pd.concat([sma, wma, ema, kama], axis=1)
         __['high'] = __.max(axis=1)
         __['low'] = __.min(axis=1)
+        if self.exchange == 'HKEx':
+            __.high = __.high.apply(roundup)
+            __.low = __.low.apply(roundup)
         __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
         return __
 
