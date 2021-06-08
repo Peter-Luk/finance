@@ -2,6 +2,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf, getcode
 from fintools import FOA, pd, np
+from finaux import roundup
 from pref import periods
 import datetime
 
@@ -295,35 +296,6 @@ class Equity(Securities, FOA):
             __.low = __.low.apply(roundup)
         __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
         return __
-
-
-def roundup(value):
-    if np.isnan(value) or not value > 0:
-        return np.nan
-    _ = int(np.floor(np.log10(value)))
-    __ = np.divmod(value, 10 ** (_ - 1))[0]
-    if _ < 0:
-        if __ < 25:
-            return np.round(value, 3)
-        if __ < 50:
-            return np.round(value * 2, 2) / 2
-        return np.round(value, 2)
-    if _ == 0:
-        return np.round(value, 2)
-    if _ > 3:
-        return np.round(value, 0)
-    if _ > 1:
-        if __ < 20:
-            return np.round(value, 1)
-        if __ < 50:
-            return np.round(value * 5, 0) / 5
-        return np.round(value * 2, 0) / 2
-    if _ > 0:
-        if __ < 10:
-            return np.round(value, 2)
-        if __ < 20:
-            return np.round(value * 5, 1) / 5
-        return np.round(value * 2, 1) / 2
 
 
 def commit(values):
