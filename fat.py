@@ -220,13 +220,22 @@ class Equity(Securities, FOA):
         return __
 
     def sma(self, period=periods['Equities']['simple']):
-        return self.analyser.sma(period)
+        _ = self.analyser.sma(period)
+        if self.exchange == 'HKEx':
+            _ = _.apply(roundup)
+        return _
 
     def wma(self, period=periods['Equities']['simple']):
-        return self.analyser.wma(period)
+        _ = self.analyser.wma(period)
+        if self.exchange == 'HKEx':
+            _ = _.apply(roundup)
+        return _
 
     def ema(self, period=periods['Equities']['simple']):
-        return self.analyser.ema(period)
+        _ = self.analyser.ema(period)
+        if self.exchange == 'HKEx':
+            _ = _.apply(roundup)
+        return _
 
     def macd(self, period=periods['Equities']['macd']):
         return self.analyser.macd(period)
@@ -240,7 +249,7 @@ class Equity(Securities, FOA):
     def kama(self, period=periods['Equities']['kama']):
         _ = self.analyser.kama(period)
         if self.exchange == 'HKEx':
-            return _.apply(roundup)
+            _ = _.apply(roundup)
         return _
 
     def soc(self, period=periods['Equities']['soc']):
