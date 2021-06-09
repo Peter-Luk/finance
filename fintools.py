@@ -4,7 +4,7 @@ from finaux import np, stepper
 
 class FOA(object):
     def __init__(self, data):
-        self.__data = data
+        self.__data = data.copy()
 
     def sma(self, period, data=None):
         if isinstance(data, type(None)):
@@ -24,7 +24,7 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data.close
         _ = data.to_frame()
-        y = stepper(period, data.to_numpy())
+        y = stepper(period, data.to_numpy().astype(float))
         _['ema'] = y
         return _.ema
 

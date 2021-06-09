@@ -52,9 +52,10 @@ def _roundup(value):
 
 if use_numba:
     print('Using numba')
-    stepper = nb.jit(forceobj=True)(_stepper)
+    # stepper = nb.jit(forceobj=True)(_stepper)
+    stepper = nb.jit()(_stepper)
     roundup = nb.jit(forceobj=True)(_roundup)
 else:
     print('Falling back to python')
     stepper = _stepper
-    roundup = _roundup
+    roundUp = _roundup
