@@ -144,6 +144,8 @@ class Index(Futures, FOA):
 
     def kc(self, period=periods['Futures']['kc']):
         _ = self.analyser.kc(period)
+        _.dropna(inplace=True)
+        _ = _.astype('int64')
         return _
 
     def apz(self, period=periods['Futures']['apz']):
