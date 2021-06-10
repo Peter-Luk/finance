@@ -58,4 +58,4 @@ if use_numba:
 else:
     print('Falling back to python')
     stepper = _stepper
-    roundUp = _roundup
+    roundup = _roundup
