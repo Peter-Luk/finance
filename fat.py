@@ -57,7 +57,7 @@ class Index(Futures, FOA):
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
-        self.analyser = FOA(self.__data)
+        self.analyser = FOA(self.__data, int)
         self.pct_change = self.__data.close.diff(1)[-1] / self.__data.close[-2] * 100
         self.date = self.__data.index[-1].to_pydatetime()
         __ = self.__data.iloc[-1]
@@ -113,13 +113,13 @@ class Index(Futures, FOA):
         return _
 
     def sma(self, period=periods['Futures']['simple']):
-        return self.analyser.sma(period).apply(roundup)
+        return self.analyser.sma(period)
 
     def wma(self, period=periods['Futures']['simple']):
-        return self.analyser.wma(period).apply(roundup)
+        return self.analyser.wma(period)
 
     def ema(self, period=periods['Futures']['simple']):
-        return self.analyser.ema(period).apply(roundup)
+        return self.analyser.ema(period)
 
     def macd(self, period=periods['Futures']['macd']):
         return self.analyser.macd(period)
@@ -131,7 +131,7 @@ class Index(Futures, FOA):
         return self.analyser.atr(period)
 
     def kama(self, period=periods['Futures']['kama']):
-        return self.analyser.kama(period).apply(roundup)
+        return self.analyser.kama(period)
 
     def soc(self, period=periods['Futures']['soc']):
         return self.analyser.soc(period)
@@ -144,14 +144,10 @@ class Index(Futures, FOA):
 
     def kc(self, period=periods['Futures']['kc']):
         _ = self.analyser.kc(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
         return _
 
     def apz(self, period=periods['Futures']['apz']):
         _ = self.analyser.apz(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
         return _
 
     def dc(self, period=periods['Futures']['dc']):
@@ -165,8 +161,6 @@ class Index(Futures, FOA):
 
     def bb(self, period=periods['Futures']['simple']):
         _ = self.analyser.bb(period)
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
         return _
 
     def mas(self, period={'simple':periods['Futures']['simple'], 'kama':periods['Futures']['kama']}):
@@ -190,7 +184,7 @@ class Equity(Securities, FOA):
         if exchange == 'HKEx':
             self.query = self.session.query(*[eval(f"Record.{_}") for _ in self.__fields]).filter(text(f"eid={self.code}"))
         self.__data = self.compose(static)
-        self.analyser = FOA(self.__data)
+        self.analyser = FOA(self.__data, float)
         self.pct_change = self.__data.close.diff(1)[-1] / self.__data.close[-2] * 100
         self.date = self.__data.index[-1].to_pydatetime()
         __ = self.__data.iloc[-1]

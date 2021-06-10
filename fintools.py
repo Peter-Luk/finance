@@ -3,8 +3,9 @@ from scipy.constants import golden_ratio as gr
 from finaux import np, stepper
 
 class FOA(object):
-    def __init__(self, data):
+    def __init__(self, data, dtype):
         self.__data = data.copy()
+        self.dtype = dtype
 
     def sma(self, period, data=None):
         if isinstance(data, type(None)):
@@ -24,7 +25,7 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data.close
         _ = data.to_frame()
-        y = stepper(period, data.to_numpy().astype(float))
+        y = stepper(period, data.to_numpy().astype(self.dtype))
         _['ema'] = y
         return _.ema
 
