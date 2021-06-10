@@ -150,6 +150,8 @@ class Index(Futures, FOA):
 
     def apz(self, period=periods['Futures']['apz']):
         _ = self.analyser.apz(period)
+        _.dropna(inplace=True)
+        _ = _.astype('int64')
         return _
 
     def dc(self, period=periods['Futures']['dc']):
@@ -163,6 +165,8 @@ class Index(Futures, FOA):
 
     def bb(self, period=periods['Futures']['simple']):
         _ = self.analyser.bb(period)
+        _.dropna(inplace=True)
+        _ = _.astype('int64')
         return _
 
     def mas(self, period={'simple':periods['Futures']['simple'], 'kama':periods['Futures']['kama']}):
@@ -174,6 +178,8 @@ class Index(Futures, FOA):
         __['high'] = __.max(axis=1)
         __['low'] = __.min(axis=1)
         __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
+        __.dropna(inplace=True)
+        __ = __.astype('int64')
         return __
 
 
