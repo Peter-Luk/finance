@@ -113,13 +113,16 @@ class Index(Futures, FOA):
         return _
 
     def sma(self, period=periods['Futures']['simple']):
-        return self.analyser.sma(period)
+        _ = self.analyser.sma(period)
+        return _.round()
 
     def wma(self, period=periods['Futures']['simple']):
-        return self.analyser.wma(period)
+        _ = self.analyser.wma(period)
+        return _.round()
 
     def ema(self, period=periods['Futures']['simple']):
-        return self.analyser.ema(period)
+        _ = self.analyser.ema(period)
+        return _.round()
 
     def macd(self, period=periods['Futures']['macd']):
         return self.analyser.macd(period)
@@ -131,7 +134,8 @@ class Index(Futures, FOA):
         return self.analyser.atr(period)
 
     def kama(self, period=periods['Futures']['kama']):
-        return self.analyser.kama(period)
+        _ = self.analyser.kama(period)
+        return _.round()
 
     def soc(self, period=periods['Futures']['soc']):
         return self.analyser.soc(period)
@@ -144,15 +148,11 @@ class Index(Futures, FOA):
 
     def kc(self, period=periods['Futures']['kc']):
         _ = self.analyser.kc(period)
-        _.dropna(inplace=True)
-        _ = _.astype('int64')
-        return _
+        return _.applymap(round, na_action='ignore')
 
     def apz(self, period=periods['Futures']['apz']):
         _ = self.analyser.apz(period)
-        _.dropna(inplace=True)
-        _ = _.astype('int64')
-        return _
+        return _.applymap(round, na_action='ignore')
 
     def dc(self, period=periods['Futures']['dc']):
         return self.analyser.dc(period)
@@ -165,9 +165,7 @@ class Index(Futures, FOA):
 
     def bb(self, period=periods['Futures']['simple']):
         _ = self.analyser.bb(period)
-        _.dropna(inplace=True)
-        _ = _.astype('int64')
-        return _
+        return _.applymap(round, na_action='ignore')
 
     def mas(self, period={'simple':periods['Futures']['simple'], 'kama':periods['Futures']['kama']}):
         sma = self.sma(period['simple'])
@@ -178,9 +176,7 @@ class Index(Futures, FOA):
         __['high'] = __.max(axis=1)
         __['low'] = __.min(axis=1)
         __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
-        __.dropna(inplace=True)
-        __ = __.astype('int64')
-        return __
+        return __.applymap(round, na_action='ignore')
 
 
 class Equity(Securities, FOA):
@@ -265,17 +261,11 @@ class Equity(Securities, FOA):
 
     def kc(self, period=periods['Equities']['kc']):
         _ = self.analyser.kc(period)
-        if self.exchange == 'HKEx':
-            _.Upper = _.Upper.apply(roundup)
-            _.Lower = _.Lower.apply(roundup)
-        return _
+        return _.applymap(roundup, na_action='ignore')
 
     def apz(self, period=periods['Equities']['apz']):
         _ = self.analyser.apz(period)
-        if self.exchange == 'HKEx':
-            _.Upper = _.Upper.apply(roundup)
-            _.Lower = _.Lower.apply(roundup)
-        return _
+        return _.applymap(roundup, na_action='ignore')
 
     def dc(self, period=periods['Equities']['dc']):
         _ = self.analyser.dc(period)
@@ -289,10 +279,7 @@ class Equity(Securities, FOA):
 
     def bb(self, period=periods['Equities']['simple']):
         _ = self.analyser.bb(period)
-        if self.exchange == 'HKEx':
-            _.Upper = _.Upper.apply(roundup)
-            _.Lower = _.Lower.apply(roundup)
-        return _
+        return _.applymap(roundup, na_action='ignore')
 
     def mas(self, period={'simple':periods['Equities']['simple'], 'kama':periods['Equities']['kama']}):
         sma = self.sma(period['simple'])
@@ -306,7 +293,7 @@ class Equity(Securities, FOA):
             __.high = __.high.apply(roundup)
             __.low = __.low.apply(roundup)
         __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
-        return __
+        return __.applymap(roundup, na_action='ignore')
 
 
 def commit(values):
