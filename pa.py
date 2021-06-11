@@ -60,6 +60,9 @@ class Person(Health):
 
     def update(self, values, criteria):
         q = self.query
+        if 'id' in criteria.keys():
+            if isinstance(criteria['id'], int):
+                q = q.filter(Subject.id == criteria['id'])
         if 'date' in criteria.keys():
             if isinstance(criteria['date'], (datetime.date, str)):
                 q = q.filter(Subject.date == criteria['date'])
