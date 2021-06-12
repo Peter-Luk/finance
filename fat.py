@@ -58,7 +58,7 @@ class Index(Futures, FOA):
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
         self.analyser = FOA(self.__data, int)
-        self.pct_change = self.__data.close.diff(1)[-1] / self.__data.close[-2] * 100
+        self.change = self.__data.close.diff(1)[-1] / self.__data.close[-2]
         self.date = self.__data.index[-1].to_pydatetime()
         __ = self.__data.iloc[-1]
         for _ in self.__data.columns:
@@ -111,6 +111,9 @@ class Index(Futures, FOA):
         _ = _.set_index(pd.DatetimeIndex(_.date))
         _.drop('date', axis=1, inplace=True)
         return _
+
+    def __str__(self):
+        return f"{self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}"
 
     def sma(self, period=periods['Futures']['simple']):
         _ = self.analyser.sma(period)
@@ -189,7 +192,7 @@ class Equity(Securities, FOA):
             self.query = self.session.query(*[eval(f"Record.{_}") for _ in self.__fields]).filter(text(f"eid={self.code}"))
         self.__data = self.compose(static)
         self.analyser = FOA(self.__data, float)
-        self.pct_change = self.__data.close.diff(1)[-1] / self.__data.close[-2] * 100
+        self.change = self.__data.close.diff(1)[-1] / self.__data.close[-2]
         self.date = self.__data.index[-1].to_pydatetime()
         __ = self.__data.iloc[-1]
         for _ in self.__data.columns:
@@ -216,6 +219,9 @@ class Equity(Securities, FOA):
             __.columns = [_.lower() for _ in __.columns]
             __.index.name = __.index.name.lower()
         return __
+
+    def __str__(self):
+        return f"{self.date:%d-%m-%Y}: close @ {self.close:0.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}"
 
     def sma(self, period=periods['Equities']['simple']):
         _ = self.analyser.sma(period).astype('float64')
