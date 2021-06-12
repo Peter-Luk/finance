@@ -25,8 +25,8 @@ def _stepper(period, x):
 def _roundup(value):
     if np.isnan(value) or not value > 0:
         return np.nan
-    _ = int(np.floor(np.log10(value)))
-    __ = np.divmod(value, 10 ** (_ - 1))[0]
+    _ = np.floor(np.log10(value))
+    __ = np.int32(value / 10 ** (_ - 1))
     if _ < 0:
         if __ < 25:
             return np.round(value, 3)
@@ -53,9 +53,9 @@ def _roundup(value):
 if use_numba:
     print('Using numba')
     # stepper = nb.jit(forceobj=True)(_stepper)
-    roundup = nb.jit(forceobj=True)(_roundup)
+    # roundup = nb.jit(forceobj=True)(_roundup)
     stepper = nb.jit()(_stepper)
-    # roundup = nb.jit()(_roundup)
+    roundup = nb.jit()(_roundup)
 else:
     print('Falling back to python')
     stepper = _stepper
