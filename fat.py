@@ -113,7 +113,7 @@ class Index(Futures, FOA):
         return _
 
     def __str__(self):
-        return f"{self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}"
+        return f"{self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {int(self.kama().iloc[-1]):d}"
 
     def sma(self, period=periods['Futures']['simple']):
         _ = self.analyser.sma(period)
@@ -221,7 +221,7 @@ class Equity(Securities, FOA):
         return __
 
     def __str__(self):
-        return f"{self.date:%d-%m-%Y}: close @ {self.close:0.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}"
+        return f"{self.date:%d-%m-%Y}: close @ {self.close:0.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {self.kama().iloc[-1]:0.2f}"
 
     def sma(self, period=periods['Equities']['simple']):
         _ = self.analyser.sma(period).astype('float64')
