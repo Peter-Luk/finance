@@ -40,7 +40,7 @@ class Record(Base):
         self.low = open
         self.close = open
 
-    def hl(self, high, close):
+    def range(self, high, low):
         self.high = high
         self.low = low
 
