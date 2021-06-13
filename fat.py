@@ -8,6 +8,7 @@ import datetime
 
 Session = sessionmaker()
 Base = declarative_base()
+idx = []
 
 class Record(Base):
     __tablename__ = 'records'
