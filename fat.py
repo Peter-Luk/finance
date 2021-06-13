@@ -33,6 +33,20 @@ class Record(Base):
         _ += f"close={self.close}, volume={self.volume})>"
         return _
 
+    def start(self, open):
+        self.open = open
+        self.high = open
+        self.low = open
+        self.close = open
+
+    def hl(self, high, close):
+        self.high = high
+        self.low = low
+
+    def cl(self, close, volume):
+        self.close = close
+        self.volume = volume
+
 
 class Futures(Record):
     def __init__(self, db='Futures'):
