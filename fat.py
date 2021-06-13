@@ -43,7 +43,7 @@ class Record(Base):
         self.high = high
         self.low = low
 
-    def cl(self, close, volume):
+    def finish(self, close, volume):
         self.close = close
         self.volume = volume
 
