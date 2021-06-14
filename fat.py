@@ -4,6 +4,7 @@ from utilities import filepath, waf, getcode
 from fintools import FOA, pd, np
 from finaux import roundup
 from pref import periods
+import copy
 import datetime
 
 Session = sessionmaker()
@@ -199,7 +200,9 @@ class Index(Futures, FOA):
 
 class Equity(Securities, FOA):
     def __init__(self, code, static=True, exchange='HKEx'):
-        self.session = Securities('Securities').session
+        s = copy.copy(Securities)
+        self.session = s('Securities').session
+        # self.session = Securities('Securities').session
         self.code = code
         self.exchange = exchange
         self.__fields = ['date', 'open', 'high', 'low', 'close', 'volume']
@@ -236,7 +239,7 @@ class Equity(Securities, FOA):
         return __
 
     def __str__(self):
-        return f"{self.date:%d-%m-%Y}: close @ {self.close:0.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {self.kama().iloc[-1]:0.2f}"
+        return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {self.kama().iloc[-1]:,.2f}"
 
     def sma(self, period=periods['Equities']['simple']):
         _ = self.analyser.sma(period).astype('float64')
