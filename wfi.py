@@ -175,7 +175,7 @@ class WFutures(object):
             change = '0'
         return self.__status(price, change, last)
 
-    def whatsend(self, recipent, message):
+    def msg2(self, recipent, message):
         try:
             self.goto('WhatsApp')
         except Exception:
@@ -349,7 +349,7 @@ class WFutures(object):
 
 def msend(wf, msg, rect=milly):
     _wf = copy.copy(wf)
-    return _wf.whatsend(rect, msg)
+    return _wf.msg2(rect, msg)
 
 
 def dow(wf, _=True):
