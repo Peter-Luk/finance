@@ -397,7 +397,7 @@ def getcode(code, boarse='HKEx', type='yahoo'):
             return f"{code:04}.T"
         if boarse == 'LSE' and isinstance(code, int):
             return f"{code}.L"
-        if boarse in ['Dow', 'Nasdaq']:
+        if boarse in ['NYSE', 'Nasdaq']:
             return code
 
 def dvs(d):
