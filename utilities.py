@@ -395,10 +395,10 @@ def getcode(code, boarse='HKEx', type='yahoo'):
             return f"{code:04}.HK"
         if boarse == 'TSE' and isinstance(code, int):
             return f"{code:04}.T"
-        if boarse == 'LSE' and isinstance(code, int):
-            return f"{code}.L"
+        if boarse == 'LSE':
+            return f"{code}.L".upper()
         if boarse in ['NYSE', 'Nasdaq']:
-            return code
+            return code.upper()
 
 def dvs(d):
     res, values = [], list(d.values())
