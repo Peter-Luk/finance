@@ -286,15 +286,17 @@ class Equity(Securities, FOA):
 
     def kc(self, period=periods['Equities']['kc']):
         _ = self.analyser.kc(period)
-        if pd.__version__ < '1.2':
-            _.Upper = _.Upper.apply(roundup)
-            _.Lower = _.Lower.apply(roundup)
-            return _
-        return _.applymap(roundup, na_action='ignore')
+        return _roundup(_)
+        # if pd.__version__ < '1.2':
+        #     _.Upper = _.Upper.apply(roundup)
+        #     _.Lower = _.Lower.apply(roundup)
+        #     return _
+        # return _.applymap(roundup, na_action='ignore')
 
     def apz(self, period=periods['Equities']['apz']):
         _ = self.analyser.apz(period)
-        return _.applymap(roundup, na_action='ignore')
+        return _roundup(_)
+        # return _.applymap(roundup, na_action='ignore')
 
     def dc(self, period=periods['Equities']['dc']):
         _ = self.analyser.dc(period)
@@ -316,16 +318,23 @@ class Equity(Securities, FOA):
         ema = self.ema(period['simple'])
         kama = self.kama(period['kama'])
         __ = pd.concat([sma, wma, ema, kama], axis=1)
-        __['high'] = __.max(axis=1)
-        __['low'] = __.min(axis=1)
-        if self.exchange == 'HKEx':
-            __.high = __.high.apply(roundup)
-            __.low = __.low.apply(roundup)
+        __['Upper'] = __.max(axis=1)
+        __['Lower'] = __.min(axis=1)
         __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
-        return __.applymap(roundup, na_action='ignore')
-
+        if self.exchange == 'HKEx':
+            __.Upper = __.Upper.apply(roundup)
+            __.Lower = __.Lower.apply(roundup)
+        # __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
+        return __
 
 def commit(values):
     _ = Index(waf()[-1]).session
     _.add_all(values)
     _.commit()
+
+def _roundup(_):
+    if pd.__version__ < '1.2':
+        _.Upper = _.Upper.apply(roundup)
+        _.Lower = _.Lower.apply(roundup)
+        return _
+    return _.applymap(roundup, na_action='ignore')
