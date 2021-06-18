@@ -286,7 +286,7 @@ class Equity(Securities, FOA):
 
     def kc(self, period=periods['Equities']['kc']):
         _ = self.analyser.kc(period)
-        if float(pd.__version__) < 1.2:
+        if pd.__version__ < '1.2':
             _.Upper = _.Upper.apply(roundup)
             _.Lower = _.Lower.apply(roundup)
             return _
