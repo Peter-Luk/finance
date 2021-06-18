@@ -286,21 +286,15 @@ class Equity(Securities, FOA):
 
     def kc(self, period=periods['Equities']['kc']):
         _ = self.analyser.kc(period)
-        return _roundup(_)
-        # if pd.__version__ < '1.2':
-        #     _.Upper = _.Upper.apply(roundup)
-        #     _.Lower = _.Lower.apply(roundup)
-        #     return _
-        # return _.applymap(roundup, na_action='ignore')
+        return _roundup(_, self.exchange)
 
     def apz(self, period=periods['Equities']['apz']):
         _ = self.analyser.apz(period)
-        return _roundup(_)
-        # return _.applymap(roundup, na_action='ignore')
+        return _roundup(_, self.exchange)
 
     def dc(self, period=periods['Equities']['dc']):
         _ = self.analyser.dc(period)
-        return _
+        return _roundup(_, self.exchange)
 
     def obv(self):
         return self.analyser.obv()
@@ -324,17 +318,18 @@ class Equity(Securities, FOA):
         if self.exchange == 'HKEx':
             __.Upper = __.Upper.apply(roundup)
             __.Lower = __.Lower.apply(roundup)
-        # __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
-        return __
+        return _roundup(__, self.exchange)
+
 
 def commit(values):
     _ = Index(waf()[-1]).session
     _.add_all(values)
     _.commit()
 
-def _roundup(_):
+def _roundup(_, exchange):
     if pd.__version__ < '1.2':
-        _.Upper = _.Upper.apply(roundup)
-        _.Lower = _.Lower.apply(roundup)
+        if exchange == 'HKEx':
+            _.Upper = _.Upper.apply(roundup)
+            _.Lower = _.Lower.apply(roundup)
         return _
     return _.applymap(roundup, na_action='ignore')
