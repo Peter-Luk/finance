@@ -286,6 +286,10 @@ class Equity(Securities, FOA):
 
     def kc(self, period=periods['Equities']['kc']):
         _ = self.analyser.kc(period)
+        if pd.__version__ < 1.2:
+            _.Upper = _.Upper.apply(roundup)
+            _.Lower = _.Lower.apply(roundup)
+            return _
         return _.applymap(roundup, na_action='ignore')
 
     def apz(self, period=periods['Equities']['apz']):
