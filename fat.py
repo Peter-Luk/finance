@@ -304,7 +304,8 @@ class Equity(Securities, FOA):
 
     def bb(self, period=periods['Equities']['simple']):
         _ = self.analyser.bb(period)
-        return _.applymap(roundup, na_action='ignore')
+        return _roundup(_, self.exchange)
+        # return _.applymap(roundup, na_action='ignore')
 
     def mas(self, period={'simple':periods['Equities']['simple'], 'kama':periods['Equities']['kama']}):
         sma = self.sma(period['simple'])
