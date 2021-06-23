@@ -1,5 +1,6 @@
 import socket
 from pytz import timezone
+from scipy.optimize import newton
 import pref
 sep, environ, linesep, platform, version_info, Path, db, gr, sleep, \
     datetime, driver, reduce, ph, subject = pref.utils
@@ -420,3 +421,10 @@ def lique(*args):
             res.append(_)
     res.sort()
     return res
+
+def xnpv(rate, values, dates):
+    min_date =min(dates)
+    return sum([value / (1 + rate)**((date - min_date).days / 365) for value, date in zip(values, dates)])
+
+def xirr(values, dates):
+    return newton(lambda r: xnpv(r, values, dates), 0)
