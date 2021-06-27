@@ -173,6 +173,16 @@ public_holiday[2021] = {
         9: (22,),
         10: (1, 14),
         12: (25, 27)}
+public_holiday[2022] = {
+        1: (1,),
+        2: (1, 2, 3),
+        4: (5, 15, 16, 18),
+        5: (2, 9),
+        6: (3,),
+        7: (1,),
+        9: (12,),
+        10: (1, 4),
+        12: (26, 27)}
 y2n = [
         pandas, numpy, sqlalchemy, golden_ratio, datetime, tqdm,
         sleep, B_scale, USHK]
