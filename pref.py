@@ -2,7 +2,7 @@ import pandas, pytz, numpy, sqlalchemy
 from scipy.constants import golden_ratio
 from datetime import datetime
 from tqdm import tqdm
-from pathlib import Path, os, sys, functools
+from pathlib import os, sys, functools
 from time import sleep
 
 driver = dict(
@@ -178,11 +178,11 @@ y2n = [
         sleep, B_scale, USHK]
 nta = [pandas, numpy, datetime, golden_ratio]
 alchemy = [
-        sys.platform, os.environ, os.sep, os.listdir, Path, sqlalchemy,
+        sys.platform, os.environ, os.sep, os.listdir, sqlalchemy,
         pandas, datetime]
 utils = [
         os.sep, os.environ, os.linesep, sys.platform, sys.version_info,
-        Path, sqlalchemy, golden_ratio, sleep, datetime, driver,
+        sqlalchemy, golden_ratio, sleep, datetime, driver,
         functools.reduce, public_holiday, subject]
 periods = dict(
     Futures=dict(

@@ -2,7 +2,7 @@ import socket
 from pytz import timezone
 from scipy.optimize import newton
 import pref
-sep, environ, linesep, platform, version_info, Path, db, gr, sleep, \
+sep, environ, linesep, platform, version_info, db, gr, sleep, \
     datetime, driver, reduce, ph, subject = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))

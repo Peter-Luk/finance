@@ -1,5 +1,5 @@
 import pref
-platform, environ, sep, listdir, Path, db, pd, datetime = pref.alchemy
+platform, environ, sep, listdir, db, pd, datetime = pref.alchemy
 from utilities import filepath
 from sqlalchemy.orm import mapper, sessionmaker, declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, text
@@ -8,12 +8,12 @@ Base = declarative_base()
 Session = sessionmaker()
 eb, fb = pref.db['Equities'], pref.db['Futures']
 if platform == 'win32':
-    home = str(Path.home())
+    home = environ.get('HOME')
 if platform in ['linux', 'linux2']:
-    subpath, home = 'shared', f'{Path.home()}'
+    subpath, home = 'shared', f"{environ.get('HOME')}"
     if 'EXTERNAL_STORAGE' in environ.keys():
         subpath = 'external-1'
-        home = sep.join([str(Path.home()), 'storage', subpath])
+        home = sep.join([environ.get('HOME'), 'storage', subpath])
 
 
 def get_db(*args, **kwargs):
