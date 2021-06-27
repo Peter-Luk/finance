@@ -9,4 +9,199 @@ driver:
     Ie:
         name: 'IEDriverServer.exe'
         path: ['browser', 'driver']
+
+subject:
+    'Peter Luk':
+        mobile:
+            primary: 63344427
+            secondary: 90757228
+            home: 27600722
+        whatsapp:
+            input:
+                90757228: '_2_1wd'
+            alias: '"陸永原"'
+    'Grace Wu':
+        mobile:
+            primary: 54761657
+            home: 26150456
+        whatsapp:
+            alias: '"胡碧茜Grace"'
+    'Milly Ling':
+        mobile:
+            primary: 90107008
+            home: 21750098
+        whatsapp:
+            alias: '"凌月明Milly"'
+    'Mickey Wong':
+        mobile:
+            primary: '+65 83826103'
+        whatsapp:
+            alias: '"Wong Mickey"'
+    'Niana Mak':
+        mobile:
+            primary: 91096866
+        whatsapp:
+            alias: '"Ms Niana Siu Chu Mak"'
+    'Vincent Wong':
+        mobile:
+            primary: 66501982
+        whatsapp:
+            alias: '"Yau Chi Vincent Wong"'
+    'Eddie Chum':
+        mobile:
+            primary: '+853 65858338'
+        whatsapp:
+            alias: '"沈志明"'
+    'Chan Cheung Yiu':
+        mobile:
+            primary: 91031418
+        whatsapp:
+            alias: '"陳長耀"'
+    'Josephine Yuen':
+        mobile:
+            primary: 98682629
+        whatsapp:
+            alias: '"袁淑兒Josephine"'
+# ---
+periods:
+    Futures:
+        macd:
+            fast: 5
+            slow: 10
+            signal: 3
+        soc:
+            K: 14
+            D: 3
+        stc:
+            fast: 5
+            slow: 12
+            K: 3
+            D: 3
+        atr: 7
+        rsi: 7
+        kama:
+            er: 7
+            fast: 2
+            slow: 12
+        kc:
+            kama:
+                er: 5
+                fast: 2
+                slow: 12
+            atr: 7
+        adx: 7
+        simple: 12
+        dc: 12
+        apz: 5
+    Equities:
+        macd:
+            fast: 12
+            slow: 26
+            signal: 9
+        soc:
+            K: 14
+            D: 3
+        stc:
+            fast: 23
+            slow: 50
+            K: 10
+            D: 10
+        atr: 14
+        rsi: 14
+        kama:
+            er: 10
+            fast: 2
+            slow: 30
+        kc:
+            kama:
+                er: 5
+                fast: 2
+                slow: 20
+            atr: 10
+        adx: 14
+        simple: 20
+        dc: 20
+        apz: 5
+db:
+    Equities:
+        name: 'Securities'
+        table: 'records'
+        index: 'date'
+        freq: 'daily'
+        exclude: [122, 368, 805, 1828, 2303, 8509]
+    Futures:
+        name: 'Futures'
+        table: 'records'
+        index: 'date'
+        freq: 'bi-daily'
+
+public_holiday: 
+    2015:
+        1: [1]
+        2: [19, 20]
+        4: [3, 6, 7]
+        5: [25]
+        7: [1]
+        9: [28]
+        10: [1, 21]
+        12: [25]
+    2016:
+        1: [1]
+        2: [8, 9, 10]
+        3: [25, 28]
+        4: [4]
+        5: [2]
+        6: [9]
+        7: [1]
+        9: [16]
+        10: [10]
+        12: [26, 27]
+    2017:
+        1: [2, 30, 31]
+        4: [4, 14, 17]
+        5:  [1, 3, 30]
+        10: [2, 5]
+        12: [25, 26]
+    2018:
+        1: [1]
+        2: [16, 19]
+        3: [30]
+        4: [2, 5]
+        5: [1, 22]
+        6: [18]
+        7: [2]
+        9: [25]
+        10: [1, 17]
+        12: [25, 26]
+    2019:
+        1: [1]
+        2: [5, 6, 7]
+        4: [5, 19, 20, 22]
+        5: [1, 12, 13]
+        6: [7]
+        7: [1]
+        9: [14]
+        10: [1, 7]
+        12: [25, 26]
+    2020:
+        1: [1, 25, 27, 28]
+        2: [14]
+        3: [20]
+        4: [4, 10, 11, 12, 13, 30]
+        5: [1, 10]
+        6: [20, 21, 25]
+        7: [1]
+        9: [22]
+        10: [1, 2, 26]
+        12: [21, 25, 26]
+    2021:
+        1: [1]
+        2: [12, 13, 14, 15]
+        4: [2, 3, 4, 5, 6]
+        5: [1, 19]
+        6: [14]
+        7: [1]
+        9: [22]
+        10: [1, 14]
+        12: [25, 27]
 ...
