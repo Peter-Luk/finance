@@ -45,7 +45,7 @@ def filepath(*args, **kwargs):
             place = 'shared'
             if environ.get('ACTUAL_HOME'):
                 file_path = sep.join((environ.get('HOME'), file_type, data_path))
-            elif environ.get('EXTERNAL_STORAGE') and ('/' in environ['EXTERNAL_STORAGE'])):
+            elif environ.get('EXTERNAL_STORAGE') and ('/' in environ['EXTERNAL_STORAGE']):
                 place = 'external-1'
                 file_path = sep.join(
                     (environ.get('HOME'), 'storage', place, file_type, data_path))
