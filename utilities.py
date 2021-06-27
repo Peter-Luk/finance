@@ -15,7 +15,7 @@ avail_indicators, cal_month = ('wma', 'kama', 'ema', 'hv'), (3, 6, 9, 12)
 
 
 def driver_path(browser):
-    _ = [str(Path.home())]
+    _ = [environ.get('HOME')]
     __ = driver[browser.capitalize()]
     _.extend(__['path'])
     _.append(__['name'])
@@ -30,26 +30,25 @@ def filepath(*args, **kwargs):
         data_path = kwargs['subpath']
     if platform == 'win32':
         if version_info.major > 2 and version_info.minor > 3:
-            return sep.join((str(Path.home()), file_type, data_path, name))
+            return sep.join((environ.get('HOME'), file_type, data_path, name))
         else:
-            file_path = sep.join((str(Path.home()), file_type, data_path))
+            file_path = sep.join((environ.get('HOME'), file_type, data_path))
     # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
     if platform in ('linux', 'linux2'):
         if version_info.major > 2 and version_info.minor > 3:
-            if 'EXTERNAL_STORAGE' in environ.keys():
+            if environ.get('EXTERNAL_STORAGE'):
                 return sep.join((
-                    str(Path.home()), 'storage', 'external-1', file_type,
+                    environ.get('HOME'), 'storage', 'external-1', file_type,
                     data_path, name))
-            return sep.join((str(Path.home()), file_type, data_path, name))
+            return sep.join((environ.get('HOME'), file_type, data_path, name))
         else:
             place = 'shared'
-            if 'ACTUAL_HOME' in environ.keys():
-                file_path = sep.join((str(Path.home()), file_type, data_path))
-            elif (('EXTERNAL_STORAGE' in environ.keys())
-                    and ('/' in environ['EXTERNAL_STORAGE'])):
+            if environ.get('ACTUAL_HOME'):
+                file_path = sep.join((environ.get('HOME'), file_type, data_path))
+            elif environ.get('EXTERNAL_STORAGE') and ('/' in environ['EXTERNAL_STORAGE'])):
                 place = 'external-1'
                 file_path = sep.join(
-                    (str(Path.home()), 'storage', place, file_type, data_path))
+                    (environ.get('HOME'), 'storage', place, file_type, data_path))
     return sep.join((file_path, name))
 
 
