@@ -2,11 +2,11 @@
 driver:
     Chrome:
         name: 'chromedriver.exe'
-        path: ['browser', 'driver'])
+        path: ['browser', 'driver']
     Firefox:
         name: 'geckodriver.exe'
-        path: ['browser', 'driver'])
+        path: ['browser', 'driver']
     Ie:
         name: 'IEDriverServer.exe'
-        path: ['browser', 'driver']))
+        path: ['browser', 'driver']
 ...
