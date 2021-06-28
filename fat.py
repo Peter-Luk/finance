@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf, getcode
 from fintools import FOA, get_periods, pd, np
 from finaux import roundup
-from pref import periods
+# from pref import periods
 import copy
 import datetime
 
