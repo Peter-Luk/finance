@@ -224,5 +224,14 @@ xvsa:
     spellcheck: 'true'
     contenteditable: 'true'
 
+B_scale:
+    BABA: .125
+    BIDU: .125
+    BILI: 1
+    TCOM: 1
+    YUMC: 1
+    NTES: .2
+    JD: .5
+
 USHK: 7.75
 ...

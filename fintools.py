@@ -2,6 +2,13 @@ import pandas as pd
 from scipy.constants import golden_ratio as gr
 from finaux import np, stepper
 
+def get_periods(yaml_file):
+    import yaml
+    with open(yaml_file, 'r') as f:
+        _ = yaml.load(f, Loader=yaml.FullLoader)
+    return _.get('periods')
+
+
 class FOA(object):
     def __init__(self, data, dtype):
         self.__data = data.copy()
