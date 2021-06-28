@@ -72,7 +72,8 @@ class Index(Futures, FOA):
     def __init__(self, code):
         __ = 'Futures'
         self.session = Futures(__).session
-        self.periods = get_periods('pref.yaml')[__]
+        # self.periods = get_periods('pref.yaml')[__]
+        self.periods = get_periods(__)
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
@@ -235,7 +236,9 @@ class Equity(Securities, FOA):
     def __init__(self, code, static=True, exchange='HKEx'):
         s = copy.copy(Securities)
         self.session = s('Securities').session
-        self.periods = get_periods('pref.yaml')['Equities']
+        # self.periods = get_periods('pref.yaml')['Equities']
+        self.periods = get_periods()
+
         # self.session = Securities('Securities').session
         self.code = code
         self.exchange = exchange
