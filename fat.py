@@ -235,6 +235,7 @@ class Equity(Securities, FOA):
     def __init__(self, code, static=True, exchange='HKEx'):
         s = copy.copy(Securities)
         self.session = s('Securities').session
+        self.periods = get_periods('pref.yaml')['Equities']
         # self.session = Securities('Securities').session
         self.code = code
         self.exchange = exchange
@@ -274,57 +275,83 @@ class Equity(Securities, FOA):
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {self.kama().iloc[-1]:,.2f}"
 
-    def sma(self, period=periods['Equities']['simple']):
+    def sma(self, period=None):
+        if period is None:
+            period = self.periods['simple']
         _ = self.analyser.sma(period).astype('float64')
         if self.exchange == 'HKEx':
             _ = _.apply(roundup)
         return _
 
-    def wma(self, period=periods['Equities']['simple']):
+    def wma(self, period=None):
+        if period is None:
+            period = self.periods['simple']
         _ = self.analyser.wma(period).astype('float64')
         if self.exchange == 'HKEx':
             _ = _.apply(roundup)
         return _
 
-    def ema(self, period=periods['Equities']['simple']):
+    def ema(self, period=None):
+        if period is None:
+            period = self.periods['simple']
         _ = self.analyser.ema(period).astype('float64')
         if self.exchange == 'HKEx':
             _ = _.apply(roundup)
         return _
 
-    def macd(self, period=periods['Equities']['macd']):
+    def macd(self, period=None):
+        if period is None:
+            period = self.periods['macd']
         return self.analyser.macd(period)
 
-    def rsi(self, period=periods['Equities']['rsi']):
+    def rsi(self, period=None):
+        if period is None:
+            period = self.periods['rsi']
         return self.analyser.rsi(period)
 
-    def atr(self, period=periods['Equities']['atr']):
+    def atr(self, period=None):
+        if period is None:
+            period = self.periods['atr']
         return self.analyser.atr(period)
 
-    def kama(self, period=periods['Equities']['kama']):
+    def kama(self, period=None):
+        if period is None:
+            period = self.periods['kama']
         _ = self.analyser.kama(period).astype('float64')
         if self.exchange == 'HKEx':
             _ = _.apply(roundup)
         return _
 
-    def soc(self, period=periods['Equities']['soc']):
+    def soc(self, period=None):
+        if period is None:
+            period = self.periods['soc']
         return self.analyser.soc(period)
 
-    def stc(self, period=periods['Equities']['stc']):
+    def stc(self, period=None):
+        if period is None:
+            period = self.periods['stc']
         return self.analyser.stc(period)
 
-    def adx(self, period=periods['Equities']['adx']):
+    def adx(self, period=None):
+        if period is None:
+            period = self.periods['adx']
         return self.analyser.adx(period)
 
-    def kc(self, period=periods['Equities']['kc']):
+    def kc(self, period=None):
+        if period is None:
+            period = self.periods['kc']
         _ = self.analyser.kc(period)
         return _roundup(_, self.exchange)
 
-    def apz(self, period=periods['Equities']['apz']):
+    def apz(self, period=None):
+        if period is None:
+            period = self.periods['apz']
         _ = self.analyser.apz(period)
         return _roundup(_, self.exchange)
 
-    def dc(self, period=periods['Equities']['dc']):
+    def dc(self, period=None):
+        if period is None:
+            period = self.periods['dc']
         _ = self.analyser.dc(period)
         return _roundup(_, self.exchange)
 
@@ -334,12 +361,16 @@ class Equity(Securities, FOA):
     def vwap(self):
         return self.analyser.vwap()
 
-    def bb(self, period=periods['Equities']['simple']):
+    def bb(self, period=None):
+        if period is None:
+            period = self.periods['simple']
         _ = self.analyser.bb(period)
         return _roundup(_, self.exchange)
         # return _.applymap(roundup, na_action='ignore')
 
-    def mas(self, period={'simple':periods['Equities']['simple'], 'kama':periods['Equities']['kama']}):
+    def mas(self, period=None):
+        if period is None:
+            period = {'simple':self.periods['simple'], 'kama':self.periods['kama']}
         sma = self.sma(period['simple'])
         wma = self.wma(period['simple'])
         ema = self.ema(period['simple'])
