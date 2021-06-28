@@ -1,7 +1,7 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf, getcode
-from fintools import FOA, pd, np
+from fintools import FOA, get_periods, pd, np
 from finaux import roundup
 from pref import periods
 import copy
@@ -70,7 +70,9 @@ class Securities(Record):
 
 class Index(Futures, FOA):
     def __init__(self, code):
-        self.session = Futures('Futures').session
+        __ = 'Futures'
+        self.session = Futures(__).session
+        self.periods = get_periods('pref.yaml')[__]
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
@@ -132,49 +134,75 @@ class Index(Futures, FOA):
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {int(self.kama().iloc[-1]):d}"
 
-    def sma(self, period=periods['Futures']['simple']):
+    def sma(self, period=None):
+        if period is None:
+            period = self.periods['simple']
         _ = self.analyser.sma(period)
         return _.round()
 
-    def wma(self, period=periods['Futures']['simple']):
+    def wma(self, period=None):
+        if period is None:
+            period = self.periods['simple']
         _ = self.analyser.wma(period)
         return _.round()
 
-    def ema(self, period=periods['Futures']['simple']):
+    def ema(self, period=None):
+        if period is None:
+            period = self.periods['simple']
         _ = self.analyser.ema(period)
         return _.round()
 
-    def macd(self, period=periods['Futures']['macd']):
+    def macd(self, period=None):
+        if period is None:
+            period = self.periods['macd']
         return self.analyser.macd(period)
 
-    def rsi(self, period=periods['Futures']['rsi']):
+    def rsi(self, period=None):
+        if period is None:
+            period = self.periods['rsi']
         return self.analyser.rsi(period)
 
-    def atr(self, period=periods['Futures']['atr']):
+    def atr(self, period=None):
+        if period is None:
+            period = self.periods['atr']
         return self.analyser.atr(period)
 
-    def kama(self, period=periods['Futures']['kama']):
+    def kama(self, period=None):
+        if period is None:
+            period = self.periods['kama']
         _ = self.analyser.kama(period)
         return _.round()
 
-    def soc(self, period=periods['Futures']['soc']):
+    def soc(self, period=None):
+        if period is None:
+            period = self.periods['soc']
         return self.analyser.soc(period)
 
-    def stc(self, period=periods['Futures']['stc']):
+    def stc(self, period=None):
+        if period is None:
+            period = self.periods['stc']
         return self.analyser.stc(period)
 
-    def adx(self, period=periods['Futures']['adx']):
+    def adx(self, period=None):
+        if period is None:
+            period = self.periods['adx']
         return self.analyser.adx(period)
 
-    def kc(self, period=periods['Futures']['kc']):
+    def kc(self, period=None):
+        if period is None:
+            period = self.periods['kc']
         _ = self.analyser.kc(period)
         return _.applymap(round, na_action='ignore')
 
-    def apz(self, period=periods['Futures']['apz']):
+    def apz(self, period=None):
+        if period is None:
+            period = self.periods['apz']
         _ = self.analyser.apz(period)
         return _.applymap(round, na_action='ignore')
 
-    def dc(self, period=periods['Futures']['dc']):
+    def dc(self, period=None):
+        if period is None:
+            period = self.periods['dc']
         return self.analyser.dc(period)
 
     def obv(self):
@@ -183,11 +211,15 @@ class Index(Futures, FOA):
     def vwap(self):
         return self.analyser.vwap()
 
-    def bb(self, period=periods['Futures']['simple']):
+    def bb(self, period=None):
+        if period is None:
+            period = self.periods['simple']
         _ = self.analyser.bb(period)
         return _.applymap(round, na_action='ignore')
 
-    def mas(self, period={'simple':periods['Futures']['simple'], 'kama':periods['Futures']['kama']}):
+    def mas(self, period=None):
+        if period is None:
+            period = {'simple':self.periods['simple'], 'kama':self.periods['kama']}
         sma = self.sma(period['simple'])
         wma = self.wma(period['simple'])
         ema = self.ema(period['simple'])
