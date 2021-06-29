@@ -3,15 +3,11 @@ from scipy.constants import golden_ratio as gr
 from finaux import np, stepper
 
 def get_periods(entity='Equities', file='pref', type='yaml'):
-#    if type == 'py':
-#        eval(f"import {file}")
-#    if type == 'yaml':
     try:
         import yaml
         __ = f"{file}.{type}"
         with open(__, 'r') as f:
             _ = yaml.load(f, Loader=yaml.FullLoader)
-#        return _.get('periods')[entity]
         return _.get('periods').get(entity)
     except:
         import pref
