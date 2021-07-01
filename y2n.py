@@ -18,7 +18,7 @@ class Futures(AF, Viewer):
         self.table = self._af.table
         self.rc = self._af.columns
         self.__conn = self._af.connect
-        self.data = self.combine(self._conf['freq'])
+        self.data = self.combine(self._conf['freq']).sort_index()
         self.view = Viewer(self.data)
         self._date = self.data.index[-1]
         self._close = self.data['Close'][-1]
