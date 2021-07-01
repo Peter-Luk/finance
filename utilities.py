@@ -11,7 +11,7 @@ futures_type = ('HSI', 'MHI', 'HHI', 'MCH')
 month_initial = dict(zip(
     [datetime(year, _+1, 1).strftime('%B') for _ in list(range(12))],
     [_.upper() for _ in list('fghjkmnquvxz')]))
-avail_indicators, cal_month = ('wma', 'kama', 'ema', 'hv'), (3, 6, 9, 12)
+avail_indicators, cal_month = ('wma', 'kama', 'ema', 'hv'), [x for x in range(1, 13) if not(x % 3)]
 
 
 def driver_path(browser):
