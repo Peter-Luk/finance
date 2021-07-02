@@ -412,7 +412,7 @@ def way(subject, file='pref.yaml'):
         with open(file, 'r') as f:
             _ = yaml.load(f, Loader=yaml.FullLoader)
         return _.get('subject').get(subject).get('whatsapp').get('alias')
-    except Exception:
+    except:
         from pref import subject as sj
         return sj.get(subject).get('whatsapp').get('alias')
 

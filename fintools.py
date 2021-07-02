@@ -10,8 +10,8 @@ def get_periods(entity='Equities', file='pref', type='yaml'):
             _ = yaml.load(f, Loader=yaml.FullLoader)
             return _.get('periods').get(entity)
     except:
-        import pref
-        return pref.periods.get(entity)
+        from pref import periods
+        return periods.get(entity)
 
 
 class FOA(object):
