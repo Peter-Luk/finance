@@ -413,7 +413,8 @@ def way(subject, file='pref.yaml'):
             _ = yaml.load(f, Loader=yaml.FullLoader)
         return _.get('subject').get(subject).get('whatsapp').get('alias')
     except Exception:
-        pass
+        from pref import subject as sj
+        return sj.get(subject).get('whatsapp').get('alias')
 
 def dvs(d):
     res, values = [], list(d.values())
