@@ -393,6 +393,13 @@ def commit(values):
     _.add_all(values)
     _.commit()
 
+def baseplot(rdf, latest=20):
+    if isinstance(rdf, (Index, Equity)):
+        _ = rdf.kc()
+        _['kama'.upper()] = rdf.kama()
+        _['close'.capitalize()] = rdf().close
+        _.tail(latest).plot(title=f"{rdf.code} last: {latest}")
+
 def _roundup(_, exchange):
     if pd.__version__ < '1.2':
         if exchange == 'HKEx':

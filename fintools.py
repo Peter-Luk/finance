@@ -13,15 +13,6 @@ def get_periods(entity='Equities', file='pref', type='yaml'):
     #     from pref import periods
     #     return periods.get(entity)
 
-def baseplot(rdf, latest=20):
-    try:
-        _ = rdf.kc()
-        _['kama'] = rdf.kama()
-        _['close'] = rdf().close
-        _.tail(latest).plot()
-    except Exception:
-        pass
-
 class FOA(object):
     def __init__(self, data, dtype):
         self.__data = data.copy()
