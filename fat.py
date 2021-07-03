@@ -242,6 +242,7 @@ class Equity(Securities, FOA):
         # self.session = Securities('Securities').session
         self.code = code
         self.exchange = exchange
+        self.yahoo_code = getcode(self.code, self.exchange)
         self.__fields = ['date', 'open', 'high', 'low', 'close', 'volume']
         if exchange == 'HKEx':
             self.query = self.session.query(*[eval(f"Record.{_}") for _ in self.__fields]).filter(text(f"eid={self.code}"))
@@ -269,7 +270,7 @@ class Equity(Securities, FOA):
             import yfinance as yf
             today = datetime.datetime.today()
             start = today.replace(2000, 1, 1)
-            __ = yf.download(getcode(self.code, self.exchange), start, today, group_by='ticker')
+            __ = yf.download(self.yahoo_code, start, today, group_by='ticker')
             __.drop('Adj Close', axis=1, inplace=True)
             __.columns = [_.lower() for _ in __.columns]
             __.index.name = __.index.name.lower()
@@ -398,7 +399,7 @@ def baseplot(rdf, latest=20):
         _ = rdf.kc()
         _['kama'.upper()] = rdf.kama()
         _['close'.capitalize()] = rdf().close
-        _.tail(latest).plot(title=f"{rdf.code} last: {latest}")
+        _.tail(latest).plot(title=f"{rdf.yahoo_code} last: {latest}")
 
 def _roundup(_, exchange):
     if pd.__version__ < '1.2':
