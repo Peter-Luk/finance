@@ -406,15 +406,15 @@ def getcode(code, boarse='HKEx', type='yahoo'):
         if boarse in ['NYSE', 'Nasdaq']:
             return code.upper()
 
-def way(subject, file='pref.yaml'):
-    try:
-        import yaml
-        with open(file, 'r') as f:
-            _ = yaml.load(f, Loader=yaml.FullLoader)
-        return _.get('subject').get(subject).get('whatsapp').get('alias')
-    except:
-        from pref import subject as sj
-        return sj.get(subject).get('whatsapp').get('alias')
+def walias(subject, file='pref.yaml'):
+    # try:
+    import yaml
+    with open(file, encoding='utf-8') as f:
+        _ = yaml.load(f, Loader=yaml.FullLoader)
+    return _.get('subject').get(subject).get('whatsapp').get('alias')
+    # except:
+    #     from pref import subject as sj
+    #     return sj.get(subject).get('whatsapp').get('alias')
 
 def dvs(d):
     res, values = [], list(d.values())
