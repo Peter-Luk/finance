@@ -15,10 +15,9 @@ def get_periods(entity='Equities', file='pref', type='yaml'):
 
 def baseplot(rdf, latest=20):
     try:
-        df = rdf.copy()
-        _ = df.kc()
-        _['kama'] = df.kama()
-        _['close'] = df().close
+        _ = rdf.kc()
+        _['kama'] = rdf.kama()
+        _['close'] = rdf().close
         _.tail(latest).plot()
     except Exception:
         pass
