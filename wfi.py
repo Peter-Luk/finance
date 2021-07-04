@@ -1,7 +1,7 @@
 import re
 import random
 import copy
-from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
+from utilities import driver_path, today, ltd, waf, mtf, IP, datetime, walias
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -13,7 +13,8 @@ from pt_2 import festi
 
 local_tz = pytz.timezone('Asia/Hong_Kong')
 lf, preference = waf(), 'Firefox'
-milly = subject['Milly Ling']['whatsapp']['alias']
+milly = walias('Milly Ling')
+# milly = subject['Milly Ling']['whatsapp']['alias']
 fds = [_ for _ in source.keys() if _ not in ['SMS', 'WhatsApp']]
 if today.day == ltd(today.year, today.month):
     lf = waf(1)
