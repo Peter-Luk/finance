@@ -87,6 +87,10 @@ class Index(Futures, FOA):
     def __call__(self):
         return self.compose()
 
+    def copy(self):
+        import copy
+        return copy.copy(self)
+
     def compose(self):
         def unique_date():
             res = []
@@ -259,6 +263,10 @@ class Equity(Securities, FOA):
     def __call__(self, static=True):
         return self.__data
 
+    def copy(self):
+        import copy
+        return copy.copy(self)
+
     def compose(self, static):
         if self.exchange != 'HKEx':
             static = False
@@ -396,16 +404,17 @@ def commit(values):
 
 def baseplot(rdf, latest=None):
     if isinstance(rdf, (Index, Equity)):
-        _ = rdf.kc()
-        _['kama'.upper()] = rdf.kama()
-        _['close'.capitalize()] = rdf().close
+        df = df.copy()
+        _ = df.kc()
+        _['kama'.upper()] = df.kama()
+        _['close'.capitalize()] = df().close
         if latest is None:
             latest = get_periods('Futures').get('simple')
-            if isinstance(rdf, Equity):
+            if isinstance(df, Equity):
                 latest = get_periods('Equities').get('simple')
-        code = rdf.code
-        if isinstance(rdf, Equity):
-            code = rdf.yahoo_code
+        code = df.code
+        if isinstance(df, Equity):
+            code = df.yahoo_code
         _.tail(latest).plot(title=f"{code} last: {latest}")
 
 def _roundup(_, exchange):
