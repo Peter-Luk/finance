@@ -404,7 +404,7 @@ def commit(values):
 
 def baseplot(rdf, latest=None):
     if isinstance(rdf, (Index, Equity)):
-        df = df.copy()
+        df = rdf.copy()
         _ = df.kc()
         _['kama'.upper()] = df.kama()
         _['close'.capitalize()] = df().close
