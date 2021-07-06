@@ -397,6 +397,8 @@ def getcode(code, boarse='HKEx', type='yahoo'):
     if type == 'yahoo':
         if boarse == 'HKEx' and isinstance(code, int):
             return f"{code:04}.HK"
+        if boarse == 'SHE' and isinstance(code, int):
+            return f"{code:06}.SS"
         if boarse == 'SZE' and isinstance(code, int):
             return f"{code:06}.SZ"
         if boarse == 'TSE' and isinstance(code, int):
