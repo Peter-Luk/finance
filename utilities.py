@@ -3,7 +3,8 @@ from pytz import timezone
 from scipy.optimize import newton
 import pref
 sep, environ, linesep, platform, version_info, db, gr, sleep, \
-    datetime, driver, reduce, ph, subject = pref.utils
+    datetime, driver, reduce, ph = pref.utils
+    # datetime, driver, reduce, ph, subject = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
@@ -409,14 +410,10 @@ def getcode(code, boarse='HKEx', type='yahoo'):
             return code.upper()
 
 def walias(subject, file='pref.yaml'):
-    # try:
     import yaml
     with open(file, encoding='utf-8') as f:
         _ = yaml.load(f, Loader=yaml.FullLoader)
     return _.get('subject').get(subject).get('whatsapp').get('alias')
-    # except:
-    #     from pref import subject as sj
-    #     return sj.get(subject).get('whatsapp').get('alias')
 
 def dvs(d):
     res, values = [], list(d.values())
