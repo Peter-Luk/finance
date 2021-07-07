@@ -1,7 +1,7 @@
 import re
 import random
 import copy
-from utilities import driver_path, today, ltd, waf, mtf, IP, datetime, walias
+from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,9 +11,15 @@ from y2n import Futures
 from pref import xvsa, source, fields, subject, pytz
 from pt_2 import festi
 
+def alias(subject, file='pref.yaml'):
+    import yaml
+    with open(file, encoding='utf-8') as f:
+        _ = yaml.load(f, Loader=yaml.FullLoader)
+    return _.get('subject').get(subject).get('whatsapp').get('alias')
+
 local_tz = pytz.timezone('Asia/Hong_Kong')
 lf, preference = waf(), 'Firefox'
-milly = walias('Milly Ling')
+milly = alias('Milly Ling')
 # milly = subject['Milly Ling']['whatsapp']['alias']
 fds = [_ for _ in source.keys() if _ not in ['SMS', 'WhatsApp']]
 if today.day == ltd(today.year, today.month):
