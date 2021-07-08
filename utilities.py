@@ -15,15 +15,19 @@ month_initial = dict(zip(
 avail_indicators, cal_month = ('wma', 'kama', 'ema', 'hv'), [x for x in range(1, 13) if not(x % 3)]
 
 
-def driver_path(browser):
+def driver_path(browser, file='pref.yaml'):
+    import yaml
+    with open(file, encoding='utf-8') as f:
+        _ = yaml.load(f, Loader=yaml.FullLoader)
+    __ = _.get('driver').get(browser.capitalize())
     _ = []
     if platform == 'win32':
         _.append(environ.get('HOMEPATH'))
     else:
-        _ .append(environ.get('HOME'))
-    __ = driver[browser.capitalize()]
-    _.extend(__['path'])
-    _.append(__['name'])
+        _.append(environ.get('HOME'))
+    # __ = driver.get(browser.capitalize())
+    _.extend(__.get('path'))
+    _.append(__.get('name'))
     return sep.join(_)
 
 
