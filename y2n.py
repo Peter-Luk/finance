@@ -245,7 +245,7 @@ class Equities(AE, Viewer):
                 else:
                     print('Retry in 30 seconds')
                     sleep(30)
-            __.drop('Adj Close', 1, inplace=True)
+            __.drop(columns=['Adj Close'])
         else:
             from alchemy import AS
             fields = ['date'] + pref.fields
