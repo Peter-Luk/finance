@@ -419,8 +419,8 @@ def baseplot(rdf, latest=None):
 
 def mplot(df, last=220):
     import mplfinance as mpf
-    adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), mpf.make_addplot(df.kama()[-last:], color='yellow'), mpf.make_addplot(df.rsi()[-last:], panel=1, color='green')]
-    mpf.plot(df()[-last:], type='candle', style='charles', addplot=adps, title=df.yahoo_code, volume=True, ylabel='Price')
+    adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), mpf.make_addplot(df.kama()[-last:], color='silver'), mpf.make_addplot(df.rsi()[-last:], panel=1, color='green')]
+    mpf.plot(df()[-last:], type='candle', style='charles', addplot=adps, mav=(10,20,50), title=df.yahoo_code, volume=True, ylabel='Price')
 
 def _roundup(_, exchange):
     if pd.__version__ < '1.2':
