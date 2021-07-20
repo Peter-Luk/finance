@@ -417,13 +417,18 @@ def baseplot(rdf, latest=None):
             code = df.yahoo_code
         _.tail(latest).plot(title=f"{code} last: {latest}")
 
-def mplot(df, last=220):
+def mplot(df, last=200):
     import mplfinance as mpf
 #     mc = mpf.make_marketcolors(up='tab:blue',down='tab:red', edge='lime', wick={'up':'blue','down':'red'}, volume='lawngreen')
 #     s  = mpf.make_mpf_style(base_mpl_style="seaborn", marketcolors=mc)
 
     adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), mpf.make_addplot(df.kama()[-last:], color='silver'), mpf.make_addplot(df.rsi()[-last:], panel=1, color='green')]
-    mpf.plot(df()[-last:], type='candle', style='charles', addplot=adps, title=df.yahoo_code, volume=True, ylabel='Price')
+    tt = df.code
+    try:
+        tt = df.yahoo_code
+    except Exception:
+        pass
+    mpf.plot(df()[-last:], type='candle', style='charles', addplot=adps, title=tt, volume=True, ylabel='Price')
 
 def _roundup(_, exchange):
     if pd.__version__ < '1.2':
