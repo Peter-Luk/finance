@@ -17,7 +17,7 @@ app = dash.Dash(__name__)
 app.layout = html.Div([
     dcc.Checklist(
         id='toggle-rangeslider',
-        options=[{'label': 'Include Rangeslider', 
+        options=[{'label': 'Include Rangeslider',
                   'value': 'slider'}],
         value=['slider']
     ),
@@ -25,19 +25,20 @@ app.layout = html.Div([
 ])
 
 @app.callback(
-    Output("graph", "figure"), 
+    Output("graph", "figure"),
     [Input("toggle-rangeslider", "value")])
+
 def display_candlestick(value):
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
-        vertical_spacing=0.03, subplot_titles=('OHLC', 'Volume'), 
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
+        vertical_spacing=0.03, subplot_titles=('OHLC', 'Volume'),
         row_width=[0.2, 0.7])
-    
+
     # Plot OHLC on 1st row
     fig.add_trace(go.Candlestick(x=df["date"], open=df["open"], high=df["high"],
-                    low=df["low"], close=df["close"], name="OHLC"), 
+                    low=df["low"], close=df["close"], name="OHLC"),
                     row=1, col=1
     )
-    
+
     # Bar trace for volumes on 2nd row without legend
     fig.add_trace(go.Bar(x=df['date'], y=df['volume'], showlegend=False), row=2, col=1)
 
