@@ -9,7 +9,8 @@ from plotly.subplots import make_subplots
 # from datetime import datetime
 from fat import Equity
 
-df = Equity('mrna', exchange='Nasdaq')()
+e1 = Equity('mrna', exchange='Nasdaq')
+df = e1()
 # df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv')
 
 app = dash.Dash(__name__)
@@ -35,15 +36,19 @@ def display_candlestick(value):
                         row_width=[0.2, 0.7])
 
     # Plot OHLC on 1st row
-    fig.add_trace(go.Candlestick(x=df["date"], open=df["open"],
+    fig.add_trace(go.Candlestick(x=df.index, open=df["open"],
                                  high=df["high"], low=df["low"],
                                  close=df["close"], name="OHLC"),
                   row=1, col=1
                   )
+    fig.add_trace(go.Scatter(x=df.index, y=e1.kama(), name='KAMA',
+        line=dict(color='firebrick', width=1)), row=1, col=1)
 
     # Bar trace for volumes on 2nd row without legend
-    fig.add_trace(go.Bar(x=df['date'], y=df['volume'],
+    fig.add_trace(go.Bar(x=df.index, y=df['volume'],
                          showlegend=False), row=2, col=1)
+    fig.add_trace(go.Scatter(x=df.index, y=e1.rsi(), name='RSI',
+        line=dict(color='green', width=1)), row=2, col=1)
 
 #     fig = go.Figure(go.Candlestick(
 #         x=df['date'],
