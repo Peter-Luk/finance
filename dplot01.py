@@ -10,7 +10,7 @@ from plotly.subplots import make_subplots
 from fat import Equity
 
 # e1 = Equity('mrna', exchange='Nasdaq')
-e1 = Equity(700, False)
+e1 = Equity(4523, exchange='TSE')
 df = e1()
 # df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv')
 
@@ -33,7 +33,8 @@ app.layout = html.Div([
 def display_candlestick(value):
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
                         vertical_spacing=0.03,
-                        subplot_titles=('OHLC', 'Volume'),
+#                         subplot_titles=('OHLC', 'Volume'),
+                        subplot_titles=(e1.yahoo_code, 'RSI', 'Volume'),
                         row_width=[0.15, 0.15, 0.6])
 
     # Plot OHLC on 1st row
@@ -50,8 +51,9 @@ def display_candlestick(value):
     fig.add_trace(go.Scatter(x=df.index, y=kc.Lower, name='Lower',
         line=dict(color='blue', width=1)), row=1, col=1)
 
-    fig.add_trace(go.Scatter(x=df.index, y=e1.rsi(), name='RSI',
-        line=dict(color='green', width=2)), row=2, col=1)
+    fig.add_trace(go.Scatter(x=df.index, y=e1.rsi(),
+        showlegend=False, line=dict(color='green', width=2)),
+                        row=2, col=1)
     # Bar trace for volumes on 3rd row without legend
     fig.add_trace(go.Bar(x=df.index, y=df['volume'],
                         showlegend=False), row=3, col=1)
