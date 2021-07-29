@@ -9,7 +9,8 @@ from plotly.subplots import make_subplots
 # from datetime import datetime
 from fat import Equity
 
-e1 = Equity('mrna', exchange='Nasdaq')
+# e1 = Equity('mrna', exchange='Nasdaq')
+e1 = Equity(700, False)
 df = e1()
 # df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv')
 
@@ -30,10 +31,10 @@ app.layout = html.Div([
     Output("graph", "figure"),
     [Input("toggle-rangeslider", "value")])
 def display_candlestick(value):
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
                         vertical_spacing=0.03,
                         subplot_titles=('OHLC', 'Volume'),
-                        row_width=[0.2, 0.7])
+                        row_width=[0.15, 0.15, 0.6])
 
     # Plot OHLC on 1st row
     fig.add_trace(go.Candlestick(x=df.index, open=df["open"],
@@ -43,12 +44,17 @@ def display_candlestick(value):
                   )
     fig.add_trace(go.Scatter(x=df.index, y=e1.kama(), name='KAMA',
         line=dict(color='firebrick', width=1)), row=1, col=1)
+    kc = e1.kc()
+    fig.add_trace(go.Scatter(x=df.index, y=kc.Upper, name='Upper',
+        line=dict(color='blue', width=1)), row=1, col=1)
+    fig.add_trace(go.Scatter(x=df.index, y=kc.Lower, name='Lower',
+        line=dict(color='blue', width=1)), row=1, col=1)
 
-    # Bar trace for volumes on 2nd row without legend
-    fig.add_trace(go.Bar(x=df.index, y=df['volume'],
-                         showlegend=False), row=2, col=1)
     fig.add_trace(go.Scatter(x=df.index, y=e1.rsi(), name='RSI',
-        line=dict(color='green', width=1)), row=2, col=1)
+        line=dict(color='green', width=2)), row=2, col=1)
+    # Bar trace for volumes on 3rd row without legend
+    fig.add_trace(go.Bar(x=df.index, y=df['volume'],
+                        showlegend=False), row=3, col=1)
 
 #     fig = go.Figure(go.Candlestick(
 #         x=df['date'],
