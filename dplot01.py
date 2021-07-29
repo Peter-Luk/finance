@@ -10,7 +10,7 @@ from plotly.subplots import make_subplots
 from fat import Equity
 
 # e1 = Equity('mrna', exchange='Nasdaq')
-e1 = Equity(4523, exchange='TSE')
+e1 = Equity(6645, exchange='TSE')
 df = e1()
 # df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv')
 
