@@ -239,17 +239,3 @@ class FOA(object):
         pv = data.drop(['open', 'volume'], 1).mean(axis=1) * data.volume
         data['vwap'] = pv.cumsum() / data.volume.cumsum()
         return data['vwap']
-
-def bcls(price, quantity, brokerage='.25/100'):
-    import math
-    amount = price * quantity
-    b_rate, b_min = [float(_) for _ in brokerage.split('/')]
-    broker = round(amount * b_rate / 100, 2)
-    if broker < b_min: broker = b_min
-    s_duty = math.ceil(.13 * amount / 100)
-    t_levy = round(.0027 * amount / 100, 2)
-    t_fee = round(.005 * amount / 100, 2)
-    ccass = round(amount * .01 / 100, 2)
-    if ccass < 3: ccass = 3
-    if ccass > 300: ccass = 300
-    return round(broker + s_duty + t_levy + t_fee + ccass, 2)

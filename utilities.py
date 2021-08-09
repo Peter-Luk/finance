@@ -438,3 +438,17 @@ def xnpv(rate, values, dates):
 
 def xirr(values, dates):
     return newton(lambda r: xnpv(r, values, dates), 0)
+
+def bcls(price, quantity, brokerage='.25/100'):
+    import math
+    amount = price * quantity
+    b_rate, b_min = [float(_) for _ in brokerage.split('/')]
+    broker = amount * b_rate / 100
+    if broker < b_min: broker = b_min
+    s_duty = math.ceil(.13 * amount / 100)
+    t_levy = .0027 * amount / 100
+    t_fee = .005 * amount / 100
+    ccass = amount * .01 / 100
+    if ccass < 3: ccass = 3
+    if ccass > 300: ccass = 300
+    return round(broker + s_duty + t_levy + t_fee + ccass, 2)
