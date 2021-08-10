@@ -464,7 +464,5 @@ def order_report(stock_code, price, quantity, previous=0, sold=True):
         require ='實收'
         amount = price * quantity - bcls(price, quantity)
         balance = previous + amount
-    msg = f"實需存入 {balance:,.2f}"
-    if balance > 0:
-        msg = f"交收後結餘 {balance:,.2f}"
+    msg = f"交收後結餘 {balance:,.2f}" if balance > 0 else f"實需存入 {balance:,.2f}"
     return f"{action} {quantity:,}股 #{stock_code} @ {price:,.2f} 連手續費及政府費用{require} {amount:,.2f}, 戶口交收前結餘 {previous:,.2f}。{msg}"
