@@ -439,7 +439,7 @@ def xnpv(rate, values, dates):
 def xirr(values, dates):
     return newton(lambda r: xnpv(r, values, dates), 0)
 
-def bcls(price, quantity, brokerage='.25/100'):
+def bcls(price, quantity, brokerage='.25/100', ccass='3/.01/300'):
     import math
     amount = price * quantity
     b_rate, b_min = [float(_) for _ in brokerage.split('/')]
@@ -448,7 +448,24 @@ def bcls(price, quantity, brokerage='.25/100'):
     s_duty = math.ceil(.13 * amount / 100)
     t_levy = .0027 * amount / 100
     t_fee = .005 * amount / 100
-    ccass = amount * .01 / 100
-    if ccass < 3: ccass = 3
-    if ccass > 300: ccass = 300
-    return round(broker + s_duty + t_levy + t_fee + ccass, 2)
+    c_min, c_rate, c_max = [float(_) for _ in ccass.split('/')]
+    cas = c_rate * amount / 100
+    if cas < c_min: cas = c_min
+    if cas > c_max: cas = c_max
+    return round(broker + s_duty + t_levy + t_fee + cas, 2)
+
+def order_report(account, stock_code, price, quantity, previous=0, sold=True):
+    action = '買入'
+    require = '需'
+    amount = price * quantity + bcls(price, quantity)
+    balance = previous - amount
+    if sold:
+        action = '沽出'
+        require ='實收'
+        amount = price * quantity - bcls(price, quantity)
+        balance = previous + amount
+    msg = f"實需存入 {balance:,}"
+    if balance > 0:
+        msg = f"交收後結餘 {balance:,}"
+    msg_text = f"戶口 {account} {action} {quantity:,}股 #{stock_code} @ {price} 連手續費及政府費用{require} {amount:,}, 戶口交收前結餘 {previous:,}。{msg}"
+    return msg_text
