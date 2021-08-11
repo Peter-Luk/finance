@@ -57,6 +57,11 @@ subject = {
             primary='+853 65858338'),
         whatsapp=dict(
             alias='"沈志明"')),
+    'Ho Hung Sung': dict(
+        mobile=dict(
+            primary=90818157),
+        whatsapp=dict(
+            alias='"何雄紳"')),
     'Chan Cheung Yiu': dict(
         mobile=dict(
             primary=91031418),
