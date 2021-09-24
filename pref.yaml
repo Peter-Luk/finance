@@ -57,6 +57,11 @@ subject:
             primary: 90818157
         whatsapp:
             alias: '"何雄紳"'
+    'Sou Wai Cheong':
+        mobile:
+            primary: 60189633
+        whatsapp:
+            alias: '"蘇偉章"'
     'Chan Cheung Yiu':
         mobile:
             primary: 91031418
@@ -67,6 +72,16 @@ subject:
             primary: 98682629
         whatsapp:
             alias: '"袁淑兒Josephine"'
+    'Philip Dymo':
+        mobile:
+            primary: 61248088
+        whatsapp:
+            alias: '"端木和祥"'
+    'Cheung Chi Ming':
+        mobile:
+            primary: 96720359
+        whatsapp:
+            alias: '"Chi Ming Cheung"'
 # ---
 periods:
     Futures:
@@ -224,7 +239,8 @@ public_holiday:
 fields: ['open', 'high', 'low', 'close', 'volume']
 xvsa:
     class: 'copyable-text selectable-text'
-    data-tab: 6
+    role: textbox
+    data-tab: 9
     dir: ltr
     spellcheck: 'true'
     contenteditable: 'true'

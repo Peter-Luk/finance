@@ -439,16 +439,16 @@ def xnpv(rate, values, dates):
 def xirr(values, dates):
     return newton(lambda r: xnpv(r, values, dates), 0)
 
-def order_report(stock_code, price, quantity, previous=0, sold=True):
+def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True):
     action = '買入'
     require = '需'
-    def bcls(price, quantity, brokerage='.25/100', ccass='3/.01/300'):
+    def bcls(price, quantity, equity, brokerage='.25/100', ccass='3/.01/300'):
         import math
         amount = price * quantity
         b_rate, b_min = [float(_) for _ in brokerage.split('/')]
         broker = amount * b_rate / 100
         if broker < b_min: broker = b_min
-        s_duty = math.ceil(.13 * amount / 100)
+        s_duty = math.ceil(.13 * amount / 100) if equity else 0
         t_levy = .0027 * amount / 100
         t_fee = .005 * amount / 100
         c_min, c_rate, c_max = [float(_) for _ in ccass.split('/')]
@@ -457,12 +457,12 @@ def order_report(stock_code, price, quantity, previous=0, sold=True):
         if cas > c_max: cas = c_max
         return round(broker + s_duty + t_levy + t_fee + cas, 2)
 
-    amount = price * quantity + bcls(price, quantity)
+    amount = price * quantity + bcls(price, quantity, equity)
     balance = previous - amount
     if sold:
         action = '沽出'
         require ='實收'
-        amount = price * quantity - bcls(price, quantity)
+        amount = price * quantity - bcls(price, quantity, equity)
         balance = previous + amount
-    msg = f"交收後結餘 {balance:,.2f}" if balance > 0 else f"實需存入 {balance:,.2f}"
-    return f"{action} {quantity:,}股 #{stock_code} @ {price:,.2f} 連手續費及政府費用{require} {amount:,.2f}, 戶口交收前結餘 {previous:,.2f}。{msg}"
+    msg = f"(交收後): {balance:,.2f}" if balance > 0 else f"實需存入 {balance:,.2f}"
+    return f"{action} {quantity:,}股 #{stock_code} @ {price:,.3f} 連手續費及政府費用{require} {amount:,.2f}。 戶口結餘(交收前): {previous:,.2f}, {msg}。"
