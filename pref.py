@@ -31,12 +31,22 @@ subject = {
             home=26150456),
         whatsapp=dict(
             alias='"胡碧茜Grace"')),
+    'Elsa Fung': dict(
+        mobile=dict(
+            primary=93556260),
+        whatsapp=dict(
+            alias='"馮麗金"')),
+    'Wong Kit Ching': dict(
+        mobile=dict(
+            primary=98804808),
+        whatsapp=dict(
+            alias='"柳太黃"')),
     'Milly Ling': dict(
         mobile=dict(
             primary=90107008,
             home=21750098),
         whatsapp=dict(
-            alias='"凌月明Milly"')),
+            alias='"凌月明"')),
     'Mickey Wong': dict(
         mobile=dict(
             primary='+65 83826103'),
@@ -98,8 +108,8 @@ source = dict(
 
 fields = ['open', 'high', 'low', 'close', 'volume']
 xvsa = dict(zip(
-    ['class', 'data-tab', 'dir', 'spellcheck', 'contenteditable'],
-    ['copyable-text selectable-text', '6', 'ltr', 'true', 'true']))
+    ['class', 'role', 'data-tab', 'dir', 'spellcheck', 'contenteditable'],
+    ['copyable-text selectable-text', 'textbox', '9', 'ltr', 'true', 'true']))
 B_scale = dict(
     BABA=1 / 8,
     BIDU=1 / 8,
@@ -107,7 +117,8 @@ B_scale = dict(
     TCOM=1,
     YUMC=1,
     NTES=1 / 5,
-    JD=1 / 2)
+    JD=1 / 2,
+    WB=1)
 
 USHK = 7.75
 public_holiday = {2015: {
@@ -266,7 +277,7 @@ db = dict(
         table='records',
         index='date',
         freq='daily',
-        exclude=[122, 368, 805, 1828, 2303, 8509]),
+        exclude=[122, 368, 805, 1573, 1828, 2303, 2606, 8509]),
     Futures=dict(
         name='Futures',
         table='records',

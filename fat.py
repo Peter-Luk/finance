@@ -1,9 +1,8 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
-from utilities import filepath, waf, getcode
+from utilities import filepath, waf, getcode, gslice
 from fintools import FOA, get_periods, pd, np
 from finaux import roundup
-# from pref import periods
 import copy
 import datetime
 
@@ -35,15 +34,14 @@ class Record(Base):
         _ += f"close={self.close}, volume={self.volume})>"
         return _
 
-    def start(self, open):
-        self.open = open
-        self.high = open
-        self.low = open
-        self.close = open
-
-    def range(self, high, low):
-        self.high = high
-        self.low = low
+    def range(self, v1, v2):
+        (v1, v2) = (v2, v1) if v1 < v2 else (v1, v2)
+        self.high = v1 if self.high is None or self.high < v1 else self.high
+        self.low = v2 if self.low is None or self.low > v2 else self.low
+        # h = v1 if v1 > v2 else v2
+        # l = v2 if v2 < v1 else v1
+        # self.high = h if self.high is None or self.high < h else self.high
+        # self.low = l if self.low is None or self.low > l else self.low
         self.close = None
 
     def finish(self, close, volume):
@@ -51,8 +49,9 @@ class Record(Base):
         self.volume = volume
 
 
-class Futures(Record):
+class Index(Record):
     def __init__(self, db='Futures'):
+        super(Index, self).__init__()
         self.engine = create_engine(f"sqlite:///{filepath(db)}")
         Session.configure(bind=self.engine)
         self.session = Session()
@@ -61,18 +60,18 @@ class Futures(Record):
 
 class Securities(Record):
     def __init__(self, db='Securities'):
-        self.engine = create_engine(f"sqlite:///{filepath(db)}")
-        Session.configure(bind=self.engine)
+        self.__engine = create_engine(f"sqlite:///{filepath(db)}")
+        Session.configure(bind=self.__engine)
         self.session = Session()
         query = self.session.query(Record.code.label('code')).subquery()
         self.query = self.session.query(query.c.code.label('eid')).options(defer('session'))
 
 
-class Index(Futures, FOA):
+class Futures(Index, FOA):
     def __init__(self, code):
+        super(Futures, self).__init__()
         __ = 'Futures'
-        self.session = Futures(__).session
-        # self.periods = get_periods('pref.yaml')[__]
+        self.session = Index(__).session
         self.periods = get_periods(__)
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
@@ -235,6 +234,34 @@ class Index(Futures, FOA):
         __.drop(['sma', 'wma', 'ema', 'kama'], axis=1, inplace=True)
         return __.applymap(round, na_action='ignore')
 
+    def optinum(self, date=None, base=None, delta=None):
+        if date is None:
+            date = self.date
+        if base is None:
+            base = self.__data
+        if delta is None:
+            delta = self.atr(self.periods['atr'])
+
+        def _patr(raw, date):
+            lc, lr = raw.close.loc[date], delta.loc[date]
+            _ = np.arange(lc - lr, lc + lr, lr).tolist()
+            _.extend(gslice([lc + lr, lc]))
+            _.extend(gslice([lc, lc - lr]))
+            return _
+
+        def _pgap(pivot, raw):
+            gap = pivot - raw.close.iloc[-1]
+            _ = gslice([pivot + gap, pivot])
+            _.extend(gslice([pivot, pivot - gap]))
+            return _
+        hdr = []
+        [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
+        hdr.sort()
+
+        buy = [round(_) for _ in hdr if _ < base.close.loc[date]]
+        sell = [round(_) for _ in hdr if _ > base.close.loc[date]]
+        return {'Buy':pd.Series(buy).unique(), 'Sell':pd.Series(sell).unique()}
+
 
 class Equity(Securities, FOA):
     def __init__(self, code, static=True, exchange='HKEx'):
@@ -396,11 +423,50 @@ class Equity(Securities, FOA):
             __.Lower = __.Lower.apply(roundup)
         return _roundup(__, self.exchange)
 
+    def optinum(self, date=None, base=None, delta=None):
+        if date is None:
+            date = self.date
+        if base is None:
+            base = self.__data
+        if delta is None:
+            delta = self.atr(self.periods['atr'])
 
-def commit(values):
-    _ = Index(waf()[-1]).session
-    _.add_all(values)
-    _.commit()
+        def _patr(raw, date):
+            lc, lr = raw.close.loc[date], delta.loc[date]
+            _ = np.arange(lc - lr, lc + lr, lr).tolist()
+            _.extend(gslice([lc + lr, lc]))
+            _.extend(gslice([lc, lc - lr]))
+            return _
+
+        def _pgap(pivot, raw):
+            gap = pivot - raw.close.iloc[-1]
+            _ = gslice([pivot + gap, pivot])
+            _.extend(gslice([pivot, pivot - gap]))
+            return _
+        hdr = []
+        [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
+        hdr.sort()
+
+        buy = [round(_, 2) for _ in hdr if _ < base.close.loc[date]]
+        sell = [round(_, 2) for _ in hdr if _ > base.close.loc[date]]
+        if self.exchange == 'TSE':
+            buy = [round(_) for _ in hdr if _ < base.close.loc[date]]
+            sell = [round(_) for _ in hdr if _ > base.close.loc[date]]
+        if self.exchange == 'HKEx':
+            buy = [roundup(_) for _ in hdr if _ < base.close.loc[date]]
+            sell = [roundup(_) for _ in hdr if _ > base.close.loc[date]]
+
+        return {'Buy':pd.Series(buy).unique(), 'Sell':pd.Series(sell).unique()}
+
+
+def submit(values, db='Futures'):
+    from tqdm import tqdm
+    _ = Index(db).session
+    with _.begin():
+        for i in tqdm(values, desc='submitting'):
+            _.add(i)
+    print('Done')
+    _.close()
 
 def baseplot(rdf, latest=None):
     if isinstance(rdf, (Index, Equity)):

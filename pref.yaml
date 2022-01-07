@@ -26,12 +26,22 @@ subject:
             home: 26150456
         whatsapp:
             alias: '"胡碧茜Grace"'
+    'Elsa Fung':
+        mobile:
+            primary: 93556260
+        whatsapp:
+            alias: '"馮麗金"'
+    'Wong Kit Ching':
+        mobile:
+            primary: 98804808
+        whatsapp:
+            alias: '"柳太黃"'
     'Milly Ling':
         mobile:
             primary: 90107008
             home: 21750098
         whatsapp:
-            alias: '"凌月明Milly"'
+            alias: '"凌月明"'
     'Mickey Wong':
         mobile:
             primary: '+65 83826103'
@@ -57,6 +67,11 @@ subject:
             primary: 90818157
         whatsapp:
             alias: '"何雄紳"'
+    'Sou Wai Cheong':
+        mobile:
+            primary: 60189633
+        whatsapp:
+            alias: '"蘇偉章"'
     'Chan Cheung Yiu':
         mobile:
             primary: 91031418
@@ -67,6 +82,16 @@ subject:
             primary: 98682629
         whatsapp:
             alias: '"袁淑兒Josephine"'
+    'Philip Dymo':
+        mobile:
+            primary: 61248088
+        whatsapp:
+            alias: '"端木和祥"'
+    'Cheung Chi Ming':
+        mobile:
+            primary: 96720359
+        whatsapp:
+            alias: '"Chi Ming Cheung"'
 # ---
 periods:
     Futures:
@@ -133,7 +158,7 @@ db:
         table: 'records'
         index: 'date'
         freq: 'daily'
-        exclude: [122, 368, 805, 1828, 2303, 8509]
+        exclude: [122, 368, 805, 1573, 1828, 2303, 2606, 8509]
     Futures:
         name: 'Futures'
         table: 'records'
@@ -224,19 +249,37 @@ public_holiday:
 fields: ['open', 'high', 'low', 'close', 'volume']
 xvsa:
     class: 'copyable-text selectable-text'
-    data-tab: 6
+    role: textbox
+    data-tab: 9
     dir: ltr
     spellcheck: 'true'
     contenteditable: 'true'
 
 B_scale:
-    BABA: .125
-    BIDU: .125
-    BILI: 1
-    TCOM: 1
-    YUMC: 1
-    NTES: .2
-    JD: .5
+    BABA:
+      code: 9988
+      ratio: .125
+    BIDU:
+      code: 9888
+      ratio: .125
+    BILI:
+      code: 9626
+      ratio: 1
+    TCOM:
+      code: 9961
+      ratio: 1
+    YUMC:
+      code: 9987
+      ratio: 1
+    NTES:
+      code: 9999
+      ratio: .2
+    JD:
+      code: 9618
+      ratio: .5
+    WB:
+      code: 9898
+      ratio: 1
 
 USHK: 7.75
 ...
