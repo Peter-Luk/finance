@@ -194,6 +194,7 @@ class WFutures(object):
         sxv = ' and '.join([f"contains(@{k}, '{v}')" for k, v in xvsa.items()])
         input_box = self.wait.until(EC.presence_of_element_located((
             By.XPATH, f"//div[{sxv}]")))
+        input_box.clear()
         input_box.send_keys(message + Keys.ENTER)
         return ' @ '.join((
             f'Message successfully sent to {recipent}',
@@ -222,7 +223,7 @@ class WFutures(object):
             './div[5]').text)[1:])
         try:
             last = source[site]['tz'].localize(datetime.strptime(
-                _l, '%a %b %d %Y %I:%M %p EDT'))
+                _l, '%a %b %d %Y %I:%M %p EST'))
         except Exception:
             last = source[site]['tz'].localize(datetime.strptime(
                 _l, '%a %b %d %Y'))
