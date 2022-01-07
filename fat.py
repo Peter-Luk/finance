@@ -3,7 +3,6 @@ from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, waf, getcode, gslice
 from fintools import FOA, get_periods, pd, np
 from finaux import roundup
-# from pref import periods
 import copy
 import datetime
 
@@ -36,10 +35,13 @@ class Record(Base):
         return _
 
     def range(self, v1, v2):
-        h = v1 if v1 > v2 else v2
-        l = v2 if v2 < v1 else v1
-        self.high = h if self.high is None or self.high < h else self.high
-        self.low = l if self.low is None or self.low > l else self.low
+        (v1, v2) = (v2, v1) if v1 < v2 else (v1, v2)
+        self.high = v1 if self.high is None or self.high < v1 else self.high
+        self.low = v2 if self.low is None or self.low > v2 else self.low
+        # h = v1 if v1 > v2 else v2
+        # l = v2 if v2 < v1 else v1
+        # self.high = h if self.high is None or self.high < h else self.high
+        # self.low = l if self.low is None or self.low > l else self.low
         self.close = None
 
     def finish(self, close, volume):
@@ -236,18 +238,29 @@ class Futures(Index, FOA):
         if date is None:
             date = self.date
         if base is None:
-            base = self.__data.close.loc[date]
+            base = self.__data
         if delta is None:
-            delta = self.atr().loc[date]
-        rd = {}
-        rl = [base - delta, base + delta]
-        rl.extend(gslice(rl))
-        rl.extend(gslice([base - delta, base]))
-        rl.extend(gslice([base, base + delta]))
-        rl.sort()
-        rd['Buy'] = [round(_) for _ in rl if _ < base]
-        rd['Sell'] = [round(_) for _ in rl if _ > base]
-        return pd.DataFrame(rd)
+            delta = self.atr(self.periods['atr'])
+
+        def _patr(raw, date):
+            lc, lr = raw.close.loc[date], delta.loc[date]
+            _ = np.arange(lc - lr, lc + lr, lr).tolist()
+            _.extend(gslice([lc + lr, lc]))
+            _.extend(gslice([lc, lc - lr]))
+            return _
+
+        def _pgap(pivot, raw):
+            gap = pivot - raw.close.iloc[-1]
+            _ = gslice([pivot + gap, pivot])
+            _.extend(gslice([pivot, pivot - gap]))
+            return _
+        hdr = []
+        [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
+        hdr.sort()
+
+        buy = [round(_) for _ in hdr if _ < base.close.loc[date]]
+        sell = [round(_) for _ in hdr if _ > base.close.loc[date]]
+        return {'Buy':pd.Series(buy).unique(), 'Sell':pd.Series(sell).unique()}
 
 
 class Equity(Securities, FOA):
@@ -414,31 +427,46 @@ class Equity(Securities, FOA):
         if date is None:
             date = self.date
         if base is None:
-            base = self.__data.close.loc[date]
+            base = self.__data
         if delta is None:
-            delta = self.atr().loc[date]
-        rd = {}
-        rl = [base - delta, base + delta]
-        rl.extend(gslice(rl))
-        rl.extend(gslice([base - delta, base]))
-        rl.extend(gslice([base, base + delta]))
-        rl.sort()
-        rd['Buy'] = [roundup(_) for _ in rl if _ < base]
-        rd['Sell'] = [roundup(_) for _ in rl if _ > base]
-        return pd.DataFrame(rd)
+            delta = self.atr(self.periods['atr'])
+
+        def _patr(raw, date):
+            lc, lr = raw.close.loc[date], delta.loc[date]
+            _ = np.arange(lc - lr, lc + lr, lr).tolist()
+            _.extend(gslice([lc + lr, lc]))
+            _.extend(gslice([lc, lc - lr]))
+            return _
+
+        def _pgap(pivot, raw):
+            gap = pivot - raw.close.iloc[-1]
+            _ = gslice([pivot + gap, pivot])
+            _.extend(gslice([pivot, pivot - gap]))
+            return _
+        hdr = []
+        [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
+        hdr.sort()
+
+        buy = [round(_, 2) for _ in hdr if _ < base.close.loc[date]]
+        sell = [round(_, 2) for _ in hdr if _ > base.close.loc[date]]
+        if self.exchange == 'TSE':
+            buy = [round(_) for _ in hdr if _ < base.close.loc[date]]
+            sell = [round(_) for _ in hdr if _ > base.close.loc[date]]
+        if self.exchange == 'HKEx':
+            buy = [roundup(_) for _ in hdr if _ < base.close.loc[date]]
+            sell = [roundup(_) for _ in hdr if _ > base.close.loc[date]]
+
+        return {'Buy':pd.Series(buy).unique(), 'Sell':pd.Series(sell).unique()}
 
 
 def submit(values, db='Futures'):
     from tqdm import tqdm
     _ = Index(db).session
-    # _ = Futures(waf()[-1]).session
     with _.begin():
         for i in tqdm(values, desc='submitting'):
             _.add(i)
     print('Done')
     _.close()
-    # _.add_all(values)
-    # _.commit()
 
 def baseplot(rdf, latest=None):
     if isinstance(rdf, (Index, Equity)):

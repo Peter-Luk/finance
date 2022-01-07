@@ -26,12 +26,22 @@ subject:
             home: 26150456
         whatsapp:
             alias: '"胡碧茜Grace"'
+    'Elsa Fung':
+        mobile:
+            primary: 93556260
+        whatsapp:
+            alias: '"馮麗金"'
+    'Wong Kit Ching':
+        mobile:
+            primary: 98804808
+        whatsapp:
+            alias: '"柳太黃"'
     'Milly Ling':
         mobile:
             primary: 90107008
             home: 21750098
         whatsapp:
-            alias: '"凌月明Milly"'
+            alias: '"凌月明"'
     'Mickey Wong':
         mobile:
             primary: '+65 83826103'
@@ -148,7 +158,7 @@ db:
         table: 'records'
         index: 'date'
         freq: 'daily'
-        exclude: [122, 368, 805, 1828, 2303, 8509]
+        exclude: [122, 368, 805, 1573, 1828, 2303, 2606, 8509]
     Futures:
         name: 'Futures'
         table: 'records'
@@ -246,13 +256,30 @@ xvsa:
     contenteditable: 'true'
 
 B_scale:
-    BABA: .125
-    BIDU: .125
-    BILI: 1
-    TCOM: 1
-    YUMC: 1
-    NTES: .2
-    JD: .5
+    BABA:
+      code: 9988
+      ratio: .125
+    BIDU:
+      code: 9888
+      ratio: .125
+    BILI:
+      code: 9626
+      ratio: 1
+    TCOM:
+      code: 9961
+      ratio: 1
+    YUMC:
+      code: 9987
+      ratio: 1
+    NTES:
+      code: 9999
+      ratio: .2
+    JD:
+      code: 9618
+      ratio: .5
+    WB:
+      code: 9898
+      ratio: 1
 
 USHK: 7.75
 ...
