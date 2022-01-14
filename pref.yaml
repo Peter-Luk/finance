@@ -250,7 +250,7 @@ fields: ['open', 'high', 'low', 'close', 'volume']
 xvsa:
     class: 'copyable-text selectable-text'
     role: textbox
-    data-tab: 9
+    data-tab: 10
     dir: ltr
     spellcheck: 'true'
     contenteditable: 'true'
