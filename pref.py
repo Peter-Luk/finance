@@ -109,7 +109,7 @@ source = dict(
 fields = ['open', 'high', 'low', 'close', 'volume']
 xvsa = dict(zip(
     ['class', 'role', 'data-tab', 'dir', 'spellcheck', 'contenteditable'],
-    ['copyable-text selectable-text', 'textbox', '9', 'ltr', 'true', 'true']))
+    ['copyable-text selectable-text', 'textbox', '10', 'ltr', 'true', 'true']))
 B_scale = dict(
     BABA=1 / 8,
     BIDU=1 / 8,
@@ -284,3 +284,10 @@ db = dict(
         index='date',
         freq='bi-daily')
 )
+prefer_stock = dict(
+    TSE=dict(
+        omron=6645,
+        sony=6758,
+        te=8035)
+)
+

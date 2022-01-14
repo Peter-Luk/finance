@@ -250,7 +250,7 @@ fields: ['open', 'high', 'low', 'close', 'volume']
 xvsa:
     class: 'copyable-text selectable-text'
     role: textbox
-    data-tab: 9
+    data-tab: 10
     dir: ltr
     spellcheck: 'true'
     contenteditable: 'true'
@@ -282,4 +282,10 @@ B_scale:
       ratio: 1
 
 USHK: 7.75
+
+prefer_stock:
+  TSE:
+    omron: 6645
+    sony:  6758
+    te:  8035
 ...
