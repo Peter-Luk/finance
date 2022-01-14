@@ -284,3 +284,10 @@ db = dict(
         index='date',
         freq='bi-daily')
 )
+prefer_stock = dict(
+    TSE=dict(
+        omron=6645,
+        sony=6758,
+        te=8035)
+)
+
