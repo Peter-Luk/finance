@@ -283,9 +283,9 @@ B_scale:
 
 USHK: 7.75
 
-prefer_stock
-  TSE
-    omron 6645
-    sony  6758
-    te  8035
+prefer_stock:
+  TSE:
+    omron: 6645
+    sony:  6758
+    te:  8035
 ...
