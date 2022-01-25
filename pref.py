@@ -1,9 +1,13 @@
 import pandas, pytz, numpy, sqlalchemy
-from scipy.constants import golden_ratio
+# from scipy.constants import golden_ratio
 from datetime import datetime
 from tqdm import tqdm
 from pathlib import os, sys, functools
 from time import sleep
+try:
+    from scipy.constants import golden_ratio
+except ImportError:
+    golden_ratio = 1.618
 
 driver = dict(
     Chrome=dict(
