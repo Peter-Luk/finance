@@ -1,6 +1,10 @@
 import pandas as pd
-from scipy.constants import golden_ratio as gr
+# from scipy.constants import golden_ratio as gr
 from finaux import np, stepper
+try:
+    from scipy.constants import golden_ratio as gr
+except ImportError:
+    gr = 1.618
 
 def get_periods(entity='Equities', file='pref', type='yaml'):
     # try:

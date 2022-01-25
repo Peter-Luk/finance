@@ -1,6 +1,6 @@
 import socket
 from pytz import timezone
-from scipy.optimize import newton
+# from scipy.optimize import newton
 import pref
 sep, environ, linesep, platform, version_info, db, gr, sleep, \
     datetime, driver, reduce, ph = pref.utils
@@ -438,7 +438,11 @@ def xnpv(rate, values, dates):
     return sum([value / (1 + rate)**((date - min_date).days / 365) for value, date in zip(values, dates)])
 
 def xirr(values, dates):
-    return newton(lambda r: xnpv(r, values, dates), 0)
+    try:
+        from scipy.optimize import newton
+        return newton(lambda r: xnpv(r, values, dates), 0)
+    except ImportError:
+        pass
 
 def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True):
     action = '買入'
