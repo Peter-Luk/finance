@@ -4,7 +4,6 @@ from pytz import timezone
 import pref
 sep, environ, linesep, platform, version_info, db, gr, sleep, \
     datetime, driver, reduce, ph = pref.utils
-    # datetime, driver, reduce, ph, subject = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
