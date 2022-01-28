@@ -3,12 +3,13 @@ from sys import platform
 
 if platform == 'win32':
     use_numba = False
-# else:
-try:
-    import numba as nb
-    use_numba = True
-except Exception:
-    use_numba = False
+else:
+    try:
+        import numba as nb
+        use_numba = True
+    except Exception:
+        use_numba = False
+
 
 def _stepper(period, x):
     y = np.empty(len(x))
@@ -22,33 +23,36 @@ def _stepper(period, x):
         i += 1
     return y
 
+
 def _roundup(value):
     if np.isnan(value) or not value > 0:
-        return np.nan
+        hdr = np.nan
     _ = np.floor(np.log10(value))
     __ = np.int32(value / 10 ** (_ - 1))
     if _ < 0:
         if __ < 25:
-            return np.round(value, 3)
+            hdr = np.round(value, 3)
         if __ < 50:
-            return np.round(value * 2, 2) / 2
-        return np.round(value, 2)
+            hdr = np.round(value * 2, 2) / 2
+        hdr = np.round(value, 2)
     if _ == 0:
-        return np.round(value, 2)
+        hdr = np.round(value, 2)
     if _ > 3:
-        return np.round(value, 0)
+        hdr = np.round(value, 0)
     if _ > 1:
         if __ < 20:
-            return np.round(value, 1)
+            hdr = np.round(value, 1)
         if __ < 50:
-            return np.round(value * 5, 0) / 5
-        return np.round(value * 2, 0) / 2
+            hdr = np.round(value * 5, 0) / 5
+        hdr = np.round(value * 2, 0) / 2
     if _ > 0:
         if __ < 10:
-            return np.round(value, 2)
+            hdr = np.round(value, 2)
         if __ < 20:
-            return np.round(value * 5, 1) / 5
-        return np.round(value * 2, 1) / 2
+            hdr = np.round(value * 5, 1) / 5
+        hdr = np.round(value * 2, 1) / 2
+    return hdr
+
 
 if use_numba:
     print('Using numba')
