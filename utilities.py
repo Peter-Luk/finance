@@ -1,10 +1,9 @@
 import socket
 from pytz import timezone
-from scipy.optimize import newton
+# from scipy.optimize import newton
 import pref
 sep, environ, linesep, platform, version_info, db, gr, sleep, \
     datetime, driver, reduce, ph = pref.utils
-    # datetime, driver, reduce, ph, subject = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
@@ -12,7 +11,8 @@ futures_type = ('HSI', 'MHI', 'HHI', 'MCH')
 month_initial = dict(zip(
     [datetime(year, _+1, 1).strftime('%B') for _ in list(range(12))],
     [_.upper() for _ in list('fghjkmnquvxz')]))
-avail_indicators, cal_month = ('wma', 'kama', 'ema', 'hv'), [x for x in range(1, 13) if not(x % 3)]
+avail_indicators = ('wma', 'kama', 'ema', 'hv')
+cal_month = [x for x in range(1, 13) if not x % 3]
 
 
 def driver_path(browser, file='pref.yaml'):
@@ -437,7 +437,11 @@ def xnpv(rate, values, dates):
     return sum([value / (1 + rate)**((date - min_date).days / 365) for value, date in zip(values, dates)])
 
 def xirr(values, dates):
-    return newton(lambda r: xnpv(r, values, dates), 0)
+    try:
+        from scipy.optimize import newton
+        return newton(lambda r: xnpv(r, values, dates), 0)
+    except ImportError:
+        pass
 
 def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True):
     action = '買入'
