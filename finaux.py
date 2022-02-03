@@ -3,12 +3,12 @@ from sys import platform
 
 if platform == 'win32':
     use_numba = False
-else:
-    try:
-        import numba as nb
-        use_numba = True
-    except Exception:
-        use_numba = False
+# else:
+try:
+    import numba as nb
+    use_numba = True
+except Exception:
+    use_numba = False
 
 
 def _stepper(period, x):
