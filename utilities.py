@@ -2,8 +2,8 @@ import socket
 from pytz import timezone
 # from scipy.optimize import newton
 import pref
-sep, environ, linesep, platform, version_info, db, gr, sleep, \
-    datetime, driver, reduce, ph = pref.utils
+sep, environ, path, linesep, platform, version_info, db, gr, \
+    sleep, datetime, driver, reduce, ph = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
@@ -46,10 +46,13 @@ def filepath(*args, **kwargs):
     if platform in ('linux', 'linux2'):
         if version_info.major > 2 and version_info.minor > 3:
             if environ.get('EXTERNAL_STORAGE'):
-                return sep.join((
+                _ = sep.join((
                     environ.get('HOME'), 'storage', 'external-1', file_type,
                     data_path, name))
-            return sep.join((environ.get('HOME'), file_type, data_path, name))
+                if path.exists(_):
+                    return _
+            _ = sep.join((environ.get('HOME'), file_type, data_path, name))
+            return _ if path.exists(_) else False
         else:
             place = 'shared'
             if environ.get('ACTUAL_HOME'):
@@ -58,7 +61,8 @@ def filepath(*args, **kwargs):
                 place = 'external-1'
                 file_path = sep.join(
                     (environ.get('HOME'), 'storage', place, file_type, data_path))
-    return sep.join((file_path, name))
+    _ = sep.join((file_path, name))
+    return _ if path.exists(_) else False
 
 
 def nitem(*args):
