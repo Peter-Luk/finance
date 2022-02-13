@@ -1,4 +1,4 @@
-# import copy
+import copy
 import datetime
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
@@ -88,7 +88,6 @@ class Futures(Index, FOA):
         return self.compose()
 
     def copy(self):
-        import copy
         return copy.copy(self)
 
     def compose(self):
@@ -292,7 +291,6 @@ class Equity(Securities, FOA):
         return self.__data
 
     def copy(self):
-        import copy
         return copy.copy(self)
 
     def compose(self, static):
@@ -313,6 +311,7 @@ class Equity(Securities, FOA):
         def amend_ta(df):
             import talib
             df['SAR'] = talib.SAR(df.high, df.low, acceleration=0.02, maximum=0.2)
+            df['ATR'] = talib.ATR(df.high, df.low, df.close, 20)
             return df
         return amend_ta(__)
 
