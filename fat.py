@@ -1,14 +1,15 @@
+# import copy
+import datetime
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
-from utilities import filepath, waf, getcode, gslice
+from utilities import filepath, getcode, gslice
 from fintools import FOA, get_periods, pd, np
 from finaux import roundup
-import copy
-import datetime
 
 Session = sessionmaker()
 Base = declarative_base()
 idx = []
+
 
 class Record(Base):
     __tablename__ = 'records'
@@ -17,7 +18,7 @@ class Record(Base):
     _create_at = datetime.datetime.now()
     date = Column(Date, default=_create_at.date(),
             server_default=text(str(_create_at.date())))
-    if _create_at.time() < datetime.time(12,25,0):
+    if _create_at.time() < datetime.time(12, 25, 0):
         session = deferred(Column(String, default='M', server_default=text('M')))
     else:
         session = deferred(Column(String, default='A', server_default=text('A')))
@@ -309,7 +310,11 @@ class Equity(Securities, FOA):
             __.drop('Adj Close', axis=1, inplace=True)
             __.columns = [_.lower() for _ in __.columns]
             __.index.name = __.index.name.lower()
-        return __
+        def amend_ta(df):
+            import talib
+            df['SAR'] = talib.SAR(df.high, df.low, acceleration=0.02, maximum=0.2)
+            return df
+        return amend_ta(__)
 
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {self.kama().iloc[-1]:,.2f}"
@@ -495,6 +500,7 @@ def mplot(df, last=200):
     except Exception:
         pass
     mpf.plot(df()[-last:], type='candle', style='charles', addplot=adps, title=tt, volume=True, ylabel='Price')
+
 
 def _roundup(_, exchange):
     if pd.__version__ < '1.2':
