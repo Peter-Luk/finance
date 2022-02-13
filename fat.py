@@ -312,6 +312,8 @@ class Equity(Securities, FOA):
             import talib
             df['SAR'] = talib.SAR(df.high, df.low, acceleration=0.02, maximum=0.2)
             df['ATR'] = talib.ATR(df.high, df.low, df.close, 20)
+            df['KAMA'] = talib.KAMA(df.close, 20)
+            df['RSI'] = talib.RSI(df.close, 20)
             return df
         return amend_ta(__)
 
