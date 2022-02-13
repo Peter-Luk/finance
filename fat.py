@@ -314,6 +314,7 @@ class Equity(Securities, FOA):
             df['ATR'] = talib.ATR(df.high, df.low, df.close, 20)
             df['KAMA'] = talib.KAMA(df.close, 20)
             df['RSI'] = talib.RSI(df.close, 20)
+            df['MACD'] = talib.MACD(df.close,9, 20, 5)
             return df
         return amend_ta(__)
 
