@@ -350,10 +350,10 @@ class Equity(Securities, FOA):
             _ = _.apply(roundup)
         return _
 
-    def macd(self, period=None):
-        if period is None:
-            period = self.periods['macd']
-        return self.analyser.macd(period)
+    # def macd(self, period=None):
+    #     if period is None:
+    #         period = self.periods['macd']
+    #     return self.analyser.macd(period)
 
     def rsi(self, period=None):
         if period is None:
