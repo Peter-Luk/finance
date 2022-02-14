@@ -310,10 +310,11 @@ class Equity(Securities, FOA):
             __.index.name = __.index.name.lower()
         def amend_ta(df):
             import talib
+            from utilities import time_period
             df['SAR'] = talib.SAR(df.high, df.low, acceleration=0.02, maximum=0.2)
-            df['ATR'] = talib.ATR(df.high, df.low, df.close, 20)
+            df['ATR'] = talib.ATR(df.high, df.low, df.close, time_period('atr', 'Securities'))
             df['KAMA'] = talib.KAMA(df.close, 20)
-            df['RSI'] = talib.RSI(df.close, 20)
+            df['RSI'] = talib.RSI(df.close, time_period('rsi', 'Securities'))
             return df
         return amend_ta(__)
 
