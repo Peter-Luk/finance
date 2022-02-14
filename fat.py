@@ -322,8 +322,8 @@ class Equity(Securities, FOA):
 
     def macd(self):
         import talib
-        tpps = self.periods('macd')
-        _ = talib.MACD(self.__data, tpps['fast'], tpps['slow'], tpps['signal'])
+        tpps = self.periods['macd']
+        _ = talib.MACD(self.__data.close, tpps['fast'], tpps['slow'], tpps['signal'])
         return pd.DataFrame({'fast':_[0], 'slow':_[1], 'signal':_[-1]})
 
     def sma(self, period=None):
