@@ -15,6 +15,14 @@ avail_indicators = ('wma', 'kama', 'ema', 'hv')
 cal_month = [x for x in range(1, 13) if not x % 3]
 
 
+def time_period(indicator, investment='Securities', file='pref'):
+    import yaml
+    with open(f'{file}.yaml', encoding='utf-8') as f:
+        _ = yaml.load(f, Loader=yaml.FullLoader)
+    __ = _.get('periods')
+    return __.get('Equities').get(indicator) if investment == 'Securities' else __.get('Futures').get(indicator)
+
+
 def driver_path(browser, file='pref.yaml'):
     import yaml
     with open(file, encoding='utf-8') as f:
