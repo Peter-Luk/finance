@@ -6,16 +6,14 @@ try:
 except ImportError:
     gr = 1.618
 
-def get_periods(entity='Equities', file='pref', type='yaml'):
-    # try:
-    import yaml
-    __ = f"{file}.{type}"
-    with open(__, encoding='utf-8') as f:
-        _ = yaml.load(f, Loader=yaml.FullLoader)
-    return _.get('periods').get(entity)
-    # except:
-    #     from pref import periods
-    #     return periods.get(entity)
+
+def get_periods(entity='Equities', file='pref.yaml'):
+    if file.split('.')[-1] == 'yaml':
+        import yaml
+        with open(file, encoding='utf-8') as f:
+            _ = yaml.load(f, Loader=yaml.FullLoader)
+        return _.get('periods').get(entity)
+
 
 class FOA(object):
     def __init__(self, data, dtype):
