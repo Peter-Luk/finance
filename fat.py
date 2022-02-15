@@ -311,20 +311,20 @@ class Equity(Securities, FOA):
         def amend_ta(df):
             import talib
             df['SAR'] = talib.SAR(df.high, df.low, acceleration=0.02, maximum=0.2)
-            df['ATR'] = talib.ATR(df.high, df.low, df.close, self.periods['atr'])
-            df['ADX'] = talib.ADX(df.high, df.low, df.close, self.periods['adx'])
-            df['RSI'] = talib.RSI(df.close, self.periods['rsi'])
+#             df['ATR'] = talib.ATR(df.high, df.low, df.close, self.periods['atr'])
+#             df['ADX'] = talib.ADX(df.high, df.low, df.close, self.periods['adx'])
+#             df['RSI'] = talib.RSI(df.close, self.periods['rsi'])
             return df
         return amend_ta(__)
 
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {self.kama().iloc[-1]:,.2f}"
 
-    def macd(self):
-        import talib
-        tpps = self.periods['macd']
-        _ = talib.MACD(self.__data.close, tpps['fast'], tpps['slow'], tpps['signal'])
-        return pd.DataFrame({'fast':_[0], 'slow':_[1], 'signal':_[-1]})
+#     def macd(self):
+#         import talib
+#         tpps = self.periods['macd']
+#         _ = talib.MACD(self.__data.close, tpps['fast'], tpps['slow'], tpps['signal'])
+#         return pd.DataFrame({'fast':_[0], 'slow':_[1], 'signal':_[-1]})
 
     def sma(self, period=None):
         if period is None:
@@ -350,10 +350,10 @@ class Equity(Securities, FOA):
             _ = _.apply(roundup)
         return _
 
-    # def macd(self, period=None):
-    #     if period is None:
-    #         period = self.periods['macd']
-    #     return self.analyser.macd(period)
+    def macd(self, period=None):
+        if period is None:
+            period = self.periods['macd']
+        return self.analyser.macd(period)
 
     def rsi(self, period=None):
         if period is None:
