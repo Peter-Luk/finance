@@ -100,7 +100,7 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         from talib import ATR
-        _ = ATR(data.high, data.low, data,close, period)
+        _ = ATR(data.high, data.low, data.close, period)
         _.name = 'ATR'
         return _
 #         pc = data.close.shift()
