@@ -270,7 +270,6 @@ class Equity(Securities, FOA):
         # self.periods = get_periods('pref.yaml')['Equities']
         self.periods = get_periods()
 
-        # self.session = Securities('Securities').session
         self.code = code
         self.exchange = exchange
         self.yahoo_code = getcode(self.code, self.exchange)
@@ -320,16 +319,18 @@ class Equity(Securities, FOA):
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {self.kama().iloc[-1]:,.2f}"
 
-#     def macd(self):
-#         import talib
-#         tpps = self.periods['macd']
-#         _ = talib.MACD(self.__data.close, tpps['fast'], tpps['slow'], tpps['signal'])
-#         return pd.DataFrame({'fast':_[0], 'slow':_[1], 'signal':_[-1]})
-
     def sma(self, period=None):
         if period is None:
             period = self.periods['simple']
         _ = self.analyser.sma(period).astype('float64')
+        if self.exchange == 'HKEx':
+            _ = _.apply(roundup)
+        return _
+
+    def sar(self, period=None):
+        if period is None:
+            period = self.periods['sar']
+        _ = self.analyser.sar(period['acceleration'], period['maximum']).astype('float64')
         if self.exchange == 'HKEx':
             _ = _.apply(roundup)
         return _
