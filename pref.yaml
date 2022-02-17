@@ -136,6 +136,9 @@ periods:
             slow: 50
             K: 10
             D: 10
+        sar:
+            acceleration: .02
+            maximum: .2
         atr: 14
         rsi: 14
         kama:
