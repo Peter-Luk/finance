@@ -19,6 +19,12 @@ class FOA(object):
     def __init__(self, data, dtype):
         self.__data = data.copy()
         self.dtype = dtype
+        self._ta = False
+        try:
+            import talib
+            self._ta = talib
+        except ImportError:
+            pass
 
     def sma(self, period, data=None):
         if isinstance(data, type(None)):
@@ -45,67 +51,70 @@ class FOA(object):
     def rsi(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        from talib import RSI
-        _ = RSI(data.close, period)
-        _.name = 'RSI'
-        return _
-#         fd = data.close.diff()
-# 
-#         def avgstep(source, direction, period):
-#             i, res = 0, []
-# 
-#             while i < len(source):
-#                 _, hdr = np.nan, source[:i]
-#                 if i == period:
-#                     if direction == '+':
-#                         _ = hdr[hdr.gt(0)].sum() / period
-#                     if direction == '-':
-#                         _ = hdr[hdr.lt(0)].abs().sum() / period
-#                 if i > period:
-#                     _, hdr = res[-1], 0
-#                     if direction == '+' and source[i] > 0:
-#                         hdr = source[i]
-#                     if direction == '-' and source[i] < 0:
-#                         hdr = abs(source[i])
-#                     _ = (_ * (period - 1) + hdr) / period
-#                 res.append(_)
-#                 i += 1
-#             return res
-# 
-#         ag = avgstep(fd, '+', period)
-#         al = avgstep(fd, '-', period)
-# 
-#         data['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
-#         return data.rsi
+        if self._ta:
+            _ = self._ta.RSI(data.close, period)
+            _.name = 'RSI'
+            return _
+        else:
+            fd = data.close.diff()
+
+            def avgstep(source, direction, period):
+                i, res = 0, []
+
+                while i < len(source):
+                    _, hdr = np.nan, source[:i]
+                    if i == period:
+                        if direction == '+':
+                            _ = hdr[hdr.gt(0)].sum() / period
+                        if direction == '-':
+                            _ = hdr[hdr.lt(0)].abs().sum() / period
+                    if i > period:
+                        _, hdr = res[-1], 0
+                        if direction == '+' and source[i] > 0:
+                            hdr = source[i]
+                        if direction == '-' and source[i] < 0:
+                            hdr = abs(source[i])
+                        _ = (_ * (period - 1) + hdr) / period
+                    res.append(_)
+                    i += 1
+                return res
+
+            ag = avgstep(fd, '+', period)
+            al = avgstep(fd, '-', period)
+
+            data['rsi'] = np.apply_along_axis(lambda a, b: 100 - 100 / (1 + a / b),0, ag, al)
+            return data.rsi
 
     def macd(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        from talib import MACD
-        _ = MACD(data.close, period['fast'], period['slow'], period['signal'])
-        return pd.DataFrame({'M Line':_[0], 'Signal':_[1], 'Histogram':_[-1]})
-#         hl = (data.high + data.low) / 2
-#         e_slow = self.ema(period['slow'], hl)
-#         e_fast = self.ema(period['fast'], hl)
-#         m_line = e_fast - e_slow
-#         s_line = self.ema(period['signal'], m_line[period['slow']:])
-#         m_hist = m_line - s_line
-#         _ = pd.concat([m_line, s_line, m_hist], axis=1)
-#         _.columns = ['M Line', 'Signal', 'Histogram']
-#         return _
+        if self._ta:
+            _ = self._ta.MACD(data.close, period['fast'], period['slow'], period['signal'])
+            return pd.DataFrame({'M Line':_[0], 'Signal':_[1], 'Histogram':_[-1]})
+        else:
+            hl = (data.high + data.low) / 2
+            e_slow = self.ema(period['slow'], hl)
+            e_fast = self.ema(period['fast'], hl)
+            m_line = e_fast - e_slow
+            s_line = self.ema(period['signal'], m_line[period['slow']:])
+            m_hist = m_line - s_line
+            _ = pd.concat([m_line, s_line, m_hist], axis=1)
+            _.columns = ['M Line', 'Signal', 'Histogram']
+            return _
 
     def atr(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        from talib import ATR
-        _ = ATR(data.high, data.low, data.close, period)
-        _.name = 'ATR'
-        return _
-#         pc = data.close.shift()
-#         _ = pd.concat([data.high - data.low, (data.high - pc).abs(), (data.low - pc).abs()], axis=1).max(axis=1)
-#         _['atr'] = self.ema(period, _)
-#         _.atr.name = 'atr'
-#         return _.atr
+        if self._ta:
+            _ = self._ta.ATR(data.high, data.low, data.close, period)
+            _.name = 'ATR'
+            return _
+        else:
+            pc = data.close.shift()
+            _ = pd.concat([data.high - data.low, (data.high - pc).abs(), (data.low - pc).abs()], axis=1).max(axis=1)
+            _['atr'] = self.ema(period, _)
+            _.atr.name = 'atr'
+            return _.atr
 
     def kama(self, period, data=None):
         if isinstance(data, type(None)):
