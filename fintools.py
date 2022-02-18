@@ -36,10 +36,9 @@ class FOA(object):
     def sar(self, acceleration, maximum, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        return self._ta.SAR(data.high, data.low, acceleration=acceleration, maximum=maximum) if self._ta else 'Not yet implement'
-        # _ = data.rolling(period).mean()
-        # _.name = 'sma'
-        # return _
+        _ = data
+        _['res'] = np.nan
+        return self._ta.SAR(data.high, data.low, acceleration=acceleration, maximum=maximum) if self._ta else _['res']
 
     def wma(self, period, data=None):
         if isinstance(data, type(None)):
