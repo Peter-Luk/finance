@@ -7,6 +7,16 @@ except ImportError:
     gr = 1.618
 
 
+def gap(boundary, ratio=gr):
+    high, low = boundary.reverse() if boundary[-1] > boundary[0] else boundary
+    if ratio > 1:
+        ratio = 1 / ratio
+    value = (high - low) * ratio
+    _ = [low, low + value, high - value, high]
+    _.sort()
+    return _
+
+
 def get_periods(entity='Equities', file='pref.yaml'):
     if file.split('.')[-1] == 'yaml':
         import yaml
