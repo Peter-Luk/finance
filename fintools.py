@@ -8,11 +8,13 @@ except ImportError:
 
 
 def gap(boundary, ratio=gr):
-    high, low = boundary.reverse() if boundary[-1] > boundary[0] else boundary
+    rb = boundary
+    rb.reverse()
+    high, low = rb if boundary[-1] > boundary[0] else boundary
     if ratio > 1:
         ratio = 1 / ratio
     value = (high - low) * ratio
-    _ = [low, low + value, high - value, high]
+    _ = [low - value, low, low + value, high - value, high, high + value]
     _.sort()
     return _
 
