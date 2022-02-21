@@ -3,7 +3,7 @@ import datetime
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, getcode, gslice
-from fintools import FOA, get_periods, pd, np
+from fintools import FOA, get_periods, pd, np, gap
 from finaux import roundup
 
 Session = sessionmaker()
@@ -470,6 +470,18 @@ class Equity(Securities, FOA):
             sell = [roundup(_) for _ in hdr if _ > base.close.loc[date]]
 
         return {'Buy':pd.Series(buy).unique(), 'Sell':pd.Series(sell).unique()}
+
+    def range(self, period=None):
+        if period is None:
+            period = {'rsi':self.periods['rsi'], 'kama':self.periods['kama']}
+        tk = self.kama(period['kama']).iloc[-1]
+        tr = self.atr(period['rsi']).iloc[-1]
+        upper = gap([tk + tr, tk])
+        lower = gap([tk - tr, tk])
+        _l = upper
+        _l.extend(lower)
+        _a = np.array(_l)
+        return pd.Series(np.unique(_a))
 
 
 def submit(values, db='Futures'):
