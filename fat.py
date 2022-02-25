@@ -509,7 +509,7 @@ def mplot(df, last=200):
     adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), \
             mpf.make_addplot(df.kama()[-last:], color='silver'), \
             mpf.make_addplot(df.rsi()[-last:], panel=1, color='green'), \
-            mpf.make_addplot(df.sar()[-last:], type='scatter', color='lightblue')]
+            mpf.make_addplot(df.sar()[-last:], type='scatter', marker='o', markersize=1, color='black')]
     tt = df.code
     try:
         tt = df.yahoo_code
