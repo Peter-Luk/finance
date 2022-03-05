@@ -19,6 +19,14 @@ def gap(boundary, ratio=gr):
     return _
 
 
+def prefer_stock(exchange='TSE', file='pref.yaml'):
+    if file.split('.')[-1] == 'yaml':
+        import yaml
+        with open(file, encoding='utf-8') as f:
+            _ = yaml.load(f, Loader=yaml.FullLoader)
+        return _.get('prefer_stock').get(exchange)
+
+
 def get_periods(entity='Equities', file='pref.yaml'):
     if file.split('.')[-1] == 'yaml':
         import yaml
