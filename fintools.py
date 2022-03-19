@@ -1,10 +1,20 @@
 import pandas as pd
-# from scipy.constants import golden_ratio as gr
 from finaux import np, stepper
 try:
     from scipy.constants import golden_ratio as gr
 except ImportError:
     gr = 1.618
+
+
+def close_at(code, period=7, exchange='HKEx'):
+    import yfinance
+    from datetime import datetime
+    if exchange == 'HKEx':
+        code_ = [f'{_:04d}.HK' for _ in code]
+    end = datetime.today()
+    start = datetime.fromordinal(end.toordinal() - period)
+    _ = yfinance.download(code_, start, end, group_by='ticker')
+    return [_[__].iloc[-1].Close for __ in code_]
 
 
 def gap(boundary, ratio=gr):
