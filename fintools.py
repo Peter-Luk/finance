@@ -6,15 +6,42 @@ except ImportError:
     gr = 1.618
 
 
-def close_at(code, period=7, exchange='HKEx'):
+def hsirnd(value):
+    if np.isnan(value) or not value > 0:
+        return np.nan
+    _ = int(np.floor(np.log10(value)))
+    __ = np.divmod(value, 10 ** (_ - 1))[0]
+    if _ < 0:
+        if __ < 25:
+            return np.round(value, 3)
+        if __ < 50:
+            return np.round(value * 2, 2) / 2
+        return np.round(value, 2)
+    if _ == 0:
+        return np.round(value, 2)
+    if _ > 3:
+        return np.round(value, 0)
+    if _ > 1:
+        if __ < 20:
+            return np.round(value, 1)
+        if __ < 50:
+            return np.round(value * 5, 0) / 5
+        return np.round(value * 2, 0) / 2
+    if _ > 0:
+        if __ < 10:
+            return np.round(value, 2)
+        if __ < 20:
+            return np.round(value * 5, 1) / 5
+        return np.round(value * 2, 1) / 2
+
+
+def close_at(code, period='5d', exchange='HKEx'):
     import yfinance
-    from datetime import datetime
     if exchange == 'HKEx':
         code_ = [f'{_:04d}.HK' for _ in code]
-    end = datetime.today()
-    start = datetime.fromordinal(end.toordinal() - period)
-    _ = yfinance.download(code_, start, end, group_by='ticker')
-    return [_[__].iloc[-1].Close for __ in code_]
+    _ = yfinance.download(code_, period=period, group_by='ticker')
+    if exchange == 'HKEx':
+        return [hsirnd(_[__].iloc[-1].Close) for __ in code_]
 
 
 def gap(boundary, ratio=gr):
