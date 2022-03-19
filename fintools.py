@@ -37,12 +37,16 @@ def hsirnd(value):
 
 def close_at(code, period='5d', exchange='HKEx'):
     import yfinance
+    if exchange == 'NYSE':
+        code_ = [_.upper() for _ in code]
     if exchange == 'HKEx':
         code_ = [f'{_:04d}.HK' for _ in code]
     _ = yfinance.download(code_, period=period, group_by='ticker')
+    if exchange == 'NYSE':
+        res = [round(_[__].iloc[-1].Close, 1) for __ in code_]
     if exchange == 'HKEx':
-        return [hsirnd(_[__].iloc[-1].Close) for __ in code_]
-
+        res = [hsirnd(_[__].iloc[-1].Close) for __ in code_]
+    return res
 
 def gap(boundary, ratio=gr):
     rb = boundary
