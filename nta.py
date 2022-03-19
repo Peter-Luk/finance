@@ -1,4 +1,5 @@
 from utilities import gslice
+from fintools import hsirnd
 import pref
 pd, np, datetime, gr = pref.nta
 
@@ -536,32 +537,32 @@ def grabber(x, initial='c'):
         return x[['High', 'Low']].mean(axis=1)
     if initial.lower() in ['ohlc', 'full', 'all']:
         return x.drop('Volume', 1).mean(axis=1)
-
-
-def hsirnd(value):
-    if np.isnan(value) or not value > 0:
-        return np.nan
-    _ = int(np.floor(np.log10(value)))
-    __ = np.divmod(value, 10 ** (_ - 1))[0]
-    if _ < 0:
-        if __ < 25:
-            return np.round(value, 3)
-        if __ < 50:
-            return np.round(value * 2, 2) / 2
-        return np.round(value, 2)
-    if _ == 0:
-        return np.round(value, 2)
-    if _ > 3:
-        return np.round(value, 0)
-    if _ > 1:
-        if __ < 20:
-            return np.round(value, 1)
-        if __ < 50:
-            return np.round(value * 5, 0) / 5
-        return np.round(value * 2, 0) / 2
-    if _ > 0:
-        if __ < 10:
-            return np.round(value, 2)
-        if __ < 20:
-            return np.round(value * 5, 1) / 5
-        return np.round(value * 2, 1) / 2
+#
+#
+# def hsirnd(value):
+#     if np.isnan(value) or not value > 0:
+#         return np.nan
+#     _ = int(np.floor(np.log10(value)))
+#     __ = np.divmod(value, 10 ** (_ - 1))[0]
+#     if _ < 0:
+#         if __ < 25:
+#             return np.round(value, 3)
+#         if __ < 50:
+#             return np.round(value * 2, 2) / 2
+#         return np.round(value, 2)
+#     if _ == 0:
+#         return np.round(value, 2)
+#     if _ > 3:
+#         return np.round(value, 0)
+#     if _ > 1:
+#         if __ < 20:
+#             return np.round(value, 1)
+#         if __ < 50:
+#             return np.round(value * 5, 0) / 5
+#         return np.round(value * 2, 0) / 2
+#     if _ > 0:
+#         if __ < 10:
+#             return np.round(value, 2)
+#         if __ < 20:
+#             return np.round(value * 5, 1) / 5
+#         return np.round(value * 2, 1) / 2
