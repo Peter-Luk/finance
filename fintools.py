@@ -37,7 +37,7 @@ def hsirnd(value):
 
 def latest(code, period='5d', exchange='HKEx'):
     import yfinance
-    # keys = ['close', 'change']
+    keys = ['close', 'change']
     if isinstance(code, (int, str)):
         code = [code]
     if exchange == 'NYSE':
@@ -46,10 +46,10 @@ def latest(code, period='5d', exchange='HKEx'):
         code_ = [f'{_:04d}.HK' for _ in code]
     _ = yfinance.download(code_, period=period, group_by='ticker')
     if exchange == 'NYSE':
-        res = [round(_[__].iloc[-1].Close, 1) for __ in code_]
+        res = [zip(keys, [round(_[__].iloc[-1].Close, 1), round(_[__].Close.diff().iloc[-1],2)]) for __ in code_]
     if exchange == 'HKEx':
-        res = [hsirnd(_[__].iloc[-1].Close) for __ in code_]
-    return res
+        res = [zip(keys, [hsirnd(_[__].iloc[-1].Close), _[__].Close.diff().iloc[-1]]) for __ in code_]
+    return [dict(_) for _ in res]
 
 
 def gap(boundary, ratio=gr):
