@@ -291,4 +291,107 @@ prefer_stock:
     omron: 6645
     sony:  6758
     te:  8035
+  HKEx:
+    5:
+      size: 400
+      margin: .8
+    27:
+      size: 1000
+      margin: .6
+    66:
+      size: 500
+      margin: .85
+    241:
+      size: 2000
+      margin: .6
+    285:
+      size: 500
+      margin: .5
+    388:
+      size: 100
+      margin: .8
+    700:
+      size: 100
+      margin: .8
+    880:
+      size: 1000
+      margin: .6
+    909:
+      size: 1000
+      margin: .4
+    910:
+      size: 5000
+      margin: .2
+    939:
+      size: 1000
+      margin: .8
+    941:
+      size: 500
+      margin: .8
+    1288:
+      size: 1000
+      margin: .8
+    1299:
+      size: 200
+      margin: .8
+    1516:
+      size: 1000
+      margin: .1
+    1772:
+      size: 200
+      margin: .4
+    1898:
+      size: 1000
+      margin: .6
+    1988:
+      size: 500
+      margin: .3
+    2009:
+      size: 1000
+      margin: .2
+    2158:
+      size: 100
+      margin: .3
+    2318:
+      size: 500
+      margin: .8
+    2333:
+      size: 500
+      margin: .7
+    2616:
+      size: 500
+      margin: .2
+    2618:
+      size: 100
+      margin: .6
+    3968:
+      size: 500
+      margin: .8
+    6078:
+      size: 200
+      margin: .2
+    6098:
+      size: 1000
+      margin: .4
+    6185:
+      size: 200
+      margin: .2
+    6618:
+      size: 50
+      margin: .7
+    6669:
+      size: 1000
+      margin: .5
+    6862:
+      size: 1000
+      margin: .5
+    6993:
+      size: 500
+      margin: .4
+    9618:
+      size: 50
+      margin: .8
+    9988:
+      size: 100
+      margin: .8
 ...
