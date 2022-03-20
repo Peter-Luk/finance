@@ -35,8 +35,11 @@ def hsirnd(value):
         return np.round(value * 2, 1) / 2
 
 
-def close_at(code, period='5d', exchange='HKEx'):
+def latest(code, period='5d', exchange='HKEx'):
     import yfinance
+    # keys = ['close', 'change']
+    if isinstance(code, (int, str)):
+        code = [code]
     if exchange == 'NYSE':
         code_ = [_.upper() for _ in code]
     if exchange == 'HKEx':
@@ -47,6 +50,7 @@ def close_at(code, period='5d', exchange='HKEx'):
     if exchange == 'HKEx':
         res = [hsirnd(_[__].iloc[-1].Close) for __ in code_]
     return res
+
 
 def gap(boundary, ratio=gr):
     rb = boundary
