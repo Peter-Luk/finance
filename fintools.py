@@ -46,9 +46,9 @@ def latest(code, period='5d', exchange='HKEx'):
         code_ = [f'{_:04d}.HK' for _ in code]
     _ = yfinance.download(code_, period=period, group_by='ticker')
     if exchange == 'NYSE':
-        res = [zip(keys, [round(_[__].iloc[-1].Close, 1), round(_[__].Close.diff().iloc[-1],2)]) for __ in code_]
+        res = [zip(keys, [round(_[__].iloc[-1].Close, 1), round(_[__].Close.diff().iloc[-1], 2)]) for __ in code_]
     if exchange == 'HKEx':
-        res = [zip(keys, [hsirnd(_[__].iloc[-1].Close), _[__].Close.diff().iloc[-1]]) for __ in code_]
+        res = [zip(keys, [hsirnd(_[__].iloc[-1].Close), round(_[__].Close.diff().iloc[-1], 3)]) for __ in code_]
     return [dict(_) for _ in res]
 
 
