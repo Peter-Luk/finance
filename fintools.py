@@ -35,15 +35,13 @@ def hsirnd(value):
         return np.round(value * 2, 1) / 2
 
 
-def etdlhk(code=None, diff=False):
-    if code is None:
-        code = list(prefer_stock('HKEx').keys())
-    hdr = latest(code, exchange='HKEx')
-    if diff:
-        ite = (round(_['change'], 3) for _ in hdr)
-    else:
-        ite = (hsirnd(_['close']) for _ in hdr)
-    return ite
+class Inspect(object):
+    def __init__(self, code=None, xhg='HKEx'):
+        if code is None:
+            code = list(prefer_stock(xhg).keys())
+        self.__data = latest(code, exchange=xhg)
+        self.close = (hsirnd(_['close']) for _ in self.__data)
+        self.delta = (round(_['change'], 3) for _ in self.__data)
 
 
 def latest(code, period='5d', exchange='HKEx'):
