@@ -40,8 +40,12 @@ class Inspect(object):
         if code is None:
             code = list(prefer_stock(xhg).keys())
         self.__data = latest(code, exchange=xhg)
-        self.close = (hsirnd(_['close']) for _ in self.__data)
-        self.delta = (round(_['change'], 3) for _ in self.__data)
+
+    def close(self):
+        return (hsirnd(_['close']) for _ in self.__data)
+
+    def delta(self):
+        return (round(_['change'], 3) for _ in self.__data)
 
 
 def latest(code, period='5d', exchange='HKEx'):
