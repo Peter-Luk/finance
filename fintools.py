@@ -37,6 +37,8 @@ def hsirnd(value):
 
 class Inspect(object):
     def __init__(self, code=None, xhg='HKEx'):
+        from datetime import datetime
+        self.at = datetime.now().time()
         if code is None:
             code = list(prefer_stock(xhg).keys())
         self.__data = latest(code, exchange=xhg)
