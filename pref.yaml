@@ -297,6 +297,9 @@ prefer_stock:
     sony:  6758
     te:  8035
   HKEx:
+    3:
+      size: 1000
+      margin: .85
     5:
       size: 400
       margin: .8
