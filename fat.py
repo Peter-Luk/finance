@@ -78,7 +78,9 @@ class Futures(Index, FOA):
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
         self.analyser = FOA(self.__data, int)
-        self.change = self.__data.close.diff(1)[-1] / self.__data.close[-2]
+        self.change = 0
+        if self.__data.shape[0] > 1:
+            self.change = self.__data.close.diff(1)[-1] / self.__data.close[-2]
         self.date = self.__data.index[-1].to_pydatetime()
         __ = self.__data.iloc[-1]
         for _ in self.__data.columns:
