@@ -31,6 +31,11 @@ subject:
             primary: 93556260
         whatsapp:
             alias: '"馮麗金"'
+    'Kwok Chi Yui':
+        mobile:
+            primary: 97786426
+        whatsapp:
+            alias: '"郭熾鋭"'
     'Wong Kit Ching':
         mobile:
             primary: 98804808
@@ -340,6 +345,9 @@ prefer_stock:
     1772:
       size: 200
       margin: .4
+    1800:
+      size: 1000
+      margin: .7
     1898:
       size: 1000
       margin: .6
