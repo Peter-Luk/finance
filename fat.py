@@ -488,6 +488,23 @@ def submit(values, db='Futures'):
     print('Done')
     _.close()
 
+
+def collect(futures):
+    values = []
+    for _ in futures:
+        s, v = 'M', 0
+        if datetime.datetime.now().time() > datetime.time(12, 4):
+            s = 'A'
+            try:
+                __ = Futures(_)().iloc[-1]
+                if __.name.date() == datetime.datetime.today().date():
+                    v = -__.volume
+            except Exception:
+                pass
+        values.append(Record(code=_, date=datetime.datetime.today().date(), session=s, volume=v))
+    return zip(futures, values)
+
+
 def baseplot(rdf, latest=None):
     if isinstance(rdf, (Index, Equity)):
         df = rdf.copy()
@@ -502,6 +519,7 @@ def baseplot(rdf, latest=None):
         if isinstance(df, Equity):
             code = df.yahoo_code
         _.tail(latest).plot(title=f"{code} last: {latest}")
+
 
 def mplot(df, last=200):
     import mplfinance as mpf
