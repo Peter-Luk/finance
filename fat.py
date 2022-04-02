@@ -2,7 +2,7 @@ import copy
 import datetime
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
-from utilities import filepath, getcode, gslice
+from utilities import filepath, getcode, gslice, waf
 from fintools import FOA, get_periods, pd, np, gap
 from finaux import roundup
 
@@ -71,9 +71,9 @@ class Securities(Record):
 class Futures(Index, FOA):
     def __init__(self, code):
         super(Futures, self).__init__()
-        __ = 'Futures'
-        self.session = Index(__).session
-        self.periods = get_periods(__)
+        self.__db = 'Futures'
+        self.session = Index(self.__db).session
+        self.periods = get_periods(self.__db)
         self.code = code.upper()
         self.query = self.session.query(Record).filter(Record.code==self.code)
         self.__data = self.compose()
@@ -489,7 +489,7 @@ def submit(values, db='Futures'):
     _.close()
 
 
-def collect(futures):
+def collect(futures=waf()):
     values = []
     for _ in futures:
         s, v = 'M', 0
