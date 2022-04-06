@@ -1,6 +1,5 @@
 import socket
 from pytz import timezone
-from cryptography.fernet import Fernet
 # from scipy.optimize import newton
 import pref
 sep, environ, path, linesep, platform, version_info, db, gr, \
@@ -475,43 +474,3 @@ def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True
         balance = previous + amount
     msg = f"(交收後): {balance:,.2f}" if balance > 0 else f"實需存入 {balance:,.2f}"
     return f"{action} {quantity:,}股 #{stock_code} @ {price:,.3f} 連手續費及政府費用{require} {amount:,.2f}。 戶口結餘(交收前): {previous:,.2f}, {msg}。"
-
-
-class PasswordManager():
-    def __init__(self):
-        self.key = None
-        self.password_file = None
-        self.password_dict = {}
-
-    def create_key(self, path):
-        self.key = Fernet.generate_key()
-        with open(path, 'wb') as f:
-            f.write(self.key)
-            
-    def load_key(self, path):
-        with open(path, 'rb') as f:
-            self.key = f.read()
-            
-    def create_password_file(self, path, initial_values=None):
-        self.password_file = path
-        if initial_values is not None:
-            for key, value in initial_values.items():
-                self.add_password(key, value)
-                
-    def load_password_file(self, path):
-        self.password_file = path
-        with open(path, 'r') as f:
-            for line in f:
-                site, encrypted = line.split(':')
-                self.password_dict[site] = Fernet(self.key).decrypt(encrypted.encode()).decode()
-                
-    def add_password(self, site, password):
-        self.password_dict[site] = password
-        if self.password_file is not None:
-            with open(self.password_file, 'a+') as f:
-                encrpyted = Fernet(self.key).encrypt(password.encode())
-                f.write(f'{site}:{encrpyted.decode()}\n')
-                    
-    def get_password(self, site):
-        return self.password_dict[site]
-    
