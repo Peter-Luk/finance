@@ -498,7 +498,7 @@ def collect(futures=waf()):
             try:
                 __ = Futures(_)().iloc[-1]
                 if __.name.date() == datetime.datetime.today().date():
-                    v = -__.volume
+                    v -= __.volume
             except Exception:
                 pass
         values.append(Record(code=_, date=datetime.datetime.today().date(), session=s, volume=v))
