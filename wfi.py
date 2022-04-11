@@ -135,10 +135,10 @@ class WFutures(object):
             self.refresh(site)
         else:
             self.goto(site)
-        price = self.browser.find_element_by_xpath('//*[@id="price"]').text
-        change = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        price = self.browser.find_element(by=By.XPATH, value='//*[@id="price"]').text
+        change = self.browser.find_element(by=By.XPATH, value='//*[@id="change"]').text
         last = source[site]['tz'].localize(datetime.strptime(
-            self.browser.find_element_by_xpath('//*[@id="hqTime"]').text,
+            self.browser.find_element(by=By.XPATH, value='//*[@id="hqTime"]').text,
             '%Y-%m-%d %H:%M:%S'))
         if change == '--':
             change = '0'
@@ -157,9 +157,9 @@ class WFutures(object):
         else:
             self.goto(site)
         try:
-            _ = self.browser.find_element_by_xpath(
+            _ = self.browser.find_element(by=By.XPATH, value=
                 '//*[@id="block-wgcheadergoldspotprice"]')
-            price = _.find_element_by_xpath('./h2/span[1]').text
+            price = _.find_element(by=By.XPATH, value='./h2/span[1]').text
             return float(price.replace(',', ''))
         except Exception:
             pass
@@ -173,10 +173,10 @@ class WFutures(object):
             self.refresh(f'sh{code}')
         else:
             self.goto(f'sh{code}')
-        price = self.browser.find_element_by_xpath('//*[@id="price"]').text
-        change = self.browser.find_element_by_xpath('//*[@id="change"]').text
+        price = self.browser.find_element(by=By.XPATH, value='//*[@id="price"]').text
+        change = self.browser.find_element(by=By.XPATH, value='//*[@id="change"]').text
         last = source[site]['tz'].localize(datetime.strptime(
-            self.browser.find_element_by_xpath('//*[@id="hqTime"]').text,
+            self.browser.find_element(by=By.XPATH, value='//*[@id="hqTime"]').text,
             '%Y-%m-%d %H:%M:%S'))
         if change == '--':
             change = '0'
@@ -214,12 +214,12 @@ class WFutures(object):
             if _ in idx:
                 return f'{source[site]["xpath_base"]}div[{1+idx.index(_)}]/div'
 
-        _ = self.browser.find_element_by_xpath(cxpath(idx))
-        price = _.find_element_by_xpath(
+        _ = self.browser.find_element(by=By.XPATH, value=cxpath(idx))
+        price = _.find_element(by=By.XPATH, value=
             f'./{div}/div/div/table/tbody/tr/td[2]').text
-        change = _.find_element_by_xpath(
+        change = _.find_element(by=By.XPATH, value=
             f'./{div}/div/div/table/tbody/tr/td[3]').text
-        _l = ''.join(re.split('\: |\|', _.find_element_by_xpath(
+        _l = ''.join(re.split('\: |\|', _.find_element(by=By.XPATH, value=
             './div[5]').text)[1:])
         try:
             last = source[site]['tz'].localize(datetime.strptime(
@@ -243,10 +243,10 @@ class WFutures(object):
             return source[site]['tz'].localize(
                     datetime.strptime(_.split('(')[0], '%b/%d/%Y'))
 
-        price = self.browser.find_element_by_xpath('//*[@id="price"]').text
-        change = self.browser.find_element_by_xpath('//*[@id="diff"]').text
+        price = self.browser.find_element(by=By.XPATH, value='//*[@id="price"]').text
+        change = self.browser.find_element(by=By.XPATH, value='//*[@id="diff"]').text
         t = change.split(' ')[0].split(',')
-        last = convert(self.browser.find_element_by_xpath(
+        last = convert(self.browser.find_element(by=By.XPATH, value=
             '//*[@id="datedtime"]').text)
         return self.__status(price, t[0], last)
 
