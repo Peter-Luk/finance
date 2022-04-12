@@ -18,7 +18,10 @@ class PasswordManager():
 
     def create_password_file(self, path, initial_values=None):
         self.password_file = path
-        if initial_values is not None:
+        if isinstance(initial_values, zip):
+            for key, value in initial_values:
+                self.add_password(key, value)
+        if isinstance(initial_values, dict):
             for key, value in initial_values.items():
                 self.add_password(key, value)
 
