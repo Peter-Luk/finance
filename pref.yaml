@@ -336,6 +336,9 @@ prefer_stock:
     941:
       size: 500
       margin: .8
+    1024:
+      size: 100
+      margin: .7
     1288:
       size: 1000
       margin: .8
