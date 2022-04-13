@@ -44,10 +44,10 @@ class Inspect(object):
         self.__data = latest(code, exchange=xhg)
 
     def close(self):
-        return (hsirnd(_['close']) for _ in self.__data)
+        return (_['close'] for _ in self.__data)
 
     def delta(self):
-        return (round(_['change'], 3) for _ in self.__data)
+        return (_['change'] for _ in self.__data)
 
 
 def latest(code, period='5d', exchange='HKEx'):
