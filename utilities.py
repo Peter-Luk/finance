@@ -474,3 +474,21 @@ def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True
         balance = previous + amount
     msg = f"(交收後): {balance:,.2f}" if balance > 0 else f"實需存入 {balance:,.2f}"
     return f"{action} {quantity:,}股 #{stock_code} @ {price:,.3f} 連手續費及政府費用{require} {amount:,.2f}。 戶口結餘(交收前): {previous:,.2f}, {msg}。"
+
+
+def push2git(fullpath, msg, *, login='Peter-Luk'):
+    from pathlib import os
+
+    from github import Github
+    from dotenv import load_dotenv
+    if load_dotenv():
+        git_token = os.getenv('GHK')
+        if isinstance(git_token, str):
+            git = Github(git_token)
+            user = git.get_user()
+            if user == login:
+                filename = os.path.basename(fullpath)
+                repo = os.path.dirname(fullpath).split(os.sep)[-1]
+                req_repo = user.get_repo(repo)
+                contents = req_repo.get_contents(filename, ref="test")
+                req_repo.update_file(contents.path, msg, filename, contents.sha, branch="test")
