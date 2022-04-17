@@ -476,7 +476,7 @@ def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True
     return f"{action} {quantity:,}股 #{stock_code} @ {price:,.3f} 連手續費及政府費用{require} {amount:,.2f}。 戶口結餘(交收前): {previous:,.2f}, {msg}。"
 
 
-def push2git(fullpath, msg, *, login='Peter-Luk'):
+def push2git(file_path, msg, *, login='Peter-Luk'):
     from pathlib import os, Path
 
     from github import Github
@@ -487,7 +487,8 @@ def push2git(fullpath, msg, *, login='Peter-Luk'):
             git = Github(git_token)
             user = git.get_user()
             if user == login:
-                if Path(str(Path.home()) + fullpath).is_file():
+                fullpath = str(Path.home()) + file_path
+                if Path(fullpath).is_file():
                     filename = os.path.basename(fullpath)
                     repo = os.path.dirname(fullpath).split(os.sep)[-1]
                     req_repo = user.get_repo(repo)
