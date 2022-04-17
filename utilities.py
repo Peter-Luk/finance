@@ -487,10 +487,10 @@ def push2git(file_path, msg, *, login='Peter-Luk'):
             git = Github(git_token)
             user = git.get_user()
             if user == login:
-                fullpath = str(Path.home()) + file_path
-                if Path(fullpath).is_file():
-                    filename = os.path.basename(fullpath)
-                    repo = os.path.dirname(fullpath).split(os.sep)[-1]
+                absolute_path = f'{str(Path.home())}{file_path}'
+                if Path(absolute_path).is_file():
+                    filename = os.path.basename(absolute_path)
+                    repo = os.path.dirname(absolute_path).split(os.sep)[-1]
                     req_repo = user.get_repo(repo)
                     contents = req_repo.get_contents(filename, ref="test")
                     req_repo.update_file(contents.path, msg, filename, contents.sha, branch="test")
