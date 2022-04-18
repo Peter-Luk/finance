@@ -1,5 +1,8 @@
 import copy
 import datetime
+import typing
+from pydantic import BaseModel
+from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, getcode, gslice, waf
@@ -8,6 +11,7 @@ from finaux import roundup
 
 Session = sessionmaker()
 Base = declarative_base()
+app = FastAPI()
 idx = []
 
 
