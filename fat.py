@@ -560,7 +560,7 @@ def quote_hk(code: int):
 @app.get("/tse/{code}")
 def quote_tse(code: str):
     __  = prefer_stock('TSE')
-    return f'{Equity(__[code], exchange="TSE")}' if code.lower() in __.keys() else {}
+    return f'{Equity(__[code.lower()], exchange="TSE")}' if code.lower() in __.keys() else {}
 
 
 @app.get("/nyse/{code}")
