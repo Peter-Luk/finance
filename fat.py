@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, getcode, gslice, waf
-from fintools import FOA, get_periods, pd, np, gap
+from fintools import FOA, get_periods, pd, np, gap, prefer_stock
 from finaux import roundup
 
 Session = sessionmaker()
@@ -559,8 +559,8 @@ def quote_hk(code: int):
 
 @app.get("/tse/{code}")
 def quote_tse(code: str):
-    _ = Equity(code, exchange="TSE")
-    return f'{_}'
+    __  = prefer_stock('TSE')
+    return f'{Equity(__[code], exchange="TSE")}' if code.lower() in __.keys() else {}
 
 
 @app.get("/nyse/{code}")
