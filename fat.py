@@ -1,6 +1,6 @@
 import copy
 import datetime
-import typing
+from typing import Optional
 from pydantic import BaseModel
 from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
@@ -549,3 +549,21 @@ def _roundup(_, exchange):
             _.Lower = _.Lower.apply(roundup)
         return _
     return _.applymap(roundup, na_action='ignore')
+
+
+@app.get("/hkex/{code}")
+def quote_hk(code: int):
+    _ = Equity(code, False)
+    return f'{_}'
+
+
+@app.get("/tse/{code}")
+def quote_tse(code: str):
+    _ = Equity(code, exchange="TSE")
+    return f'{_}'
+
+
+@app.get("/nyse/{code}")
+def quote_nyse(code: str):
+    _ = Equity(code, exchange="NYSE")
+    return f'{_}'
