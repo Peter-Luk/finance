@@ -554,16 +554,16 @@ def _roundup(_, exchange):
 @app.get("/hkex/{code}")
 async def quote_hk(code: int):
     _ = Equity(code, False)
-    return f'{_}'
+    return {f'{code:04d}.HK': f'{_}'}
 
 
 @app.get("/tse/{code}")
 async def quote_tse(code: str):
     __  = prefer_stock('TSE')
-    return f'{Equity(__[code.lower()], exchange="TSE")}' if code.lower() in __.keys() else {}
+    return {f'{__[code.lower()]}.T': f'{Equity(__[code.lower()], exchange="TSE")}' if code.lower() in __.keys() else {}}
 
 
 @app.get("/nyse/{code}")
 async def quote_nyse(code: str):
     _ = Equity(code, exchange="NYSE")
-    return f'{_}'
+    return {code.upper(): f'{_}'}
