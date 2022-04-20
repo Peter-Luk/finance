@@ -554,7 +554,8 @@ def _roundup(_, exchange):
 @app.get("/hkex/{code}")
 async def quote_hk(code: int):
     _ = Equity(code, False)
-    return {f'{code:04d}.HK': f'{_}'}
+    __ = f'{code:04d}.HK'
+    return {__: f'{_}'}
 
 
 @app.get("/tse/{code}")
