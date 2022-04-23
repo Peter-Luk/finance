@@ -554,17 +554,38 @@ def _roundup(_, exchange):
 @app.get("/hkex/{code}")
 async def quote_hk(code: int):
     _ = Equity(code, False)
-    __ = f'{code:04d}.HK'
-    return {__: f'{_}'}
+    return {_.yahoo_code: f'{_}'}
+
+
+@app.get("/hkex/{code}/optinum")
+async def optinum_hk(code: int):
+    _ = Equity(code, False)
+    return {_.yahoo_code: f'{_.optinum()}'}
 
 
 @app.get("/tse/{code}")
 async def quote_tse(code: str):
     __  = prefer_stock('TSE')
-    return {f'{__[code.lower()]}.T': f'{Equity(__[code.lower()], exchange="TSE")}' if code.lower() in __.keys() else {}}
+    if code.lower() in __.keys():
+        _ = Equity(__[code.lower()], exchange='TSE')
+        return {_.yahoo_code: f'{_}'}
+
+
+@app.get("/tse/{code}/optinum")
+async def optinum_tse(code: str):
+    __  = prefer_stock('TSE')
+    if code.lower() in __.keys():
+        _ = Equity(__[code.lower()], exchange='TSE')
+        return {_.yahoo_code: f'{_.optinum()}'}
 
 
 @app.get("/nyse/{code}")
 async def quote_nyse(code: str):
     _ = Equity(code, exchange="NYSE")
-    return {code.upper(): f'{_}'}
+    return {_.yahoo_code: f'{_}'}
+
+
+@app.get("/nyse/{code}/optinum")
+async def optinum_nyse(code: str):
+    _ = Equity(code, exchange="NYSE")
+    return {_.yahoo_code: f'{_.optinum()}'}
