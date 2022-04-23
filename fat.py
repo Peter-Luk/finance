@@ -266,7 +266,7 @@ class Futures(Index, FOA):
 
         buy = [round(_) for _ in hdr if _ < base.close.loc[date]]
         sell = [round(_) for _ in hdr if _ > base.close.loc[date]]
-        return {'Buy':pd.Series(buy).unique(), 'Sell':pd.Series(sell).unique()}
+        return {'Buy': pd.Series(buy).unique().tolist(), 'Sell': pd.Series(sell).unique().tolist()}
 
 
 class Equity(Securities, FOA):
@@ -468,7 +468,7 @@ class Equity(Securities, FOA):
             buy = [roundup(_) for _ in hdr if _ < base.close.loc[date]]
             sell = [roundup(_) for _ in hdr if _ > base.close.loc[date]]
 
-        return {'Buy':pd.Series(buy).unique(), 'Sell':pd.Series(sell).unique()}
+        return {'Buy': pd.Series(buy).unique().tolist(), 'Sell': pd.Series(sell).unique().tolist()}
 
     def range(self, period=None):
         if period is None:
@@ -560,7 +560,7 @@ async def quote_hk(code: int):
 @app.get("/hkex/{code}/optinum")
 async def optinum_hk(code: int):
     _ = Equity(code, False)
-    return {_.yahoo_code: f'{_.optinum()}'}
+    return {_.yahoo_code: _.optinum()}
 
 
 @app.get("/tse/{code}")
