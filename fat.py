@@ -560,7 +560,7 @@ async def quote_hk(code: int):
 @app.get("/hkex/{code}/optinum")
 async def optinum_hk(code: int):
     _ = Equity(code, False)
-    return {_.yahoo_code: _.optinum()}
+    return _.optinum()
 
 
 @app.get("/tse/{code}")
@@ -576,7 +576,7 @@ async def optinum_tse(code: str):
     __  = prefer_stock('TSE')
     if code.lower() in __.keys():
         _ = Equity(__[code.lower()], exchange='TSE')
-        return {_.yahoo_code: f'{_.optinum()}'}
+        return _.optinum()
 
 
 @app.get("/nyse/{code}")
@@ -588,4 +588,4 @@ async def quote_nyse(code: str):
 @app.get("/nyse/{code}/optinum")
 async def optinum_nyse(code: str):
     _ = Equity(code, exchange="NYSE")
-    return {_.yahoo_code: f'{_.optinum()}'}
+    return _.optinum()
