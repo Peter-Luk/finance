@@ -264,9 +264,10 @@ class Futures(Index, FOA):
         [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
         hdr.sort()
 
-        buy = [round(_) for _ in hdr if _ < base.close.loc[date]]
-        sell = [round(_) for _ in hdr if _ > base.close.loc[date]]
-        return {'Buy': pd.Series(buy).unique().tolist(), 'Sell': pd.Series(sell).unique().tolist()}
+        kc = self.kc(self.periods['kc']).loc[date]
+        buy = [round(_) for _ in hdr if _ < kc.Lower]
+        sell = [round(_) for _ in hdr if _ > kc.Upper]
+        return {'Buy': pd.Series(buy).unique().tolist() if buy else buy, 'Sell': pd.Series(sell).unique().tolist() if sell else sell}
 
 
 class Equity(Securities, FOA):
@@ -459,16 +460,17 @@ class Equity(Securities, FOA):
         [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
         hdr.sort()
 
-        buy = [round(_, 2) for _ in hdr if _ < base.close.loc[date]]
-        sell = [round(_, 2) for _ in hdr if _ > base.close.loc[date]]
+        kc = self.kc(self.periods['kc']).loc[date]
+        buy = [round(_, 2) for _ in hdr if _ < kc.Lower]
+        sell = [round(_, 2) for _ in hdr if _ > kc.Upper]
         if self.exchange == 'TSE':
-            buy = [round(_) for _ in hdr if _ < base.close.loc[date]]
-            sell = [round(_) for _ in hdr if _ > base.close.loc[date]]
+            buy = [round(_) for _ in hdr if _ < kc.Lower]
+            sell = [round(_) for _ in hdr if _ > kc.Upper]
         if self.exchange == 'HKEx':
-            buy = [roundup(_) for _ in hdr if _ < base.close.loc[date]]
-            sell = [roundup(_) for _ in hdr if _ > base.close.loc[date]]
+            buy = [roundup(_) for _ in hdr if _ < kc.Lower]
+            sell = [roundup(_) for _ in hdr if _ > kc.Upper]
 
-        return {'Buy': pd.Series(buy).unique().tolist(), 'Sell': pd.Series(sell).unique().tolist()}
+        return {'Buy': pd.Series(buy).unique().tolist() if buy else buy, 'Sell': pd.Series(sell).unique().tolist() if sell else sell}
 
     def range(self, period=None):
         if period is None:
