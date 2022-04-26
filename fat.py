@@ -461,14 +461,14 @@ class Equity(Securities, FOA):
         hdr.sort()
 
         kc = self.kc(self.periods['kc']).loc[date]
-        buy = [round(_, 2) for _ in hdr if _ < kc.Lower]
-        sell = [round(_, 2) for _ in hdr if _ > kc.Upper]
+        buy = [round(_, 2) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+        sell = [round(_, 2) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
         if self.exchange == 'TSE':
-            buy = [round(_) for _ in hdr if _ < kc.Lower]
-            sell = [round(_) for _ in hdr if _ > kc.Upper]
+            buy = [round(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+            sell = [round(_) for _ in hdr if _ > kc.Upper and _> self.__data.close.loc[date]]
         if self.exchange == 'HKEx':
-            buy = [roundup(_) for _ in hdr if _ < kc.Lower]
-            sell = [roundup(_) for _ in hdr if _ > kc.Upper]
+            buy = [roundup(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+            sell = [roundup(_) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
 
         return {'Buy': pd.Series(buy).unique().tolist() if buy else buy, 'Sell': pd.Series(sell).unique().tolist() if sell else sell}
 
