@@ -497,8 +497,7 @@ def submit(values, db='Futures'):
 
 def collect(advance=False):
     values = []
-    futures = waf()
-    if  advance: futures = waf(1)
+    futures = waf(1) if advance else waf()
     for _ in futures:
         s, v = 'M', 0
         if datetime.datetime.now().time() > datetime.time(12, 4):
