@@ -1,4 +1,5 @@
 import multiprocessing
+# from concurrent.futures import ThreadPoolExecutor
 from y2n import Equities, entities, pref, datetime, tqdm, gr, pd
 
 
@@ -20,6 +21,8 @@ def mav(c, date):
 
 
 def compose(code=entities(pref.db['Equities']['name'])):
+    # with ThreadPoolExecutor(max_workers=4) as pool:
+    #     r = list(tqdm(pool.map(grab, code), total=len(code)))
     with multiprocessing.Pool() as pool:
         # r = pool.map(grab, tqdm(code))
         r = list(tqdm(pool.imap(grab, code), total=len(code)))
