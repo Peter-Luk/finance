@@ -89,6 +89,7 @@ class Futures(Index, FOA):
         __ = self.__data.iloc[-1]
         for _ in self.__data.columns:
             exec(f"self.{_}=__.{_}")
+        self.session.close()
 
     def __call__(self):
         return self.compose()
