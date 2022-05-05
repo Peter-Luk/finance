@@ -1,7 +1,22 @@
 <html>
-  <head>
-    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
-    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
-  </head>
-  <body> <py-script> print('Hello, World!') </py-script> </body>
+    <head>
+        <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+        <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+        <py-env>
+            <!-- - numpy -->
+            <!-- - matplotlib -->
+            - paths:
+                - /fat.py
+                - /utilities.py
+        </py-env>
+    </head>
+    <body>
+        <py-script>
+from fat import Futures, baseplot
+from utilities import mtf
+
+mini_futures = Futures([_ for _ in mtf() if 'MH' in _][0])
+            <!-- print('Hello, World!') -->
+        </py-script>
+    </body>
 </html>
