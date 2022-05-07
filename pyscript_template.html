@@ -11,13 +11,15 @@
         </py-env>
     </head>
     <body>
-        <div id="plot">
+        <py-script src="./fat.py"></py-script>
+        <py-script src="./utilities.py"></py-script>
+        <div id="plot"></div>
         <py-script output="plot">
 from fat import Futures, baseplot
 from utilities import mtf
 
 mini_futures = Futures([_ for _ in mtf() if 'MH' in _][0])
-print(mini_futures)
+<!-- print(mini_futures) -->
 baseplot(mini_futures)
         </py-script>
 
