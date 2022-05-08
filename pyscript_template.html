@@ -7,6 +7,7 @@
             - matplotlib
             - numpy
             - pandas
+            - pandas_datareader
             - pytz
             - sqlalchemy
             - scipy
@@ -26,6 +27,8 @@
         <br>
 <b><p>Pandas: <u><label id='pan-ver'></label></u></p></b>
         <br>
+<b><p>Pandas Datareader: <u><label id='pdr-ver'></label></u></p></b>
+        <br>
 <b><p>Pytz: <u><label id='ptz-ver'></label></u></p></b>
         <br>
 <b><p>Scipy: <u><label id='sci-ver'></label></u></p></b>
@@ -41,6 +44,7 @@ import matplotlib
 <!-- import numba -->
 import numpy
 import pandas
+import pandas_datareader
 import pytz
 import scipy
 import sqlalchemy
@@ -48,6 +52,7 @@ import tqdm
 pyscript.write('mat_ver', f'{matplotlib.__version__} loaded')
 pyscript.write('num-ver', f'{numpy.__version__} loaded')
 pyscript.write('pan-ver', f'{pandas.__version__} loaded')
+pyscript.write('pdr-ver', f'{pandas_datareader.__version__} loaded')
 pyscript.write('ptz-ver', f'{pytz.__version__} loaded')
 pyscript.write('sci-ver', f'{scipy.__version__} loaded')
 pyscript.write('sqa-ver', f'{sqlalchemy.__version__} loaded')
@@ -55,6 +60,5 @@ pyscript.write('tqd-ver', f'{tqdm.__version__} loaded')
 from utilities import waf
 print(waf()[1])
         </py-script>
-
     </body>
 </html>
