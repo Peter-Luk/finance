@@ -1,8 +1,5 @@
 import copy
 import datetime
-# from typing import Optional
-# from pydantic import BaseModel
-from fastapi import FastAPI
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from utilities import filepath, getcode, gslice, waf
@@ -11,7 +8,6 @@ from finaux import roundup
 
 Session = sessionmaker()
 Base = declarative_base()
-app = FastAPI()
 idx = []
 
 
@@ -553,43 +549,3 @@ def _roundup(_, exchange):
             _.Lower = _.Lower.apply(roundup)
         return _
     return _.applymap(roundup, na_action='ignore')
-
-
-@app.get("/hkex/{code}")
-async def quote_hk(code: int):
-    _ = Equity(code, False)
-    return {_.yahoo_code: f'{_}'}
-
-
-@app.get("/hkex/{code}/optinum")
-async def optinum_hk(code: int):
-    _ = Equity(code, False)
-    return _.optinum()
-
-
-@app.get("/tse/{code}")
-async def quote_tse(code: str):
-    __  = prefer_stock('TSE')
-    if code.lower() in __.keys():
-        _ = Equity(__[code.lower()], exchange='TSE')
-        return {_.yahoo_code: f'{_}'}
-
-
-@app.get("/tse/{code}/optinum")
-async def optinum_tse(code: str):
-    __  = prefer_stock('TSE')
-    if code.lower() in __.keys():
-        _ = Equity(__[code.lower()], exchange='TSE')
-        return _.optinum()
-
-
-@app.get("/nyse/{code}")
-async def quote_nyse(code: str):
-    _ = Equity(code, exchange="NYSE")
-    return {_.yahoo_code: f'{_}'}
-
-
-@app.get("/nyse/{code}/optinum")
-async def optinum_nyse(code: str):
-    _ = Equity(code, exchange="NYSE")
-    return _.optinum()
