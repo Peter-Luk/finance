@@ -3,32 +3,31 @@
         <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
         <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
         <py-env>
-- pandas_datareader
-<!-- - 'https://files.pythonhosted.org/packages/a1/b5/bf3bf6adf9acdd18ac15f93e2d42b7a9a468f8cb70144e316980d9d9dd61/yfinance-0.1.70-py2.py3-none-any.whl' -->
-<!-- - 'https://files.pythonhosted.org/packages/3f/16/56c9d648b503619ebe96f726b5f642b68e299b34162ed2d6faa9d7966b7d/pandas_datareader-0.10.0-py3-none-any.whl' -->
-        <!--     - numpy -->
-        <!--     - matplotlib -->
-        <!--     - paths: -->
-        <!--     -   /fat.py -->
-        <!--     -   /utilities.py -->
+            - numpy
+            - matplotlib
+            - pandas
+            - asyncio
         </py-env>
     </head>
     <body>
         <!-- <py-script src="/fat.py"></py-script> -->
         <!-- <py-script src="/utilities.py"></py-script> -->
-        <div id="plot"></div>
+        <div id="plot">
+<b><p>Matplotlib: <u><label id='mat_ver'></label></u></p></b>
+        <br>
+<b><p>Numpy: <u><label id='num-ver'></label></u></p></b>
+        <br>
+<b><p>Pandas: <u><label id='pan-ver'></label></u></p></b>
+        <br>
+        </div>
         <py-script output="plot">
-<!-- from fat import Futures, baseplot -->
-<!-- from utilities import mtf -->
-<!-- import yfinance -->
-<!-- pyscript.write(f'{yfinance.__version__} loaded') -->
-import pandas_datareader
-pyscript.write(f'{pandas_datareader.__version__} loaded')
-<!-- print([_ for _ in mtf() if 'MH' in _][0]) -->
-<!-- mini_futures = Futures([_ for _ in mtf() if 'MH' in _][0]) -->
-<!-- mini_futures = Futures('MHIK2') -->
-<!-- print(mini_futures) -->
-<!-- baseplot(mini_futures) -->
+import matplotlib
+import numpy
+import pandas
+import asyncio
+pyscript.write('mat_ver', f'{matplotlib.__version__} loaded')
+pyscript.write('num-ver', f'{numpy.__version__} loaded')
+pyscript.write('pan-ver', f'{pandas.__version__} loaded')
         </py-script>
 
     </body>
