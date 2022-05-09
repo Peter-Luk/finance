@@ -8,13 +8,17 @@
             - numpy
             - pandas
             - pandas_datareader
+            - pathlib
             - pytz
-            - sqlalchemy
             - scipy
+            - selenium
+            - sqlalchemy
             - tqdm
             - paths:
                 - pref.py
                 - pref.yaml
+                - finaux.py
+                - fintools.py
                 - fat.py
                 - utilities.py
         </py-env>
@@ -33,6 +37,8 @@
         <br>
 <b><p>Scipy: <u><label id='sci-ver'></label></u></p></b>
         <br>
+<b><p>Selenium: <u><label id='sel-ver'></label></u></p></b>
+        <br>
 <b><p>Sqlalchemy: <u><label id='sqa-ver'></label></u></p></b>
         <br>
 <b><p>Tqdm: <u><label id='tqd-ver'></label></u></p></b>
@@ -45,8 +51,10 @@ import matplotlib
 import numpy
 import pandas
 import pandas_datareader
+import pathlib
 import pytz
 import scipy
+import selenium
 import sqlalchemy
 import tqdm
 pyscript.write('mat_ver', f'{matplotlib.__version__} loaded')
@@ -55,10 +63,15 @@ pyscript.write('pan-ver', f'{pandas.__version__} loaded')
 pyscript.write('pdr-ver', f'{pandas_datareader.__version__} loaded')
 pyscript.write('ptz-ver', f'{pytz.__version__} loaded')
 pyscript.write('sci-ver', f'{scipy.__version__} loaded')
+pyscript.write('sel-ver', f'{selenium.__version__} loaded')
 pyscript.write('sqa-ver', f'{sqlalchemy.__version__} loaded')
 pyscript.write('tqd-ver', f'{tqdm.__version__} loaded')
+from fat import Futures
 from utilities import waf
 print(waf()[1])
+print(pathlib.sys.platform)
+print(pathlib.os.environ.get('HOME'))
+print(pathlib.os.environ.get('HOMEPATH'))
         </py-script>
     </body>
 </html>
