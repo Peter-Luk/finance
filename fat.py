@@ -525,15 +525,17 @@ def baseplot(rdf, latest=None):
         _.tail(latest).plot(title=f"{code} last: {latest}")
 
 
-def mplot(df, last=200):
+def mplot(df, last=200, sar=True):
     import mplfinance as mpf
 #     mc = mpf.make_marketcolors(up='tab:blue',down='tab:red', edge='lime', wick={'up':'blue','down':'red'}, volume='lawngreen')
 #     s  = mpf.make_mpf_style(base_mpl_style="seaborn", marketcolors=mc)
 
     adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), \
             mpf.make_addplot(df.kama()[-last:], color='silver'), \
-            mpf.make_addplot(df.rsi()[-last:], panel=1, color='green'), \
-            mpf.make_addplot(df.sar()[-last:], type='scatter', marker='o', markersize=1, color='black')]
+            mpf.make_addplot(df.rsi()[-last:], panel=1, color='green')]
+    if sar:
+            adps.append(mpf.make_addplot(df.sar()[-last:], type='scatter', marker='o', markersize=1, color='black'))
+
     tt = df.code
     try:
         tt = df.yahoo_code
