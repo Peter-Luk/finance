@@ -37,3 +37,8 @@ class Equity(FOA):
         if period is None:
             period = self.periods['kama']
         return self.analyser.kama(period).astype('float64')
+
+    def kc(self, period=None):
+        if period is None:
+            period = self.periods['kc']
+        return self.analyser.kc(period)
