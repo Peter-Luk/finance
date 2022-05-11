@@ -2,7 +2,7 @@ import socket
 from pytz import timezone
 # from scipy.optimize import newton
 import pref
-sep, environ, path, linesep, platform, version_info, db, gr, \
+sep, environ, path, Path, linesep, platform, version_info, db, gr, \
     sleep, datetime, driver, reduce, ph = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
@@ -42,6 +42,8 @@ def filepath(*args, **kwargs):
             return sep.join((environ.get('HOMEPATH'), file_type, data_path, name))
         else:
             file_path = sep.join((environ.get('HOMEPATH'), file_type, data_path))
+            _ = sep.join((file_path, name))
+            return _ if path.exists(_) else False
     # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
     if platform in ('linux', 'linux2'):
         if version_info.major > 2 and version_info.minor > 3:
@@ -61,8 +63,16 @@ def filepath(*args, **kwargs):
                 place = 'external-1'
                 file_path = sep.join(
                     (environ.get('HOME'), 'storage', place, file_type, data_path))
-    _ = sep.join((file_path, name))
-    return _ if path.exists(_) else False
+            _ = sep.join((file_path, name))
+            return _ if path.exists(_) else False
+    else:
+        path_holder_list = ['..', file_type, data_path]
+        path_holder = sep.join(path_holder_list)
+        if Path(path_holder).is_file():
+            return Path(path_holder).absolute().__str__
+        else:
+            path_holder = sep.join(['..', '..'] + path_holder_list)
+            return Path(path_holder).absolute().__str__ if Path(path_holder).is_file() else False
 
 
 def nitem(*args):

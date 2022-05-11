@@ -2,7 +2,7 @@ import pandas, pytz, numpy, sqlalchemy
 # from scipy.constants import golden_ratio
 from datetime import datetime
 from tqdm import tqdm
-from pathlib import os, sys, functools, posixpath
+from pathlib import os, sys, functools, posixpath, Path
 from time import sleep
 try:
     from scipy.constants import golden_ratio
@@ -211,7 +211,7 @@ alchemy = [
         sys.platform, os.environ, os.sep, os.listdir, sqlalchemy,
         pandas, datetime]
 utils = [
-        os.sep, os.environ, posixpath, os.linesep, sys.platform,
+        os.sep, os.environ, posixpath, Path, os.linesep, sys.platform,
         sys.version_info, sqlalchemy, golden_ratio, sleep, datetime, driver,
         functools.reduce, public_holiday]
         # functools.reduce, public_holiday, subject]
