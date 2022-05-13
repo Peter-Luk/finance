@@ -122,7 +122,8 @@ B_scale = dict(
     YUMC=1,
     NTES=1 / 5,
     JD=1 / 2,
-    WB=1)
+    WB=1,
+    ZLAB=1 /10)
 
 USHK = 7.75
 public_holiday = {2015: {

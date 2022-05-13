@@ -15,7 +15,6 @@
                 - fat.py
                 - finaux.py
                 - fintools.py
-                - pdr_data.py
                 - pref.py
                 - pref.yaml
                 - utilities.py
@@ -47,10 +46,6 @@ pyscript.write('pdr-ver', f'{pandas_datareader.__version__} loaded')
 print(pathlib.sys.platform)
 print(pathlib.os.environ.get('HOME'))
 print(pathlib.os.environ.get('HOMEPATH'))
-from pdr_data import Equity
-from fat import mplot
-_ = Equity('MRNA')
-mplot(_, 120, False)
         </py-script>
     </body>
 </html>

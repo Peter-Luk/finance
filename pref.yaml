@@ -288,6 +288,9 @@ B_scale:
     WB:
       code: 9898
       ratio: 1
+    ZLAB:
+      code: 9688
+      ratio: .1
 
 USHK: 7.75
 
