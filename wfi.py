@@ -216,9 +216,9 @@ class WFutures(object):
 
         _ = self.browser.find_element(by=By.XPATH, value=cxpath(idx))
         price = _.find_element(by=By.XPATH, value=
-            f'./{div}/div/div/table/tbody/tr/td[2]').text
+            f'./{div}/div[1]/div/table/tbody/tr/td[2]').text
         change = _.find_element(by=By.XPATH, value=
-            f'./{div}/div/div/table/tbody/tr/td[3]').text
+            f'./{div}/div[1]/div/table/tbody/tr/td[3]').text
         _l = ''.join(re.split('\: |\|', _.find_element(by=By.XPATH, value=
             './div[5]').text)[1:])
         try:
@@ -389,16 +389,16 @@ def display(wf, interval=0):
     from time import sleep
     while True:
         print(f'Time: {datetime.now():%H:%M:%S}')
-        # try:
-        #     _d = dow(wf)
-        #     print(f'Dow:\t{_d[0]}\t{_d[1]}\t{_d[2]}\t{_d[-1]}')
-        # except Exception:
-        #     pass
-        # try:
-        #     _d = nq(wf)
-        #     print(f'Nasdaq:\t{_d[0]}\t{_d[1]}\t{_d[2]}\t{_d[-1]}')
-        # except Exception:
-        #     pass
+        try:
+            _d = dow(wf)
+            print(f'Dow:\t{_d[0]}\t{_d[1]}\t{_d[2]}\t{_d[-1]}')
+        except Exception:
+            pass
+        try:
+            _d = nq(wf)
+            print(f'Nasdaq:\t{_d[0]}\t{_d[1]}\t{_d[2]}\t{_d[-1]}')
+        except Exception:
+            pass
         try:
             _n = nk(wf)
             print(f'Nikkei:\t{_n[0]}\t{_n[1]}\t{_n[2]}\t{_n[-1]}')
