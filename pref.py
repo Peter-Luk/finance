@@ -97,12 +97,12 @@ source = dict(
         hyperlink='https://indexes.nikkei.co.jp/en/nkave/index/' +
         'profile?idx=nk225',
         tz=pytz.timezone('Asia/Tokyo')),
-    CNBC=dict(
-        hyperlink='https://www.cnbc.com/pre-markets/',
-        tz=pytz.timezone('US/Eastern'),
-        # xpath_base='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/' +
-        xpath_base='/html/body/div[2]/div/div[1]/div[3]/div/div/div/' +
-        'div[3]/div[1]/div/div[1]/'),
+#     CNBC=dict(
+#         hyperlink='https://www.cnbc.com/pre-markets/',
+#         tz=pytz.timezone('US/Eastern'),
+#         # xpath_base='/html/body/div[2]/div/div[1]/div[3]/div[2]/div/div/' +
+#         xpath_base='/html/body/div[2]/div/div[1]/div[3]/div/div/div/' +
+#         'div[3]/div[1]/div/div[1]/'),
     WhatsApp=dict(
         hyperlink='https://web.whatsapp.com'),
     SMS=dict(

@@ -200,34 +200,34 @@ class WFutures(object):
             f'Message successfully sent to {recipent}',
             f'{datetime.now():%H:%M:%S}'))
 
-    def usif(self, idx='Dow', site='CNBC', implied=True):
-        if self.browser.current_url == source[site]['hyperlink']:
-            self.refresh(site)
-        else:
-            self.goto(site)
-        div = 'div[2]'
-        if implied:
-            div = 'div[4]'
-
-        def cxpath(_):
-            idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
-            if _ in idx:
-                return f'{source[site]["xpath_base"]}div[{1+idx.index(_)}]/div'
-
-        _ = self.browser.find_element(by=By.XPATH, value=cxpath(idx))
-        price = _.find_element(by=By.XPATH, value=
-            f'./{div}/div[1]/div/table/tbody/tr/td[2]').text
-        change = _.find_element(by=By.XPATH, value=
-            f'./{div}/div[1]/div/table/tbody/tr/td[3]').text
-        _l = ''.join(re.split('\: |\|', _.find_element(by=By.XPATH, value=
-            './div[5]').text)[1:])
-        try:
-            last = source[site]['tz'].localize(datetime.strptime(
-                _l, '%a %b %d %Y %I:%M %p EST'))
-        except Exception:
-            last = source[site]['tz'].localize(datetime.strptime(
-                _l, '%a %b %d %Y'))
-        return self.__status(price, change, last)
+#     def usif(self, idx='Dow', site='CNBC', implied=True):
+#         if self.browser.current_url == source[site]['hyperlink']:
+#             self.refresh(site)
+#         else:
+#             self.goto(site)
+#         div = 'div[2]'
+#         if implied:
+#             div = 'div[4]'
+# 
+#         def cxpath(_):
+#             idx = ['Dow', 'S&P', 'Nasdaq', 'Russell']
+#             if _ in idx:
+#                 return f'{source[site]["xpath_base"]}div[{1+idx.index(_)}]/div'
+# 
+#         _ = self.browser.find_element(by=By.XPATH, value=cxpath(idx))
+#         price = _.find_element(by=By.XPATH, value=
+#             f'./{div}/div[1]/div/table/tbody/tr/td[2]').text
+#         change = _.find_element(by=By.XPATH, value=
+#             f'./{div}/div[1]/div/table/tbody/tr/td[3]').text
+#         _l = ''.join(re.split('\: |\|', _.find_element(by=By.XPATH, value=
+#             './div[5]').text)[1:])
+#         try:
+#             last = source[site]['tz'].localize(datetime.strptime(
+#                 _l, '%a %b %d %Y %I:%M %p EST'))
+#         except Exception:
+#             last = source[site]['tz'].localize(datetime.strptime(
+#                 _l, '%a %b %d %Y'))
+#         return self.__status(price, change, last)
 
     def nk225(self, site='NIKKEI'):
         if self.browser.current_url == source[site]['hyperlink']:
@@ -360,19 +360,19 @@ def msend(wf, msg, rect=milly):
     return _wf.msg2(rect, msg)
 
 
-def dow(wf, _=True):
-    _wf = copy.copy(wf)
-    return _wf.usif('Dow', implied=_)
-
-
-def nq(wf, _=True):
-    _wf = copy.copy(wf)
-    return _wf.usif('Nasdaq', implied=_)
-
-
-def sp(wf, _=True):
-    _wf = copy.copy(wf)
-    return _wf.usif('S&P', implied=_)
+# def dow(wf, _=True):
+#     _wf = copy.copy(wf)
+#     return _wf.usif('Dow', implied=_)
+# 
+# 
+# def nq(wf, _=True):
+#     _wf = copy.copy(wf)
+#     return _wf.usif('Nasdaq', implied=_)
+# 
+# 
+# def sp(wf, _=True):
+#     _wf = copy.copy(wf)
+#     return _wf.usif('S&P', implied=_)
 
 
 def nk(wf):
