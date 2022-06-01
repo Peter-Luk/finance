@@ -191,9 +191,18 @@ class WFutures(object):
         group_title = self.wait.until(EC.presence_of_element_located((
             By.XPATH, x_arg)))
         group_title.click()
+#         for k, v in xvsa.items():
+#             sxv = f"@{k}='{v}'"
+#         input_box = self.wait.until(EC.presence_of_element_located((
+#             By.XPATH, f"//p[{sxv}]")))
         sxv = ' and '.join([f"contains(@{k}, '{v}')" for k, v in xvsa.items()])
+#         input_box = self.wait.until(EC.presence_of_element_located((
+#             By.XPATH, f"//div[{sxv}]")))
         input_box = self.wait.until(EC.presence_of_element_located((
             By.XPATH, f"//div[{sxv}]")))
+        input_box.click()
+# #         input_box = self.wait.until(EC.presence_of_element_located((
+# #             By.XPATH, f"//div[{sxv}]//child::p")))
         input_box.clear()
         input_box.send_keys(message + Keys.ENTER)
         return ' @ '.join((
