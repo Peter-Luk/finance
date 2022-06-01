@@ -12,8 +12,7 @@ change, pct_change = [float(_) for _ in nikkei_soup.select('#diff')[0].text.stri
 try:
     time = datetime.strptime(nikkei_soup.select('#datedtime')[0].text.strip('\n '), '%b/%d/%Y(%H:%M)')
 except Exception:
-    time = datetime.strptime(nikkei_soup.select('#datedtime')[0].text.strip('\n '), '%b/%d/%Y(Close)')
-
+    time = datetime.strptime(nikkei_soup.select('#datedtime')[0].text.strip('\n '), '%b/%d/%Y(*Close)')
  
 http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml
 #price
