@@ -1,0 +1,18 @@
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
+
+nikkei_req = requests.get('https://indexes.nikkei.co.jp/en/nkave/index/profile', params={'idx':'nk225'})
+nikkei_soup = BeautifulSoup(nikkei_req.content, 'html.parser')
+# css selector #price
+price = float(nikkei_soup.select('#price')[0].text.strip('\n ').replace(',',''))
+# css selector #diff
+change, pct_change = [float(_) for _ in nikkei_soup.select('#diff')[0].text.strip(')%\n\xa0').split(' (')]
+# css selector #datedtime
+time = datetime.strptime(nikkei_soup.select('#datedtime')[0].text.strip('\n '), '%b/%d/%Y(%H:%M)')
+ 
+http://finance.sina.com.cn/realstock/company/sh000001/nc.shtml
+#price
+#change
+#changeP
+#hqTime

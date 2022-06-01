@@ -111,9 +111,13 @@ source = dict(
         hyperlink='https://www.gold.org/'))
 
 fields = ['open', 'high', 'low', 'close', 'volume']
+# xvsa = {'class': 'selectable-text copyable-text'}
 xvsa = dict(zip(
-    ['class', 'role', 'data-tab', 'dir', 'spellcheck', 'contenteditable'],
-    ['copyable-text selectable-text', 'textbox', '10', 'ltr', 'true', 'true']))
+    ['role', 'data-tab', 'data-lexical-editor', 'spellcheck', 'contenteditable'],
+    ['textbox', '10', 'true', 'true', 'true']))
+# xvsa = dict(zip(
+#     ['class', 'role', 'data-tab', 'dir', 'spellcheck', 'contenteditable'],
+#     ['copyable-text selectable-text', 'textbox', '10', 'ltr', 'true', 'true']))
 B_scale = dict(
     BABA=1 / 8,
     BIDU=1 / 8,
@@ -123,7 +127,7 @@ B_scale = dict(
     NTES=1 / 5,
     JD=1 / 2,
     WB=1,
-    ZLAB=1 /10)
+    ZLAB=11 / 100)
 
 USHK = 7.75
 public_holiday = {2015: {
