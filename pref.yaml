@@ -427,10 +427,10 @@ site_adr:
 
 symbol:
     Yahoo:
-        S&P Futures: ES=F
-        Dow Futures: YM=F
-        Nasdaq Futures: NQ=F
-        Russell 2000 Futures: RTY=F
-        Crude Oil: CL=F
-        Gold: GC=F
+      S&P Futures: ES=F
+      Dow Futures: YM=F
+      Nasdaq Futures: NQ=F
+      Russell 2000 Futures: RTY=F
+      Crude Oil: CL=F
+      Gold: GC=F
 ...
