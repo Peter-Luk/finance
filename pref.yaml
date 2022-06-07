@@ -422,11 +422,11 @@ prefer_stock:
       margin: .8
 
 site_adr:
-  Yahoo: finance.yahoo.com
-  Nikkei: indexes.nikkei.co.jp/en/nkave/index/profile
+    Yahoo: finance.yahoo.com
+    Nikkei: indexes.nikkei.co.jp/en/nkave/index/profile
 
 symbol:
-  Yahoo:
+    Yahoo:
         S&P Futures: ES=F
         Dow Futures: YM=F
         Nasdaq Futures: NQ=F
