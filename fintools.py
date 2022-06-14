@@ -94,6 +94,7 @@ def get_periods(entity='Equities', file='pref.yaml'):
             _ = yaml.load(f, Loader=yaml.FullLoader)
         return _.get('periods').get(entity)
 
+
 def mplot(df, last=200, sar=True):
     import matplotlib as plt
     import mplfinance as mpf
