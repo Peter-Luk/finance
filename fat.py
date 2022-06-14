@@ -527,6 +527,28 @@ def baseplot(rdf, latest=None):
 
 def mplot(df, last=200, sar=True):
     import mplfinance as mpf
+# """
+    fig, axs = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(14, 10))
+    adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), \
+            mpf.make_addplot(df.kama()[-last:], color='silver'), \
+#             mpf.make_addplot(df.rsi()[-last:], panel=1, color='green'), \
+            ]
+    if sar:
+            adps.append(mpf.make_addplot(df.sar()[-last:], type='scatter', marker='o', markersize=1, color='black'))
+
+    tt = df.code
+    try:
+        tt = df.yahoo_code
+    except Exception:
+        pass
+    colors = mpf.make_marketcolors(up='#00ff00', down='#ff0000')
+    mpf_style = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=colors)
+    mpf.plot(df()[-last:], type='candle', ax=axs[0], style=mpf_style, addplot=adps, title=tt, volume=True, ylabel='Price')
+#     mpf.plot(df()[-last:], type='candle', ax=axs[0]. style=mpf_style)
+    axs[1].axhline(y=70, color='r', linestyle='--')
+    axs[1].axhline(y=30, color='g', linestyle='--')
+    axs[1].plot(df.rsi()[-last:], color='orange')
+# """
 #     mc = mpf.make_marketcolors(up='tab:blue',down='tab:red', edge='lime', wick={'up':'blue','down':'red'}, volume='lawngreen')
 #     s  = mpf.make_mpf_style(base_mpl_style="seaborn", marketcolors=mc)
 """
@@ -553,6 +575,7 @@ mpf_style = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=colors)
 mpf.plot(data, type='candle', ax=axs[0]. style=mpf_style)
 axs[1].plot(data['ENGULFING'], color='blue')
 """
+"""
     adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), \
             mpf.make_addplot(df.kama()[-last:], color='silver'), \
             mpf.make_addplot(df.rsi()[-last:], panel=1, color='green')]
@@ -565,7 +588,7 @@ axs[1].plot(data['ENGULFING'], color='blue')
     except Exception:
         pass
     mpf.plot(df()[-last:], type='candle', style='charles', addplot=adps, title=tt, volume=True, ylabel='Price')
-
+"""
 
 def _roundup(_, exchange):
     if pd.__version__ < '1.2':
