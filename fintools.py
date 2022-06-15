@@ -96,9 +96,7 @@ def get_periods(entity='Equities', file='pref.yaml'):
 
 
 def mplot(df, last=200, sar=True):
-#     import matplotlib.pyplot as plt
     import mplfinance as mpf
-#    fig, axs = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(14, 10))
     adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), \
         mpf.make_addplot(df.kama()[-last:], color='silver'), \
         mpf.make_addplot(df.rsi()[-last:], panel=1, color='green')]
