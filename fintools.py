@@ -98,6 +98,7 @@ def get_periods(entity='Equities', file='pref.yaml'):
 def mplot(df, last=200, sar=True):
 #     import matplotlib.pyplot as plt
     import mplfinance as mpf
+#    fig, axs = plt.subplots(2, 1, gridspec_kw={'height_ratios': [3, 1]}, figsize=(14, 10))
     adps = [mpf.make_addplot(df.kc()[-last:], color='blue'), \
         mpf.make_addplot(df.kama()[-last:], color='silver'), \
         mpf.make_addplot(df.rsi()[-last:], panel=1, color='green')]
@@ -109,7 +110,9 @@ def mplot(df, last=200, sar=True):
         tt = df.yahoo_code
     except Exception:
         pass
-    mpf.plot(df()[-last:], type='candle', style='charles', addplot=adps, title=tt, volume=True, ylabel='Price')
+    colors = mpf.make_marketcolors(up='#00ff00', down='#ff0000')
+    mpf_style = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=colors)
+    mpf.plot(df()[-last:], type='candle', style=mpf_style, addplot=adps, title=tt, volume=True, ylabel='Price')
 
 
 class FOA(object):
