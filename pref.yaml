@@ -421,16 +421,25 @@ prefer_stock:
       size: 100
       margin: .8
 
-site_adr:
-    Yahoo: finance.yahoo.com
-    Nikkei: indexes.nikkei.co.jp/en/nkave/index/profile
-
-symbol:
-    Yahoo:
+website:
+  Yahoo:
+    address: finance.yahoo.com
+    symbol:
       S&P Futures: ES=F
       Dow Futures: YM=F
       Nasdaq Futures: NQ=F
       Russell 2000 Futures: RTY=F
       Crude Oil: CL=F
       Gold: GC=F
+    fields:
+      latest: Price
+      change: Change
+      \% change: ChangePercent
+  Nikkei:
+    address: indexes.nikkei.co.jp/en/nkave/index/profile
+    fields:
+      latest: \#price
+      change: \#diff
+      \% change: \#diff
+      time: \#datedtime
 ...
