@@ -434,12 +434,12 @@ website:
     fields:
       latest: Price
       change: Change
-      \% change: ChangePercent
+      "% change": ChangePercent
   Nikkei:
     address: indexes.nikkei.co.jp/en/nkave/index/profile
     fields:
-      latest: \#price
-      change: \#diff
-      \% change: \#diff
-      time: \#datedtime
+      latest: price
+      change: diff
+      "% change": diff
+      time: datedtime
 ...
