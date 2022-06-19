@@ -424,6 +424,7 @@ prefer_stock:
 website:
   Yahoo:
     address: finance.yahoo.com
+    timeout: 90000
     symbol:
       S&P Futures: ES=F
       Dow Futures: YM=F
@@ -437,6 +438,7 @@ website:
       "% change": ChangePercent
   Nikkei:
     address: indexes.nikkei.co.jp/en/nkave/index/profile
+    timeout: 18000
     fields:
       latest: price
       change: diff
