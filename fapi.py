@@ -1,6 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
-from fat import Equity
+from fat import Equity, prefer_stock
 from utilities import IP
 
 app = FastAPI()
