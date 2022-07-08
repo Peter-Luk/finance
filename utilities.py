@@ -13,8 +13,10 @@ import pref
 
 driver = pref.driver
 ph = pref.public_holiday
+sep = os.sep
 linesep = os.linesep
 platform = sys.platform
+reduce = functools.reduce
 
 try:
     from scipy.constants import golden_ratio as gr
@@ -48,7 +50,7 @@ def driver_path(browser, file='pref.yaml'):
     # __ = driver.get(browser.capitalize())
     _.extend(__.get('path'))
     _.append(__.get('name'))
-    return os.sep.join(_)
+    return sep.join(_)
 
 
 def filepath(*args, **kwargs):
@@ -59,39 +61,39 @@ def filepath(*args, **kwargs):
         data_path = kwargs['subpath']
     if platform == 'win32':
         if sys.version_info.major > 2 and sys.version_info.minor > 3:
-            return os.sep.join((os.environ.get('HOMEPATH'), file_type, data_path, name))
+            return sep.join((os.environ.get('HOMEPATH'), file_type, data_path, name))
         else:
-            file_path = os.sep.join((os.environ.get('HOMEPATH'), file_type, data_path))
-            _ = os.sep.join((file_path, name))
+            file_path = sep.join((os.environ.get('HOMEPATH'), file_type, data_path))
+            _ = sep.join((file_path, name))
             return _ if path.exists(_) else False
-    # if platform == 'linux-armv7l':file_drive, file_path = '', os.sep.join(('mnt', 'sdcard', file_type, data_path))
+    # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
     if platform in ('linux', 'linux2'):
         if sys.version_info.major > 2 and sys.version_info.minor > 3:
             if os.environ.get('EXTERNAL_STORAGE'):
-                _ = os.sep.join((
+                _ = sep.join((
                     os.environ.get('HOME'), 'storage', 'external-1', file_type,
                     data_path, name))
                 if path.exists(_):
                     return _
-            _ = os.sep.join((os.environ.get('HOME'), file_type, data_path, name))
+            _ = sep.join((os.environ.get('HOME'), file_type, data_path, name))
             return _ if path.exists(_) else False
         else:
             place = 'shared'
             if os.environ.get('ACTUAL_HOME'):
-                file_path = os.sep.join((os.environ.get('HOME'), file_type, data_path))
+                file_path = sep.join((os.environ.get('HOME'), file_type, data_path))
             elif os.environ.get('EXTERNAL_STORAGE') and ('/' in os.environ['EXTERNAL_STORAGE']):
                 place = 'external-1'
-                file_path = os.sep.join(
+                file_path = sep.join(
                     (os.environ.get('HOME'), 'storage', place, file_type, data_path))
-            _ = os.sep.join((file_path, name))
+            _ = sep.join((file_path, name))
             return _ if path.exists(_) else False
     else:
         path_holder_list = ['..', file_type, data_path]
-        path_holder = os.sep.join(path_holder_list)
+        path_holder = sep.join(path_holder_list)
         if Path(path_holder).is_file():
             return Path(path_holder).absolute().__str__
         else:
-            path_holder = os.sep.join(['..', '..'] + path_holder_list)
+            path_holder = sep.join(['..', '..'] + path_holder_list)
             return Path(path_holder).absolute().__str__ if Path(path_holder).is_file() else False
 
 
@@ -143,7 +145,7 @@ def dictfcomp(*args, **kwargs):
         rd = args[1]
     for _ in list(rd.keys()):
         try:
-            if not functools.reduce(
+            if not reduce(
                 (lambda x, y: x and y),
                 ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__])
                     for __ in list(rd[_].keys())]):
@@ -520,7 +522,7 @@ def push2git(file_path, msg, *, login='Peter-Luk'):
                 absolute_path = f'{str(Path.home())}{file_path}'
                 if Path(absolute_path).is_file():
                     filename = os.path.basename(absolute_path)
-                    repo = os.path.dirname(absolute_path).split(os.sep)[-1]
+                    repo = os.path.dirname(absolute_path).split(sep)[-1]
                     req_repo = user.get_repo(repo)
                     contents = req_repo.get_contents(filename, ref="test")
                     req_repo.update_file(contents.path, msg, filename, contents.sha, branch="test")
