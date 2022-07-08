@@ -4,10 +4,10 @@ from datetime import datetime
 from tqdm import tqdm
 from pathlib import os, sys, functools, posixpath, Path
 from time import sleep
-try:
-    from scipy.constants import golden_ratio
-except ImportError:
-    golden_ratio = 1.618
+# try:
+#     from scipy.constants import golden_ratio
+# except ImportError:
+#     golden_ratio = 1.618
 
 driver = dict(
     Chrome=dict(
@@ -217,17 +217,17 @@ public_holiday[2023] = {
         9: (30,),
         10: (2, 23),
         12: (25, 26)}
-y2n = [
-        pandas, numpy, sqlalchemy, golden_ratio, datetime, tqdm,
-        sleep, B_scale, USHK]
-nta = [pandas, numpy, datetime, golden_ratio]
-alchemy = [
-        sys.platform, os.environ, os.sep, os.listdir, sqlalchemy,
-        pandas, datetime]
-utils = [
-        os.sep, os.environ, posixpath, Path, os.linesep, sys.platform,
-        sys.version_info, sqlalchemy, golden_ratio, sleep, datetime, driver,
-        functools.reduce, public_holiday]
+# y2n = [
+#         pandas, numpy, sqlalchemy, golden_ratio, datetime, tqdm,
+#         sleep, B_scale, USHK]
+# nta = [pandas, numpy, datetime, golden_ratio]
+# alchemy = [
+#         sys.platform, os.environ, os.sep, os.listdir, sqlalchemy,
+#         pandas, datetime]
+# utils = [
+#         os.sep, os.environ, posixpath, Path, os.linesep, sys.platform,
+#         sys.version_info, sqlalchemy, golden_ratio, sleep, datetime, driver,
+#         functools.reduce, public_holiday]
         # functools.reduce, public_holiday, subject]
 periods = dict(
     Futures=dict(
