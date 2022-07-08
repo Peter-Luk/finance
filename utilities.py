@@ -1,9 +1,28 @@
 import socket
 from pytz import timezone
 # from scipy.optimize import newton
-import pref
-sep, environ, path, Path, linesep, platform, version_info, db, gr, \
-    sleep, datetime, driver, reduce, ph = pref.utils
+import sqlalchemy as db
+from datetime import datetime
+from time import sleep
+from pathlib import posixpath as path
+from pathlib import os, Path, sys, functools
+# from pathlib.os import sep, environ
+# from pathlib.sys import platform, version_info
+# from pathlib.functools import reduce
+from pref import driver
+from pref import public_holiday as ph
+
+linesep = os.linesep
+platform = sys.platform
+
+try:
+    from scipy.constants import golden_ratio as gr
+except ImportError:
+    gr = 1.618
+
+# import pref
+# sep, environ, path, Path, linesep, platform, version_info, db, gr, \
+#     sleep, datetime, driver, reduce, ph = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
@@ -22,13 +41,13 @@ def driver_path(browser, file='pref.yaml'):
     __ = _.get('driver').get(browser.capitalize())
     _ = []
     if platform == 'win32':
-        _.append(environ.get('HOMEPATH'))
+        _.append(os.environ.get('HOMEPATH'))
     else:
-        _.append(environ.get('HOME'))
+        _.append(os.environ.get('HOME'))
     # __ = driver.get(browser.capitalize())
     _.extend(__.get('path'))
     _.append(__.get('name'))
-    return sep.join(_)
+    return os.sep.join(_)
 
 
 def filepath(*args, **kwargs):
@@ -38,40 +57,40 @@ def filepath(*args, **kwargs):
     if 'subpath' in list(kwargs.keys()):
         data_path = kwargs['subpath']
     if platform == 'win32':
-        if version_info.major > 2 and version_info.minor > 3:
-            return sep.join((environ.get('HOMEPATH'), file_type, data_path, name))
+        if sys.version_info.major > 2 and sys.version_info.minor > 3:
+            return os.sep.join((os.environ.get('HOMEPATH'), file_type, data_path, name))
         else:
-            file_path = sep.join((environ.get('HOMEPATH'), file_type, data_path))
-            _ = sep.join((file_path, name))
+            file_path = os.sep.join((os.environ.get('HOMEPATH'), file_type, data_path))
+            _ = os.sep.join((file_path, name))
             return _ if path.exists(_) else False
-    # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
+    # if platform == 'linux-armv7l':file_drive, file_path = '', os.sep.join(('mnt', 'sdcard', file_type, data_path))
     if platform in ('linux', 'linux2'):
-        if version_info.major > 2 and version_info.minor > 3:
-            if environ.get('EXTERNAL_STORAGE'):
-                _ = sep.join((
-                    environ.get('HOME'), 'storage', 'external-1', file_type,
+        if sys.version_info.major > 2 and sys.version_info.minor > 3:
+            if os.environ.get('EXTERNAL_STORAGE'):
+                _ = os.sep.join((
+                    os.environ.get('HOME'), 'storage', 'external-1', file_type,
                     data_path, name))
                 if path.exists(_):
                     return _
-            _ = sep.join((environ.get('HOME'), file_type, data_path, name))
+            _ = os.sep.join((os.environ.get('HOME'), file_type, data_path, name))
             return _ if path.exists(_) else False
         else:
             place = 'shared'
-            if environ.get('ACTUAL_HOME'):
-                file_path = sep.join((environ.get('HOME'), file_type, data_path))
-            elif environ.get('EXTERNAL_STORAGE') and ('/' in environ['EXTERNAL_STORAGE']):
+            if os.environ.get('ACTUAL_HOME'):
+                file_path = os.sep.join((os.environ.get('HOME'), file_type, data_path))
+            elif os.environ.get('EXTERNAL_STORAGE') and ('/' in os.environ['EXTERNAL_STORAGE']):
                 place = 'external-1'
-                file_path = sep.join(
-                    (environ.get('HOME'), 'storage', place, file_type, data_path))
-            _ = sep.join((file_path, name))
+                file_path = os.sep.join(
+                    (os.environ.get('HOME'), 'storage', place, file_type, data_path))
+            _ = os.sep.join((file_path, name))
             return _ if path.exists(_) else False
     else:
         path_holder_list = ['..', file_type, data_path]
-        path_holder = sep.join(path_holder_list)
+        path_holder = os.sep.join(path_holder_list)
         if Path(path_holder).is_file():
             return Path(path_holder).absolute().__str__
         else:
-            path_holder = sep.join(['..', '..'] + path_holder_list)
+            path_holder = os.sep.join(['..', '..'] + path_holder_list)
             return Path(path_holder).absolute().__str__ if Path(path_holder).is_file() else False
 
 
@@ -123,7 +142,7 @@ def dictfcomp(*args, **kwargs):
         rd = args[1]
     for _ in list(rd.keys()):
         try:
-            if not reduce(
+            if not functools.reduce(
                 (lambda x, y: x and y),
                 ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__])
                     for __ in list(rd[_].keys())]):
@@ -342,7 +361,7 @@ def rnd(n, decimal_place=0):
     try:
         if decimal_place:
             return round(n, decimal_place)
-        elif version_info.major > 2:
+        elif sys.version_info.major > 2:
             return round(n)
         else:
             return int(round(n))
@@ -487,7 +506,7 @@ def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True
 
 
 def push2git(file_path, msg, *, login='Peter-Luk'):
-    from pathlib import os, Path
+#    from pathlib import os, Path
 
     from github import Github
     from dotenv import load_dotenv
