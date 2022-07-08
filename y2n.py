@@ -1,8 +1,23 @@
+import pandas as pd
+import numpy as np
+import sqlalchemy as db
+from tqdm import tqdm
 import pref
+
+B_scale = pref.B_scale
+USHK = pref.USHK
+
+try:
+    from scipy.constants import golden_ratio as gr
+except ImportError:
+    gr = 1.618
+
+from datetime import datetime
+from time import sleep
 from utilities import filepath
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
-pd, np, db, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
+# pd, np, db, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
 
 class Futures(AF, Viewer):

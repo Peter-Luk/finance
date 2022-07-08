@@ -1,5 +1,16 @@
+import pandas as pd
+import sqlalchemy as db
 import pref
-platform, environ, sep, listdir, db, pd, datetime = pref.alchemy
+
+from datetime import datetime
+from pathlib import os, sys
+platform = sys.platform
+environ = os.environ
+sep = os.sep
+listdir = os.listdir
+
+# import pref
+# platform, environ, sep, listdir, db, pd, datetime = pref.alchemy
 from utilities import filepath
 from sqlalchemy.orm import mapper, sessionmaker, declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, text

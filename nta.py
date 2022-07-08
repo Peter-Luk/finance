@@ -1,7 +1,16 @@
+import pandas as pd
+import numpy as np
+import pref
+
+from datetime import datetime
 from utilities import gslice
 from fintools import hsirnd
-import pref
-pd, np, datetime, gr = pref.nta
+
+try:
+    from scipy.constants import golden_ratio as gr
+except ImportError:
+    gr = 1.618
+# pd, np, datetime, gr = pref.nta
 
 
 class ONA(object):

@@ -9,9 +9,10 @@ from pathlib import os, Path, sys, functools
 # from pathlib.os import sep, environ
 # from pathlib.sys import platform, version_info
 # from pathlib.functools import reduce
-from pref import driver
-from pref import public_holiday as ph
+import pref
 
+driver = pref.driver
+ph = pref.public_holiday
 linesep = os.linesep
 platform = sys.platform
 
