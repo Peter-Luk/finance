@@ -1,5 +1,7 @@
 import pandas as pd
 from finaux import np, stepper
+from utilities import PYTHON_PATH, sep
+
 try:
     from scipy.constants import golden_ratio as gr
 except ImportError:
@@ -79,7 +81,7 @@ def gap(boundary, ratio=gr):
     return _
 
 
-def prefer_stock(exchange='TSE', file='pref.yaml'):
+def prefer_stock(exchange='TSE', file=f'{PYTHON_PATH}{sep}pref.yaml'):
     if file.split('.')[-1] == 'yaml':
         import yaml
         with open(file, encoding='utf-8') as f:
@@ -87,7 +89,7 @@ def prefer_stock(exchange='TSE', file='pref.yaml'):
         return _.get('prefer_stock').get(exchange)
 
 
-def get_periods(entity='Equities', file='pref.yaml'):
+def get_periods(entity='Equities', file=f'{PYTHON_PATH}{sep}pref.yaml'):
     if file.split('.')[-1] == 'yaml':
         import yaml
         with open(file, encoding='utf-8') as f:

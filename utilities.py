@@ -15,6 +15,7 @@ driver = pref.driver
 ph = pref.public_holiday
 sep = os.sep
 linesep = os.linesep
+PYTHON_PATH = os.environ.get('PYTHONPATH')
 platform = sys.platform
 reduce = functools.reduce
 
@@ -37,7 +38,7 @@ avail_indicators = ('wma', 'kama', 'ema', 'hv')
 cal_month = [x for x in range(1, 13) if not x % 3]
 
 
-def driver_path(browser, file='pref.yaml'):
+def driver_path(browser, file=f"{PYTHON_PATH}{sep}pref.yaml"):
     import yaml
     with open(file, encoding='utf-8') as f:
         _ = yaml.load(f, Loader=yaml.FullLoader)

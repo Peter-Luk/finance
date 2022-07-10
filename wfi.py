@@ -7,11 +7,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from utilities import PYTHON_PATH, sep
 from y2n import Futures
 from pref import xvsa, source, fields, subject, pytz
 from pt_2 import festi
 
-def alias(subject, file='pref.yaml'):
+def alias(subject, file=f'{PYTHON_PATH}{sep}pref.yaml'):
     import yaml
     with open(file, encoding='utf-8') as f:
         _ = yaml.load(f, Loader=yaml.FullLoader)
