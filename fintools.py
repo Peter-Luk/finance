@@ -1,6 +1,7 @@
+# import re
 import pandas as pd
-from finaux import np, stepper
-from utilities import PYTHON_PATH, sep
+from finance.finaux import np, stepper
+from finance.utilities import PYTHON_PATH, os, sep
 
 try:
     from scipy.constants import golden_ratio as gr
@@ -81,18 +82,30 @@ def gap(boundary, ratio=gr):
     return _
 
 
-def prefer_stock(exchange='TSE', file=f'{PYTHON_PATH}{sep}pref.yaml'):
+def prefer_stock(exchange='TSE', file='pref.yaml'):
     if file.split('.')[-1] == 'yaml':
         import yaml
-        with open(file, encoding='utf-8') as f:
+        fpaths = [os.getcwd()]
+        fpaths.extend(PYTHON_PATH)
+        for fp in fpaths:
+            _f = f'{fp}{sep}{file}'
+            if os.path.isfile(_f):
+                break
+        with open(_f, encoding='utf-8') as f:
             _ = yaml.load(f, Loader=yaml.FullLoader)
         return _.get('prefer_stock').get(exchange)
 
 
-def get_periods(entity='Equities', file=f'{PYTHON_PATH}{sep}pref.yaml'):
+def get_periods(entity='Equities', file='pref.yaml'):
     if file.split('.')[-1] == 'yaml':
         import yaml
-        with open(file, encoding='utf-8') as f:
+        fpaths = [os.getcwd()]
+        fpaths.extend(PYTHON_PATH)
+        for fp in fpaths:
+            _f = f'{fp}{sep}{file}'
+            if os.path.isfile(_f):
+                break
+        with open(_f, encoding='utf-8') as f:
             _ = yaml.load(f, Loader=yaml.FullLoader)
         return _.get('periods').get(entity)
 

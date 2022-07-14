@@ -1,3 +1,4 @@
+import re
 import socket
 from pytz import timezone
 # from scipy.optimize import newton
@@ -9,13 +10,13 @@ from pathlib import os, Path, sys, functools
 # from pathlib.os import sep, environ
 # from pathlib.sys import platform, version_info
 # from pathlib.functools import reduce
-import pref
+import finance.pref as pref
 
 driver = pref.driver
 ph = pref.public_holiday
 sep = os.sep
 linesep = os.linesep
-PYTHON_PATH = os.environ.get('PYTHONPATH')
+PYTHON_PATH = re.split(';|:', os.environ.get('PYTHONPATH'))
 platform = sys.platform
 reduce = functools.reduce
 
@@ -38,9 +39,15 @@ avail_indicators = ('wma', 'kama', 'ema', 'hv')
 cal_month = [x for x in range(1, 13) if not x % 3]
 
 
-def driver_path(browser, file=f"{PYTHON_PATH}{sep}pref.yaml"):
+def driver_path(browser, file="pref.yaml"):
     import yaml
-    with open(file, encoding='utf-8') as f:
+    fpaths = [os.getcwd()]
+    fpaths.extend(PYTHON_PATH)
+    for fp in fpaths:
+        _f = f'{fp}{sep}{file}'
+        if os.path.isfile(_f):
+            break
+    with open(_f, encoding='utf-8') as f:
         _ = yaml.load(f, Loader=yaml.FullLoader)
     __ = _.get('driver').get(browser.capitalize())
     _ = []

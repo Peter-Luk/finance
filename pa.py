@@ -1,6 +1,6 @@
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
-from utilities import filepath
+from finance.utilities import filepath
 import datetime
 import pandas as pd
 

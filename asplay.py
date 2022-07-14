@@ -1,4 +1,5 @@
 import asyncio
+# import re
 import json
 import pathlib
 import time
@@ -10,10 +11,17 @@ import pandas as pd
 import yaml
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
-from utilities import PYTHON_PATH, sep
+from finance.utilities import PYTHON_PATH, os, sep
 
 
-with open(f'{PYTHON_PATH}{sep}pref.yaml', encoding='utf-8') as f:
+fname = 'pref.yaml'
+fpaths = [os.getcwd()]
+fpaths.extend(PYTHON_PATH)
+for fp in fpaths:
+    _f = f'{fp}{os.sep}{fname}'
+    if os.path.isfile(_f):
+        break
+with open(_f, encoding='utf-8') as f:
     _ = yaml.load(f, Loader=yaml.FullLoader)
     _site = _.get('website')
 
@@ -88,4 +96,4 @@ if __name__ == '__main__':
             print(datetime.now().time())
             print(f'Fetching error: {e}')
         print()
-        time.sleep(random.randint(55, 165))
+        time.sleep(random.randint(55, 105))

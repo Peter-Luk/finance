@@ -1,20 +1,26 @@
-import re
+# import re
 import random
 import copy
-from utilities import driver_path, today, ltd, waf, mtf, IP, datetime
+from utilities import PYTHON_PATH, os, sep, driver_path, today, ltd, waf, mtf, IP, datetime
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from utilities import PYTHON_PATH, sep
+# from utilities import os, sep
 from y2n import Futures
 from pref import xvsa, source, fields, subject, pytz
 from pt_2 import festi
 
-def alias(subject, file=f'{PYTHON_PATH}{sep}pref.yaml'):
+def alias(subject, file='pref.yaml'):
     import yaml
-    with open(file, encoding='utf-8') as f:
+    fpaths = [os.getcwd()]
+    fpaths.extend(PYTHON_PATH)
+    for fp in fpaths:
+        _f = f'{fp}{sep}{file}'
+        if os.path.isfile(_f):
+            break
+    with open(_f, encoding='utf-8') as f:
         _ = yaml.load(f, Loader=yaml.FullLoader)
     return _.get('subject').get(subject).get('whatsapp').get('alias')
 
