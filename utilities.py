@@ -7,9 +7,6 @@ from datetime import datetime
 from time import sleep
 from pathlib import posixpath as path
 from pathlib import os, Path, sys, functools
-# from pathlib.os import sep, environ
-# from pathlib.sys import platform, version_info
-# from pathlib.functools import reduce
 import finance.pref as pref
 
 driver = pref.driver
@@ -24,10 +21,6 @@ try:
     from scipy.constants import golden_ratio as gr
 except ImportError:
     gr = 1.618
-
-# import pref
-# sep, environ, path, Path, linesep, platform, version_info, db, gr, \
-#     sleep, datetime, driver, reduce, ph = pref.utils
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
@@ -517,8 +510,6 @@ def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True
 
 
 def push2git(file_path, msg, *, login='Peter-Luk'):
-#    from pathlib import os, Path
-
     from github import Github
     from dotenv import load_dotenv
     if load_dotenv():

@@ -1,4 +1,4 @@
-# import re
+import re
 import random
 import copy
 from utilities import PYTHON_PATH, os, sep, driver_path, today, ltd, waf, mtf, IP, datetime
@@ -7,7 +7,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-# from utilities import os, sep
 from y2n import Futures
 from pref import xvsa, source, fields, subject, pytz
 from pt_2 import festi
@@ -27,7 +26,6 @@ def alias(subject, file='pref.yaml'):
 local_tz = pytz.timezone('Asia/Hong_Kong')
 lf, preference = waf(), 'Firefox'
 milly = alias('Milly Ling')
-# milly = subject['Milly Ling']['whatsapp']['alias']
 fds = [_ for _ in source.keys() if _ not in ['SMS', 'WhatsApp']]
 if today.day == ltd(today.year, today.month):
     lf = waf(1)
