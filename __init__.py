@@ -4,4 +4,4 @@ from .fat import Equity
 from .pa import Person
 # from .utilities import PYTHON_PATH
 
-__all__ = ['fapi', 'asplay']
+__all__ = ['fapi', 'asplay', 'utilities', 'pref']
