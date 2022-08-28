@@ -264,6 +264,7 @@ public_holiday:
 
 
 fields: ['open', 'high', 'low', 'close', 'volume']
+indicators: ['sma', 'ema', 'kama', 'mcad', 'adx', 'rsi', 'sar', 'stc', 'soc', 'atr', 'kc', 'dc', 'apz']
 xvsa:
     class: 'copyable-text selectable-text'
     role: textbox
