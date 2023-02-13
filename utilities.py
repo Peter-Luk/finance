@@ -3,6 +3,9 @@ import socket
 from pytz import timezone
 # from scipy.optimize import newton
 import sqlalchemy as db
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from time import sleep
 from pathlib import posixpath as path
@@ -30,6 +33,20 @@ month_initial = dict(zip(
     [_.upper() for _ in list('fghjkmnquvxz')]))
 avail_indicators = ('wma', 'kama', 'ema', 'hv')
 cal_month = [x for x in range(1, 13) if not x % 3]
+
+
+async def async_fetch(subject_id, db_name='Health'):
+    if db_name == 'Health':
+        from pa import Subject
+    async_engine = create_async_engine(f'sqlite+aiosqlite:///{filepath(db_name)}')
+    async_session = sessionmaker(async_engine, expire_on_commit=False, class_=AsyncSession)
+    async with async_session() as session:
+        async with session.begin():
+            q = select(Subject).where(Subject.subject_id == subject_id)
+            result = await session.execute(q)
+        await session.commit()
+    await async_engine.dispose()
+    return result
 
 
 def driver_path(browser, file="pref.yaml"):
