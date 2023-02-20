@@ -1,8 +1,9 @@
+import datetime
+import pandas as pd
+from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
 from finance.utilities import filepath
-import datetime
-import pandas as pd
 
 Session = sessionmaker()
 Base = declarative_base()
