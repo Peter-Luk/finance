@@ -2,10 +2,11 @@ import asyncio
 import datetime
 import pandas as pd
 from sqlalchemy.future import select
-from sqlalchemy.orm import declarative_base, load_only
+from sqlalchemy.orm import sessionmaker, declarative_base, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
 from finance.utilities import filepath, async_fetch
 
+Session = sessionmaker()
 Base = declarative_base()
 
 def rome(data, field, period=14):
@@ -33,9 +34,17 @@ class Subject(Base):
         return _
 
 
+class Health(Subject):
+    def __init__(self, db):
+        self.engine = create_engine(f'sqlite:///{filepath(db)}')
+        Session.configure(bind=self.engine)
+        self.session =Session()
+
+
 class Person(Subject):
     def __init__(self, subject_id, db_name='Health'):
         self.db_name = db_name
+        self.session = Health(self.db_name).session
         self.subject_id = subject_id
         self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
 
