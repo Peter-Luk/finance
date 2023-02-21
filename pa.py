@@ -38,15 +38,15 @@ class Health(Subject):
     def __init__(self, db):
         self.engine = create_engine(f'sqlite:///{filepath(db)}')
         Session.configure(bind=self.engine)
-        self.session =Session()
+        self.session = Session()
 
 
 class Person(Subject):
     def __init__(self, subject_id, db_name='Health'):
         self.db_name = db_name
-        self.session = Health(self.db_name).session
         self.subject_id = subject_id
-        self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
+        self.session = Health(self.db_name).session
+        self.query  = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
 
     def __call__(self):
         format = '%Y-%m-%d %H:%M:%S'
