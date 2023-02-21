@@ -1,9 +1,10 @@
+import asyncio
 import datetime
 import pandas as pd
 from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker, declarative_base, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
-from finance.utilities import filepath
+from finance.utilities import filepath, async_fetch
 
 Session = sessionmaker()
 Base = declarative_base()
@@ -31,32 +32,51 @@ class Subject(Base):
         _ += f"sys={self.sys}, dia={self.dia}, pulse={self.pulse}, "
         _ += f"remarks='{self.remarks}')>"
         return _
+# 
+# 
+# class Health(Subject):
+#     def __init__(self, db):
+#         self.engine = create_engine(f"sqlite:///{filepath(db)}")
+#         Session.configure(bind=self.engine)
+#         self.session = Session()
+#         self.query = self.session.query(Subject)
 
 
-class Health(Subject):
-    def __init__(self, db='Health'):
-        self.engine = create_engine(f"sqlite:///{filepath(db)}")
-        Session.configure(bind=self.engine)
-        self.session = Session()
-        self.query = self.session.query(Subject)
-
-
-class Person(Health):
-    def __init__(self, subject_id):
-        self.session = Health('Health').session
+# class Person(Health):
+class Person(Subject):
+    def __init__(self, subject_id, db_name='Health'):
+        self.db_name = db_name
+#         self.session = Health(self.db_name).session
         self.subject_id = subject_id
-        self.query = self.session.query(Subject).filter(Subject.subject_id==self.subject_id)
+        self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
+#         self.query = self.session.query(Subject).filter(Subject.subject_id==self.subject_id)
 
     def __call__(self):
         format = '%Y-%m-%d %H:%M:%S'
         fields = ['date', 'time', 'sys', 'dia', 'pulse']
         cols = ['date', 'time']
-        _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[cols])
+#         _ = pd.read_sql(str(self.query.options(load_only(*fields))), self.session.bind, parse_dates=[cols])
+
+##        _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[cols])
+#         fields = ['date', 'time', 'sys', 'dia', 'pulse']
+# #         cols = ['date', 'time']
+#         _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[cols])
+#         query = select(Subject).options(load_only(*fields)) \
+#                     .where(Subject.subject_id == subject_id)
+        data = asyncio.run(async_fetch(self.query.options(load_only(*fields)), self.db_name))
+        holder = data.scalars().all()
+        date_c = [_.date for _ in holder]
+        time_c = [_.time for _ in holder]
+        sys_c = [_.sys for _ in holder]
+        dia_c = [_.dia for _ in holder]
+        pulse_c = [_.pulse for _ in holder]
+        _ = pd.DataFrame({'date':date_c, 'time':time_c, 'sys':sys_c, 'dia':dia_c, 'pulse':pulse_c})
         _ = _.convert_dtypes()
         _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
         _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=format)
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
-        _ = _.drop(['id', 'date','time', 'Datetime'], axis=1)
+#         _ = _.drop(['id', 'date','time', 'Datetime'], axis=1)
+        _ = _.drop(['date', 'time', 'Datetime'], axis=1)
         return _
 
     def update(self, values, criteria):
