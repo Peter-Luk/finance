@@ -2,11 +2,10 @@ import asyncio
 import datetime
 import pandas as pd
 from sqlalchemy.future import select
-from sqlalchemy.orm import sessionmaker, declarative_base, load_only
+from sqlalchemy.orm import declarative_base, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
 from finance.utilities import filepath, async_fetch
 
-Session = sessionmaker()
 Base = declarative_base()
 
 def rome(data, field, period=14):
@@ -32,37 +31,18 @@ class Subject(Base):
         _ += f"sys={self.sys}, dia={self.dia}, pulse={self.pulse}, "
         _ += f"remarks='{self.remarks}')>"
         return _
-# 
-# 
-# class Health(Subject):
-#     def __init__(self, db):
-#         self.engine = create_engine(f"sqlite:///{filepath(db)}")
-#         Session.configure(bind=self.engine)
-#         self.session = Session()
-#         self.query = self.session.query(Subject)
 
 
-# class Person(Health):
 class Person(Subject):
     def __init__(self, subject_id, db_name='Health'):
         self.db_name = db_name
-#         self.session = Health(self.db_name).session
         self.subject_id = subject_id
         self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
-#         self.query = self.session.query(Subject).filter(Subject.subject_id==self.subject_id)
 
     def __call__(self):
         format = '%Y-%m-%d %H:%M:%S'
         fields = ['date', 'time', 'sys', 'dia', 'pulse']
-        cols = ['date', 'time']
-#         _ = pd.read_sql(str(self.query.options(load_only(*fields))), self.session.bind, parse_dates=[cols])
-
-##        _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[cols])
-#         fields = ['date', 'time', 'sys', 'dia', 'pulse']
-# #         cols = ['date', 'time']
-#         _ = pd.read_sql(self.query.options(load_only(*fields)).statement, self.session.bind, parse_dates=[cols])
-#         query = select(Subject).options(load_only(*fields)) \
-#                     .where(Subject.subject_id == subject_id)
+#         cols = ['date', 'time']
         data = asyncio.run(async_fetch(self.query.options(load_only(*fields)), self.db_name))
         holder = data.scalars().all()
         date_c = [_.date for _ in holder]
@@ -75,23 +55,12 @@ class Person(Subject):
         _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
         _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=format)
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
-#         _ = _.drop(['id', 'date','time', 'Datetime'], axis=1)
         _ = _.drop(['date', 'time', 'Datetime'], axis=1)
         return _
 
     def update(self, values, criteria):
         q = self.query
         if 'id' in criteria.keys():
-            if isinstance(criteria['id'], int):
-                q = q.filter(Subject.id == criteria['id'])
-        if 'date' in criteria.keys():
-            if isinstance(criteria['date'], (datetime.date, str)):
-                q = q.filter(Subject.date == criteria['date'])
-        if 'time' in criteria.keys() and 'lesser' in criteria.keys():
-            if criteria['lesser']:
-                q = q.filter(Subject.time < criteria['time'])
-        if 'time' in criteria.keys() and 'greater' in criteria.keys():
-            if criteria['greater']:
                 q = q.filter(Subject.time < criteria['time'])
         if 'time' in criteria.keys() and 'lesser' not in criteria.keys() and 'greater' not in criteria.keys():
             q = q.filter(Subject.time == criteria['time'])
