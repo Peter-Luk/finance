@@ -52,7 +52,7 @@ class Person(Subject):
         format = '%Y-%m-%d %H:%M:%S'
         fields = ['date', 'time', 'sys', 'dia', 'pulse']
 #         cols = ['date', 'time']
-        data = asyncio.run(async_fetch(self.query.options(load_only(*fields)), self.db_name))
+        data = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in fields])), self.db_name))
         holder = data.scalars().all()
         date_c = [_.date for _ in holder]
         time_c = [_.time for _ in holder]
