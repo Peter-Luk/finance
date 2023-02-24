@@ -52,14 +52,10 @@ class Person(Subject):
         format = '%Y-%m-%d %H:%M:%S'
         fields = ['date', 'time', 'sys', 'dia', 'pulse']
 #         cols = ['date', 'time']
-        data = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in fields])), self.db_name))
-        holder = data.scalars().all()
-        date_c = [_.date for _ in holder]
-        time_c = [_.time for _ in holder]
-        sys_c = [_.sys for _ in holder]
-        dia_c = [_.dia for _ in holder]
-        pulse_c = [_.pulse for _ in holder]
-        _ = pd.DataFrame({'date':date_c, 'time':time_c, 'sys':sys_c, 'dia':dia_c, 'pulse':pulse_c})
+        data = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in fields])), self.db_name)).scalars().all()
+        _ = pd.DataFrame()
+        for f in fields:
+            exec(f"_['{f}'] = [__.{f} for __ in data]")
         _ = _.convert_dtypes()
         _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
         _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=format)
