@@ -9,9 +9,11 @@ from finance.utilities import filepath, async_fetch
 Session = sessionmaker()
 Base = declarative_base()
 
+
 def rome(data, field, period=14):
     if isinstance(data, pd.core.frame.DataFrame) and field in data.columns:
         return data[field].rolling(period).mean()
+
 
 class Subject(Base):
     __tablename__ = 'records'
@@ -46,19 +48,19 @@ class Person(Subject):
         self.db_name = db_name
         self.subject_id = subject_id
         self.session = Health(self.db_name).session
-        self.query  = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
+        self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
 
     def __call__(self):
-        format = '%Y-%m-%d %H:%M:%S'
+        date_format = '%Y-%m-%d %H:%M:%S'
         fields = ['date', 'time', 'sys', 'dia', 'pulse']
 #         cols = ['date', 'time']
-        data = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in fields])), self.db_name)).scalars().all()
+        holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in fields])), self.db_name)).scalars().all()
         _ = pd.DataFrame()
-        for f in fields:
-            exec(f"_['{f}'] = [__.{f} for __ in data]")
+        for field in fields:
+            exec(f"_['{field}'] = [__.{field} for __ in holder]")
         _ = _.convert_dtypes()
         _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
-        _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=format)
+        _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=date_format)
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
         _ = _.drop(['date', 'time', 'Datetime'], axis=1)
         return _
