@@ -146,9 +146,7 @@ if __name__ == "__main__":
             sj.dia = input("Diastolic: ")
             sj.pulse = input("Pulse: ")
             rmk = input(f"Remark (default: {dk}): ")
-            if rmk == '':
-                rmk = dk
-            sj.remarks = rmk
+            sj.remarks = dk if rmk == '' else rmk
             _modify_at = datetime.datetime.now()
             sj.date = _modify_at.date()
             sj.time = _modify_at.time()
