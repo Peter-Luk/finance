@@ -44,22 +44,25 @@ class Person(Subject):
         self.db_name = db_name
         self.subject_id = subject_id
         self.session = Health(self.db_name).session
-        self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
+        self.__fields = Subject._data_fields
+        self.__fields.extend(['subject_id', 'date'])
+        self.query = select(Subject).options(load_only(*[eval(f'Subject.{_}') for _ in self.__fields])).where(Subject.subject_id == self.subject_id)
+
+        # self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
 
     def __call__(self):
         date_format = '%Y-%m-%d %H:%M:%S'
-        fields = Subject._data_fields
         # fields = ['date', 'time', 'sys', 'dia', 'pulse']
         # cols = ['date', 'time']
-        holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in fields])), self.db_name)).scalars().all()
+        holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name)).scalars().all()
         _ = pd.DataFrame()
-        for field in fields:
+        for field in Subject._data_fields:
             exec(f"_['{field}'] = [__.{field} for __ in holder]")
         _ = _.convert_dtypes()
         _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
         _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=date_format)
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
-        _ = _.drop(['date', 'time', 'Datetime'], axis=1)
+        _ = _.drop(['subject_id', 'date', 'time', 'Datetime'], axis=1)
         return _
 
     def update(self, values, criteria):
