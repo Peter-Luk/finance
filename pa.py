@@ -2,17 +2,34 @@ import asyncio
 import datetime
 import pandas as pd
 from sqlalchemy.future import select
-from sqlalchemy.orm import sessionmaker, load_only
-from sqlalchemy import create_engine, text
+from sqlalchemy.orm import declarative_base, sessionmaker, load_only
+from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
 from finance.utilities import filepath, async_fetch
-from ormlib import Subject
+# from ormlib import Subject
 
 Session = sessionmaker()
+Base = declarative_base()
 
 
 def rome(data, field, period=14):
     if isinstance(data, pd.core.frame.DataFrame) and field in data.columns:
         return data[field].rolling(period).mean()
+
+
+class Subject(Base):
+    __table_args__ = {'extend_existing': True}
+    __tablename__ = 'records'
+    _data_fields = ['date', 'time', 'sys', 'dia', 'pulse']
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    instrument_id = Column(Integer, default=1, server_default=text('1'))
+    subject_id = Column(Integer)
+    _created_at = datetime.datetime.now()
+    date = Column(Date, default=_created_at.date(), server_default=text(str(_created_at.date())))
+    time = Column(Time, default=_created_at.time(), server_default=text(str(_created_at.time())))
+    sys = Column(Integer)
+    dia = Column(Integer)
+    pulse = Column(Integer)
+    remarks = Column(String)
 
 
 class Health(Subject):
