@@ -2,38 +2,17 @@ import asyncio
 import datetime
 import pandas as pd
 from sqlalchemy.future import select
-from sqlalchemy.orm import sessionmaker, declarative_base, load_only
-from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
+from sqlalchemy.orm import sessionmaker, load_only
+from sqlalchemy import create_engine, text
 from finance.utilities import filepath, async_fetch
+from ormlib import Subject
 
 Session = sessionmaker()
-Base = declarative_base()
 
 
 def rome(data, field, period=14):
     if isinstance(data, pd.core.frame.DataFrame) and field in data.columns:
         return data[field].rolling(period).mean()
-
-
-class Subject(Base):
-    __tablename__ = 'records'
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    instrument_id = Column(Integer, default=1, server_default=text('1'))
-    subject_id = Column(Integer)
-    _created_at = datetime.datetime.now()
-    date = Column(Date, default=_created_at.date(), server_default=text(str(_created_at.date())))
-    time = Column(Time, default=_created_at.time(), server_default=text(str(_created_at.time())))
-    sys = Column(Integer)
-    dia = Column(Integer)
-    pulse = Column(Integer)
-    remarks = Column(String)
-
-    def __repr__(self):
-        _ = f"<Subject(instrument_id={self.instrument_id}, "
-        _ += f"subject_id={self.subject_id}, date='{self.date}', time='{self.time}', "
-        _ += f"sys={self.sys}, dia={self.dia}, pulse={self.pulse}, "
-        _ += f"remarks='{self.remarks}')>"
-        return _
 
 
 class Health(Subject):
@@ -52,8 +31,9 @@ class Person(Subject):
 
     def __call__(self):
         date_format = '%Y-%m-%d %H:%M:%S'
-        fields = ['date', 'time', 'sys', 'dia', 'pulse']
-#         cols = ['date', 'time']
+        fields = Subject._data_fields
+        # fields = ['date', 'time', 'sys', 'dia', 'pulse']
+        # cols = ['date', 'time']
         holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in fields])), self.db_name)).scalars().all()
         _ = pd.DataFrame()
         for field in fields:
