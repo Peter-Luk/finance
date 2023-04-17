@@ -3,6 +3,8 @@ import aiohttp
 import asyncio
 import pandas as pd
 from io import StringIO
+from typing import Any
+from utilities import getcode
 
 YAHOO_URL = 'https://query1.finance.yahoo.com/v7/finance/download'
 # ticker = 'BTC-USD'
@@ -24,8 +26,9 @@ params = {
 #         return await response.text()
 #
 #
-async def get_data(ticker:int=9988):
-    # url = f'{YAHOO_URL}/{ticker}?'
+async def get_data(ticker: Any = 9988,
+        boarse: str = 'HKEx') -> pd.DataFrame:
+    url = f'{YAHOO_URL}/{getcode(ticker, boarse)}?'
 
 
     async def fetch(session, url, params, headers):
@@ -34,7 +37,7 @@ async def get_data(ticker:int=9988):
 
 
     async with aiohttp.ClientSession() as session:
-        url = f'{YAHOO_URL}/{ticker:04d}.HK?'
+        # url = f'{YAHOO_URL}/{ticker:04d}.HK?'
         response = await fetch(session, url, params, headers)
         df = pd.read_csv(StringIO(response))
         return df
