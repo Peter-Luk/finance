@@ -23,6 +23,7 @@ try:
     from scipy.constants import golden_ratio as gr
 except ImportError:
     gr = 1.618
+from typing import Any
 
 today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
@@ -448,8 +449,10 @@ class IP():
     def __str__(self):
         return self.address
 
-def getcode(code, boarse='HKEx', type='yahoo'):
-    if type == 'yahoo':
+def getcode(code: Any,
+        boarse: str = 'HKEx',
+        source: str = 'yahoo') -> str:
+    if source.lower() == 'yahoo':
         if boarse == 'HKEx' and isinstance(code, int):
             return f"{code:04}.HK"
         if boarse == 'SHE' and isinstance(code, int):
