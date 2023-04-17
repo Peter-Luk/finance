@@ -82,11 +82,11 @@ supported_indicators = yaml_get('indicators', YAML_PREFERANCE)
 @asyncinit
 class Equity(FOA):
     """ base object (trial) """
-    async def __init__(self, code: int) -> Coroutine:
+    async def __init__(self, code: int, boarse: str = 'HKEx') -> Coroutine:
         today = datetime.date.today()
         start = datetime.date(today.year - random.choice(range(5, 16)), 1, 1)
         self.code = code
-        if code in STORED:
+        if boarse == 'HKEx' and code in STORED:
             # self.code = code
             self.__data = pd.DataFrame(
                     await self.fetch(start),
@@ -94,7 +94,7 @@ class Equity(FOA):
                     )
             self.__data.set_index('date', inplace=True)
         else:
-            self.__data = await get_data(code)
+            self.__data = await get_data(code, boarse)
             self.__data.drop('Adj Close', axis=1, inplace=True)
             self.__data.columns = [_.lower() for _ in self.__data.columns]
             self.__data.set_index('date', inplace=True)
