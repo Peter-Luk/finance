@@ -114,58 +114,57 @@ class Equity(FOA):
                 Record.date >= start)
         return await async_fetch(sql_stmt, DB_NAME)
 
-    def sma(self, param: int = param.get('simple'), data: Any = None):
+    def sma(self, param: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
         """ sma """
         return super().sma(param, data).astype('float64')
 
-    def ema(self, param: int = param.get('simple'), data: Any = None):
+    def ema(self, param: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
         """ ema """
         return super().ema(param, data).astype('float64')
 
-    def atr(self, param: int = param.get('atr'), data: Any = None):
+    def atr(self, param: int = param.get('atr'), data: Any = None) -> pd.DataFrame:
         """ atr """
         return super().atr(param, data).astype('float64')
 
-    def kama(self, param: Dict = param.get('kama'), data: Any = None):
-        """ kama """
-        return super().kama(param, data).astype('float64')
+    def kama(self, param: Dict = param.get('kama'), data: Any = None) -> pd.DataFrame:
+       return super().kama(param, data).astype('float64')
 
-    def adx(self, param: int = param.get('adx'), astype: str = 'float64'):
+    def adx(self, param: int = param.get('adx'), astype: str = 'float64') -> pd.DataFrame:
         """ adx """
         return super().adx(param).astype(astype)
 
-    def apz(self, param: int = param.get('apz'), astype: str = 'float64'):
+    def apz(self, param: int = param.get('apz'), astype: str = 'float64') -> pd.DataFrame:
         """ apz """
         return super().apz(param).astype(astype)
 
-    def dc(self, param: int = param.get('dc'), astype: str = 'float64'):
+    def dc(self, param: int = param.get('dc'), astype: str = 'float64') -> pd.DataFrame:
         """ dc """
         return super().dc(param).astype(astype)
 
-    def kc(self, param: Dict = param.get('kc'), astype: str = 'float64'):
+    def kc(self, param: Dict = param.get('kc'), astype: str = 'float64') -> pd.DataFrame:
         """ kc """
         return super().kc(param).astype(astype)
 
-    def macd(self, param: Dict = param.get('macd'), astype: str = 'float64'):
+    def macd(self, param: Dict = param.get('macd'), astype: str = 'float64') -> pd.DataFrame:
         """ macd """
         return super().macd(param).astype(astype)
 
-    def rsi(self, param: int = param.get('rsi'), astype: str = 'float64'):
+    def rsi(self, param: int = param.get('rsi'), astype: str = 'float64') -> pd.DataFrame:
         """ rsi """
         return super().rsi(param).astype(astype)
 
-    def sar(self, param: Dict = param.get('sar'), astype: str = 'float64'):
+    def sar(self, param: Dict = param.get('sar'), astype: str = 'float64') -> pd.DataFrame:
         """ ta-lib sar """
         return super().sar(
                 param.get('acceleration'),
                 param.get('maximum')
                 ).astype(astype)
 
-    def stc(self, param: Dict = param.get('stc'), astype: str = 'float64'):
+    def stc(self, param: Dict = param.get('stc'), astype: str = 'float64') -> pd.DataFrame:
         """ stc """
         return super().stc(param).astype(astype)
 
-    def soc(self, param: Dict = param.get('soc'), astype: str = 'float64'):
+    def soc(self, param: Dict = param.get('soc'), astype: str = 'float64') -> pd.DataFrame:
         """ soc """
         return super().soc(param).astype(astype)
 
