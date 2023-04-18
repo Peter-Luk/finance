@@ -2,7 +2,7 @@
 import asyncio
 import datetime
 import random
-from typing import Any, Coroutine, Iterable, List, Dict
+from typing import Any, Coroutine, Iterable, List, Dict, Final
 import pandas as pd
 # import yfinance as yf
 from tqdm import tqdm
@@ -71,7 +71,7 @@ async def stored_entities() -> List:
     entities = [_[0] for _ in await async_fetch(sql_stmt, DB_NAME) if _[0] not in yaml_db_get('exclude')]
     return entities
 
-STORED = asyncio.run(stored_entities())
+STORED: Final[List] = asyncio.run(stored_entities())
 fields = ['date']
 fields.extend(yaml_get('fields', YAML_PREFERANCE))
 data_fields = [eval(f"Record.{_}") for _ in fields]
