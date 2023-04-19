@@ -95,9 +95,6 @@ class Equity(FOA):
             self.__data.set_index('date', inplace=True)
         else:
             self.__data = await get_data(code, boarse)
-            self.__data.drop('Adj Close', axis=1, inplace=True)
-            self.__data.columns = [_.lower() for _ in self.__data.columns]
-            self.__data.set_index('date', inplace=True)
             # self.__data = yf.download(f'{self.code:04d}.HK', period='max', group_by='ticker')
             # self.__data.drop('Adj Close', axis=1, inplace=True)
             # self.__data.columns = [_.lower() for _ in self.__data.columns]
