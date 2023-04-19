@@ -15,7 +15,7 @@ from finance.fintools import FOA
 from finance.utilities import filepath, PYTHON_PATH, os, sep, async_fetch
 from asyahoo import get_data
 
-YAML_PREFERANCE = 'pref.yaml'
+YAML_PREFERENCE: Final[str] = 'pref.yaml'
 Base = declarative_base()
 
 
@@ -37,14 +37,14 @@ def yaml_get(field: str, file: str) -> Any:
 def yaml_db_get(
         field: str,
         entity: str = 'Equities',
-        file: str = YAML_PREFERANCE) -> Any:
+        file: str = YAML_PREFERENCE) -> Any:
     """ yaml db config reader """
     _ = yaml_get('db', file)
     return _.get(entity).get(field)
 
 
-DB_NAME = yaml_db_get('name')
-DB_PATH = filepath(DB_NAME)
+DB_NAME: Final[str] = yaml_db_get('name')
+DB_PATH: Final[str] = filepath(DB_NAME)
 
 
 class Record(Base):
@@ -73,10 +73,10 @@ async def stored_entities() -> List:
 
 STORED: Final[List] = asyncio.run(stored_entities())
 fields = ['date']
-fields.extend(yaml_get('fields', YAML_PREFERANCE))
+fields.extend(yaml_get('fields', YAML_PREFERENCE))
 data_fields = [eval(f"Record.{_}") for _ in fields]
-param = yaml_get('periods', YAML_PREFERANCE).get('Equities')
-supported_indicators = yaml_get('indicators', YAML_PREFERANCE)
+param = yaml_get('periods', YAML_PREFERENCE).get('Equities')
+INDICATORS: Final[List] = yaml_get('indicators', YAML_PREFERENCE)
 
 
 @asyncinit
@@ -180,5 +180,5 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
 
     result = await atq.gather(*ent_list)
     res_list = [eval(f"_.{indicator}()") for _ in tqdm(result)] \
-        if (indicator in supported_indicators) else result
+        if (indicator in INDICATORS) else result
     return zip(name_list, res_list)
