@@ -100,7 +100,7 @@ class Equity(FOA):
             # self.__data.columns = [_.lower() for _ in self.__data.columns]
             # self.__data.index.name = self.__data.index.name.lower()
 
-        self.change = self.__data.close.diff(1)[-1] / self.__data.close[-2]
+        self.change = self.__data.close.pct_change()[-1] * 100
         self.date = self.__data.index[-1]
         self.close = self.__data.close[-1]
         super().__init__(self.__data, float)
