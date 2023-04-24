@@ -100,6 +100,7 @@ class Equity(FOA):
             # self.__data.columns = [_.lower() for _ in self.__data.columns]
             # self.__data.index.name = self.__data.index.name.lower()
 
+        self.__data.index = self.__data.index.astype('datetime64[ns]')
         self.change = self.__data.close.pct_change()[-1] * 100
         self.date = self.__data.index[-1]
         self.close = self.__data.close[-1]
