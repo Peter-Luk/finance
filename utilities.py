@@ -541,3 +541,15 @@ def push2git(file_path, msg, *, login='Peter-Luk'):
                     req_repo = user.get_repo(repo)
                     contents = req_repo.get_contents(filename, ref="test")
                     req_repo.update_file(contents.path, msg, filename, contents.sha, branch="test")
+
+
+class conditional_decorator(object):
+    def __init__(self, dec, condition):
+        self.decorator = dec
+        self.condition = condition
+
+    def __call__(self, func):
+        if not self.condition:
+            # Return the function unchanged, not decorated.
+            return func
+        return self.decorator(func)
