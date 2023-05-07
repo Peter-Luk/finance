@@ -3,7 +3,7 @@ import asyncio
 import datetime
 import random
 from typing import Any, Coroutine, Iterable, List, Dict, Final
-import pandas as pd
+# import pandas as pd
 # import yfinance as yf
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atq
@@ -11,8 +11,9 @@ from asyncinit import asyncinit
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
-from finance.fintools import FOA
-from finance.utilities import filepath, PYTHON_PATH, os, sep, async_fetch
+from finance.fintools import FOA, pd, np
+from finance.utilities import filepath, PYTHON_PATH, os, sep, async_fetch, gslice
+from finance.finaux import roundup
 from asyahoo import get_data
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
@@ -165,6 +166,42 @@ class Equity(FOA):
     def soc(self, param: Dict = param.get('soc'), astype: str = 'float64') -> pd.DataFrame:
         """ soc """
         return super().soc(param).astype(astype)
+
+    def optinum(self, date=None, base=None, delta=None):
+        if date is None:
+            date = self.date
+        if base is None:
+            base = self.__data
+        if delta is None:
+            delta = self.atr(self.periods['atr'])
+
+        def _patr(raw, date):
+            lc, lr = raw.close.loc[date], delta.loc[date]
+            _ = np.arange(lc - lr, lc + lr, lr).tolist()
+            _.extend(gslice([lc + lr, lc]))
+            _.extend(gslice([lc, lc - lr]))
+            return _
+
+        def _pgap(pivot, raw):
+            gap = pivot - raw.close.iloc[-1]
+            _ = gslice([pivot + gap, pivot])
+            _.extend(gslice([pivot, pivot - gap]))
+            return _
+        hdr = []
+        [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
+        hdr.sort()
+
+        kc = self.kc(self.periods['kc']).loc[date]
+        buy = [round(_, 2) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+        sell = [round(_, 2) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
+        if self.exchange == 'TSE':
+            buy = [round(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+            sell = [round(_) for _ in hdr if _ > kc.Upper and _> self.__data.close.loc[date]]
+        if self.exchange == 'HKEx':
+            buy = [roundup(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+            sell = [roundup(_) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
+
+        return {'Buy': pd.Series(buy).unique().tolist() if buy else buy, 'Sell': pd.Series(sell).unique().tolist() if sell else sell}
 
 
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
