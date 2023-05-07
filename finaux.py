@@ -12,7 +12,7 @@ try:
 except Exception:
     use_numba = False
 
-@conditional_decorator(jit, use_numba)
+@conditional_decorator(jit(nopython=True), use_numba)
 def stepper(period, x):
     y = np.empty(len(x))
     y[:] = np.nan
@@ -37,7 +37,7 @@ def stepper(period, x):
     return y
 """
 
-@conditional_decorator(jit, use_numba)
+@conditional_decorator(jit(nopython=True), use_numba)
 def roundup(value):
     if np.isnan(value) or not value > 0:
         hdr = np.nan
