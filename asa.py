@@ -89,7 +89,6 @@ class Equity(FOA):
         self.code = code
         if boarse == 'HKEx':
             if code in STORED and static:
-            # self.code = code
                 self.__data = pd.DataFrame(
                         await self.fetch(start),
                         columns=fields
@@ -99,10 +98,6 @@ class Equity(FOA):
                 self.__data = await get_data(code, boarse)
         else:
             self.__data = await get_data(code, boarse)
-            # self.__data = yf.download(f'{self.code:04d}.HK', period='max', group_by='ticker')
-            # self.__data.drop('Adj Close', axis=1, inplace=True)
-            # self.__data.columns = [_.lower() for _ in self.__data.columns]
-            # self.__data.index.name = self.__data.index.name.lower()
 
         self.__data.index = self.__data.index.astype('datetime64[ns]')
         self.change = self.__data.close.pct_change()[-1] * 100
