@@ -83,17 +83,20 @@ INDICATORS: Final[List] = yaml_get('indicators', YAML_PREFERENCE)
 @asyncinit
 class Equity(FOA):
     """ base object (trial) """
-    async def __init__(self, code: int, boarse: str = 'HKEx') -> Coroutine:
+    async def __init__(self, code: int, boarse: str = 'HKEx', static: bool = True) -> Coroutine:
         today = datetime.date.today()
         start = datetime.date(today.year - random.choice(range(5, 16)), 1, 1)
         self.code = code
-        if boarse == 'HKEx' and code in STORED:
+        if boarse == 'HKEx':
+            if code in STORED and static:
             # self.code = code
-            self.__data = pd.DataFrame(
-                    await self.fetch(start),
-                    columns=fields
-                    )
-            self.__data.set_index('date', inplace=True)
+                self.__data = pd.DataFrame(
+                        await self.fetch(start),
+                        columns=fields
+                        )
+                self.__data.set_index('date', inplace=True)
+            else:
+                self.__data = await get_data(code, boarse)
         else:
             self.__data = await get_data(code, boarse)
             # self.__data = yf.download(f'{self.code:04d}.HK', period='max', group_by='ticker')
