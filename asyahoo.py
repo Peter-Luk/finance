@@ -39,15 +39,12 @@ async def get_data(ticker: Any = 9988,
 
 
     async with aiohttp.ClientSession() as session:
-        try:
-            response = await fetch(session, url, params, headers)
-            df = pd.read_csv(StringIO(response))
-            df.drop('Adj Close', axis=1, inplace=True)
-            df.columns = [_.lower() for _ in df.columns]
-            df.set_index('date', inplace=True)
-            return df
-        except StockCodeError:
-            pass
+        response = await fetch(session, url, params, headers)
+        df = pd.read_csv(StringIO(response))
+        df.drop('Adj Close', axis=1, inplace=True)
+        df.columns = [_.lower() for _ in df.columns]
+        df.set_index('date', inplace=True)
+        return df
 
 if __name__ == "__main__":
     print(asyncio.run(get_data()))
