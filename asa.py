@@ -11,7 +11,7 @@ from asyncinit import asyncinit
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
-from finance.fintools import FOA, pd, np
+from finance.fintools import FOA, pd, np, get_periods
 from finance.utilities import filepath, PYTHON_PATH, os, sep, async_fetch, gslice
 from finance.finaux import roundup
 from asyahoo import get_data
@@ -86,6 +86,7 @@ class Equity(FOA):
     async def __init__(self, code: int, boarse: str = 'HKEx', static: bool = True) -> Coroutine:
         today = datetime.date.today()
         start = datetime.date(today.year - random.choice(range(5, 16)), 1, 1)
+        self.periods = get_periods()
         self.code = code
         if boarse == 'HKEx':
             if code in STORED and static:
