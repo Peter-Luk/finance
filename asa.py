@@ -87,8 +87,9 @@ class Equity(FOA):
         today = datetime.date.today()
         start = datetime.date(today.year - random.choice(range(5, 16)), 1, 1)
         self.periods = get_periods()
+        self.exchange = boarse
         self.code = code
-        if boarse == 'HKEx':
+        if self.exchange == 'HKEx':
             if code in STORED and static:
                 self.__data = pd.DataFrame(
                         await self.fetch(start),
@@ -96,9 +97,9 @@ class Equity(FOA):
                         )
                 self.__data.set_index('date', inplace=True)
             else:
-                self.__data = await get_data(code, boarse)
+                self.__data = await get_data(code, self.exchange)
         else:
-            self.__data = await get_data(code, boarse)
+            self.__data = await get_data(code, self.exchange)
 
         self.__data.index = self.__data.index.astype('datetime64[ns]')
         self.change = self.__data.close.pct_change()[-1] * 100
