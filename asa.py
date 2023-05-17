@@ -88,11 +88,6 @@ class Equity(FOA):
         self.exchange = boarse
         self.code = code
         await self.compose(static)
-        self.__data.index = self.__data.index.astype('datetime64[ns]')
-        self.change = self.__data.close.pct_change()[-1] * 100
-        self.date = self.__data.index[-1]
-        self.close = self.__data.close[-1]
-        super().__init__(self.__data, float)
 
     async def compose(self, static: bool) -> pd.DataFrame:
         if self.exchange == 'HKEx':
@@ -111,6 +106,11 @@ class Equity(FOA):
                 self.__data = await get_data(self.code, self.exchange)
         else:
             self.__data = await get_data(self.code, self.exchange)
+        self.__data.index = self.__data.index.astype('datetime64[ns]')
+        self.change = self.__data.close.pct_change()[-1] * 100
+        self.date = self.__data.index[-1]
+        self.close = self.__data.close[-1]
+        super().__init__(self.__data, float)
 
     async def fetch(self, start: datetime.date) -> List:
         """ fetch records from local db """
