@@ -87,24 +87,6 @@ class Equity(FOA):
         self.periods = get_periods()
         self.exchange = boarse
         self.code = code
-        """
-        today = datetime.date.today()
-        start = datetime.date(today.year - random.choice(range(5, 16)), 1, 1)
-        if self.exchange == 'HKEx':
-            if static:
-                if self.code in STORED:
-                    self.__data = pd.DataFrame(
-                            await self.fetch(start),
-                            columns=fields
-                            )
-                    self.__data.set_index('date', inplace=True)
-                else:
-                    self.__data = await get_data(code, self.exchange)
-            else:
-                self.__data = await get_data(code, self.exchange)
-        else:
-            self.__data = await get_data(code, self.exchange)
-        """
         await self.compose(static)
         self.__data.index = self.__data.index.astype('datetime64[ns]')
         self.change = self.__data.close.pct_change()[-1] * 100
