@@ -84,28 +84,51 @@ INDICATORS: Final[List] = yaml_get('indicators', YAML_PREFERENCE)
 class Equity(FOA):
     """ base object (trial) """
     async def __init__(self, code: int, boarse: str = 'HKEx', static: bool = True) -> Coroutine:
-        today = datetime.date.today()
-        start = datetime.date(today.year - random.choice(range(5, 16)), 1, 1)
         self.periods = get_periods()
         self.exchange = boarse
         self.code = code
+        """
+        today = datetime.date.today()
+        start = datetime.date(today.year - random.choice(range(5, 16)), 1, 1)
         if self.exchange == 'HKEx':
-            if code in STORED and static:
-                self.__data = pd.DataFrame(
-                        await self.fetch(start),
-                        columns=fields
-                        )
-                self.__data.set_index('date', inplace=True)
+            if static:
+                if self.code in STORED:
+                    self.__data = pd.DataFrame(
+                            await self.fetch(start),
+                            columns=fields
+                            )
+                    self.__data.set_index('date', inplace=True)
+                else:
+                    self.__data = await get_data(code, self.exchange)
             else:
                 self.__data = await get_data(code, self.exchange)
         else:
             self.__data = await get_data(code, self.exchange)
-
+        """
+        await self.compose(static)
         self.__data.index = self.__data.index.astype('datetime64[ns]')
         self.change = self.__data.close.pct_change()[-1] * 100
         self.date = self.__data.index[-1]
         self.close = self.__data.close[-1]
         super().__init__(self.__data, float)
+
+    async def compose(self, static: bool) -> pd.DataFrame:
+        if self.exchange == 'HKEx':
+            if static:
+                if self.code in STORED:
+                    today = datetime.date.today()
+                    start = datetime.date(today.year - random.choice(range(5, 16)), 1, 1)
+                    self.__data = pd.DataFrame(
+                            await self.fetch(start),
+                            columns=fields
+                            )
+                    self.__data.set_index('date', inplace=True)
+                else:
+                    self.__data = await get_data(self.code, self.exchange)
+            else:
+                self.__data = await get_data(self.code, self.exchange)
+        else:
+            self.__data = await get_data(self.code, self.exchange)
 
     async def fetch(self, start: datetime.date) -> List:
         """ fetch records from local db """
