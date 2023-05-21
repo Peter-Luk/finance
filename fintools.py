@@ -330,7 +330,7 @@ class FOA(object):
         tr = pd.concat(
             [data.high - data.low,
                 (data.high - data.close.shift(1)).abs(),
-                (data.low - data.close.shift(1)).abs()], 1).max(axis=1)
+                (data.low - data.close.shift(1)).abs()], axis=1).max(axis=1)
 
         upper = volatility + tr * gr
         lower = volatility - tr * gr
