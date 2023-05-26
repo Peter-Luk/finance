@@ -294,6 +294,9 @@ B_scale:
     BILI:
       code: 9626
       ratio: 1
+    XPEV:
+      code: 9868
+      ratio: .5
     TCOM:
       code: 9961
       ratio: 1
