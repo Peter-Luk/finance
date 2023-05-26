@@ -3,7 +3,8 @@ import asyncio
 import datetime
 import random
 from typing import Any, Coroutine, Iterable, List, Dict, Final
-# import pandas as pd
+import pandas as pd
+import numpy as np
 # import yfinance as yf
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atq
@@ -11,7 +12,7 @@ from asyncinit import asyncinit
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
-from finance.fintools import FOA, pd, np, get_periods
+from finance.fintools import FOA, get_periods, hsirnd
 from finance.utilities import filepath, PYTHON_PATH, os, sep, async_fetch, gslice
 from finance.finaux import roundup
 from asyahoo import get_data
@@ -222,3 +223,19 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
     res_list = [eval(f"_.{indicator}()") for _ in tqdm(result)] \
         if (indicator in INDICATORS) else result
     return zip(name_list, res_list)
+
+
+async def A2B(entities: Iterable=yaml_get('B_scale', YAML_PREFERENCE).keys()) -> zip:
+    b_scale = yaml_get('B_scale', YAML_PREFERENCE)
+
+    async def get(code: str) -> Any:
+        hdr = (await Equity(code, boarse='NYSE')).optinum()['Buy']
+        res = np.nan if len(hdr)==0 \
+            else [hsirnd(_ * yaml_get('USHK', YAML_PREFERENCE) * b_scale.get(code).get('ratio')) for _ in hdr]
+        return res
+
+    ent_ = [get(_) for _ in entities]
+    code_ = [b_scale.get(_).get('code') for _ in entities]
+    name_ = [f'{_:04d}.HK' for _ in code_]
+    res_ = await atq.gather(*ent_)
+    return zip(name_, res_)
