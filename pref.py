@@ -123,6 +123,7 @@ B_scale = dict(
     BIDU=1 / 8,
     BILI=1,
     TCOM=1,
+    XPEV=.5,
     YUMC=1,
     NTES=1 / 5,
     JD=1 / 2,
@@ -216,6 +217,17 @@ public_holiday[2023] = {
         7: (1,),
         9: (30,),
         10: (2, 23),
+        12: (25, 26)}
+public_holiday[2024] = {
+        1: (1,),
+        2: (10, 12, 13),
+        3: (29, 30),
+        4: (1, 4),
+        5: (1, 15),
+        6: (10,),
+        7: (1,),
+        9: (18,),
+        10: (1, 11),
         12: (25, 26)}
 # y2n = [
 #         pandas, numpy, sqlalchemy, golden_ratio, datetime, tqdm,
