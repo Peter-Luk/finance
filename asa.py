@@ -79,6 +79,7 @@ fields.extend(yaml_get('fields', YAML_PREFERENCE))
 data_fields = [eval(f"Record.{_}") for _ in fields]
 param = yaml_get('periods', YAML_PREFERENCE).get('Equities')
 INDICATORS: Final[List] = yaml_get('indicators', YAML_PREFERENCE)
+b_scale = yaml_get('B_scale', YAML_PREFERENCE)
 
 
 @asyncinit
@@ -132,7 +133,7 @@ class Equity(FOA):
         return super().atr(param, data).astype('float64')
 
     def kama(self, param: Dict = param.get('kama'), data: Any = None) -> pd.DataFrame:
-       return super().kama(param, data).astype('float64')
+        return super().kama(param, data).astype('float64')
 
     def adx(self, param: int = param.get('adx'), astype: str = 'float64') -> pd.DataFrame:
         """ adx """
@@ -225,14 +226,24 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
     return zip(name_list, res_list)
 
 
-async def A2B(entities: Iterable=yaml_get('B_scale', YAML_PREFERENCE).keys()) -> zip:
-    b_scale = yaml_get('B_scale', YAML_PREFERENCE)
+async def A2B(
+        entities: Iterable = b_scale.keys(),
+        date: datetime.date = None) -> zip:
 
-    async def get(code: str) -> Any:
-        hdr = (await Equity(code, boarse='NYSE')).optinum()['Buy']
-        res = np.nan if len(hdr)==0 \
-            else [hsirnd(_ * yaml_get('USHK', YAML_PREFERENCE) * b_scale.get(code).get('ratio')) for _ in hdr]
-        return res
+    async def get(code: str,
+        date: datetime.date = None) -> Any:
+        hdr = await Equity(code, boarse='NYSE')
+        if date is None:
+            date = hdr.date
+        optinum = hdr.optinum(date)
+        buy = optinum['Buy']
+        sell = optinum['Sell']
+        res = {}
+        res['Buy'] = np.nan if len(buy) == 0 \
+            else [hsirnd(_ * yaml_get('USHK', YAML_PREFERENCE) * b_scale.get(code).get('ratio')) for _ in buy]
+        res['Sell'] = np.nan if len(sell) == 0 \
+            else [hsirnd(_ * yaml_get('USHK', YAML_PREFERENCE) * b_scale.get(code).get('ratio')) for _ in sell]
+        return pd.DataFrame(res)
 
     ent_ = [get(_) for _ in entities]
     code_ = [b_scale.get(_).get('code') for _ in entities]
