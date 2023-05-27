@@ -178,7 +178,7 @@ class Equity(FOA):
         if date is None:
             date = self.date
         if base is None:
-            base = self.__data
+            base = self.__data.query(f'date <= "{date}"')
         if delta is None:
             delta = self.atr(self.periods['atr'])
 
@@ -208,7 +208,7 @@ class Equity(FOA):
             buy = [roundup(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
             sell = [roundup(_) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
 
-        return {'Buy': pd.Series(buy).unique().tolist() if buy else buy, 'Sell': pd.Series(sell).unique().tolist() if sell else sell}
+        return pd.DataFrame({'Buy': pd.Series(buy).unique().tolist() if buy else np.NaN, 'Sell': pd.Series(sell).unique().tolist() if sell else np.NaN})
 
 
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
@@ -228,26 +228,12 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
 
 async def A2B(
         entities: Iterable = b_scale.keys(),
-        date: datetime.date = None) -> zip:
+        date: str = None) -> dict:
 
     async def get(
-            code: str,
-            date: datetime.date = None) -> pd.DataFrame:
-        hdr = await Equity(code, boarse='NYSE')
-        if date is None:
-            date = hdr.date
-        optinum = hdr.optinum(date)
-        buy = optinum['Buy']
-        sell = optinum['Sell']
-        res = {}
-        res['Buy'] = np.nan if len(buy) == 0 \
-            else [hsirnd(_ * yaml_get('USHK', YAML_PREFERENCE) * b_scale.get(code).get('ratio')) for _ in buy]
-        res['Sell'] = np.nan if len(sell) == 0 \
-            else [hsirnd(_ * yaml_get('USHK', YAML_PREFERENCE) * b_scale.get(code).get('ratio')) for _ in sell]
-        return pd.DataFrame(res)
+            code: str) -> tuple:
+        return (f'{b_scale.get(code).get("code"):04d}.HK', await Equity(code, boarse='NYSE'))
 
     ent_ = [get(_) for _ in entities]
-    code_ = [b_scale.get(_).get('code') for _ in entities]
-    name_ = [f'{_:04d}.HK' for _ in code_]
-    res_ = await atq.gather(*ent_)
-    return zip(name_, res_)
+    res = dict(await atq.gather(*ent_))
+    return dict(zip(res.keys(), [_.optinum(date) for _ in res.values()]))
