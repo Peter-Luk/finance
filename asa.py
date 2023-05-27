@@ -230,8 +230,9 @@ async def A2B(
         entities: Iterable = b_scale.keys(),
         date: datetime.date = None) -> zip:
 
-    async def get(code: str,
-        date: datetime.date = None) -> Any:
+    async def get(
+            code: str,
+            date: datetime.date = None) -> pd.DataFrame:
         hdr = await Equity(code, boarse='NYSE')
         if date is None:
             date = hdr.date
