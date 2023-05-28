@@ -232,8 +232,20 @@ async def A2B(
 
     async def get(
             code: str) -> tuple:
-        return (f'{b_scale.get(code).get("code"):04d}.HK', await Equity(code, boarse='NYSE'))
+        return (code, await Equity(code, boarse='NYSE'))
 
+    xhg = yaml_get('USHK', YAML_PREFERENCE)
+    code_ = []
+    opt_ = []
     ent_ = [get(_) for _ in entities]
     res = dict(await atq.gather(*ent_))
-    return dict(zip(res.keys(), [_.optinum(date) for _ in res.values()]))
+
+    for k, v in res.items():
+        yk = b_scale.get(k)
+        code_.append(f'{yk.get("code")}.HK')
+        hdr = v.optinum(date)
+        hdr['Buy'] = (hdr['Buy'] * xhg * yk.get('ratio')).apply(hsirnd)
+        hdr['Sell'] = (hdr['Sell'] * xhg * yk.get('ratio')).apply(hsirnd)
+        opt_.append(hdr)
+
+    return dict(zip(code_, opt_))
