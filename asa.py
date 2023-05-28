@@ -242,10 +242,11 @@ async def A2B(
 
     for k, v in res.items():
         yk = b_scale.get(k)
+        ratio = yk.get('ratio')
         code_.append(f'{yk.get("code")}.HK')
         hdr = v.optinum(date)
-        hdr['Buy'] = (hdr['Buy'] * xhg * yk.get('ratio')).apply(hsirnd)
-        hdr['Sell'] = (hdr['Sell'] * xhg * yk.get('ratio')).apply(hsirnd)
+        hdr['Buy'] = (hdr['Buy'] * xhg * ratio).apply(hsirnd)
+        hdr['Sell'] = (hdr['Sell'] * xhg * ratio).apply(hsirnd)
         opt_.append(hdr)
 
     return dict(zip(code_, opt_))
