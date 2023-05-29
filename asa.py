@@ -174,7 +174,9 @@ class Equity(FOA):
         """ soc """
         return super().soc(param).astype(astype)
 
-    def optinum(self, date=None, base=None, delta=None):
+    def optinum(self, date: str = None,
+                base: pd.DataFrame = None,
+                delta: pd.DataFrame = None) -> pd.DataFrame:
         if date is None:
             date = self.date
         if base is None:
