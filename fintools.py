@@ -1,6 +1,8 @@
 # import re
 import pandas as pd
-from finance.finaux import np, stepper
+import numpy as np
+from typing import Iterable
+from finance.finaux import stepper
 from finance.utilities import PYTHON_PATH, os, sep
 
 try:
@@ -9,7 +11,7 @@ except ImportError:
     gr = 1.618
 
 
-def hsirnd(value):
+def hsirnd(value: float) -> float:
     if np.isnan(value) or not value > 0:
         return np.nan
     _ = int(np.floor(np.log10(value)))
@@ -70,7 +72,7 @@ def latest(code, period='5d', exchange='HKEx'):
     return [dict(_) for _ in res]
 
 
-def gap(boundary, ratio=gr):
+def gap(boundary: Iterable, ratio: float=gr) -> Iterable:
     rb = boundary
     rb.reverse()
     high, low = rb if boundary[-1] > boundary[0] else boundary
