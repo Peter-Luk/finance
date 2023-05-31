@@ -197,21 +197,27 @@ class Equity(FOA):
             _.extend(gslice([pivot, pivot - gap]))
             return _
         hdr = []
-        [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
-        hdr.sort()
+        try:
+            [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
+            hdr.sort()
+    
+            kc = self.kc(self.periods['kc']).loc[date]
+            buy = [round(_, 2) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+            sell = [round(_, 2) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
+            if self.exchange == 'TSE':
+                buy = [round(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+                sell = [round(_) for _ in hdr if _ > kc.Upper and _> self.__data.close.loc[date]]
+            if self.exchange == 'HKEx':
+                buy = [roundup(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
+                sell = [roundup(_) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
 
-        kc = self.kc(self.periods['kc']).loc[date]
-        buy = [round(_, 2) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
-        sell = [round(_, 2) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
-        if self.exchange == 'TSE':
-            buy = [round(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
-            sell = [round(_) for _ in hdr if _ > kc.Upper and _> self.__data.close.loc[date]]
-        if self.exchange == 'HKEx':
-            buy = [roundup(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
-            sell = [roundup(_) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
-
-        return pd.DataFrame({'Buy': pd.Series(buy).unique().tolist() if buy else np.NaN, 'Sell': pd.Series(sell).unique().tolist() if sell else np.NaN})
-
+            res = pd.DataFrame(
+                    dict(Buy=pd.Series(buy).unique().tolist() if buy else np.NaN,
+                        Sell=pd.Series(sell).unique().tolist() if sell else np.NaN))
+            return res
+        except:
+            pass
+        return hdr
 
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
     """ fetch entities stored records """
@@ -246,9 +252,12 @@ async def A2B(
         yk = b_scale.get(k)
         ratio = yk.get('ratio')
         code_.append(f'{yk.get("code")}.HK')
-        hdr = v.optinum(date)
-        for k in hdr.keys():
-            hdr[k] = (hdr[k] * xhg * ratio).apply(hsirnd)
-        opt_.append(hdr)
+        try:
+            hdr = v.optinum(date)
+            for k in hdr.keys():
+                hdr[k] = (hdr[k] * xhg * ratio).apply(hsirnd)
+            opt_.append(hdr)
+        except Exception:
+            pass
 
     return dict(zip(code_, opt_))
