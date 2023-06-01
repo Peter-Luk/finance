@@ -197,10 +197,13 @@ class Equity(FOA):
             _.extend(gslice([pivot, pivot - gap]))
             return _
         hdr = []
+        res = pd.DataFrame(dict(
+            Buy=pd.Series([]),
+            Sell=pd.Series([])))
         try:
             [hdr.extend(_pgap(_, base)) for _ in _patr(base, date)]
             hdr.sort()
-    
+
             kc = self.kc(self.periods['kc']).loc[date]
             buy = [round(_, 2) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
             sell = [round(_, 2) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
@@ -211,13 +214,11 @@ class Equity(FOA):
                 buy = [roundup(_) for _ in hdr if _ < kc.Lower and _ < self.__data.close.loc[date]]
                 sell = [roundup(_) for _ in hdr if _ > kc.Upper and _ > self.__data.close.loc[date]]
 
-            res = pd.DataFrame(
-                    dict(Buy=pd.Series(buy).unique().tolist() if buy else np.NaN,
-                        Sell=pd.Series(sell).unique().tolist() if sell else np.NaN))
-            return res
+            res['Buy'] = pd.Series(buy).unique().tolist() if buy else np.NaN
+            res['Sell'] = pd.Series(sell).unique().tolist() if sell else np.NaN
         except:
             pass
-        return hdr
+        return res
 
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
     """ fetch entities stored records """
@@ -252,12 +253,9 @@ async def A2B(
         yk = b_scale.get(k)
         ratio = yk.get('ratio')
         code_.append(f'{yk.get("code")}.HK')
-        try:
-            hdr = v.optinum(date)
-            for k in hdr.keys():
-                hdr[k] = (hdr[k] * xhg * ratio).apply(hsirnd)
-            opt_.append(hdr)
-        except Exception:
-            pass
+        hdr = v.optinum(date)
+        for k in hdr.keys():
+            hdr[k] = hdr[k] if len(hdr[k]) == 0 else (hdr[k] * xhg * ratio).apply(hsirnd)
+        opt_.append(hdr)
 
     return dict(zip(code_, opt_))
