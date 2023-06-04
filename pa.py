@@ -51,7 +51,7 @@ class Person(Subject):
         # self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
 
     def __call__(self):
-        date_format = '%Y-%m-%d %H:%M:%S'
+        # date_format = '%Y-%m-%d %H:%M:%S'
         # fields = ['date', 'time', 'sys', 'dia', 'pulse']
         # cols = ['date', 'time']
         holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name)).scalars().all()
