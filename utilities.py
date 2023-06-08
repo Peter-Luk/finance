@@ -36,13 +36,16 @@ cal_month = [x for x in range(1, 13) if not x % 3]
 
 
 async def async_fetch(query, db_name):
-    async_engine = create_async_engine(f'sqlite+aiosqlite:///{filepath(db_name)}')
-    async_session = sessionmaker(async_engine, expire_on_commit=False, class_=AsyncSession)
-    async with async_session() as session:
+    a_Session = Session(db_name, sync=False)
+    async with a_Session.session() as session:
+    # async_engine = create_async_engine(f'sqlite+aiosqlite:///{filepath(db_name)}')
+    # async_session = sessionmaker(async_engine, expire_on_commit=False, class_=AsyncSession)
+    # async with async_session() as session:
         async with session.begin():
             result = await session.execute(query)
         await session.commit()
-    await async_engine.dispose()
+    await a_Session.engine.dispose()
+    # await async_engine.dispose()
     return result
 
 
@@ -553,3 +556,13 @@ class conditional_decorator(object):
             # Return the function unchanged, not decorated.
             return func
         return self.decorator(func)
+
+
+class Session(object):
+    def __init__(self, db_name: str, sync: bool = True):
+        if sync:
+            self.engine = db.create_engine(f'sqlite:///{filepath(db_name)}')
+            self.session = sessionmaker(self.engine, expire_on_commit=False)
+        else:
+            self.engine = create_async_engine(f'sqlite+aiosqlite:///{filepath(db_name)}')
+            self.session = sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)
