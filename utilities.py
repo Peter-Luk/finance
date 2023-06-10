@@ -1,6 +1,7 @@
 import re
 import socket
 from pytz import timezone
+from typing import Iterable
 # from scipy.optimize import newton
 import sqlalchemy as db
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -35,18 +36,14 @@ avail_indicators = ('wma', 'kama', 'ema', 'hv')
 cal_month = [x for x in range(1, 13) if not x % 3]
 
 
-async def async_fetch(query, db_name):
+async def async_fetch(query: str, db_name: str) -> Iterable:
     a_Session = Session(db_name, sync=False)
     async with a_Session.session() as session:
-    # async_engine = create_async_engine(f'sqlite+aiosqlite:///{filepath(db_name)}')
-    # async_session = sessionmaker(async_engine, expire_on_commit=False, class_=AsyncSession)
-    # async with async_session() as session:
         async with session.begin():
             result = await session.execute(query)
         await session.commit()
     await a_Session.engine.dispose()
-    # await async_engine.dispose()
-    return result
+    return result.scalars().all()
 
 
 def driver_path(browser, file="pref.yaml"):
