@@ -54,7 +54,8 @@ class Person(Subject):
         # date_format = '%Y-%m-%d %H:%M:%S'
         # fields = ['date', 'time', 'sys', 'dia', 'pulse']
         # cols = ['date', 'time']
-        holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name)).scalars().all()
+        holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name))
+        # holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name)).scalars().all()
         _ = pd.DataFrame()
         for field in Subject._data_fields:
             exec(f"_['{field}'] = [__.{field} for __ in holder]")
