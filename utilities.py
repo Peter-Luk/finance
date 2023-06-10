@@ -40,10 +40,10 @@ async def async_fetch(query: str, db_name: str) -> Iterable:
     a_Session = Session(db_name, sync=False)
     async with a_Session.session() as session:
         async with session.begin():
-            result = await session.execute(query)
+            result = (await session.execute(query)).scalars().all()
         await session.commit()
     await a_Session.engine.dispose()
-    return result.scalars().all()
+    return result
 
 
 def driver_path(browser, file="pref.yaml"):
