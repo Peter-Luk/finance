@@ -4,7 +4,8 @@ import pandas as pd
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base, sessionmaker, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
-from finance.utilities import filepath, async_fetch
+from finance.utilities import filepath
+from finance.ormlib import async_fetch
 
 Session = sessionmaker()
 Base = declarative_base()
@@ -45,23 +46,16 @@ class Person(Subject):
         self.session = Health(self.db_name).session
         self.__fields = Subject._data_fields
         self.__fields.append('subject_id') if 'subject_id' not in self.__fields else None
-        # self.__fields.extend(['subject_id', 'date'])
         self.query = select(Subject).options(load_only(*[eval(f'Subject.{_}') for _ in self.__fields])).where(Subject.subject_id == self.subject_id)
 
-        # self.query = select(Subject).filter(text(f'records.subject_id=={self.subject_id}'))
 
     def __call__(self):
-        # date_format = '%Y-%m-%d %H:%M:%S'
-        # fields = ['date', 'time', 'sys', 'dia', 'pulse']
-        # cols = ['date', 'time']
         holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name))
-        # holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name)).scalars().all()
         _ = pd.DataFrame()
         for field in Subject._data_fields:
             exec(f"_['{field}'] = [__.{field} for __ in holder]")
         _ = _.convert_dtypes()
         _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
-        # _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format=date_format, dayfirst=True)
         _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format='ISO8601', dayfirst=True)
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
         _ = _.drop(['subject_id', 'date', 'time', 'Datetime'], axis=1)
