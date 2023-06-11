@@ -13,7 +13,8 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
 from finance.fintools import FOA, get_periods, hsirnd
-from finance.utilities import filepath, PYTHON_PATH, os, sep, async_fetch, gslice
+from finance.utilities import filepath, PYTHON_PATH, os, sep, gslice
+from finance.ormlib import async_fetch
 from finance.finaux import roundup
 from asyahoo import get_data
 
@@ -70,7 +71,7 @@ class Record(Base):
 async def stored_entities() -> List:
     """ fetching stored records """
     sql_stmt = select(Record.eid.distinct()).order_by(Record.eid)
-    entities = [_[0] for _ in await async_fetch(sql_stmt, DB_NAME) if _[0] not in yaml_db_get('exclude')]
+    entities = [_ for _ in await async_fetch(sql_stmt, DB_NAME) if _ not in yaml_db_get('exclude')]
     return entities
 
 STORED: Final[List] = asyncio.run(stored_entities())
