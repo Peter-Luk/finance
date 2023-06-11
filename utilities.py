@@ -4,11 +4,12 @@ from pytz import timezone
 from typing import Iterable
 # from scipy.optimize import newton
 import sqlalchemy as db
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+# from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+# from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from time import sleep
 from pathlib import os, Path, sys, functools
+from ormlib import filepath, Session
 import finance.pref as pref
 
 driver = pref.driver
@@ -67,48 +68,48 @@ def driver_path(browser, file="pref.yaml"):
     return sep.join(_)
 
 
-def filepath(*args, **kwargs):
-    name, file_type, data_path = args[0], 'data', 'sqlite3'
-    if 'type' in list(kwargs.keys()):
-        file_type = kwargs['type']
-    if 'subpath' in list(kwargs.keys()):
-        data_path = kwargs['subpath']
-    if platform == 'win32':
-        if sys.version_info.major > 2 and sys.version_info.minor > 3:
-            return sep.join((os.environ.get('HOMEPATH'), file_type, data_path, name))
-        else:
-            file_path = sep.join((os.environ.get('HOMEPATH'), file_type, data_path))
-            _ = sep.join((file_path, name))
-            return _ if os.path.exists(_) else False
-    # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
-    if platform in ('linux', 'linux2'):
-        if sys.version_info.major > 2 and sys.version_info.minor > 3:
-            if os.environ.get('EXTERNAL_STORAGE'):
-                _ = sep.join((
-                    os.environ.get('HOME'), 'storage', 'external-1', file_type,
-                    data_path, name))
-                if os.path.exists(_):
-                    return _
-            _ = sep.join((os.environ.get('HOME'), file_type, data_path, name))
-            return _ if os.path.exists(_) else False
-        else:
-            place = 'shared'
-            if os.environ.get('ACTUAL_HOME'):
-                file_path = sep.join((os.environ.get('HOME'), file_type, data_path))
-            elif os.environ.get('EXTERNAL_STORAGE') and ('/' in os.environ['EXTERNAL_STORAGE']):
-                place = 'external-1'
-                file_path = sep.join(
-                    (os.environ.get('HOME'), 'storage', place, file_type, data_path))
-            _ = sep.join((file_path, name))
-            return _ if os.path.exists(_) else False
-    else:
-        path_holder_list = ['..', file_type, data_path]
-        path_holder = sep.join(path_holder_list)
-        if os.path.isfile(path_holder):
-            return os.path.abspath(path_holder)
-        else:
-            path_holder = sep.join(['..', '..'] + path_holder_list)
-            return os.path.abspath(path_holder) if os.path.isfile(path_holder) else False
+# def filepath(*args, **kwargs):
+#     name, file_type, data_path = args[0], 'data', 'sqlite3'
+#     if 'type' in list(kwargs.keys()):
+#         file_type = kwargs['type']
+#     if 'subpath' in list(kwargs.keys()):
+#         data_path = kwargs['subpath']
+#     if platform == 'win32':
+#         if sys.version_info.major > 2 and sys.version_info.minor > 3:
+#             return sep.join((os.environ.get('HOMEPATH'), file_type, data_path, name))
+#         else:
+#             file_path = sep.join((os.environ.get('HOMEPATH'), file_type, data_path))
+#             _ = sep.join((file_path, name))
+#             return _ if os.path.exists(_) else False
+#     # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
+#     if platform in ('linux', 'linux2'):
+#         if sys.version_info.major > 2 and sys.version_info.minor > 3:
+#             if os.environ.get('EXTERNAL_STORAGE'):
+#                 _ = sep.join((
+#                     os.environ.get('HOME'), 'storage', 'external-1', file_type,
+#                     data_path, name))
+#                 if os.path.exists(_):
+#                     return _
+#             _ = sep.join((os.environ.get('HOME'), file_type, data_path, name))
+#             return _ if os.path.exists(_) else False
+#         else:
+#             place = 'shared'
+#             if os.environ.get('ACTUAL_HOME'):
+#                 file_path = sep.join((os.environ.get('HOME'), file_type, data_path))
+#             elif os.environ.get('EXTERNAL_STORAGE') and ('/' in os.environ['EXTERNAL_STORAGE']):
+#                 place = 'external-1'
+#                 file_path = sep.join(
+#                     (os.environ.get('HOME'), 'storage', place, file_type, data_path))
+#             _ = sep.join((file_path, name))
+#             return _ if os.path.exists(_) else False
+#     else:
+#         path_holder_list = ['..', file_type, data_path]
+#         path_holder = sep.join(path_holder_list)
+#         if os.path.isfile(path_holder):
+#             return os.path.abspath(path_holder)
+#         else:
+#             path_holder = sep.join(['..', '..'] + path_holder_list)
+#             return os.path.abspath(path_holder) if os.path.isfile(path_holder) else False
 
 
 def nitem(*args):
@@ -552,15 +553,3 @@ class conditional_decorator(object):
             # Return the function unchanged, not decorated.
             return func
         return self.decorator(func)
-
-
-class Session(object):
-    def __init__(self, db_name: str, sync: bool = True):
-        db_file = filepath(db_name)
-        if os.path.isfile(db_file):
-            if sync:
-                self.engine = db.create_engine(f'sqlite:///{db_file}')
-                self.session = sessionmaker(self.engine, expire_on_commit=False)
-            else:
-                self.engine = create_async_engine(f'sqlite+aiosqlite:///{db_file}')
-                self.session = sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)
