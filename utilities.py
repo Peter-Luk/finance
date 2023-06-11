@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from time import sleep
-from pathlib import posixpath as path
 from pathlib import os, Path, sys, functools
 import finance.pref as pref
 
@@ -80,7 +79,7 @@ def filepath(*args, **kwargs):
         else:
             file_path = sep.join((os.environ.get('HOMEPATH'), file_type, data_path))
             _ = sep.join((file_path, name))
-            return _ if path.exists(_) else False
+            return _ if os.path.exists(_) else False
     # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
     if platform in ('linux', 'linux2'):
         if sys.version_info.major > 2 and sys.version_info.minor > 3:
@@ -88,10 +87,10 @@ def filepath(*args, **kwargs):
                 _ = sep.join((
                     os.environ.get('HOME'), 'storage', 'external-1', file_type,
                     data_path, name))
-                if path.exists(_):
+                if os.path.exists(_):
                     return _
             _ = sep.join((os.environ.get('HOME'), file_type, data_path, name))
-            return _ if path.exists(_) else False
+            return _ if os.path.exists(_) else False
         else:
             place = 'shared'
             if os.environ.get('ACTUAL_HOME'):
@@ -101,15 +100,15 @@ def filepath(*args, **kwargs):
                 file_path = sep.join(
                     (os.environ.get('HOME'), 'storage', place, file_type, data_path))
             _ = sep.join((file_path, name))
-            return _ if path.exists(_) else False
+            return _ if os.path.exists(_) else False
     else:
         path_holder_list = ['..', file_type, data_path]
         path_holder = sep.join(path_holder_list)
-        if Path(path_holder).is_file():
-            return Path(path_holder).absolute().__str__
+        if os.path.isfile(path_holder):
+            return os.path.abspath(path_holder)
         else:
             path_holder = sep.join(['..', '..'] + path_holder_list)
-            return Path(path_holder).absolute().__str__ if Path(path_holder).is_file() else False
+            return os.path.abspath(path_holder) if os.path.isfile(path_holder) else False
 
 
 def nitem(*args):
@@ -535,7 +534,7 @@ def push2git(file_path, msg, *, login='Peter-Luk'):
             user = git.get_user()
             if user == login:
                 absolute_path = f'{str(Path.home())}{file_path}'
-                if Path(absolute_path).is_file():
+                if os.path.isfile(absolute_path):
                     filename = os.path.basename(absolute_path)
                     repo = os.path.dirname(absolute_path).split(sep)[-1]
                     req_repo = user.get_repo(repo)
@@ -557,9 +556,11 @@ class conditional_decorator(object):
 
 class Session(object):
     def __init__(self, db_name: str, sync: bool = True):
-        if sync:
-            self.engine = db.create_engine(f'sqlite:///{filepath(db_name)}')
-            self.session = sessionmaker(self.engine, expire_on_commit=False)
-        else:
-            self.engine = create_async_engine(f'sqlite+aiosqlite:///{filepath(db_name)}')
-            self.session = sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)
+        db_file = filepath(db_name)
+        if os.path.isfile(db_file):
+            if sync:
+                self.engine = db.create_engine(f'sqlite:///{db_file}')
+                self.session = sessionmaker(self.engine, expire_on_commit=False)
+            else:
+                self.engine = create_async_engine(f'sqlite+aiosqlite:///{db_file}')
+                self.session = sessionmaker(self.engine, expire_on_commit=False, class_=AsyncSession)
