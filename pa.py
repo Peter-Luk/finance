@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base, sessionmaker, load_only
 from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
-from finance.utilities import filepath
+from utilities import filepath
 from finance.ormlib import async_fetch
 
 Session = sessionmaker()
