@@ -1,12 +1,93 @@
+import asyncio
 import datetime
-from pathlib import os, sys
+from time import sleep
+from pathlib import os
 from typing import Iterable
-from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
+from sqlalchemy import asc, create_engine, Column, Integer, Date, Time, String, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from utilities import filepath
+from sqlalchemy.future import select
+from utilities import yaml_db_get, filepath, get_start
 from pref import fields
+
 Base = declarative_base()
+
+
+def stored_eid():
+    query = select(Securities.eid.distinct()).order_by(asc(Securities.eid))
+    res = asyncio.run(async_fetch(query, yaml_db_get('name')))
+    exclude = yaml_db_get('exclude')
+    return [_ for _ in res if  _ not in  exclude]
+
+
+def web_collect(*args, **kwargs):
+    import yfinance as yf
+    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 7, \
+        datetime.today(), False, {}
+    if args:
+        if isinstance(args[0], (tuple, list)):
+            code = list(args[0])
+        if isinstance(args[0], (int, float)):
+            code = [int(args[0])]
+        if len(args) > 1:
+            if isinstance(args[1], (int, float)):
+                period = int(args[1])
+    if 'code' in lk:
+        if isinstance(kwargs['code'], (tuple, list)):
+            code = list(kwargs['code'])
+        if isinstance(kwargs['code'], (int, float)):
+            code = [int(kwargs['code'])]
+    if 'period' in lk:
+        if isinstance(kwargs['period'], (int, float)):
+            period = int(kwargs['period'])
+    if 'source' in lk:
+        if isinstance(kwargs['source'], str):
+            src = kwargs['source']
+    if 'pandas' in lk:
+        if isinstance(kwargs['pandas'], bool):
+            efor = kwargs['pandas']
+
+    # def stored_eid():
+    #     pE = pref.db['Equities']
+    #     s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
+    #     s_conn = s_engine.connect()
+    #     rc = db.Table(
+    #         pE['table'],
+    #         db.MetaData(),
+    #         autoload=True,
+    #         autoload_with=s_engine).columns
+    #     query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
+    #     return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()]
+    #             if __ not in pE['exclude']]
+
+    try:
+        code
+    except Exception:
+        code = stored_eid()
+    if src == 'yahoo':
+        code = [f'{_:04d}.HK' for _ in code]
+    process, start = True, get_start(period)
+    if start:
+        while process:
+            dp = yf.download(code, start, end, group_by='ticker')
+            if len(dp):
+                process = not process
+            else:
+                print('Retry in 25 seconds')
+                sleep(25)
+        # dp = data.DataReader(code, src, start, end)
+        for c in code:
+            # res[c] = dp.minor_xs(c).transpose().to_dict()
+            # res[c] = dp[c].transpose().to_dict()
+            tmp = dp[c].transpose().to_dict()
+            hdr = {}
+            for _ in list(tmp.keys()):
+                hdr[_.to_pydatetime().date()] = tmp[_]
+            res[c] = hdr
+            if efor:
+                res[c] = dp[c]
+            # if efor: res[c] = dp.minor_xs(c)
+        return res
 
 
 async def async_fetch(query: str, db_name: str) -> Iterable:
