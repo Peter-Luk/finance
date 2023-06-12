@@ -7,7 +7,7 @@ from time import sleep
 from typing import Any
 import sqlalchemy as db
 from pathlib import os, Path, sys, functools
-import finance.pref as pref
+import pref
 
 driver = pref.driver
 ph = pref.public_holiday
