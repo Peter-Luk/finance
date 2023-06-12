@@ -4,7 +4,7 @@ from pytz import timezone
 # from scipy.optimize import newton
 from datetime import datetime
 from time import sleep
-from typing import Any
+from typing import Final, Any
 import sqlalchemy as db
 from pathlib import os, Path, sys, functools
 import pref
@@ -31,18 +31,45 @@ month_initial = dict(zip(
 avail_indicators = ('wma', 'kama', 'ema', 'hv')
 cal_month = [x for x in range(1, 13) if not x % 3]
 
+YAML_PREFERENCE: Final[str] = 'pref.yaml'
+
+
+def yaml_get(field: str, file: str) -> Any:
+    """ Basic yaml config reader """
+    if file.split('.')[-1] == 'yaml':
+        import yaml
+        fpaths = [os.getcwd()]
+        fpaths.extend(PYTHON_PATH)
+        for f_p in fpaths:
+            _f = f'{f_p}{sep}{file}'
+            if os.path.isfile(_f):
+                with open(_f, encoding='utf-8') as y_f:
+                    _ = yaml.load(y_f, Loader=yaml.FullLoader)
+                res = _.get(field)
+    return res
+
+
+def yaml_db_get(
+        field: str,
+        entity: str = 'Equities',
+        file: str = YAML_PREFERENCE) -> Any:
+    """ yaml db config reader """
+    _ = yaml_get('db', file)
+    return _.get(entity).get(field)
+
 
 def driver_path(browser, file="pref.yaml"):
-    import yaml
+    # import yaml
     fpaths = [os.getcwd()]
     fpaths.extend(PYTHON_PATH)
     for fp in fpaths:
         _f = f'{fp}{sep}{file}'
         if os.path.isfile(_f):
             break
-    with open(_f, encoding='utf-8') as f:
-        _ = yaml.load(f, Loader=yaml.FullLoader)
-    __ = _.get('driver').get(browser.capitalize())
+    # with open(_f, encoding='utf-8') as f:
+    #     _ = yaml.load(f, Loader=yaml.FullLoader)
+    # __ = _.get('driver').get(browser.capitalize())
+    __ = yaml_get('driver', file).get(browser.capitalize())
     _ = []
     if platform == 'win32':
         _.append(os.environ.get('HOMEPATH'))
@@ -223,74 +250,74 @@ def get_start(*args, **kwargs):
         return datetime.fromordinal(eo - period)
 
 
-def web_collect(*args, **kwargs):
-    import yfinance as yf
-    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 7, \
-        datetime.today(), False, {}
-    if args:
-        if isinstance(args[0], (tuple, list)):
-            code = list(args[0])
-        if isinstance(args[0], (int, float)):
-            code = [int(args[0])]
-        if len(args) > 1:
-            if isinstance(args[1], (int, float)):
-                period = int(args[1])
-    if 'code' in lk:
-        if isinstance(kwargs['code'], (tuple, list)):
-            code = list(kwargs['code'])
-        if isinstance(kwargs['code'], (int, float)):
-            code = [int(kwargs['code'])]
-    if 'period' in lk:
-        if isinstance(kwargs['period'], (int, float)):
-            period = int(kwargs['period'])
-    if 'source' in lk:
-        if isinstance(kwargs['source'], str):
-            src = kwargs['source']
-    if 'pandas' in lk:
-        if isinstance(kwargs['pandas'], bool):
-            efor = kwargs['pandas']
-
-    def stored_eid():
-        pE = pref.db['Equities']
-        s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
-        s_conn = s_engine.connect()
-        rc = db.Table(
-            pE['table'],
-            db.MetaData(),
-            autoload=True,
-            autoload_with=s_engine).columns
-        query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
-        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()]
-                if __ not in pE['exclude']]
-
-    try:
-        code
-    except Exception:
-        code = stored_eid()
-    if src == 'yahoo':
-        code = [f'{_:04d}.HK' for _ in code]
-    process, start = True, get_start(period)
-    if start:
-        while process:
-            dp = yf.download(code, start, end, group_by='ticker')
-            if len(dp):
-                process = not process
-            else:
-                print('Retry in 25 seconds')
-                sleep(25)
-        # dp = data.DataReader(code, src, start, end)
-        for c in code:
-            # res[c] = dp.minor_xs(c).transpose().to_dict()
-            # res[c] = dp[c].transpose().to_dict()
-            tmp = dp[c].transpose().to_dict()
-            hdr = {}
-            for _ in list(tmp.keys()):
-                hdr[_.to_pydatetime().date()] = tmp[_]
-            res[c] = hdr
-            if efor:
-                res[c] = dp[c]
-            # if efor: res[c] = dp.minor_xs(c)
-        return res
+# def web_collect(*args, **kwargs):
+#     import yfinance as yf
+#     src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 7, \
+#         datetime.today(), False, {}
+#     if args:
+#         if isinstance(args[0], (tuple, list)):
+#             code = list(args[0])
+#         if isinstance(args[0], (int, float)):
+#             code = [int(args[0])]
+#         if len(args) > 1:
+#             if isinstance(args[1], (int, float)):
+#                 period = int(args[1])
+#     if 'code' in lk:
+#         if isinstance(kwargs['code'], (tuple, list)):
+#             code = list(kwargs['code'])
+#         if isinstance(kwargs['code'], (int, float)):
+#             code = [int(kwargs['code'])]
+#     if 'period' in lk:
+#         if isinstance(kwargs['period'], (int, float)):
+#             period = int(kwargs['period'])
+#     if 'source' in lk:
+#         if isinstance(kwargs['source'], str):
+#             src = kwargs['source']
+#     if 'pandas' in lk:
+#         if isinstance(kwargs['pandas'], bool):
+#             efor = kwargs['pandas']
+#
+#     def stored_eid():
+#         pE = pref.db['Equities']
+#         s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
+#         s_conn = s_engine.connect()
+#         rc = db.Table(
+#             pE['table'],
+#             db.MetaData(),
+#             autoload=True,
+#             autoload_with=s_engine).columns
+#         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
+#         return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()]
+#                 if __ not in pE['exclude']]
+#
+#     try:
+#         code
+#     except Exception:
+#         code = stored_eid()
+#     if src == 'yahoo':
+#         code = [f'{_:04d}.HK' for _ in code]
+#     process, start = True, get_start(period)
+#     if start:
+#         while process:
+#             dp = yf.download(code, start, end, group_by='ticker')
+#             if len(dp):
+#                 process = not process
+#             else:
+#                 print('Retry in 25 seconds')
+#                 sleep(25)
+#         # dp = data.DataReader(code, src, start, end)
+#         for c in code:
+#             # res[c] = dp.minor_xs(c).transpose().to_dict()
+#             # res[c] = dp[c].transpose().to_dict()
+#             tmp = dp[c].transpose().to_dict()
+#             hdr = {}
+#             for _ in list(tmp.keys()):
+#                 hdr[_.to_pydatetime().date()] = tmp[_]
+#             res[c] = hdr
+#             if efor:
+#                 res[c] = dp[c]
+#             # if efor: res[c] = dp.minor_xs(c)
+#         return res
 
 
 def get_month(index):
@@ -300,18 +327,19 @@ def get_month(index):
                 return i[0]
 
 
-def dex(n=0):
-    if n in range(12):
-        n_month, n_year = month + n, today.year
-        if n_month > 12 and n_month != n_month % 12:
-            n_month, n_year = n_month % 12, n_year + 1
-        _ = f"{month_initial[datetime(n_year, n_month, 1).strftime('%B')]}{f'{n_year}'[-1]}"
-        return _
-    else:
-        print("Out of range (0 - 11)")
-
-
 def waf(delta=0):
+    def dex(n=0):
+        if n in range(12):
+            n_month, n_year = month + n, today.year
+            if n_month > 12 and n_month != n_month % 12:
+                n_month, n_year = n_month % 12, n_year + 1
+            _ = f"{month_initial[datetime(n_year, n_month, 1).strftime('%B')]}{f'{n_year}'[-1]}"
+            return _
+        else:
+            print("Out of range (0 - 11)")
+
+
+# def waf(delta=0):
     futures = [''.join((f, dex(delta))) for f in futures_type[:-2]]
     futures += [''.join((f, dex(delta+1))) for f in futures_type[:-2]]
     return tuple(futures)
