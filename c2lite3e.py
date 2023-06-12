@@ -1,5 +1,7 @@
 from utilities import filepath, get_start, dictfcomp, datetime, platform, \
-    reduce, sep, web_collect
+    reduce, sep
+from ormlib import web_collect
+    # reduce, sep, web_collect
 from os import path, listdir, remove
 import sqlite3 as lite
 import pref
