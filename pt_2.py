@@ -2,7 +2,8 @@
 Local Futures (sqlite) analysis using pandas, \
 matplotlib (visualize) via pyplot.
 """
-from utilities import dvs, gr, get_month, mtf, datetime
+from utilities import dvs, gr, get_month, datetime
+from ormlib import mtf
 from trial01 import I2
 import pandas as pd
 from sys import version_info
