@@ -3,11 +3,11 @@ import datetime
 from time import sleep
 from pathlib import os
 from typing import Iterable
-from sqlalchemy import asc, create_engine, Column, Integer, Date, Time, String, text
+from sqlalchemy import asc, desc, create_engine, Column, Integer, Date, Time, String, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.future import select
-from utilities import yaml_db_get, filepath, get_start
+from utilities import today, futures_type, yaml_db_get, filepath, get_start, waf, ltd
 from pref import fields
 
 Base = declarative_base()
@@ -17,7 +17,7 @@ def stored_eid():
     query = select(Securities.eid.distinct()).order_by(asc(Securities.eid))
     res = asyncio.run(async_fetch(query, yaml_db_get('name')))
     exclude = yaml_db_get('exclude')
-    return [_ for _ in res if  _ not in  exclude]
+    return [_ for _ in res if _ not in exclude]
 
 
 def web_collect(*args, **kwargs):
@@ -46,20 +46,6 @@ def web_collect(*args, **kwargs):
     if 'pandas' in lk:
         if isinstance(kwargs['pandas'], bool):
             efor = kwargs['pandas']
-
-    # def stored_eid():
-    #     pE = pref.db['Equities']
-    #     s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
-    #     s_conn = s_engine.connect()
-    #     rc = db.Table(
-    #         pE['table'],
-    #         db.MetaData(),
-    #         autoload=True,
-    #         autoload_with=s_engine).columns
-    #     query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
-    #     return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()]
-    #             if __ not in pE['exclude']]
-
     try:
         code
     except Exception:
@@ -75,10 +61,7 @@ def web_collect(*args, **kwargs):
             else:
                 print('Retry in 25 seconds')
                 sleep(25)
-        # dp = data.DataReader(code, src, start, end)
         for c in code:
-            # res[c] = dp.minor_xs(c).transpose().to_dict()
-            # res[c] = dp[c].transpose().to_dict()
             tmp = dp[c].transpose().to_dict()
             hdr = {}
             for _ in list(tmp.keys()):
@@ -86,8 +69,46 @@ def web_collect(*args, **kwargs):
             res[c] = hdr
             if efor:
                 res[c] = dp[c]
-            # if efor: res[c] = dp.minor_xs(c)
         return res
+
+
+def mtf(*args, **kwargs):
+    ftype = futures_type[:2]
+    if args:
+        if isinstance(args[0], str):
+            ftype = [args[0]]
+        else:
+            ftype = list(args[0])
+    if 'type' in list(kwargs.keys()):
+        if isinstance(kwargs['type'], str):
+            ftype = [kwargs['type']]
+        else:
+            ftype = list(kwargs['type'])
+    fi = []
+    query = select(Derivatives.volume).order_by(desc(Derivatives.date))
+    awaf = waf()
+    if today.day == ltd(today.year, today.month):
+        awaf = waf(1)
+    for _ in ftype:
+        aft = []
+        for __ in awaf:
+            if _.upper() in __:
+                aft.append(__)
+        try:
+            nfv = sync_fetch(query.where(Derivatives.code == aft[1]),
+                    yaml_db_get('name', entity='Futures'))[0]
+
+            cfv = sync_fetch(query.where(Derivatives.code == aft[0]),
+                    yaml_db_get('name', entity='Futures'))[0]
+            if cfv > nfv:
+                fi.append(aft[0])
+            else:
+                fi.append(aft[1])
+        except Exception:
+            fi.append(aft[0])
+    if len(fi) == 1:
+        return fi.pop()
+    return fi
 
 
 async def async_fetch(query: str, db_name: str) -> Iterable:
