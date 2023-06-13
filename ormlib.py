@@ -23,7 +23,7 @@ def stored_eid():
 def web_collect(*args, **kwargs):
     import yfinance as yf
     src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 7, \
-        datetime.today(), False, {}
+        datetime.datetime.today(), False, {}
     if args:
         if isinstance(args[0], (tuple, list)):
             code = list(args[0])
