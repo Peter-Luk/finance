@@ -1,7 +1,8 @@
 import re
 import random
 import copy
-from utilities import PYTHON_PATH, os, sep, driver_path, today, ltd, waf, mtf, IP, datetime
+from utilities import PYTHON_PATH, os, sep, driver_path, today, ltd, waf, IP, datetime
+from ormlib import mtf
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
