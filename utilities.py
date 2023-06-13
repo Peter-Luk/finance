@@ -249,76 +249,76 @@ def get_start(*args, **kwargs):
         eo = end.toordinal()
         return datetime.fromordinal(eo - period)
 
+"""
+def web_collect(*args, **kwargs):
+    import yfinance as yf
+    src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 7, \
+        datetime.today(), False, {}
+    if args:
+        if isinstance(args[0], (tuple, list)):
+            code = list(args[0])
+        if isinstance(args[0], (int, float)):
+            code = [int(args[0])]
+        if len(args) > 1:
+            if isinstance(args[1], (int, float)):
+                period = int(args[1])
+    if 'code' in lk:
+        if isinstance(kwargs['code'], (tuple, list)):
+            code = list(kwargs['code'])
+        if isinstance(kwargs['code'], (int, float)):
+            code = [int(kwargs['code'])]
+    if 'period' in lk:
+        if isinstance(kwargs['period'], (int, float)):
+            period = int(kwargs['period'])
+    if 'source' in lk:
+        if isinstance(kwargs['source'], str):
+            src = kwargs['source']
+    if 'pandas' in lk:
+        if isinstance(kwargs['pandas'], bool):
+            efor = kwargs['pandas']
 
-# def web_collect(*args, **kwargs):
-#     import yfinance as yf
-#     src, lk, period, end, efor, res = 'yahoo', list(kwargs.keys()), 7, \
-#         datetime.today(), False, {}
-#     if args:
-#         if isinstance(args[0], (tuple, list)):
-#             code = list(args[0])
-#         if isinstance(args[0], (int, float)):
-#             code = [int(args[0])]
-#         if len(args) > 1:
-#             if isinstance(args[1], (int, float)):
-#                 period = int(args[1])
-#     if 'code' in lk:
-#         if isinstance(kwargs['code'], (tuple, list)):
-#             code = list(kwargs['code'])
-#         if isinstance(kwargs['code'], (int, float)):
-#             code = [int(kwargs['code'])]
-#     if 'period' in lk:
-#         if isinstance(kwargs['period'], (int, float)):
-#             period = int(kwargs['period'])
-#     if 'source' in lk:
-#         if isinstance(kwargs['source'], str):
-#             src = kwargs['source']
-#     if 'pandas' in lk:
-#         if isinstance(kwargs['pandas'], bool):
-#             efor = kwargs['pandas']
-#
-#     def stored_eid():
-#         pE = pref.db['Equities']
-#         s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
-#         s_conn = s_engine.connect()
-#         rc = db.Table(
-#             pE['table'],
-#             db.MetaData(),
-#             autoload=True,
-#             autoload_with=s_engine).columns
-#         query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
-#         return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()]
-#                 if __ not in pE['exclude']]
-#
-#     try:
-#         code
-#     except Exception:
-#         code = stored_eid()
-#     if src == 'yahoo':
-#         code = [f'{_:04d}.HK' for _ in code]
-#     process, start = True, get_start(period)
-#     if start:
-#         while process:
-#             dp = yf.download(code, start, end, group_by='ticker')
-#             if len(dp):
-#                 process = not process
-#             else:
-#                 print('Retry in 25 seconds')
-#                 sleep(25)
-#         # dp = data.DataReader(code, src, start, end)
-#         for c in code:
-#             # res[c] = dp.minor_xs(c).transpose().to_dict()
-#             # res[c] = dp[c].transpose().to_dict()
-#             tmp = dp[c].transpose().to_dict()
-#             hdr = {}
-#             for _ in list(tmp.keys()):
-#                 hdr[_.to_pydatetime().date()] = tmp[_]
-#             res[c] = hdr
-#             if efor:
-#                 res[c] = dp[c]
-#             # if efor: res[c] = dp.minor_xs(c)
-#         return res
+    def stored_eid():
+        pE = pref.db['Equities']
+        s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
+        s_conn = s_engine.connect()
+        rc = db.Table(
+            pE['table'],
+            db.MetaData(),
+            autoload=True,
+            autoload_with=s_engine).columns
+        query = db.select([rc.eid.distinct()]).order_by(db.asc(rc.eid))
+        return [__ for __ in [_[0] for _ in s_conn.execute(query).fetchall()]
+                if __ not in pE['exclude']]
 
+    try:
+        code
+    except Exception:
+        code = stored_eid()
+    if src == 'yahoo':
+        code = [f'{_:04d}.HK' for _ in code]
+    process, start = True, get_start(period)
+    if start:
+        while process:
+            dp = yf.download(code, start, end, group_by='ticker')
+            if len(dp):
+                process = not process
+            else:
+                print('Retry in 25 seconds')
+                sleep(25)
+        # dp = data.DataReader(code, src, start, end)
+        for c in code:
+            # res[c] = dp.minor_xs(c).transpose().to_dict()
+            # res[c] = dp[c].transpose().to_dict()
+            tmp = dp[c].transpose().to_dict()
+            hdr = {}
+            for _ in list(tmp.keys()):
+                hdr[_.to_pydatetime().date()] = tmp[_]
+            res[c] = hdr
+            if efor:
+                res[c] = dp[c]
+            # if efor: res[c] = dp.minor_xs(c)
+        return res
+"""
 
 def get_month(index):
     if index.upper() in month_initial.values():
@@ -344,7 +344,7 @@ def waf(delta=0):
     futures += [''.join((f, dex(delta+1))) for f in futures_type[:-2]]
     return tuple(futures)
 
-
+"""
 def mtf(*args, **kwargs):
     ftype = futures_type[:2]
     if args:
@@ -387,7 +387,7 @@ def mtf(*args, **kwargs):
     if len(fi) == 1:
         return fi.pop()
     return fi
-
+"""
 
 def rnd(n, decimal_place=0):
     try:
