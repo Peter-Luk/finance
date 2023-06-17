@@ -128,20 +128,20 @@ async def async_fetch(query: str, db_name: str) -> Iterable:
     a_Session = Session(db_name, sync=False)
     async with a_Session.session() as session:
         async with session.begin():
-            result = (await session.execute(query))
+            result = (await session.execute(query)).fetchall()
         await session.commit()
     await a_Session.engine.dispose()
-    return result.fetchall()
+    return result
 
 
 def sync_fetch(query: str, db_name: str) -> Iterable:
     s_Session = Session(db_name, sync=True)
     with s_Session.session() as session:
         with session.begin():
-            result = session.execute(query)
+            result = session.execute(query).fetchall()
         session.commit()
     s_Session.engine.dispose()
-    return result.fetchall()
+    return result
 
 
 class Securities(Base):
