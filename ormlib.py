@@ -14,13 +14,46 @@ from pref import fields
 Base = declarative_base()
 
 
-def trade_data(code: Any) -> pd.DataFrame:
-    fields = ['date']
+def trade_data(code: Any, derivative: bool = False) -> pd.DataFrame:
+    fields = ['date', 'session'] if derivative else ['date']
     fields.extend(yaml_get('fields', YAML_PREFERENCE))
-    query = select(*[eval(f'Securities.{_}') for _ in fields]).where(Securities.eid == code)
-    holder = asyncio.run(async_fetch(query, yaml_db_get('name', 'Equities', YAML_PREFERENCE)))
-    df = pd.DataFrame(holder)
-    df.columns = fields
+    if derivative:
+        query = select(*[eval(f'Derivatives.{_}') for _ in fields]).where(Derivatives.code ==  code)
+        holder = asyncio.run(async_fetch(query, yaml_db_get('name', 'Futures', YAML_PREFERENCE)))
+        tdf = pd.DataFrame(holder)
+        tdf.columns = fields
+        date_ = tdf.date.unique()
+        open_ = []
+        high_ = []
+        low_ = []
+        close_ = []
+        volume_ = []
+        for da in date_:
+            t = tdf[tdf['date'] == da]
+            if len(t) < 2:
+                open_.append(t.open)
+                high_.append(t.high)
+                low_.append(t.low)
+                close_.append(t.close)
+                volume_.append(t.volume)
+            else:
+                open_.append(t.open[t['session'] == 'M'].iloc[0])
+                close_.append(t.close[t['session'] == 'A'].iloc[0])
+                high_.append(t.high.max())
+                low_.append(t.low.min())
+                volume_.append(t.volume.sum())
+        df = pd.DataFrame(date_)
+        df.columns = ['date']
+        df['open'] = open_
+        df['high'] = high_
+        df['low'] = low_
+        df['close'] = close_
+        df['volume'] = volume_
+    else:
+        query = select(*[eval(f'Securities.{_}') for _ in fields]).where(Securities.eid == code)
+        holder = asyncio.run(async_fetch(query, yaml_db_get('name', 'Equities', YAML_PREFERENCE)))
+        df = pd.DataFrame(holder)
+        df.columns = fields
     df = df.set_index(pd.DatetimeIndex(df.date))
     df = df.drop(columns=['date'])
     return df
