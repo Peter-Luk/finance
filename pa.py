@@ -46,11 +46,13 @@ class Person(Subject):
         self.session = Health(self.db_name).session
         self.__fields = Subject._data_fields
         self.__fields.append('subject_id') if 'subject_id' not in self.__fields else None
-        self.query = select(Subject).options(load_only(*[eval(f'Subject.{_}') for _ in self.__fields])).where(Subject.subject_id == self.subject_id)
+        self.query = select(*[eval(f'Subject.{_}') for _ in Subject._data_fields]).where(Subject.subject_id == self.subject_id)
+        # self.query = select(Subject).options(load_only(*[eval(f'Subject.{_}') for _ in self.__fields])).where(Subject.subject_id == self.subject_id)
 
 
     def __call__(self):
-        holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name))
+        holder = asyncio.run(async_fetch(self.query, self.db_name))
+        # holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name))
         _ = pd.DataFrame()
         for field in Subject._data_fields:
             exec(f"_['{field}'] = [__.{field} for __ in holder]")
