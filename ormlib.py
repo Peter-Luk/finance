@@ -1,16 +1,29 @@
 import asyncio
 import datetime
+import pandas as pd
 from time import sleep
 from pathlib import os
-from typing import Iterable
+from typing import Iterable, Any
 from sqlalchemy import asc, desc, create_engine, Column, Integer, Date, Time, String, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.future import select
-from utilities import today, futures_type, yaml_db_get, filepath, get_start, waf, ltd
+from utilities import today, futures_type, yaml_db_get, filepath, get_start, waf, ltd, yaml_get, YAML_PREFERENCE
 from pref import fields
 
 Base = declarative_base()
+
+
+def trade_data(code: Any) -> pd.DataFrame:
+    fields = ['date']
+    fields.extend(yaml_get('fields', YAML_PREFERENCE))
+    query = select(*[eval(f'Securities.{_}') for _ in fields]).where(Securities.eid == code)
+    holder = asyncio.run(async_fetch(query, yaml_db_get('name', 'Equities', YAML_PREFERENCE)))
+    df = pd.DataFrame(holder)
+    df.columns = fields
+    df = df.set_index(pd.DatetimeIndex(df.date))
+    df = df.drop(columns=['date'])
+    return df
 
 
 def stored_eid():
@@ -115,20 +128,20 @@ async def async_fetch(query: str, db_name: str) -> Iterable:
     a_Session = Session(db_name, sync=False)
     async with a_Session.session() as session:
         async with session.begin():
-            result = (await session.execute(query)).scalars().all()
+            result = (await session.execute(query))
         await session.commit()
     await a_Session.engine.dispose()
-    return result
+    return result.fetchall()
 
 
 def sync_fetch(query: str, db_name: str) -> Iterable:
     s_Session = Session(db_name, sync=True)
     with s_Session.session() as session:
         with session.begin():
-            result = session.execute(query).fetchall()
+            result = session.execute(query)
         session.commit()
     s_Session.engine.dispose()
-    return result
+    return result.fetchall()
 
 
 class Securities(Base):
