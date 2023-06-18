@@ -2,8 +2,10 @@ import copy
 import datetime
 from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
 from sqlalchemy import create_engine, Column, Integer, Date, String, text
-from finance.utilities import filepath, getcode, gslice, waf
+from sqlalchemy.future import select
+from finance.utilities import yaml_get, yaml_db_get, YAML_PREFERENCE, filepath, getcode, gslice, waf
 from finance.fintools import FOA, get_periods, pd, np, gap, prefer_stock, mplot
+from ormlib import trade_data, Derivatives
 from finance.finaux import roundup
 
 Session = sessionmaker()
@@ -71,12 +73,11 @@ class Securities(Record):
 class Futures(Index, FOA):
     def __init__(self, code):
         super(Futures, self).__init__()
-        self.__db = 'Futures'
+        self.__db = yaml_db_get('name', entity='Futures')
         self.session = Index(self.__db).session
-        self.periods = get_periods(self.__db)
+        self.periods = yaml_get('periods', YAML_PREFERENCE).get(self.__db)
         self.code = code.upper()
-        self.query = self.session.query(Record).filter(Record.code==self.code)
-        self.__data = self.compose()
+        self.__data = trade_data(self.code, True)
         self.analyser = FOA(self.__data, int)
         self.change = 0
         if self.__data.shape[0] > 1:
@@ -88,55 +89,10 @@ class Futures(Index, FOA):
         self.session.close()
 
     def __call__(self):
-        return self.compose()
+        return self.__data
 
     def copy(self):
         return copy.copy(self)
-
-    def compose(self):
-        def unique_date():
-            res = []
-            for _ in self.query.all():
-                if _.date not in res:
-                    res.append(_.date)
-            return res
-        res = []
-        for _ in unique_date():
-            try:
-                md = self.query.filter(Record.date==_).filter(Record.session=='M').one()
-                open = md.open
-                high = md.high
-                low = md.low
-                close = md.close
-                volume = md.volume
-                try:
-                    ad = self.query.filter(Record.date==_).filter(Record.session=='A').one()
-                    if ad.high > high:
-                        high = ad.high
-                    if ad.low < low:
-                        low = ad.low
-                    close = ad.close
-                    volume += ad.volume
-                except Exception:
-                    pass
-            except:
-                try:
-                    ad = self.query.filter(Record.date==_).filter(Record.session=='A').one()
-                    open = ad.open
-                    high = ad.high
-                    low = ad.low
-                    close = ad.close
-                    volume = ad.volume
-                except Exception:
-                    pass
-            res.append({'date':_, 'open':open,'high':high, 'low':low, 'close':close, 'volume':volume})
-        _ = pd.DataFrame(res)
-        _ = _.convert_dtypes()
-        _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
-        _.date = pd.to_datetime(_.date, format='%Y-%m-%d')
-        _ = _.set_index(pd.DatetimeIndex(_.date))
-        _.drop('date', axis=1, inplace=True)
-        return _
 
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f} and KAMA is {int(self.kama().iloc[-1]):d}"
@@ -146,6 +102,15 @@ class Futures(Index, FOA):
             period = self.periods['simple']
         _ = self.analyser.sma(period)
         return _.round()
+
+    def sar(self, period=None):
+        if period is None:
+            period = self.periods['sar']
+        _ = self.analyser.sar(period['acceleration'], period['maximum']).astype('float64')
+        # if self.exchange == 'HKEx':
+        #     _ = _.apply(roundup)
+        return _
+
 
     def wma(self, period=None):
         if period is None:
