@@ -237,14 +237,17 @@ class Equity(Securities, FOA):
         s = copy.copy(Securities)
         self.session = s('Securities').session
         # self.periods = get_periods('pref.yaml')['Equities']
-        self.periods = get_periods()
+        self.periods = yaml_get('periods', YAML_PREFERENCE).get('Equities')
+        # self.periods = get_periods()
 
         self.code = code
         self.exchange = exchange
         self.yahoo_code = getcode(self.code, self.exchange)
-        self.__fields = ['date', 'open', 'high', 'low', 'close', 'volume']
-        if exchange == 'HKEx':
-            self.query = self.session.query(*[eval(f"Record.{_}") for _ in self.__fields]).filter(text(f"eid={self.code}"))
+        self.__fields = ['date']
+        self.__fields.extend(yaml_get('fields', YAML_PREFERENCE))
+        # self.__fields = ['date', 'open', 'high', 'low', 'close', 'volume']
+        # if exchange == 'HKEx':
+            # self.query = self.session.query(*[eval(f"Record.{_}") for _ in self.__fields]).filter(text(f"eid={self.code}"))
         self.__data = self.compose(static)
         self.analyser = FOA(self.__data, float)
         self.change = self.__data.close.diff(1)[-1] / self.__data.close[-2]
@@ -265,9 +268,10 @@ class Equity(Securities, FOA):
         if self.exchange != 'HKEx':
             static = False
         if static:
-            __ = pd.read_sql(self.query.statement, self.session.bind, parse_dates=['date'])
-            __ = __.set_index(pd.DatetimeIndex(__.date))
-            __.drop('date', axis=1, inplace=True)
+            __ = trade_data(self.code, False)
+            # __ = pd.read_sql(self.query.statement, self.session.bind, parse_dates=['date'])
+            # __ = __.set_index(pd.DatetimeIndex(__.date))
+            # __.drop('date', axis=1, inplace=True)
         else:
             import yfinance as yf
             today = datetime.datetime.today()
