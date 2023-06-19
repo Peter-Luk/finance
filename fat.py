@@ -111,7 +111,6 @@ class Futures(Index, FOA):
         #     _ = _.apply(roundup)
         return _
 
-
     def wma(self, period=None):
         if period is None:
             period = self.periods['simple']
