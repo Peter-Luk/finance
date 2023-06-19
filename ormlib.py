@@ -31,11 +31,11 @@ def trade_data(code: Any, derivative: bool = False) -> pd.DataFrame:
         for da in date_:
             t = tdf[tdf['date'] == da]
             if len(t) < 2:
-                open_.append(t.open)
-                high_.append(t.high)
-                low_.append(t.low)
-                close_.append(t.close)
-                volume_.append(t.volume)
+                open_.append(t.iloc[-1].open)
+                high_.append(t.iloc[-1].high)
+                low_.append(t.iloc[-1].low)
+                close_.append(t.iloc[-1].close)
+                volume_.append(t.iloc[-1].volume)
             else:
                 open_.append(t.open[t['session'] == 'M'].iloc[0])
                 close_.append(t.close[t['session'] == 'A'].iloc[0])
