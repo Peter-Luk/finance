@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, Date, String, text
 from sqlalchemy.future import select
 from finance.utilities import yaml_get, yaml_db_get, YAML_PREFERENCE, filepath, getcode, gslice, waf
 from finance.fintools import FOA, get_periods, pd, np, gap, prefer_stock, mplot
-from ormlib import trade_data, Derivatives
+from ormlib import trade_data, Derivatives, Session as S2
 from finance.finaux import roundup
 
 Session = sessionmaker()
@@ -453,12 +453,23 @@ class Equity(Securities, FOA):
 
 def submit(values, db='Futures'):
     from tqdm import tqdm
+    """
     _ = Index(db).session
     with _.begin():
         for i in tqdm(values, desc='submitting'):
             _.add(i)
     print('Done')
     _.close()
+    """
+    s_Session = S2('Futures', True)
+    with s_Session.session() as session:
+        with session.begin():
+            for i in tqdm(values, desc='submitting'):
+                session.add(i)
+        session.commit()
+    s_Session.engine.dispose()
+    print('Done!')
+
 
 
 def collect(advance=False):
