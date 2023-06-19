@@ -461,7 +461,7 @@ def submit(values, db='Futures'):
     print('Done')
     _.close()
     """
-    s_Session = S2('Futures', True)
+    s_Session = S2(db, True)
     with s_Session.session() as session:
         with session.begin():
             for i in tqdm(values, desc='submitting'):
