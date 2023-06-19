@@ -441,7 +441,7 @@ class Equity(Securities, FOA):
         return pd.Series(np.unique(_a))
 
 
-def submit(values, db='Futures'):
+def submit(values, db=yaml_db_get('name', entity='Futures')):
     from tqdm import tqdm
     """
     _ = Index(db).session
@@ -459,7 +459,6 @@ def submit(values, db='Futures'):
         session.commit()
     s_Session.engine.dispose()
     print('Done!')
-
 
 
 def collect(advance=False):
