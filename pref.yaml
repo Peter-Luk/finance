@@ -175,6 +175,10 @@ db:
         table: 'records'
         index: 'date'
         freq: 'bi-daily'
+    Health:
+        name: 'Health'
+        table: 'records'
+        index: 'Datetime'
 
 public_holiday: 
     2015:
