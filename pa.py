@@ -2,12 +2,11 @@ import asyncio
 import datetime
 import pandas as pd
 from sqlalchemy.future import select
-from sqlalchemy.orm import declarative_base, sessionmaker, load_only
-from sqlalchemy import create_engine, Column, Integer, Date, Time, String, text
-from utilities import filepath
-from finance.ormlib import async_fetch
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, Date, Time, String, text
+from utilities import yaml_db_get, YAML_PREFERENCE
+from finance.ormlib import async_fetch, Session
 
-Session = sessionmaker()
 Base = declarative_base()
 
 
@@ -32,27 +31,17 @@ class Subject(Base):
     remarks = Column(String)
 
 
-class Health(Subject):
-    def __init__(self, db):
-        self.engine = create_engine(f'sqlite:///{filepath(db)}')
-        Session.configure(bind=self.engine)
-        self.session = Session()
-
-
 class Person(Subject):
     def __init__(self, subject_id, db_name='Health'):
         self.db_name = db_name
         self.subject_id = subject_id
-        self.session = Health(self.db_name).session
+        # self.session = Health(self.db_name).session
         self.__fields = Subject._data_fields
         self.__fields.append('subject_id') if 'subject_id' not in self.__fields else None
         self.query = select(*[eval(f'Subject.{_}') for _ in Subject._data_fields]).where(Subject.subject_id == self.subject_id)
-        # self.query = select(Subject).options(load_only(*[eval(f'Subject.{_}') for _ in self.__fields])).where(Subject.subject_id == self.subject_id)
-
 
     def __call__(self):
         holder = asyncio.run(async_fetch(self.query, self.db_name))
-        # holder = asyncio.run(async_fetch(self.query.options(load_only(*[eval(f'Subject.{_}') for _ in Subject._data_fields])), self.db_name))
         _ = pd.DataFrame()
         for field in Subject._data_fields:
             exec(f"_['{field}'] = [__.{field} for __ in holder]")
@@ -63,6 +52,7 @@ class Person(Subject):
         _ = _.drop(['subject_id', 'date', 'time', 'Datetime'], axis=1)
         return _
 
+"""
     def update(self, values, criteria):
         q = self.query
         if 'id' in criteria.keys():
@@ -101,53 +91,32 @@ class Person(Subject):
         except Exception:
             return "Intend for unique record only"
         self.session.commit()
-
+"""
 
 if __name__ == "__main__":
-    from pathlib import sys
     sid, confirm, dk = 1, 'Y', 'at ease prior to bed'
     if datetime.datetime.today().hour < 13:
         dk = 'wake up, washed before breakfast'
 
     while confirm.upper() != 'N':
         sj = Subject()
-        if sys.version_info.major == 2:
-            sd = raw_input("Subject ID")
-            try:
-                sj.subject_id = int(sd)
-                pn = Person(sj.subject_id)
-            except Exception:
-                sj.subject_id = sid
-                pn = Person(sj.subject_id)
-            sj.sys = raw_input("Systolic: ")
-            sj.dia = raw_input("Diastolic: ")
-            sj.pulse = raw_input("Pulse: ")
-            rmk = raw_input("Remark: ")
-            if rmk == '':
-                rmk = dk
-            sj.remarks = rmk
-            _modify_at = datetime.datetime.now()
-            sj.date = _modify_at.date()
-            sj.time = _modify_at.time()
-            pn.session.add(sj)
-            pn.session.commit()
-            confirm = raw_input("Others? (Y)es/(N)o: ")
-        if sys.version_info.major == 3:
-            sd = input(f"Subject ID (default: {sid}): ")
-            try:
-                sj.subject_id = int(sd)
-                pn = Person(sj.subject_id)
-            except Exception:
-                sj.subject_id = sid
-                pn = Person(sj.subject_id)
-            sj.sys = input("Systolic: ")
-            sj.dia = input("Diastolic: ")
-            sj.pulse = input("Pulse: ")
-            rmk = input(f"Remark (default: {dk}): ")
-            sj.remarks = dk if rmk == '' else rmk
-            _modify_at = datetime.datetime.now()
-            sj.date = _modify_at.date()
-            sj.time = _modify_at.time()
-            pn.session.add(sj)
-            pn.session.commit()
-            confirm = input("Others? (Y)es/(N)o: ")
+        sd = input(f"Subject ID (default: {sid}): ")
+        try:
+            sj.subject_id = int(sd)
+        except Exception:
+            sj.subject_id = sid
+        sj.sys = input("Systolic: ")
+        sj.dia = input("Diastolic: ")
+        sj.pulse = input("Pulse: ")
+        rmk = input(f"Remark (default: {dk}): ")
+        sj.remarks = dk if rmk == '' else rmk
+        _modify_at = datetime.datetime.now()
+        sj.date = _modify_at.date()
+        sj.time = _modify_at.time()
+        pn = Session(yaml_db_get('name', 'Health', YAML_PREFERENCE))
+        with pn.session() as session:
+            with session.begin():
+                session.add(sj)
+            session.commit()
+        pn.engine.dispose()
+        confirm = input("Others? (Y)es/(N)o: ")
