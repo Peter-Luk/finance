@@ -1,14 +1,13 @@
 import copy
 import datetime
-from sqlalchemy.orm import sessionmaker, declarative_base, deferred, defer
-from sqlalchemy import create_engine, Column, Integer, Date, String, text
-from sqlalchemy.future import select
-from finance.utilities import yaml_get, yaml_db_get, YAML_PREFERENCE, filepath, getcode, gslice, waf
+from sqlalchemy.orm import declarative_base, deferred
+from sqlalchemy import Column, Integer, Date, String, text
+# from sqlalchemy.future import select
+from finance.utilities import yaml_get, yaml_db_get, YAML_PREFERENCE, getcode, gslice, waf
 from finance.fintools import FOA, get_periods, pd, np, gap, prefer_stock, mplot
-from ormlib import trade_data, Derivatives, Session as S2
+from ormlib import trade_data, Session
 from finance.finaux import roundup
 
-Session = sessionmaker()
 Base = declarative_base()
 idx = []
 
@@ -52,28 +51,8 @@ class Record(Base):
         self.volume = volume
 
 
-class Index(Record):
-    def __init__(self, db='Futures'):
-        super(Index, self).__init__()
-        self.engine = create_engine(f"sqlite:///{filepath(db)}")
-        Session.configure(bind=self.engine)
-        self.session = Session()
-        self.query = self.session.query(Record)
-
-
-class Securities(Record):
-    def __init__(self, db='Securities'):
-        self.__engine = create_engine(f"sqlite:///{filepath(db)}")
-        Session.configure(bind=self.__engine)
-        self.session = Session()
-        query = self.session.query(Record.code.label('code')).subquery()
-        self.query = self.session.query(query.c.code.label('eid')).options(defer('session'))
-
-
-# class Futures(Index, FOA):
 class Futures(FOA):
     def __init__(self, code):
-        # super(Futures, self).__init__()
         self.__db = yaml_db_get('name', entity='Futures')
         self.periods = yaml_get('periods', YAML_PREFERENCE).get(self.__db)
         self.code = code.upper()
@@ -228,10 +207,8 @@ class Futures(FOA):
         return {'Buy': pd.Series(buy).unique().tolist() if buy else buy, 'Sell': pd.Series(sell).unique().tolist() if sell else sell}
 
 
-class Equity(Securities, FOA):
+class Equity(FOA):
     def __init__(self, code, static=True, exchange='HKEx'):
-        s = copy.copy(Securities)
-        self.session = s('Securities').session
         self.periods = yaml_get('periods', YAML_PREFERENCE).get('Equities')
 
         self.code = code
@@ -443,15 +420,7 @@ class Equity(Securities, FOA):
 
 def submit(values, db=yaml_db_get('name', entity='Futures')):
     from tqdm import tqdm
-    """
-    _ = Index(db).session
-    with _.begin():
-        for i in tqdm(values, desc='submitting'):
-            _.add(i)
-    print('Done')
-    _.close()
-    """
-    s_Session = S2(db, True)
+    s_Session = Session(db, True)
     with s_Session.session() as session:
         with session.begin():
             for i in tqdm(values, desc='submitting'):
@@ -479,7 +448,7 @@ def collect(advance=False):
 
 
 def baseplot(rdf, latest=None):
-    if isinstance(rdf, (Index, Equity)):
+    if isinstance(rdf, (Futures, Equity)):
         df = rdf.copy()
         _ = df.kc()
         _['kama'.upper()] = df.kama()
