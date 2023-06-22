@@ -58,6 +58,21 @@ def trade_data(code: Any, derivative: bool = False) -> pd.DataFrame:
     df = df.drop(columns=['date'])
     return df
 
+""""
+def entities(dbname: str = None):
+    if dbname is None:
+        dbname = yaml_db_get('name', 'Equities', YAML_PREFERENCE)
+    if dbname == yaml_db_get('name', 'Equities', YAML_PREFERENCE):
+        query = select(Securities.eid.distinct()).order_by(asc(Securities.eid))
+        __ = asyncio.run(async_fetch(query, dbname))
+        exclude = yaml_db_get('exclude', 'Equities', YAML_PREFERENCE)
+        res =  [_[0] for _ in __ if _ not in exclude]
+    if dbname == yaml_db_get('name', 'Futures', YAML_PREFERENCE):
+        query = select(Derivatives.code.distinct()).order_by(asc(Derivatives.code))
+        __ = asyncio.run(async_fetch(query, dbname))
+        res =  [_[0] for _ in __]
+    return res
+"""
 
 def stored_eid():
     query = select(Securities.eid.distinct()).order_by(asc(Securities.eid))
