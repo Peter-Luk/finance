@@ -423,7 +423,7 @@ def entities(dbname: str = None):
         exclude = yaml_db_get('exclude', 'Equities', YAML_PREFERENCE)
         res =  [_[0] for _ in __ if _ not in exclude]
     if dbname == yaml_db_get('name', 'Futures', YAML_PREFERENCE):
-        query = select(Derivatives.code.distinct()).order_by(asc(Derivatives.code))
+        query = select(Derivatives.code.distinct()).order_by(db.asc(Derivatives.code))
         __ = asyncio.run(async_fetch(query, dbname))
         res =  [_[0] for _ in __]
     return res
