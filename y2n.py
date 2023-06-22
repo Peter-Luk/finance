@@ -1,5 +1,6 @@
+import asyncio
 import pandas as pd
-import numpy as np
+# import numpy as np
 import sqlalchemy as db
 from tqdm import tqdm
 import pref
@@ -14,9 +15,11 @@ except ImportError:
 
 from datetime import datetime
 from time import sleep
-from utilities import filepath
+from utilities import yaml_db_get, YAML_PREFERENCE, filepath
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
+from ormlib import Securities, Derivatives, trade_data, async_fetch
+from sqlalchemy.future import select
 # pd, np, db, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
 
@@ -262,14 +265,18 @@ class Equities(AE, Viewer):
                     sleep(30)
             __.drop(columns=['Adj Close'])
         else:
-            from alchemy import AS
-            fields = ['date'] + pref.fields
-            sfc = ', '.join([f'{_} as {_.capitalize()}' for _ in fields])
-            qtext = f"SELECT {sfc} FROM records WHERE eid={code:d} AND \
-                    date>{start:'%Y-%m-%d'}"
-            conn = AS(self._conf['name']).connect
-            __ = pd.read_sql(
-                    qtext, conn, index_col='Date', parse_dates=['Date'])
+            # from alchemy import AS
+            # fields = ['date'] + pref.fields
+            # sfc = ', '.join([f'{_} as {_.capitalize()}' for _ in fields])
+            # qtext = f"SELECT {sfc} FROM records WHERE eid={code:d} AND \
+            #         date>{start:'%Y-%m-%d'}"
+            # conn = AS(self._conf['name']).connect
+            # __ = pd.read_sql(
+            #         qtext, conn, index_col='Date', parse_dates=['Date'])
+            __ = trade_data(code, False)
+            __ = __[__.index > start]
+            __.columns = [_.capitalize() for _ in __.columns]
+            __.index.name = __.index.name.capitalize()
         return __
 
     def mas(self, date=None, period=periods):
@@ -407,6 +414,21 @@ def bqo(el, action='buy', bound=True, adhoc=False):
     return _.T
 
 
+def entities(dbname: str = None):
+    if dbname is None:
+        dbname = yaml_db_get('name', 'Equities', YAML_PREFERENCE)
+    if dbname == yaml_db_get('name', 'Equities', YAML_PREFERENCE):
+        query = select(Securities.eid.distinct()).order_by(db.asc(Securities.eid))
+        __ = asyncio.run(async_fetch(query, dbname))
+        exclude = yaml_db_get('exclude', 'Equities', YAML_PREFERENCE)
+        res =  [_[0] for _ in __ if _ not in exclude]
+    if dbname == yaml_db_get('name', 'Futures', YAML_PREFERENCE):
+        query = select(Derivatives.code.distinct()).order_by(asc(Derivatives.code))
+        __ = asyncio.run(async_fetch(query, dbname))
+        res =  [_[0] for _ in __]
+    return res
+
+"""
 def entities(dbname=None, series=False):
     pF, pE = pref.db['Futures'], pref.db['Equities']
     if not dbname:
@@ -434,7 +456,7 @@ def entities(dbname=None, series=False):
     if series:
         return pd.Series(res)
     return res
-
+"""
 
 def compose(code=None):
     def grab(c):
