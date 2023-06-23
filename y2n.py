@@ -421,7 +421,7 @@ def entities(dbname: str = None):
         query = select(Securities.eid.distinct()).order_by(db.asc(Securities.eid))
         __ = sync_fetch(query, dbname)
         exclude = yaml_db_get('exclude', 'Equities', YAML_PREFERENCE)
-        res =  [_[0] for _ in __ if _ not in exclude]
+        res =  [_[0] for _ in __ if _[0] not in exclude]
     if dbname == yaml_db_get('name', 'Futures', YAML_PREFERENCE):
         query = select(Derivatives.code.distinct()).order_by(db.asc(Derivatives.code))
         __ = sync_fetch(query, dbname)
