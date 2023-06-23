@@ -51,12 +51,13 @@ def trade_data(code: Any, derivative: bool = False) -> pd.DataFrame:
         df['volume'] = volume_
     else:
         query = select(*[eval(f'Securities.{_}') for _ in fields]).where(Securities.eid == code)
-        holder = asyncio.run(async_fetch(query, yaml_db_get('name', 'Equities', YAML_PREFERENCE)))
+        holder = sync_fetch(query, yaml_db_get('name', 'Equities', YAML_PREFERENCE))
         df = pd.DataFrame(holder)
         df.columns = fields
     df = df.set_index(pd.DatetimeIndex(df.date))
     df = df.drop(columns=['date'])
     return df
+
 
 """"
 def entities(dbname: str = None):
