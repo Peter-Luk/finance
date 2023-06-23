@@ -18,7 +18,7 @@ from time import sleep
 from utilities import yaml_db_get, YAML_PREFERENCE, filepath
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
-from ormlib import Securities, Derivatives, trade_data, async_fetch
+from ormlib import Securities, Derivatives, trade_data, async_fetch, sync_fetch
 from sqlalchemy.future import select
 # pd, np, db, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
@@ -419,12 +419,12 @@ def entities(dbname: str = None):
         dbname = yaml_db_get('name', 'Equities', YAML_PREFERENCE)
     if dbname == yaml_db_get('name', 'Equities', YAML_PREFERENCE):
         query = select(Securities.eid.distinct()).order_by(db.asc(Securities.eid))
-        __ = asyncio.run(async_fetch(query, dbname))
+        __ = sync_fetch(query, dbname)
         exclude = yaml_db_get('exclude', 'Equities', YAML_PREFERENCE)
         res =  [_[0] for _ in __ if _ not in exclude]
     if dbname == yaml_db_get('name', 'Futures', YAML_PREFERENCE):
         query = select(Derivatives.code.distinct()).order_by(db.asc(Derivatives.code))
-        __ = asyncio.run(async_fetch(query, dbname))
+        __ = sync_fetch(query, dbname)
         res =  [_[0] for _ in __]
     return res
 
