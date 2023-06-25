@@ -16,7 +16,7 @@ from finance.fintools import FOA, get_periods, hsirnd
 from finance.utilities import yaml_get, yaml_db_get, filepath, gslice
 from finance.ormlib import async_fetch
 from finance.finaux import roundup
-from nta import Viewer
+# from nta import Viewer
 from asyahoo import get_data
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
@@ -85,14 +85,15 @@ b_scale = yaml_get('B_scale', YAML_PREFERENCE)
 
 
 @asyncinit
-class Equity(FOA, Viewer):
+class Equity(FOA):
+# class Equity(FOA, Viewer):
     """ base object (trial) """
     async def __init__(self, code: int, boarse: str = 'HKEx', static: bool = True) -> Coroutine:
         self.periods = get_periods()
         self.exchange = boarse
         self.code = code
         await self.compose(static)
-        self.view = Viewer(self.__data)
+        # self.view = Viewer(self.__data)
 
     async def compose(self, static: bool) -> pd.DataFrame:
         if self.exchange == 'HKEx':
@@ -105,6 +106,7 @@ class Equity(FOA, Viewer):
                             columns=fields
                             )
                     self.__data.set_index('date', inplace=True)
+                    self.__data.columns = [_.capitalize() for _ in fields]
                 else:
                     self.__data = await get_data(self.code, self.exchange)
             else:
@@ -177,15 +179,15 @@ class Equity(FOA, Viewer):
         """ soc """
         return super().soc(param).astype(astype)
 
-    def maverick(self,
-            date=None,
-            period=yaml_get('periods',
-                YAML_PREFERENCE).get('Equities'),
-            unbound=True,
-            exclusive=True):
-        if date is None:
-            date = self.date
-        return self.view.maverick(self.__data, period, date, unbound, exclusive)
+    # def maverick(self,
+    #         date=None,
+    #         period=yaml_get('periods',
+    #             YAML_PREFERENCE).get('Equities'),
+    #         unbound=True,
+    #         exclusive=True):
+    #     if date is None:
+    #         date = self.date
+    #     return self.view.maverick(self.__data, period, date, unbound, exclusive)
 
     def optinum(self, date: str = None,
                 base: pd.DataFrame = None,
