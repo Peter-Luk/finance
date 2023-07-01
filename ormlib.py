@@ -14,7 +14,7 @@ from pref import fields
 Base = declarative_base()
 
 
-def trade_data(code: Any, derivative: bool = False) -> pd.DataFrame:
+def trade_data(code: Any, derivative: bool = False, capitalize: bool = False) -> pd.DataFrame:
     fields = ['date', 'session'] if derivative else ['date']
     fields.extend(yaml_get('fields', YAML_PREFERENCE))
     if derivative:
@@ -56,6 +56,8 @@ def trade_data(code: Any, derivative: bool = False) -> pd.DataFrame:
         df.columns = fields
     df = df.set_index(pd.DatetimeIndex(df.date))
     df = df.drop(columns=['date'])
+    if capitalize:
+        df.columns = [_.capitalize() for _ in yaml_get('fields', YAML_PREFERENCE)]
     return df
 
 
