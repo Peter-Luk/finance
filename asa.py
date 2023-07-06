@@ -99,7 +99,8 @@ class Equity(FOA):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, sar: {self.sar().iloc[-1]:,.2f} and KAMA: {self.kama().iloc[-1]:,.2f}"
 
     def __call__(self, static=True):
-        return self.__data
+        return self.optinum(date=self.date)
+        # return self.__data
 
     async def compose(self, static: bool) -> pd.DataFrame:
         if self.exchange == 'HKEx':
