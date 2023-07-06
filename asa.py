@@ -95,6 +95,12 @@ class Equity(FOA):
         await self.compose(static)
         # self.view = Viewer(self.__data)
 
+    def __str__(self):
+        return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, sar: {self.sar().iloc[-1]:,.2f} and KAMA: {self.kama().iloc[-1]:,.2f}"
+
+    def __call__(self, static=True):
+        return self.__data
+
     async def compose(self, static: bool) -> pd.DataFrame:
         if self.exchange == 'HKEx':
             if static:
@@ -114,7 +120,7 @@ class Equity(FOA):
         else:
             self.__data = await get_data(self.code, self.exchange)
         self.__data.index = self.__data.index.astype('datetime64[ns]')
-        self.change = self.__data.close.pct_change()[-1] * 100
+        self.change = self.__data.close.pct_change()[-1]
         self.date = self.__data.index[-1]
         self.close = self.__data.close[-1]
         super().__init__(self.__data, float)
