@@ -21,32 +21,6 @@ from asyahoo import get_data
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
 Base = declarative_base()
-
-
-# def yaml_get(field: str, file: str) -> Any:
-#     """ Basic yaml config reader """
-#     if file.split('.')[-1] == 'yaml':
-#         import yaml
-#         fpaths = [os.getcwd()]
-#         fpaths.extend(PYTHON_PATH)
-#         for f_p in fpaths:
-#             _f = f'{f_p}{sep}{file}'
-#             if os.path.isfile(_f):
-#                 with open(_f, encoding='utf-8') as y_f:
-#                     _ = yaml.load(y_f, Loader=yaml.FullLoader)
-#                 res = _.get(field)
-#     return res
-#
-#
-# def yaml_db_get(
-#         field: str,
-#         entity: str = 'Equities',
-#         file: str = YAML_PREFERENCE) -> Any:
-#     """ yaml db config reader """
-#     _ = yaml_get('db', file)
-#     return _.get(entity).get(field)
-
-
 DB_NAME: Final[str] = yaml_db_get('name')
 DB_PATH: Final[str] = filepath(DB_NAME)
 
@@ -112,8 +86,9 @@ class Equity(FOA):
                             await self.fetch(start),
                             columns=fields
                             )
-                    self.__data.set_index('date', inplace=True)
-                    self.__data.columns = [_.capitalize() for _ in fields]
+                    self.__data = self.__data.set_index(pd.DatetimeIndex(self.__data.date))
+                    # self.__data.set_index('date', inplace=True)
+                    # self.__data.columns = [_.capitalize() for _ in fields]
                 else:
                     self.__data = await get_data(self.code, self.exchange)
             else:
@@ -202,7 +177,10 @@ class Equity(FOA):
         if date is None:
             date = self.date
         if base is None:
-            base = self.__data.query(f'date <= "{date}"')
+            try:
+                base = self.__data.query(f'date <= "{date}"')
+            except:
+                base = self.__data.query(f'Date <= "{date}"')
         if delta is None:
             delta = self.atr(self.periods['atr'])
 
