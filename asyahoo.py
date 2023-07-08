@@ -43,8 +43,11 @@ async def get_data(ticker: Any = 9988,
         df = pd.read_csv(StringIO(response))
         df.drop('Adj Close', axis=1, inplace=True)
         df.columns = [_.lower() for _ in df.columns]
-        df.set_index('date', inplace=True)
-        return df
+        df = df.set_index(pd.DatetimeIndex(df.date))
+        df.drop('date', axis=1, inplace=True)
+        # df.set_index('Date', inplace=True)
+        # df.columns = [_.lower() for _ in df.columns]
+    return df
 
 if __name__ == "__main__":
     print(asyncio.run(get_data()))
