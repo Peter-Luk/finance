@@ -143,7 +143,10 @@ class FOA(object):
 
     def sma(self, period, data=None):
         if isinstance(data, type(None)):
-            data = self.__data.close
+            try:
+                data = self.__data.close
+            except:
+                data = self.__data.Close
         _ = data.rolling(period).mean()
         _.name = 'sma'
         return _
@@ -153,18 +156,28 @@ class FOA(object):
             data = self.__data
         _ = data
         _['res'] = np.nan
-        return self._ta.SAR(data.high, data.low, acceleration=acceleration, maximum=maximum) if self._ta else _['res']
+        try:
+            result = self._ta.SAR(data.High, data.Low, acceleration=acceleration, maximum=maximum) if self._ta else _['res']
+        except:
+            result = self._ta.SAR(data.high, data.low, acceleration=acceleration, maximum=maximum) if self._ta else _['res']
+        return result
 
     def wma(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        _ = (data.close * data.volume).rolling(period).sum() / data.volume.rolling(period).sum()
+        try:
+            _ = (data.close * data.volume).rolling(period).sum() / data.volume.rolling(period).sum()
+        except:
+            _ = (data.Close * data.Volume).rolling(period).sum() / data.Volume.rolling(period).sum()
         _.name = 'wma'
         return _
 
     def ema(self, period, data=None):
         if isinstance(data, type(None)):
-            data = self.__data.close
+            try:
+                data = self.__data.close
+            except:
+                data = self.__data.Close
         _ = data.to_frame()
         y = stepper(period, data.to_numpy().astype(self.dtype))
         _['ema'] = y
@@ -174,11 +187,17 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         if self._ta:
-            _ = self._ta.RSI(data.close, period)
+            try:
+                _ = self._ta.RSI(data.close, period)
+            except:
+                _ = self._ta.RSI(data.Close, period)
             _.name = 'RSI'
             return _
         else:
-            fd = data.close.diff()
+            try:
+                fd = data.close.diff()
+            except:
+                fd = data.Close.diff()
 
             def avgstep(source, direction, period):
                 i, res = 0, []
@@ -228,19 +247,29 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         if self._ta:
-            _ = self._ta.ATR(data.high, data.low, data.close, period)
+            try:
+                _ = self._ta.ATR(data.high, data.low, data.close, period)
+            except:
+                _ = self._ta.ATR(data.High, data.Low, data.Close, period)
             _.name = 'ATR'
             return _
         else:
-            pc = data.close.shift()
-            _ = pd.concat([data.high - data.low, (data.high - pc).abs(), (data.low - pc).abs()], axis=1).max(axis=1)
+            try:
+                pc = data.close.shift()
+                _ = pd.concat([data.high - data.low, (data.high - pc).abs(), (data.low - pc).abs()], axis=1).max(axis=1)
+            except:
+                pc = data.Close.shift()
+                _ = pd.concat([data.High - data.Low, (data.High - pc).abs(), (data.Low - pc).abs()], axis=1).max(axis=1)
             _['atr'] = self.ema(period, _)
             _.atr.name = 'atr'
             return _.atr
 
     def kama(self, period, data=None):
         if isinstance(data, type(None)):
-            data = self.__data.close
+            try:
+                data = self.__data.close
+            except:
+                data = self.__data.Close
         sma = self.sma(period['er'], data)
         acp = data.diff(period['er']).abs()[period['er']:]
         vot = data.diff(1).abs()[1:].rolling(period['er']).sum()
@@ -260,9 +289,14 @@ class FOA(object):
     def soc(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        ml = data.low.rolling(period['K']).min()
-        mh = data.high.rolling(period['K']).max()
-        data['kseries'] = np.apply_along_axis(lambda a, b, c: (a - c) /(b - c) * 100, 0, data.close, mh, ml)
+        try:
+            ml = data.low.rolling(period['K']).min()
+            mh = data.high.rolling(period['K']).max()
+            data['kseries'] = np.apply_along_axis(lambda a, b, c: (a - c) /(b - c) * 100, 0, data.close, mh, ml)
+        except:
+            ml = data.Low.rolling(period['K']).min()
+            mh = data.High.rolling(period['K']).max()
+            data['kseries'] = np.apply_along_axis(lambda a, b, c: (a - c) /(b - c) * 100, 0, data.Close, mh, ml)
         k = data.kseries.rolling(period['D']).mean()
         k.name = '%K'
         d = k.rolling(period['D']).mean()
@@ -274,7 +308,10 @@ class FOA(object):
     def stc(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        hl = (data.high + data.low) / 2
+        try:
+            hl = (data.high + data.low) / 2
+        except:
+            hl = (data.High + data.Low) / 2
         e_slow = self.ema(period['slow'], hl)
         e_fast = self.ema(period['fast'], hl)
         m_line = e_fast.sub(e_slow)
@@ -293,10 +330,16 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         atr = self.atr(period)
-        _ = data.high.diff(1)
+        try:
+            _ = data.high.diff(1)
+        except:
+            _ = data.High.diff(1)
         _[_<0] = 0
         dm_plus = _[1:]
-        _ = data.low.diff(1)
+        try:
+            _ = data.low.diff(1)
+        except:
+            _ = data.Low.diff(1)
         _[_<0] = 0
         dm_minus = _[1:]
         di_plus = self.ema(period, dm_plus) / atr * 100
@@ -314,7 +357,10 @@ class FOA(object):
     def kc(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        hl = (data.high + data.low) / 2
+        try:
+            hl = (data.high + data.low) / 2
+        except:
+            hl = (data.High + data.Low) / 2
         middle_line = self.kama(period['kama'], hl)
         atr = self.atr(period['atr'], data)
         upper = middle_line + (gr * atr)
@@ -326,13 +372,22 @@ class FOA(object):
     def apz(self, period, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        hl = (data.high + data.low) / 2
+        try:
+            hl = (data.high + data.low) / 2
+        except:
+            hl = (data.High + data.Low) / 2
         ehl = self.ema(period, hl)
         volatility = self.ema(2 * period, ehl[period:])
-        tr = pd.concat(
-            [data.high - data.low,
-                (data.high - data.close.shift(1)).abs(),
-                (data.low - data.close.shift(1)).abs()], axis=1).max(axis=1)
+        try:
+            tr = pd.concat(
+                [data.high - data.low,
+                    (data.high - data.close.shift(1)).abs(),
+                    (data.low - data.close.shift(1)).abs()], axis=1).max(axis=1)
+        except:
+            tr = pd.concat(
+                [data.High - data.Low,
+                    (data.High - data.Close.shift(1)).abs(),
+                    (data.Low - data.Close.shift(1)).abs()], axis=1).max(axis=1)
 
         upper = volatility + tr * gr
         lower = volatility - tr * gr
@@ -344,15 +399,22 @@ class FOA(object):
         # Donchian Channel
         if isinstance(data, type(None)):
             data = self.__data
-        pax = data.high.rolling(period).max()
-        pin = data.low.rolling(period).min()
+        try:
+            pax = data.high.rolling(period).max()
+            pin = data.low.rolling(period).min()
+        except:
+            pax = data.High.rolling(period).max()
+            pin = data.Low.rolling(period).min()
         _ = pd.concat([pax, pin], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
 
     def bb(self, period, data=None):
         if isinstance(data, type(None)):
-            data = self.__data.close
+            try:
+                data = self.__data.close
+            except:
+                data = self.__data.Close
         ml = self.sma(period, data)
         wd = data.rolling(period).std()
         _ = pd.concat([ml + wd, ml - wd], 1)
@@ -362,24 +424,43 @@ class FOA(object):
     def obv(self, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        dcp = data.close.diff()
+        try:
+            dcp = data.close.diff()
+        except:
+            dcp = data.Close.diff()
         tmp, i = [], 0
-        while i < len(data.volume):
-            _ = data.volume.iloc[i]
-            if i > 0:
-                _ = tmp[i - 1]
-                if dcp.iloc[i] > 0:
-                    _ += data.volume.iloc[i]
-                if dcp.iloc[i] < 0:
-                    _ -= data.volume.iloc[i]
-            tmp.append(_)
-            i += 1
+        try:
+            while i < len(data.volume):
+                _ = data.volume.iloc[i]
+                if i > 0:
+                    _ = tmp[i - 1]
+                    if dcp.iloc[i] > 0:
+                        _ += data.volume.iloc[i]
+                    if dcp.iloc[i] < 0:
+                        _ -= data.volume.iloc[i]
+                tmp.append(_)
+                i += 1
+        except:
+            while i < len(data.Volume):
+                _ = data.Volume.iloc[i]
+                if i > 0:
+                    _ = tmp[i - 1]
+                    if dcp.iloc[i] > 0:
+                        _ += data.Volume.iloc[i]
+                    if dcp.iloc[i] < 0:
+                        _ -= data.Volume.iloc[i]
+                tmp.append(_)
+                i += 1
         data['obv'] = tmp
         return data['obv']
 
     def vwap(self, data=None):
         if isinstance(data, type(None)):
             data = self.__data
-        pv = data.drop(['open', 'volume'], 1).mean(axis=1) * data.volume
-        data['vwap'] = pv.cumsum() / data.volume.cumsum()
+        try:
+            pv = data.drop(['open', 'volume'], 1).mean(axis=1) * data.volume
+            data['vwap'] = pv.cumsum() / data.volume.cumsum()
+        except:
+            pv = data.drop(['Open', 'Volume'], 1).mean(axis=1) * data.Volume
+            data['vwap'] = pv.cumsum() / data.Volume.cumsum()
         return data['vwap']
