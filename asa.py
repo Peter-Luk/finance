@@ -62,10 +62,17 @@ b_scale = yaml_get('B_scale', YAML_PREFERENCE)
 class Equity(FOA):
 # class Equity(FOA, Viewer):
     """ base object (trial) """
-    async def __init__(self, code: int, boarse: str = 'HKEx', static: bool = True) -> Coroutine:
+    async def __init__(
+            self,
+            code: int,
+            boarse: str = 'HKEx',
+            static: bool = True,
+            capitalize: bool = False
+            ) -> Coroutine:
         self.periods = get_periods()
-        self.exchange = boarse
         self.code = code
+        self.exchange = boarse
+        self.__capitalize = capitalize
         await self.compose(static)
         # self.view = Viewer(self.__data)
 
@@ -86,19 +93,27 @@ class Equity(FOA):
                             await self.fetch(start),
                             columns=fields
                             )
-                    self.__data = self.__data.set_index(pd.DatetimeIndex(self.__data.date))
+                    if self.__capitalize:
+                        self.__data.columns = [_.capitalize() for _ in self.__data.columns]
+                        self.__data = self.__data.set_index(pd.DatetimeIndex(self.__data.Date))
+                    else:
+                        self.__data = self.__data.set_index(pd.DatetimeIndex(self.__data.date))
                     # self.__data.set_index('date', inplace=True)
                     # self.__data.columns = [_.capitalize() for _ in fields]
                 else:
                     self.__data = await get_data(self.code, self.exchange)
             else:
-                self.__data = await get_data(self.code, self.exchange)
+                self.__data = await get_data(self.code, self.exchange, self.__capitalize)
         else:
             self.__data = await get_data(self.code, self.exchange)
         self.__data.index = self.__data.index.astype('datetime64[ns]')
-        self.change = self.__data.close.pct_change()[-1]
         self.date = self.__data.index[-1]
-        self.close = self.__data.close[-1]
+        if self.__capitalize:
+            self.change = self.__data.Close.pct_change()[-1]
+            self.close = self.__data.Close[-1]
+        else:
+            self.change = self.__data.close.pct_change()[-1]
+            self.close = self.__data.close[-1]
         super().__init__(self.__data, float)
 
     async def fetch(self, start: datetime.date) -> List:
