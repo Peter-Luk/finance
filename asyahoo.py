@@ -28,8 +28,11 @@ params = {
 #         return await response.text()
 #
 #
-async def get_data(ticker: Any = 9988,
-        boarse: str = 'HKEx') -> pd.DataFrame:
+async def get_data(
+        ticker: Any = 9988,
+        boarse: str = 'HKEx',
+        capitalize: bool = False
+        ) -> pd.DataFrame:
     url = f'{YAHOO_URL}/{getcode(ticker, boarse)}?'
 
 
@@ -42,9 +45,13 @@ async def get_data(ticker: Any = 9988,
         response = await fetch(session, url, params, headers)
         df = pd.read_csv(StringIO(response))
         df.drop('Adj Close', axis=1, inplace=True)
-        df.columns = [_.lower() for _ in df.columns]
-        df = df.set_index(pd.DatetimeIndex(df.date))
-        df.drop('date', axis=1, inplace=True)
+        if capitalize:
+            df = df.set_index(pd.DatetimeIndex(df.Date))
+            df.drop('Date', axis=1, inplace=True)
+        else:
+            df.columns = [_.lower() for _ in df.columns]
+            df = df.set_index(pd.DatetimeIndex(df.date))
+            df.drop('date', axis=1, inplace=True)
         # df.set_index('Date', inplace=True)
         # df.columns = [_.lower() for _ in df.columns]
     return df
