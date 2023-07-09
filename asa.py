@@ -101,11 +101,11 @@ class Equity(FOA):
                     # self.__data.set_index('date', inplace=True)
                     # self.__data.columns = [_.capitalize() for _ in fields]
                 else:
-                    self.__data = await get_data(self.code, self.exchange)
+                    self.__data = await get_data(self.code, self.exchange, self.__capitalize)
             else:
                 self.__data = await get_data(self.code, self.exchange, self.__capitalize)
         else:
-            self.__data = await get_data(self.code, self.exchange)
+            self.__data = await get_data(self.code, self.exchange, self.__capitalize)
         self.__data.index = self.__data.index.astype('datetime64[ns]')
         self.date = self.__data.index[-1]
         if self.__capitalize:
