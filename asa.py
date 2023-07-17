@@ -16,7 +16,7 @@ from finance.fintools import FOA, get_periods, hsirnd
 from finance.utilities import yaml_get, yaml_db_get, filepath, gslice
 from finance.ormlib import async_fetch
 from finance.finaux import roundup
-# from nta import Viewer
+from nta import Viewer
 from asyahoo import get_data
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
@@ -59,28 +59,28 @@ b_scale = yaml_get('B_scale', YAML_PREFERENCE)
 
 
 @asyncinit
-class Equity(FOA):
-# class Equity(FOA, Viewer):
+# class Equity(FOA):
+class Equity(FOA, Viewer):
     """ base object (trial) """
     async def __init__(
             self,
             code: int,
             boarse: str = 'HKEx',
             static: bool = True,
-            capitalize: bool = False
+            capitalize: bool = True
             ) -> Coroutine:
         self.periods = get_periods()
         self.code = code
         self.exchange = boarse
         self.__capitalize = capitalize
         await self.compose(static)
-        # self.view = Viewer(self.__data)
+        self.view = Viewer(self.__data)
 
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, sar: {self.sar().iloc[-1]:,.2f} and KAMA: {self.kama().iloc[-1]:,.2f}"
 
     def __call__(self, static=True):
-        return self.optinum(date=self.date)
+        return self.maverick(date=self.date) if self.__capitalize else self.optinum(date=self.date)
         # return self.__data
 
     async def compose(self, static: bool) -> pd.DataFrame:
@@ -122,69 +122,70 @@ class Equity(FOA):
                 Record.date >= start)
         return await async_fetch(sql_stmt, DB_NAME)
 
-    def sma(self, param: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
+    def sma(self, period: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
         """ sma """
-        return super().sma(param, data).astype('float64')
+        return super().sma(period, data).astype('float64')
 
-    def ema(self, param: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
+    def ema(self, period: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
         """ ema """
-        return super().ema(param, data).astype('float64')
+        return super().ema(period, data).astype('float64')
 
-    def atr(self, param: int = param.get('atr'), data: Any = None) -> pd.DataFrame:
+    def atr(self, period: int = param.get('atr'), data: Any = None) -> pd.DataFrame:
         """ atr """
-        return super().atr(param, data).astype('float64')
+        return super().atr(period, data).astype('float64')
 
-    def kama(self, param: Dict = param.get('kama'), data: Any = None) -> pd.DataFrame:
-        return super().kama(param, data).astype('float64')
+    def kama(self, period: Dict = param.get('kama'), data: Any = None) -> pd.DataFrame:
+        return super().kama(period, data).astype('float64')
 
-    def adx(self, param: int = param.get('adx'), astype: str = 'float64') -> pd.DataFrame:
+    def adx(self, period: int = param.get('adx'), astype: str = 'float64') -> pd.DataFrame:
         """ adx """
-        return super().adx(param).astype(astype)
+        return super().adx(period).astype(astype)
 
-    def apz(self, param: int = param.get('apz'), astype: str = 'float64') -> pd.DataFrame:
+    def apz(self, period: int = param.get('apz'), astype: str = 'float64') -> pd.DataFrame:
         """ apz """
-        return super().apz(param).astype(astype)
+        return super().apz(period).astype(astype)
 
-    def dc(self, param: int = param.get('dc'), astype: str = 'float64') -> pd.DataFrame:
+    def dc(self, period: int = param.get('dc'), astype: str = 'float64') -> pd.DataFrame:
         """ dc """
-        return super().dc(param).astype(astype)
+        return super().dc(period).astype(astype)
 
-    def kc(self, param: Dict = param.get('kc'), astype: str = 'float64') -> pd.DataFrame:
+    def kc(self, period: Dict = param.get('kc'), astype: str = 'float64') -> pd.DataFrame:
         """ kc """
-        return super().kc(param).astype(astype)
+        return super().kc(period).astype(astype)
 
-    def macd(self, param: Dict = param.get('macd'), astype: str = 'float64') -> pd.DataFrame:
+    def macd(self, period: Dict = param.get('macd'), astype: str = 'float64') -> pd.DataFrame:
         """ macd """
-        return super().macd(param).astype(astype)
+        return super().macd(period).astype(astype)
 
-    def rsi(self, param: int = param.get('rsi'), astype: str = 'float64') -> pd.DataFrame:
+    def rsi(self, period: int = param.get('rsi'), astype: str = 'float64') -> pd.DataFrame:
         """ rsi """
-        return super().rsi(param).astype(astype)
+        return super().rsi(period).astype(astype)
 
-    def sar(self, param: Dict = param.get('sar'), astype: str = 'float64') -> pd.DataFrame:
+    def sar(self, period: Dict = param.get('sar'), astype: str = 'float64') -> pd.DataFrame:
         """ ta-lib sar """
         return super().sar(
-                param.get('acceleration'),
-                param.get('maximum')
+                period.get('acceleration'),
+                period.get('maximum')
                 ).astype(astype)
 
-    def stc(self, param: Dict = param.get('stc'), astype: str = 'float64') -> pd.DataFrame:
+    def stc(self, period: Dict = param.get('stc'), astype: str = 'float64') -> pd.DataFrame:
         """ stc """
-        return super().stc(param).astype(astype)
+        return super().stc(period).astype(astype)
 
-    def soc(self, param: Dict = param.get('soc'), astype: str = 'float64') -> pd.DataFrame:
+    def soc(self, period: Dict = param.get('soc'), astype: str = 'float64') -> pd.DataFrame:
         """ soc """
-        return super().soc(param).astype(astype)
+        return super().soc(period).astype(astype)
 
-    # def maverick(self,
-    #         date=None,
-    #         period=yaml_get('periods',
-    #             YAML_PREFERENCE).get('Equities'),
-    #         unbound=True,
-    #         exclusive=True):
-    #     if date is None:
-    #         date = self.date
-    #     return self.view.maverick(self.__data, period, date, unbound, exclusive)
+    def maverick(self,
+            date=None,
+            period=param,
+            # period=yaml_get('periods',
+            #     YAML_PREFERENCE).get('Equities'),
+            unbound=True,
+            exclusive=True):
+        if date is None:
+            date = self.date
+        return self.view.maverick(self.__data, period, date, unbound, exclusive)
 
     def optinum(self, date: str = None,
                 base: pd.DataFrame = None,
@@ -256,7 +257,7 @@ async def A2B(
 
     async def get(
             code: str) -> tuple:
-        return (code, await Equity(code, boarse='NYSE'))
+        return (code, await Equity(code, boarse='NYSE', capitalize=False))
 
     xhg = yaml_get('USHK', YAML_PREFERENCE)
     code_ = []
@@ -268,7 +269,7 @@ async def A2B(
         yk = b_scale.get(k)
         ratio = yk.get('ratio')
         code_.append(f'{yk.get("code")}.HK')
-        hdr = v.optinum(date)
+        hdr = v.maverick(date)
         for k in hdr.keys():
             hdr[k] = hdr[k] if len(hdr[k]) == 0 else (hdr[k] * xhg * ratio).apply(hsirnd)
         opt_.append(hdr)
