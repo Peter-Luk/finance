@@ -475,6 +475,8 @@ def getcode(code: Any,
             return f"{code:06}.SZ"
         if boarse == 'TSE' and isinstance(code, int):
             return f"{code:04}.T"
+        if boarse == 'DAX':
+            return f"{code}.DE".upper()
         if boarse == 'LSE':
             return f"{code}.L".upper()
         if boarse in ['NYSE', 'Nasdaq']:
