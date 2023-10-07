@@ -261,11 +261,10 @@ async def get_summary(code: str, boarse: str) -> str:
 async def summary(target: str = 'nato_defence') -> None:
     if target == 'nato_defence':
         subject = yaml_get('listing', YAML_PREFERENCE).get(target)
-        for f in asyncio.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
-            await f
     if target == 'TSE':
-        subject = yaml_get('prefer_stock', YAML_PREFERENCE).get(target)
-        for f in asyncio.as_completed([get_summary(c, target) for c in list(subject.keys())]):
+        _ = yaml_get('prefer_stock', YAML_PREFERENCE).get(target).keys()
+        subject = dict(zip(_, [target for __ in _]))
+    for f in asyncio.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
             await f
 
 
