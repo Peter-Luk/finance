@@ -2,7 +2,7 @@
 import asyncio
 import datetime
 import random
-from typing import Any, Coroutine, Iterable, List, Dict, Final
+from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
 import pandas as pd
 import numpy as np
 # import yfinance as yf
@@ -13,7 +13,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
 from finance.fintools import FOA, get_periods, hsirnd
-from finance.utilities import yaml_get, yaml_db_get, filepath, gslice
+from finance.utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
 from finance.ormlib import async_fetch
 from finance.finaux import roundup
 from nta import Viewer
@@ -64,7 +64,7 @@ class Equity(FOA, Viewer):
     """ base object (trial) """
     async def __init__(
             self,
-            code: int,
+            code: Union[int, str],
             boarse: str = 'HKEx',
             static: bool = True,
             capitalize: bool = True
@@ -72,6 +72,7 @@ class Equity(FOA, Viewer):
         self.periods = get_periods()
         self.code = code
         self.exchange = boarse
+        self.yahoo_code = getcode(self.code, self.exchange)
         self.__capitalize = capitalize
         await self.compose(static)
         self.view = Viewer(self.__data)
@@ -236,6 +237,7 @@ class Equity(FOA, Viewer):
             pass
         return res
 
+
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
     """ fetch entities stored records """
     async def get(code: int) -> Coroutine:
@@ -249,6 +251,22 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
     res_list = [eval(f"_.{indicator}()") for _ in tqdm(result)] \
         if (indicator in INDICATORS) else result
     return zip(name_list, res_list)
+
+
+async def get_summary(code: str, boarse: str) -> str:
+    _ = await Equity(code, boarse)
+    print(f'{_.yahoo_code} - {_}')
+
+
+async def summary(target: str = 'nato_defence') -> None:
+    if target == 'nato_defence':
+        subject = yaml_get('listing', YAML_PREFERENCE).get(target)
+        for f in asyncio.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
+            await f
+    if target == 'TSE':
+        subject = yaml_get('prefer_stock', YAML_PREFERENCE).get(target)
+        for f in asyncio.as_completed([get_summary(c, target) for c in list(subject.keys())]):
+            await f
 
 
 async def A2B(
