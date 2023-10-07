@@ -325,11 +325,22 @@ B_scale:
 
 USHK: 7.75
 
+listing:
+  nato_defence:
+    rtx: NYSE
+    rhm: DAX
+    mitsu: TSE
+    ba: LSE
+    noc: NYSE
+    lmt: NYSE
+
 prefer_stock:
   TSE:
-    omron: 6645
-    sony:  6758
-    te:  8035
+    OMRON Corporation: 6645
+    Sony Group Corporation: 6758
+    Tokyo Electron Limited: 8035
+    Mitsubishi Heavy Industries: 7011
+    Fast Retailing Co: 9983
   HKEx:
     3:
       size: 1000
