@@ -6,6 +6,7 @@ from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
 import pandas as pd
 import numpy as np
 # import yfinance as yf
+from pprint import pprint
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atq
 from asyncinit import asyncinit
@@ -255,17 +256,46 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
 
 async def get_summary(code: str, boarse: str) -> str:
     _ = await Equity(code, boarse)
-    print(f'{_.yahoo_code} - {_}')
+    return {_.yahoo_code: f'{_}'}
+    # print(f'{_.yahoo_code} - {_}')
 
 
-async def summary(target: str = 'nato_defence') -> None:
+async def close_at(code: str, boarse: str) -> dict:
+    _ = await Equity(code, boarse, static=False)
+    return {_.code: _.close}
+
+
+async def summary(target: str = 'nato_defence'):
+    result = {}
     if target == 'nato_defence':
         subject = yaml_get('listing', YAML_PREFERENCE).get(target)
+    if target == 'B_shares':
+        _ = yaml_get('B_scale', YAML_PREFERENCE).keys()
+        subject = dict(zip(_, ['NYSE' for __ in _]))
     if target == 'TSE':
         _ = yaml_get('prefer_stock', YAML_PREFERENCE).get(target).keys()
         subject = dict(zip(_, [target for __ in _]))
     for f in asyncio.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
-            await f
+        holder = await f
+        result[list(holder.keys()).pop()] = list(holder.values()).pop()
+    return result
+        # await f
+
+
+async def daily_close(client_no: str = 'P851223'):
+    result = {}
+    _ = yaml_get(client_no, 'portfolio.yaml').get('HKEx')
+    subject = dict(zip(_, ['HKEx' for __ in _]))
+    for f in asyncio.as_completed([close_at(c, b) for c, b in list(subject.items())]):
+        holder = await f
+        result[list(holder.keys()).pop()] = list(holder.values()).pop()
+    res = ['Close price']
+    keys = list(result.keys())
+    keys.sort()
+    for _ in keys:
+        v_for = '0.2' if result[_] > .5 else '0.3'
+        res.append(f'{_} {result[_]:{v_for}f}')
+    print(', '.join(res))
 
 
 async def A2B(
@@ -292,3 +322,9 @@ async def A2B(
         opt_.append(hdr)
 
     return dict(zip(code_, opt_))
+
+
+if __name__ == "__main__":
+    sector = input('Sector: ')
+    _ = asyncio.run(summary(sector))
+    pprint(_)
