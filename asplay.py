@@ -12,6 +12,7 @@ import yaml
 from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 from finance.utilities import PYTHON_PATH, os, sep
+import pretty_errors
 
 
 fname = 'pref.yaml'
