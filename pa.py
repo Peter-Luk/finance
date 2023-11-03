@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 import asyncio
 import datetime
 import pandas as pd
+import pretty_errors
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, Date, Time, String, text
