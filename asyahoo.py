@@ -9,12 +9,9 @@ from utilities import getcode
 class StockCodeError(Exception):
     'Raised when no valid stock code matched'
 YAHOO_URL: Final[str] = 'https://query1.finance.yahoo.com/v7/finance/download'
-# ticker = 'BTC-USD'
-# url = f'{YAHOO_URL}/{ticker}?'
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ApplSeWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57'
 }
-# url = f'https://query1.finance.yahoo.com/v7/finance/download/{ticker}?'
 
 params = {
     'period1': 0,
@@ -52,8 +49,6 @@ async def get_data(
             df.columns = [_.lower() for _ in df.columns]
             df = df.set_index(pd.DatetimeIndex(df.date))
             df.drop('date', axis=1, inplace=True)
-        # df.set_index('Date', inplace=True)
-        # df.columns = [_.lower() for _ in df.columns]
     return df
 
 if __name__ == "__main__":
