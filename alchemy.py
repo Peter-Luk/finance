@@ -66,7 +66,8 @@ def load(*args):
         engine = db.create_engine('sqlite:///{}'.format(
             sep.join((home,) + db_path + (dbn,))))
         metadata = db.MetaData(engine)
-        records = db.Table('records', metadata, autoload=True)
+        records = db.Table('records', metadata)
+        # records = db.Table('records', metadata, autoload=True)
         eval('mapper({}, records)'.format(dbn))
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -93,13 +94,21 @@ class AS(object):
         self.db = name
         engine = db.create_engine(f"sqlite:///{filepath(self.db)}")
         def tables():
-            table = db.Table('sqlite_master', db.MetaData(), autoload=True, autoload_with=engine)
+            metadata = db.MetaData()
+            # metadata.bind(engine)
+            table = db.Table('sqlite_master', metadata, autoload_with=engine)
+            # table = db.Table('sqlite_master', db.MetaData(), autoload=True, autoload_with=engine)
+            table.metadata.reflect(bind=engine, extend_existing=True)
+            # table.metadata.reflect(bind=engine, extend_existing=True, only=['sqlite_master'])
+            # if table.exists:
+            #     table._init_existing()
             mc = table.columns
             qry = db.select(mc.name).filter(mc.type==db.text("'table'")).filter(mc.name.notlike('sqlite_%')).filter(mc.name.notlike('android_%'))
             return [_[0] for _ in engine.connect().execute(qry).fetchall()]
 
         if prefer in tables():
-            self.table = db.Table(prefer, db.MetaData(), autoload=True, autoload_with=engine)
+            self.table = db.Table(prefer, db.MetaData(), autoload_with=engine)
+            # self.table = db.Table(prefer, db.MetaData(), autoload=True, autoload_with=engine)
             self.columns = self.table.columns
         self.connect = engine.connect()
 
