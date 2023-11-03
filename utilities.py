@@ -34,6 +34,13 @@ cal_month = [x for x in range(1, 13) if not x % 3]
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
 
 
+def tse_stock_code(name: str) -> Any:
+    _tse = yaml_get('prefer_stock', YAML_PREFERENCE).get('TSE')
+    _code = [_tse.get(_) for _ in _tse.keys() if name.title() in _.title()]
+    if len(_code) == 1:
+        return f'{_code.pop():04d}.T'
+
+
 def yaml_get(field: str, file: str) -> Any:
     """ Basic yaml config reader """
     if file.split('.')[-1] == 'yaml':
@@ -473,8 +480,9 @@ def getcode(code: Any,
             return f"{code:06}.SS"
         if boarse == 'SZE' and isinstance(code, int):
             return f"{code:06}.SZ"
-        if boarse == 'TSE' and isinstance(code, int):
-            return f"{code:04}.T"
+        if boarse == 'TSE' and isinstance(code, str):
+            # return f"{code:04}.T"
+            return tse_stock_code(code)
         if boarse == 'DAX':
             return f"{code}.DE".upper()
         if boarse == 'LSE':
