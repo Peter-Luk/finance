@@ -169,7 +169,7 @@ db:
         table: 'records'
         index: 'date'
         freq: 'daily'
-        exclude: [122, 368, 805, 1212, 1337, 1573, 1828, 2303, 2606, 8509]
+        exclude: [122, 368, 417, 543, 611, 805, 1212, 1337, 1573, 1828, 2303, 2606, 8509]
     Futures:
         name: 'Futures'
         table: 'records'
@@ -326,7 +326,7 @@ B_scale:
 USHK: 7.75
 
 listing:
-  nato_defence:
+  nato_defense:
     rtx: NYSE
     rhm: DAX
     mitsu: TSE

@@ -30,8 +30,8 @@ async def get_data(
         boarse: str = 'HKEx',
         capitalize: bool = False
         ) -> pd.DataFrame:
-    url = f'{YAHOO_URL}/{getcode(ticker, boarse)}?'
-
+    _ = getcode(ticker, boarse)
+    url = f'{YAHOO_URL}/{_}?'
 
     async def fetch(session, url: str, params: Dict, headers: Dict):
         async with session.get(url, params=params, headers=headers) as response:

@@ -13,6 +13,7 @@ from asyncinit import asyncinit
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
+# from finance.fintt get_periods, hsirnd
 from finance.fintools import FOA, get_periods, hsirnd
 from finance.utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
 from finance.ormlib import async_fetch
@@ -61,6 +62,7 @@ b_scale = yaml_get('B_scale', YAML_PREFERENCE)
 
 @asyncinit
 # class Equity(FOA):
+# class Equity(Viewer):
 class Equity(FOA, Viewer):
     """ base object (trial) """
     async def __init__(
@@ -124,58 +126,59 @@ class Equity(FOA, Viewer):
                 Record.date >= start)
         return await async_fetch(sql_stmt, DB_NAME)
 
+# """
     def sma(self, period: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
-        """ sma """
+        # sma 
         return super().sma(period, data).astype('float64')
 
     def ema(self, period: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
-        """ ema """
+        #  ema 
         return super().ema(period, data).astype('float64')
 
     def atr(self, period: int = param.get('atr'), data: Any = None) -> pd.DataFrame:
-        """ atr """
+        #  atr 
         return super().atr(period, data).astype('float64')
 
     def kama(self, period: Dict = param.get('kama'), data: Any = None) -> pd.DataFrame:
         return super().kama(period, data).astype('float64')
 
     def adx(self, period: int = param.get('adx'), astype: str = 'float64') -> pd.DataFrame:
-        """ adx """
+        #  adx 
         return super().adx(period).astype(astype)
 
     def apz(self, period: int = param.get('apz'), astype: str = 'float64') -> pd.DataFrame:
-        """ apz """
+        #  apz 
         return super().apz(period).astype(astype)
 
     def dc(self, period: int = param.get('dc'), astype: str = 'float64') -> pd.DataFrame:
-        """ dc """
+        #  dc 
         return super().dc(period).astype(astype)
 
     def kc(self, period: Dict = param.get('kc'), astype: str = 'float64') -> pd.DataFrame:
-        """ kc """
+        #  kc 
         return super().kc(period).astype(astype)
 
     def macd(self, period: Dict = param.get('macd'), astype: str = 'float64') -> pd.DataFrame:
-        """ macd """
+        #  macd 
         return super().macd(period).astype(astype)
 
     def rsi(self, period: int = param.get('rsi'), astype: str = 'float64') -> pd.DataFrame:
-        """ rsi """
+        #  rsi 
         return super().rsi(period).astype(astype)
 
     def sar(self, period: Dict = param.get('sar'), astype: str = 'float64') -> pd.DataFrame:
-        """ ta-lib sar """
+        #  ta-lib sar 
         return super().sar(
                 period.get('acceleration'),
                 period.get('maximum')
                 ).astype(astype)
 
     def stc(self, period: Dict = param.get('stc'), astype: str = 'float64') -> pd.DataFrame:
-        """ stc """
+        #  stc 
         return super().stc(period).astype(astype)
 
     def soc(self, period: Dict = param.get('soc'), astype: str = 'float64') -> pd.DataFrame:
-        """ soc """
+        #  soc 
         return super().soc(period).astype(astype)
 
     def maverick(self,
@@ -237,7 +240,7 @@ class Equity(FOA, Viewer):
         except:
             pass
         return res
-
+# """
 
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
     """ fetch entities stored records """
@@ -265,9 +268,9 @@ async def close_at(code: str, boarse: str) -> dict:
     return {_.code: _.close}
 
 
-async def summary(target: str = 'nato_defence'):
+async def summary(target: str = 'nato_defense'):
     result = {}
-    if target == 'nato_defence':
+    if target == 'nato_defense':
         subject = yaml_get('listing', YAML_PREFERENCE).get(target)
     if target == 'B_shares':
         _ = yaml_get('B_scale', YAML_PREFERENCE).keys()
@@ -282,10 +285,12 @@ async def summary(target: str = 'nato_defence'):
         # await f
 
 
-async def daily_close(client_no: str = 'P851223'):
+async def daily_close(
+        client_no: str,
+        boarse: str = 'HKEx'):
     result = {}
-    _ = yaml_get(client_no, 'portfolio.yaml').get('HKEx')
-    subject = dict(zip(_, ['HKEx' for __ in _]))
+    _ = yaml_get(client_no, 'portfolio.yaml').get(boarse)
+    subject = dict(zip(_, [boarse for __ in _]))
     for f in asyncio.as_completed([close_at(c, b) for c, b in list(subject.items())]):
         holder = await f
         result[list(holder.keys()).pop()] = list(holder.values()).pop()
