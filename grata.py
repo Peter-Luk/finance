@@ -3,7 +3,7 @@ from time import sleep
 from random import randint
 from c2lite3e import wap
 
-def fetch_data(hour, minute, second=0):
+def fetch_data(hour: int, minute: int, second: int= 0) -> None:
     while datetime.datetime.now().time() < datetime.time(hour, minute, second):
         sleep(randint(2,5))
     return wap()
