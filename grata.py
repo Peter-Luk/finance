@@ -10,3 +10,4 @@ def fetch_data(hour, minute, second=0):
 
 if __name__ == "__main__":
     fetch_data(16, 25)
+    # fetch_data(12, 25)
