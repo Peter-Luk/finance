@@ -46,9 +46,9 @@ async def quote_nyse(code: str):
     _ = await Equity(code, boarse="NYSE")
     result = {f'{_.date:%d-%m-%Y}': f'{_.change:+.2%}'}
     result['close'] = _.close
-    result['kama'] = f'{_.kama().loc[_.date]:.3f}'
-    result['sar'] = f'{_.sar().loc[_.date]:.3f}'
-    result['rsi'] = f'{_.rsi().loc[_.date]:.3f}'
+    result['kama'] = float(f'{_.kama().loc[_.date]:.3f}')
+    result['sar'] = float(f'{_.sar().loc[_.date]:.3f}')
+    result['rsi'] = float(f'{_.rsi().loc[_.date]:.3f}')
 
     return {_.yahoo_code: result}
 
