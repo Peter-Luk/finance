@@ -44,11 +44,12 @@ async def optinum_tse(code: str):
 @app.get("/nyse/{code}")
 async def quote_nyse(code: str):
     _ = await Equity(code, boarse="NYSE")
-    result = {f'{_.date:%d-%m-%Y}': f'{_.change:+.2%}'}
+    d0 = _.date
+    result = {f'{d0:%d-%m-%Y}': f'{_.change:+.2%}'}
     result['close'] = round(_.close, 2)
-    result['kama'] = round(_.kama().loc[_.date], 3)
-    result['sar'] = round(_.sar().loc[_.date], 3)
-    result['rsi'] = round(_.rsi().loc[_.date], 3)
+    result['kama'] = round(_.kama().loc[d0], 3)
+    result['sar'] = round(_.sar().loc[d0], 3)
+    result['rsi'] = round(_.rsi().loc[d0], 3)
 
     return {_.yahoo_code: result}
 
