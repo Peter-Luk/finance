@@ -11,6 +11,10 @@ from finance.utilities import IP
 app = FastAPI()
 
 
+def ind_status(b:float, i:float) -> str:
+    return  '+' if b > i else '-' if b < i else '='
+
+
 @app.get("/hkex/{code}")
 async def quote_hk(code: int):
     _ = await Equity(code, static=False)
@@ -42,16 +46,22 @@ async def optinum_tse(code: str):
 
 
 @app.get("/nyse/{code}")
-async def quote_nyse(code: str):
-    _ = await Equity(code, boarse="NYSE")
-    d0 = _.date
-    result = {f'{d0:%d-%m-%Y}': f'{_.change:+.2%}'}
-    result['close'] = round(_.close, 2)
-    result['kama'] = round(_.kama().loc[d0], 3)
-    result['sar'] = round(_.sar().loc[d0], 3)
-    result['rsi'] = round(_.rsi().loc[d0], 3)
-
-    return {_.yahoo_code: result}
+async def quote_nyse(code: str) -> dict:
+    ind_list: list = ['kama', 'sar', 'rsi']
+    data = await Equity(code, boarse="NYSE")
+    data_close = data._Equity__data.Close
+    d0 = data.date
+    result = {f'{d0:%d-%m-%Y}': f'{data.change:+.2%}'}
+    result['close'] = round(data.close, 2)
+    for _ in ind_list:
+        res = {'value': eval(f'round(data.{_}().loc[d0], 3)')}
+        if _ == 'rsi':
+            res['change'] = round(data.rsi().diff().loc[d0], 3)
+        else:
+            ts = eval(f'(data_close - data.{_}()).diff()')
+            res['delta'] = ind_status(abs(ts[-2]), abs(ts[-1]))
+        result[_] = res
+    return {data.yahoo_code: result}
 
 
 @app.get("/nyse/{code}/optinum")
