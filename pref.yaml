@@ -329,7 +329,7 @@ listing:
   nato_defense:
     rtx: NYSE
     rhm: DAX
-    mitsu: TSE
+    mitsubishi heavy: TSE
     ba: LSE
     noc: NYSE
     lmt: NYSE
@@ -339,8 +339,24 @@ prefer_stock:
     OMRON Corporation: 6645
     Sony Group Corporation: 6758
     Tokyo Electron Limited: 8035
-    Mitsubishi Heavy Industries: 7011
-    Fast Retailing Co: 9983
+    Toyota Motor Corporation: 7203
+    'Sumitomo Mitsui Financial Group, Inc.': 8316
+    Nikon Corporation: 7731
+    'Canon Inc.': 7751
+    Yaskawa Electric Corporation: 6506
+    'Yamazaki Baking Co., Ltd.': 2212
+    Asahi Kasei Corporation: 3407
+    Sapporo Holdings Limited: 2501
+    'Sapporo Clinical Laboratory Inc.': 9776
+    'Kirin Holdings Company, Limited': 2503
+    Nippon Steel Corporation: 5401
+    Nippon Telegraph and Telephone Corporation: 9432
+    Mitsubishi Corporation: 8058
+    'Mitsubishi Heavy Industries, Ltd.': 7011
+    'Monato Holdings Inc.': 6862
+    'Ashimori Industry Co., Ltd.': 3526
+    'Fast Retailing Co., Ltd.': 9983
+    'Nintendo Co., Ltd.': 7974
   HKEx:
     3:
       size: 1000
