@@ -6,20 +6,29 @@ from asa import Equity
 # from finance import Equity
 # from finance.fat import prefer_stock
 # from finance.utilities import IP, tse_stock_code
-from finance.utilities import IP
+from finance.utilities import IP, yaml_get, YAML_PREFERENCE
 
 app = FastAPI()
 
 
-def ind_status(b:float, i:float) -> str:
-    return  '+' if b > i else '-' if b < i else '='
+def ind_status(b: float, i: float) -> str:
+    return '+' if b > i else '-' if b < i else '='
 
 
-def _processor(data) -> dict:
+def get_name(c: int, b: str = '') -> str:
+    if b == 'TSE':
+        for k, v in yaml_get('prefer_stock', YAML_PREFERENCE).get(b).items():
+            if c == v:
+                return k
+
+
+def _processor(data, boarse: str) -> dict:
     ind_list: list = ['kama', 'sar', 'rsi', 'obv', 'kc']
     data_close = data._Equity__data.Close
     d0 = data.date
-    result = {f'{d0:%d-%m-%Y}': f'{data.change:+.2%}'}
+    pct_change_spec = '+.2%'
+    # change = round(data.change * 100, 2)
+    result = {f'{d0:%d-%m-%Y}': f'{data.change:{pct_change_spec}}'}
     result['close'] = round(data.close, 2)
     for _ in ind_list:
         val = eval(f'data.{_}()')
@@ -39,12 +48,16 @@ def _processor(data) -> dict:
                     ind_status(abs(tsl[-2]), abs(tsl[-1]))]
         elif _ == 'obv':
             res['value'] = round(val.loc[d0], 1)
-            res['change'] = f'{val.pct_change().loc[d0]:+.2%}'
+            res['change'] = f'{val.pct_change().loc[d0]:{pct_change_spec}}'
         else:
             ts = (data_close - val).diff()
             res['delta'] = ind_status(abs(ts[-2]), abs(ts[-1]))
         result[_] = res
-    return {data.yahoo_code: result}
+    code = data.yahoo_code
+    if boarse == 'TSE':
+        c, b = code.split('.')
+        code = get_name(int(c), boarse)
+    return {code: result}
 
 
 @app.get("/hkex/{code}")
@@ -62,8 +75,9 @@ async def optinum_hk(code: int):
 
 @app.get("/tse/{code}")
 async def quote_tse(code: str):
-    _ = await Equity(code, boarse='TSE')
-    return _processor(_)
+    boarse: str = 'TSE'
+    _ = await Equity(code, boarse=boarse)
+    return _processor(_, boarse)
     # return {_.yahoo_code: f'{_}'}
     # _ = Equity(tse_stock_code(code), exchange='TSE')
     # return {_.yahoo_code: f'{_}'}
@@ -81,8 +95,9 @@ async def optinum_tse(code: str):
 
 @app.get("/nyse/{code}")
 async def quote_nyse(code: str) -> dict:
-    data = await Equity(code, boarse="NYSE")
-    return _processor(data)
+    boarse: str = 'NYSE'
+    data = await Equity(code, boarse=boarse)
+    return _processor(data, boarse)
     # ind_list: list = ['kama', 'sar', 'rsi', 'obv', 'kc']
     # data_close = data._Equity__data.Close
     # d0 = data.date
