@@ -26,9 +26,9 @@ def _processor(data, boarse: str) -> dict:
     ind_list: list = ['kama', 'sar', 'rsi', 'obv', 'kc']
     data_close = data._Equity__data.Close
     d0 = data.date
-    pct_change_spec = '+.2%'
+    pct_change_spec = lambda d=2: f'+.{d}%'
     # change = round(data.change * 100, 2)
-    result = {f'{d0:%d-%m-%Y}': f'{data.change:{pct_change_spec}}'}
+    result = {f'{d0:%d-%m-%Y}': f'{data.change:{pct_change_spec()}}'}
     result['close'] = round(data.close, 2)
     for _ in ind_list:
         val = eval(f'data.{_}()')
@@ -48,7 +48,7 @@ def _processor(data, boarse: str) -> dict:
                     ind_status(abs(tsl[-2]), abs(tsl[-1]))]
         elif _ == 'obv':
             res['value'] = round(val.loc[d0], 1)
-            res['change'] = f'{val.pct_change().loc[d0]:{pct_change_spec}}'
+            res['change'] = f'{val.pct_change().loc[d0]:{pct_change_spec()}}'
         else:
             ts = (data_close - val).diff()
             res['delta'] = ind_status(abs(ts[-2]), abs(ts[-1]))
