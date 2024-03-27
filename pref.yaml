@@ -336,6 +336,14 @@ listing:
 
 prefer_stock:
   TSE:
+    'Kobayashi Pharmaceutical Co., Ltd.': 4967
+    'Nissan Motor Co., Ltd.': 7201
+    'Nissin Foods Holdings Co., Ltd.': 2897
+    'Sumitomo Chemical Company, Limited': 4005
+    Mitsubishi Materials Corporation: 5711
+    Mitsubishi Chemical Group Corporation: 4188
+    Mitsubishi Electric Corporation: 6503
+    
     OMRON Corporation: 6645
     Sony Group Corporation: 6758
     Tokyo Electron Limited: 8035
