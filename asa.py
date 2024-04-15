@@ -83,7 +83,7 @@ class Equity(FOA, Viewer):
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, sar: {self.sar().iloc[-1]:,.2f} and KAMA: {self.kama().iloc[-1]:,.2f}"
 
-    def __call__(self, static=True):
+    def __call__(self, static: bool = True) -> pd.Series:
         return self.maverick(date=self.date) if self.__capitalize else self.optinum(date=self.date)
         # return self.__data
 
@@ -157,6 +157,10 @@ class Equity(FOA, Viewer):
     def kc(self, period: Dict = param.get('kc'), astype: str = 'float64') -> pd.DataFrame:
         #  kc 
         return super().kc(period).astype(astype)
+
+    def obv(self, astype: str = 'float64') -> pd.DataFrame:
+        #  obv 
+        return super().obv().astype(astype)
 
     def macd(self, period: Dict = param.get('macd'), astype: str = 'float64') -> pd.DataFrame:
         #  macd 
