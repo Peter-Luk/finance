@@ -260,10 +260,12 @@ class WFutures(object):
 
         price = self.browser.find_element(by=By.XPATH, value='//*[@id="price"]').text
         change = self.browser.find_element(by=By.XPATH, value='//*[@id="diff"]').text
-        t = change.split(' ')[0].split(',')
+        # t = change.split(' ')[0].split(',')
+        t = change.split(' ')[0]
         last = convert(self.browser.find_element(by=By.XPATH, value=
             '//*[@id="datedtime"]').text)
-        return self.__status(price, t[0], last)
+        # return self.__status(price, t[0], last)
+        return self.__status(price, t, last)
 
     def reset(self, tabs=lf):
         for _ in [__ for __ in tabs if __ in lf]:
