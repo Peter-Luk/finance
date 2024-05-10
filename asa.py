@@ -296,7 +296,7 @@ async def daily_close(
     result = {}
     _ = yaml_get(client_no, 'portfolio.yaml').get(boarse)
     subject = dict(zip(_, [boarse for __ in _]))
-    for f in atq.as_completed([close_at(c, b) for c, b in list(subject.items())]):
+    for f in asyncio.as_completed([close_at(c, b) for c, b in list(subject.items())]):
         holder = await f
         result[list(holder.keys()).pop()] = list(holder.values()).pop()
     res = ['Close price']
