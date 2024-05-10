@@ -282,11 +282,12 @@ async def summary(target: str = 'nato_defense'):
     if target == 'TSE':
         _ = yaml_get('prefer_stock', YAML_PREFERENCE).get(target).keys()
         subject = dict(zip(_, [target for __ in _]))
-    for f in asyncio.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
+    # for f in asyncio.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
+    for f in atq.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
         holder = await f
         result[list(holder.keys()).pop()] = list(holder.values()).pop()
     return result
-        # await f
+       # await f
 
 
 async def daily_close(
@@ -295,7 +296,7 @@ async def daily_close(
     result = {}
     _ = yaml_get(client_no, 'portfolio.yaml').get(boarse)
     subject = dict(zip(_, [boarse for __ in _]))
-    for f in asyncio.as_completed([close_at(c, b) for c, b in list(subject.items())]):
+    for f in atq.as_completed([close_at(c, b) for c, b in list(subject.items())]):
         holder = await f
         result[list(holder.keys()).pop()] = list(holder.values()).pop()
     res = ['Close price']
@@ -304,7 +305,7 @@ async def daily_close(
     for _ in keys:
         v_for = '0.2' if result[_] > .5 else '0.3'
         res.append(f'{_} {result[_]:{v_for}f}')
-    print(', '.join(res))
+    print(f'{client_no}\n' + ', '.join(res))
 
 
 async def A2B(
