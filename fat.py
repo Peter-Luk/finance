@@ -3,10 +3,10 @@ import datetime
 from sqlalchemy.orm import declarative_base, deferred
 from sqlalchemy import Column, Integer, Date, String, text
 # from sqlalchemy.future import select
-from finance.utilities import yaml_get, yaml_db_get, YAML_PREFERENCE, getcode, gslice, waf
-from finance.fintools import FOA, get_periods, pd, np, gap, prefer_stock, mplot
+from utilities import yaml_get, yaml_db_get, YAML_PREFERENCE, getcode, gslice, waf
+from fintools import FOA, get_periods, pd, np, gap, prefer_stock, mplot
 from ormlib import trade_data, Session
-from finance.finaux import roundup
+from finaux import roundup
 
 Base = declarative_base()
 idx = []
@@ -60,7 +60,7 @@ class Futures(FOA):
         self.analyser = FOA(self.__data, int)
         self.change = 0
         if self.__data.shape[0] > 1:
-            self.change = self.__data.close.diff(1)[-1] / self.__data.close[-2]
+            self.change = self.__data.close.diff(1).iloc[-1] / self.__data.close.iloc[-2]
         self.date = self.__data.index[-1].to_pydatetime()
         __ = self.__data.iloc[-1]
         for _ in self.__data.columns:

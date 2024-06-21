@@ -207,7 +207,7 @@ class Equities(AE, Viewer):
             self.__conn = self._ae.connect
         self.view = Viewer(self.data)
         self._date = self.data.index[-1]
-        self._close = hsirnd(self.data['Close'][-1])
+        self._close = hsirnd(self.data['Close'].iloc[-1])
 
     def __del__(self):
         self.foreign = self._conf = self.rc = self._ae = self.__conn = None
@@ -221,7 +221,7 @@ class Equities(AE, Viewer):
         return self.maverick(date=date, unbound=False)
 
     def __str__(self):
-        delta = round(self.data['Close'].diff()[-1] / self.data['Close'][-2] * 100, 3)
+        delta = round(self.data['Close'].diff().iloc[-1] / self.data['Close'].iloc[-2] * 100, 3)
         return f"#{self.code} close @ {self._close:.02f} ({delta}%) on {self._date:'%Y-%m-%d'}"
 
     def insert(self, values, conditions):

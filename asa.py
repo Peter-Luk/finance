@@ -14,10 +14,14 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
 # from finance.fintt get_periods, hsirnd
-from finance.fintools import FOA, get_periods, hsirnd
-from finance.utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
-from finance.ormlib import async_fetch
-from finance.finaux import roundup
+from fintools import FOA, get_periods, hsirnd
+from utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
+from ormlib import async_fetch
+from finaux import roundup
+# from finance.fintools import FOA, get_periods, hsirnd
+# from finance.utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
+# from finance.ormlib import async_fetch
+# from finance.finaux import roundup
 from nta import Viewer
 from asyahoo import get_data
 
@@ -48,7 +52,7 @@ class Record(Base):
 async def stored_entities() -> List:
     """ fetching stored records """
     sql_stmt = select(Record.eid.distinct()).order_by(Record.eid)
-    entities = [_ for _ in await async_fetch(sql_stmt, DB_NAME) if _ not in yaml_db_get('exclude')]
+    entities = [_[0] for _ in await async_fetch(sql_stmt, DB_NAME) if _ not in yaml_db_get('exclude')]
     return entities
 
 STORED: Final[List] = asyncio.run(stored_entities())
@@ -113,11 +117,11 @@ class Equity(FOA, Viewer):
         self.__data.index = self.__data.index.astype('datetime64[ns]')
         self.date = self.__data.index[-1]
         if self.__capitalize:
-            self.change = self.__data.Close.pct_change()[-1]
-            self.close = self.__data.Close[-1]
+            self.change = self.__data.Close.pct_change(fill_method=None).iloc[-1]
+            self.close = self.__data.Close.iloc[-1]
         else:
-            self.change = self.__data.close.pct_change()[-1]
-            self.close = self.__data.close[-1]
+            self.change = self.__data.close.pct_change(fill_method=None).iloc[-1]
+            self.close = self.__data.close.iloc[-1]
         super().__init__(self.__data, float)
 
     async def fetch(self, start: datetime.date) -> List:

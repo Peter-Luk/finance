@@ -7,7 +7,8 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, Date, Time, String, text
 from utilities import yaml_db_get, YAML_PREFERENCE
-from finance.ormlib import async_fetch, Session
+from ormlib import async_fetch, Session
+# from finance.ormlib import async_fetch, Session
 
 Base = declarative_base()
 

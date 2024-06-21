@@ -2,8 +2,10 @@
 import pandas as pd
 import numpy as np
 from typing import Iterable
-from finance.finaux import stepper
-from finance.utilities import PYTHON_PATH, os, sep
+from finaux import stepper
+from utilities import PYTHON_PATH, os, sep
+# from finance.finaux import stepper
+# from finance.utilities import PYTHON_PATH, os, sep
 
 try:
     from scipy.constants import golden_ratio as gr
@@ -211,10 +213,10 @@ class FOA(object):
                             _ = hdr[hdr.lt(0)].abs().sum() / period
                     if i > period:
                         _, hdr = res[-1], 0
-                        if direction == '+' and source[i] > 0:
-                            hdr = source[i]
-                        if direction == '-' and source[i] < 0:
-                            hdr = abs(source[i])
+                        if direction == '+' and source.iloc[i] > 0:
+                            hdr = source.iloc[i]
+                        if direction == '-' and source.iloc[i] < 0:
+                            hdr = abs(source.iloc[i])
                         _ = (_ * (period - 1) + hdr) / period
                     res.append(_)
                     i += 1

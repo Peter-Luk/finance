@@ -1,6 +1,7 @@
 import numpy as np
 from sys import platform
-from finance.utilities import conditional_decorator
+from utilities import conditional_decorator
+# from finance.utilities import conditional_decorator
 
 if platform == 'win32':
     use_numba = False
@@ -12,7 +13,7 @@ try:
 except Exception:
     use_numba = False
 
-@conditional_decorator(jit(nopython=True), use_numba)
+# @conditional_decorator(jit(nopython=True), use_numba)
 def stepper(period, x):
     y = np.empty(len(x))
     y[:] = np.nan
@@ -37,7 +38,7 @@ def stepper(period, x):
     return y
 """
 
-@conditional_decorator(jit(nopython=True), use_numba)
+# @conditional_decorator(jit(nopython=True), use_numba)
 def roundup(value):
     if np.isnan(value) or not value > 0:
         hdr = np.nan

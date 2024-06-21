@@ -48,7 +48,7 @@ def _processor(data, boarse: str) -> dict:
                     ind_status(abs(tsl[-2]), abs(tsl[-1]))]
         elif _ == 'obv':
             res['value'] = round(val.loc[d0], 1)
-            res['change'] = f'{val.pct_change().loc[d0]:{pct_change_spec()}}'
+            res['change'] = f'{val.pct_change(fill_method=None).loc[d0]:{pct_change_spec()}}'
         else:
             ts = (data_close - val).diff()
             res['delta'] = ind_status(abs(ts[-2]), abs(ts[-1]))
