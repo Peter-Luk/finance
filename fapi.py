@@ -6,7 +6,7 @@ from asa import Equity
 # from finance import Equity
 # from finance.fat import prefer_stock
 # from finance.utilities import IP, tse_stock_code
-from finance.utilities import IP, yaml_get, YAML_PREFERENCE
+from utilities import IP, yaml_get, YAML_PREFERENCE
 
 app = FastAPI()
 
