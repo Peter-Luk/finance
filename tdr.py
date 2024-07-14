@@ -58,7 +58,7 @@ async def daily_close(
     print(f"{client_no}\nClose price, {', '.join(result)}")
 
 async def main():
-    for f in asyncio.as_completed([daily_close(_, 'HKEx') for _ in tqdm(list(clients))]):
+    for f in asyncio.as_completed([daily_close(_, 'HKEx') for _ in clients]):
         await f
 
 def update_entities(
