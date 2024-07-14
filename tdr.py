@@ -1,4 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/python
+"""
+#!/bin/python3
+"""
 import asyncio
 import pandas as pd
 from tqdm import tqdm
@@ -64,7 +67,7 @@ def update_entities(
         boarse: str = 'HKEx',
         add: bool = True) -> None:
     if isinstance(target, str):
-        target = [int(target)]
+        target = [int(target)] if boarse in ['HKEx', 'TSE'] else [target]
     else:
         target = [target] if isinstance(target, int) else target
 
