@@ -1,4 +1,4 @@
-import re
+# import re
 import socket
 from pytz import timezone
 # from scipy.optimize import newton
@@ -6,7 +6,7 @@ from datetime import datetime
 from time import sleep
 from typing import Final, Any
 import sqlalchemy as db
-from pathlib import os, Path, sys, functools
+from pathlib import os, re, Path, sys, functools
 import pref
 
 driver = pref.driver
@@ -545,7 +545,7 @@ def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True
         require ='實收'
         amount = price * quantity - bcls(price, quantity, equity)
         balance = previous + amount
-    msg = f"(交收後): {balance:,.2f}" if balance > 0 else f"實需存入 {balance:,.2f}"
+    msg = f"(交收後): {balance:,.2f}" if balance > 0 else f"實需存入 {abs(balance):,.2f}"
     return f"{action} {quantity:,}股 #{stock_code} @ {price:,.3f} 連手續費及政府費用{require} {amount:,.2f}。 戶口結餘(交收前): {previous:,.2f}, {msg}。"
 
 

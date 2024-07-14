@@ -3,12 +3,15 @@ import asyncio
 import pandas as pd
 from tqdm import tqdm
 from asyncinit import asyncinit
-from typing import Coroutine, Dict, List, Final, Union
-from utilities import yaml_get, getcode
+from benedict import benedict
+from pathlib import os
+from typing import Coroutine, Dict, List, Iterable, Final, Union
+from utilities import getcode
+# from utilities import yaml_get, getcode
 from fintools import hsirnd
 from asyahoo import get_data
 
-YAML_PREFERENCE: Final[str] = 'pref.yaml'
+YAML_PREFERENCE: Final[str] = f'{os.sep}portfolio.yaml'
 clients = iter(('M213423', 'M241238', 'P724059', 'P772215', 'P851223', 'P854787'))
 
 @asyncinit
@@ -43,7 +46,8 @@ async def daily_close(
         client_no: str,
         boarse: str = 'HKEx') -> None:
     result: List = []
-    _: List = yaml_get(client_no, 'portfolio.yaml').get(boarse)
+    _: List = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}").get_list(f'{client_no.upper()}.{boarse}')
+    # _: List = yaml_get(client_no, 'portfolio.yaml').get(boarse)
     subject: Dict = dict(zip(_, [boarse for __ in _]))
     for f in asyncio.as_completed([Equity(c, b) for c, b in tqdm(list(subject.items()))]):
         holder = await f
@@ -53,6 +57,32 @@ async def daily_close(
 async def main():
     for f in asyncio.as_completed([daily_close(_, 'HKEx') for _ in tqdm(list(clients))]):
         await f
+
+def update_entities(
+        target: Union[int, str, Iterable],
+        client:str,
+        boarse:str = ’HKEx',
+        add: bool = True) -> None:
+    if isinstance(target, str):
+        target = [int(target)]
+    else:
+        target = [target] if isinstance(target, int) else target
+
+    f_ = f”{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}”
+    _ = f'{client.upper()}.{boarse}'
+    d = benedict.from_yaml(f_)
+    ent_list = d.get_list(_)
+    if add:
+        for t in target:
+            if t not in ent_list:
+                ent_list.append(t)
+        ent_list.sort()
+    else:
+        for t in target:
+            ent_list.remove(t)
+
+    d[_] = ent_list
+    d.to_yaml(filepath=f_)
 
 if __name__ == "__main__":
     asyncio.run(main())
