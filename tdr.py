@@ -60,15 +60,15 @@ async def main():
 
 def update_entities(
         target: Union[int, str, Iterable],
-        client:str,
-        boarse:str = ’HKEx',
+        client: str,
+        boarse: str = 'HKEx',
         add: bool = True) -> None:
     if isinstance(target, str):
         target = [int(target)]
     else:
         target = [target] if isinstance(target, int) else target
 
-    f_ = f”{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}”
+    f_ = f"{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}"
     _ = f'{client.upper()}.{boarse}'
     d = benedict.from_yaml(f_)
     ent_list = d.get_list(_)
