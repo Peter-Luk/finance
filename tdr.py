@@ -10,7 +10,6 @@ from benedict import benedict
 from pathlib import os
 from typing import Coroutine, Dict, List, Iterable, Final, Union
 from utilities import getcode
-# from utilities import yaml_get, getcode
 from fintools import hsirnd
 from asyahoo import get_data
 
@@ -49,8 +48,7 @@ async def daily_close(
         client_no: str,
         boarse: str = 'HKEx') -> None:
     result: List = []
-    _: List = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}").get_list(f'{client_no.upper()}.{boarse}')
-    # _: List = yaml_get(client_no, 'portfolio.yaml').get(boarse)
+    _: List = Portfolio(client_no, boarse)()
     subject: Dict = dict(zip(_, [boarse for __ in _]))
     for f in asyncio.as_completed([Equity(c, b) for c, b in tqdm(list(subject.items()))]):
         holder = await f
@@ -62,36 +60,34 @@ async def main():
         await f
 
 class Portfolio():
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, client: str, boarse: str = 'HKEx'):
+        self.client = client.upper()
+        self.boarse = boarse
+        self.f_ = f"{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}"
+        self._ = f'{self.client}.{self.boarse}'
 
-    def add(
-            self,
-            code: Union[int, str, Iterable],
-            boarse: str = 'HKEx') -> None:
-        self.update_(code, self.client, boarse, add=True)
+    def __call__(self):
+        d = benedict.from_yaml(self.f_)
+        return d.get_list(self._)
 
-    def subtract(
-            self,
-            code: Union[int, str, Iterable],
-            boarse: str = 'HKEx') -> None:
-        self.update_(code, self.client, boarse, add=False)
+    def add(self,
+            code: Union[int, str, Iterable]) -> None:
+        self.update_(code, add=True)
 
-    def update_(
-            self,
-            target: Union[int, str, Iterable],
-            client: str,
-            boarse: str = 'HKEx',
-            add: bool = True) -> None:
+    def remove(self,
+               code: Union[int, str, Iterable]) -> None:
+        self.update_(code, add=False)
+
+    def update_(self,
+                target: Union[int, str, Iterable],
+                add: bool = True) -> None:
         if isinstance(target, str):
             target = [int(target)] if boarse in ['HKEx', 'TSE'] else [target]
         else:
             target = [target] if isinstance(target, int) else target
     
-        f_ = f"{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}"
-        _ = f'{client.upper()}.{boarse}'
-        d = benedict.from_yaml(f_)
-        ent_list = d.get_list(_)
+        d = benedict.from_yaml(self.f_)
+        ent_list = d.get_list(self._)
         if add:
             for t in target:
                 if t not in ent_list:
@@ -101,8 +97,8 @@ class Portfolio():
             for t in target:
                 ent_list.remove(t)
     
-        d[_] = ent_list
-        d.to_yaml(filepath=f_)
+        d[self._] = ent_list
+        d.to_yaml(filepath=self.f_)
 
 if __name__ == "__main__":
     asyncio.run(main())
