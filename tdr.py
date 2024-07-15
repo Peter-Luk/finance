@@ -61,31 +61,48 @@ async def main():
     for f in asyncio.as_completed([daily_close(_, 'HKEx') for _ in clients]):
         await f
 
-def update_entities(
-        target: Union[int, str, Iterable],
-        client: str,
-        boarse: str = 'HKEx',
-        add: bool = True) -> None:
-    if isinstance(target, str):
-        target = [int(target)] if boarse in ['HKEx', 'TSE'] else [target]
-    else:
-        target = [target] if isinstance(target, int) else target
+class Portfolio():
+    def __init__(self, client):
+        self.client = client
 
-    f_ = f"{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}"
-    _ = f'{client.upper()}.{boarse}'
-    d = benedict.from_yaml(f_)
-    ent_list = d.get_list(_)
-    if add:
-        for t in target:
-            if t not in ent_list:
-                ent_list.append(t)
-        ent_list.sort()
-    else:
-        for t in target:
-            ent_list.remove(t)
+    def add(
+            self,
+            code: Union[int, str, Iterable],
+            boarse: str = 'HKEx') -> None:
+        self.update_(code, self.client, boarse, add=True)
 
-    d[_] = ent_list
-    d.to_yaml(filepath=f_)
+    def subtract(
+            self,
+            code: Union[int, str, Iterable],
+            boarse: str = 'HKEx') -> None:
+        self.update_(code, self.client, boarse, add=False)
+
+    def update_(
+            self,
+            target: Union[int, str, Iterable],
+            client: str,
+            boarse: str = 'HKEx',
+            add: bool = True) -> None:
+        if isinstance(target, str):
+            target = [int(target)] if boarse in ['HKEx', 'TSE'] else [target]
+        else:
+            target = [target] if isinstance(target, int) else target
+    
+        f_ = f"{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}"
+        _ = f'{client.upper()}.{boarse}'
+        d = benedict.from_yaml(f_)
+        ent_list = d.get_list(_)
+        if add:
+            for t in target:
+                if t not in ent_list:
+                    ent_list.append(t)
+            ent_list.sort()
+        else:
+            for t in target:
+                ent_list.remove(t)
+    
+        d[_] = ent_list
+        d.to_yaml(filepath=f_)
 
 if __name__ == "__main__":
     asyncio.run(main())
