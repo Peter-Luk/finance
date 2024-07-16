@@ -65,6 +65,15 @@ class Portfolio():
         self.boarse = boarse
         self.f_ = f"{os.getenv('PYTHONPATH')}{YAML_PREFERENCE}"
         self._ = f'{self.client}.{self.boarse}'
+        d = benedict.from_yaml(self.f_)
+        self.holdings = d.get_list(self._)
+
+    def __add__(self, another):
+        res = list(set(self.holdings + another.holdings))
+        return sorted(res)
+
+    def __len__(self):
+        return len(self.holdings)
 
     def __call__(self):
         d = benedict.from_yaml(self.f_)
