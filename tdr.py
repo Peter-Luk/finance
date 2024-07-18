@@ -1,6 +1,6 @@
-#!/data/data/com.termux/files/usr/bin/python
-"""
 #!/bin/python3
+"""
+#!/data/data/com.termux/files/usr/bin/python
 """
 import asyncio
 import pandas as pd
