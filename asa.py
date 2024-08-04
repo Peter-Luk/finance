@@ -13,7 +13,6 @@ from asyncinit import asyncinit
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
-# from finance.fintt get_periods, hsirnd
 from fintools import FOA, get_periods, hsirnd
 from utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
 from ormlib import async_fetch

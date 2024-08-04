@@ -232,8 +232,12 @@ class FOA(object):
         if isinstance(data, type(None)):
             data = self.__data
         if self._ta:
-            _ = self._ta.MACD(data.close, period['fast'], period['slow'], period['signal'])
-            return pd.DataFrame({'M Line':_[0], 'Signal':_[1], 'Histogram':_[-1]})
+            try:
+                _ = self._ta.MACD(data.close, period['fast'], period['slow'], period['signal'])
+                return pd.DataFrame({'M Line':_[0], 'Signal':_[1], 'Histogram':_[-1]})
+            except:
+                _ = self._ta.MACD(data.Close, period['fast'], period['slow'], period['signal'])
+                return pd.DataFrame({'M Line':_[0], 'Signal':_[1], 'Histogram':_[-1]})
         else:
             hl = (data.high + data.low) / 2
             e_slow = self.ema(period['slow'], hl)
