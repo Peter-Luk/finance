@@ -22,7 +22,7 @@ from finaux import roundup
 # from finance.utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
 # from finance.ormlib import async_fetch
 # from finance.finaux import roundup
-from nta import Viewer
+from asa import Viewer
 # from asyahoo import get_data
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
