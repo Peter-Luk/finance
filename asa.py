@@ -6,6 +6,7 @@ from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
 import pandas as pd
 import numpy as np
 # import yfinance as yf
+from pstock import Bars
 from pprint import pprint
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atq
@@ -22,12 +23,26 @@ from finaux import roundup
 # from finance.ormlib import async_fetch
 # from finance.finaux import roundup
 from nta import Viewer
-from asyahoo import get_data
+# from asyahoo import get_data
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
 Base = declarative_base()
 DB_NAME: Final[str] = yaml_db_get('name')
 DB_PATH: Final[str] = filepath(DB_NAME)
+
+
+async def get_data(
+        ticker: Any = 9988,
+        boarse: str = 'HKEx',
+        capitalize: bool = False
+        ) -> pd.DataFrame:
+    _ = getcode(ticker, boarse)
+    df = (await Bars.get(_, interval='1d')).df
+    df.drop(['adj_close', 'interval'], axis=1, inplace=True)
+    if capitalize:
+        df.columns = [c.capitalize() for c in df.columns]
+        df.index.name = df.index.name.capitalize()
+    return df
 
 
 class Record(Base):
