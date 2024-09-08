@@ -11,10 +11,11 @@ from pathlib import os
 from typing import Coroutine, Dict, List, Iterable, Final, Union
 from utilities import getcode
 from fintools import hsirnd
-from asyahoo import get_data
+from asa import get_data
+# from asyahoo import get_data
 
 YAML_PREFERENCE: Final[str] = f'{os.sep}portfolio.yaml'
-clients = iter(('M213423', 'M241238', 'P724059', 'P772215', 'P851223', 'P854787'))
+clients = iter(('M213423', 'M241238', 'P724059', 'P772215', 'P851223'))
 
 @asyncinit
 class Equity():
