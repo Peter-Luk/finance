@@ -4,10 +4,11 @@ import datetime
 import random
 from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
 import pandas as pd
+from pstock import Bars
 import numpy as np
 # import yfinance as yf
-from pstock import Bars
-from pprint import pprint
+# from pstock import Bars
+# from pprint import pprint
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atq
 from asyncinit import asyncinit
