@@ -8,7 +8,8 @@ from utilities import getcode
 
 class StockCodeError(Exception):
     'Raised when no valid stock code matched'
-YAHOO_URL: Final[str] = 'https://query1.finance.yahoo.com/v7/finance/download'
+# YAHOO_URL: Final[str] = 'https://query1.finance.yahoo.com/v7/finance/download'
+YAHOO_URL: Final[str] = 'https://query2.finance.yahoo.com/v8/finance/chart'
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ApplSeWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57'
 }

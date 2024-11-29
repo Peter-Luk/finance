@@ -535,7 +535,8 @@ def summary(__):
     if not isinstance(__, (list, tuple)):
         __ = list(__)
     _ = [_press(_) for _ in __]
-    print('\n'.join(_))
+    # print('\n'.join(_))
+    return '\n'.join(_)
 
 
 def A2B(_):

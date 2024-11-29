@@ -577,13 +577,15 @@ B_scale:
 USHK: 7.75
 
 listing:
-  nato_defense:
+  nato_defence:
+    pltr: NYSE
     rtx: NYSE
     rhm: DAX
     mitsubishi heavy: TSE
     ba: LSE
     noc: NYSE
     lmt: NYSE
+    lhx: NYSE
 
 prefer_stock:
   TSE:

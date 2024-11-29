@@ -6,9 +6,7 @@ from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
 import pandas as pd
 from pstock import Bars
 import numpy as np
-# import yfinance as yf
-# from pstock import Bars
-# from pprint import pprint
+from pprint import pprint
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atq
 from asyncinit import asyncinit
@@ -19,12 +17,7 @@ from fintools import FOA, get_periods, hsirnd
 from utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
 from ormlib import async_fetch
 from finaux import roundup
-# from finance.fintools import FOA, get_periods, hsirnd
-# from finance.utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
-# from finance.ormlib import async_fetch
-# from finance.finaux import roundup
 from nta import Viewer
-# from asyahoo import get_data
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
 Base = declarative_base()
@@ -43,6 +36,7 @@ async def get_data(
     if capitalize:
         df.columns = [c.capitalize() for c in df.columns]
         df.index.name = df.index.name.capitalize()
+    df.index = df.index.astype('datetime64[ns]')
     return df
 
 
@@ -94,13 +88,24 @@ class Equity(FOA, Viewer):
         self.periods = get_periods()
         self.code = code
         self.exchange = boarse
+        match self.exchange:
+            case 'HKEx':
+                self.currency = 'HKD'
+            case 'NYSE':
+                self.currency = 'USD'
+            case 'DAX':
+                self.currency = 'EUR'
+            case 'TSE':
+                self.currency = 'JPY'
+            case 'LSE':
+                self.currency = 'GBP'
         self.yahoo_code = getcode(self.code, self.exchange)
         self.__capitalize = capitalize
         await self.compose(static)
         self.view = Viewer(self.__data)
 
     def __str__(self):
-        return f"{self.date:%d-%m-%Y}: close @ {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, sar: {self.sar().iloc[-1]:,.2f} and KAMA: {self.kama().iloc[-1]:,.2f}"
+        return f"{self.yahoo_code} {self.date:%d-%m-%Y}: close @ {self.currency} {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, sar: {self.sar().iloc[-1]:,.2f} and KAMA: {self.kama().iloc[-1]:,.2f}"
 
     def __call__(self, static: bool = True) -> pd.Series:
         return self.maverick(date=self.date) if self.__capitalize else self.optinum(date=self.date)
@@ -118,9 +123,11 @@ class Equity(FOA, Viewer):
                             )
                     if self.__capitalize:
                         self.__data.columns = [_.capitalize() for _ in self.__data.columns]
-                        self.__data = self.__data.set_index(pd.DatetimeIndex(self.__data.Date))
+                        # self.__data = self.__data.set_index(pd.DatetimeIndex(self.__data.Date))
+                        pd.DatetimeIndex(self.__data.Date)
                     else:
-                        self.__data = self.__data.set_index(pd.DatetimeIndex(self.__data.date))
+                        # self.__data = self.__data.set_index(pd.DatetimeIndex(self.__data.date))
+                        pd.DatetimeIndex(self.__data.date)
                     # self.__data.set_index('date', inplace=True)
                     # self.__data.columns = [_.capitalize() for _ in fields]
                 else:
@@ -129,7 +136,7 @@ class Equity(FOA, Viewer):
                 self.__data = await get_data(self.code, self.exchange, self.__capitalize)
         else:
             self.__data = await get_data(self.code, self.exchange, self.__capitalize)
-        self.__data.index = self.__data.index.astype('datetime64[ns]')
+        # self.__data.index = self.__data.index.astype('datetime64[ns]')
         self.date = self.__data.index[-1]
         if self.__capitalize:
             self.change = self.__data.Close.pct_change(fill_method=None).iloc[-1]
@@ -282,7 +289,8 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
 
 async def get_summary(code: str, boarse: str) -> str:
     _ = await Equity(code, boarse)
-    return {_.yahoo_code: f'{_}'}
+    return f'{_}'
+    # return {_.yahoo_code: f'{_}'}
     # print(f'{_.yahoo_code} - {_}')
 
 
@@ -291,22 +299,17 @@ async def close_at(code: str, boarse: str) -> dict:
     return {_.code: _.close}
 
 
-async def summary(target: str = 'nato_defense'):
-    result = {}
-    if target == 'nato_defense':
-        subject = yaml_get('listing', YAML_PREFERENCE).get(target)
-    if target == 'B_shares':
-        _ = yaml_get('B_scale', YAML_PREFERENCE).keys()
-        subject = dict(zip(_, ['NYSE' for __ in _]))
-    if target == 'TSE':
-        _ = yaml_get('prefer_stock', YAML_PREFERENCE).get(target).keys()
-        subject = dict(zip(_, [target for __ in _]))
-    # for f in asyncio.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
-    for f in atq.as_completed([get_summary(c, b) for c, b in list(subject.items())]):
-        holder = await f
-        result[list(holder.keys()).pop()] = list(holder.values()).pop()
-    return result
-       # await f
+async def summary(target: str = 'nato_defence') -> list:
+    match target:
+        case 'nato_defence':
+            subject = yaml_get('listing', YAML_PREFERENCE).get(target)
+        case 'B_shares':
+            _ = yaml_get('B_scale', YAML_PREFERENCE).keys()
+            subject = dict(zip(_, ['NYSE' for __ in _]))
+        case 'TSE':
+            _ = yaml_get('prefer_stock', YAML_PREFERENCE).get(target).keys()
+            subject = dict(zip(_, [target for __ in _]))
+    return [await f for f in atq.as_completed([get_summary(c, b) for c, b in list(subject.items())])]
 
 
 async def daily_close(
@@ -356,4 +359,4 @@ async def A2B(
 if __name__ == "__main__":
     sector = input('Sector: ')
     _ = asyncio.run(summary(sector))
-    pprint(_)
+    pprint(_, width=50)

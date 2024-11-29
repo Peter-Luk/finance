@@ -12,7 +12,7 @@ from utilities import getcode
 from fintools import hsirnd
 
 YAML_PREFERENCE: Final[str] = f'{os.sep}portfolio.yaml'
-clients = iter(('M213423', 'M241238', 'P724059', 'P772215', 'P851223'))
+clients: list = ['M213423', 'M241238', 'P724059', 'P772215', 'P851223']
 
 
 async def daily_close(
@@ -22,11 +22,16 @@ async def daily_close(
     _y = [getcode(__, boarse) for __ in tqdm(_)]
     data = await BarsMulti.get(_y, period='5d', interval='1d')
     result = [f'{i} {hsirnd(data[getcode(i, boarse)].df.close.iloc[-1]):0.2f}' for i in _]
-    print(f"{client_no}\nClose price, {', '.join(result)}")
+    return {client_no: f"Close price, {', '.join(result)}"}
 
 async def main():
-    for f in asyncio.as_completed([daily_close(_, 'HKEx') for _ in clients]):
-        await f
+    holder = {}
+    for c in clients:
+        _ = await daily_close(c, 'HKEx')
+        for k, v in _.items():
+            holder[k] = v
+    for k, v in holder.items():
+        print(f'{k}\n{v}')
 
 class Portfolio():
     def __init__(self, client: str, boarse: str = 'HKEx'):
@@ -51,10 +56,14 @@ class Portfolio():
     def add(self,
             code: Union[int, str, Iterable]) -> None:
         self.update_(code, add=True)
+        result = f'{code}' if isinstance(code, (int, str)) else ', '.join([f'{_}' for _ in code])
+        return f'updated, {result} added.'
 
     def remove(self,
                code: Union[int, str, Iterable]) -> None:
         self.update_(code, add=False)
+        result = f'{code}' if isinstance(code, (int, str)) else ', '.join([f'{_}' for _ in code])
+        return f'updated, {result} removed.'
 
     def update_(self,
                 target: Union[int, str, Iterable],
@@ -73,7 +82,9 @@ class Portfolio():
             ent_list.sort()
         else:
             for t in target:
-                ent_list.remove(t)
+                if t in ent_list:
+                    ent_list.remove(t)
+        self.holdings = ent_list
     
         d[self._] = ent_list
         d.to_yaml(filepath=self.f_)

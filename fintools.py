@@ -162,6 +162,7 @@ class FOA(object):
             result = self._ta.SAR(data.High, data.Low, acceleration=acceleration, maximum=maximum) if self._ta else _['res']
         except:
             result = self._ta.SAR(data.high, data.low, acceleration=acceleration, maximum=maximum) if self._ta else _['res']
+        result.name = 'SAR'
         return result
 
     def wma(self, period, data=None):
