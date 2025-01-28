@@ -69,10 +69,9 @@ class Portfolio():
                 target: Union[int, str, Iterable],
                 add: bool = True) -> None:
         if isinstance(target, str):
-            target = [int(target)] if boarse in ['HKEx', 'TSE'] else [target]
+            target = [int(target)] if self.boarse in ['HKEx', 'TSE'] else [target]
         else:
             target = [target] if isinstance(target, int) else target
-    
         d = benedict.from_yaml(self.f_)
         ent_list = d.get_list(self._)
         if add:
