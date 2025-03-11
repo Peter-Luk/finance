@@ -4,7 +4,8 @@ import datetime
 import random
 from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
 import pandas as pd
-from pstock import Bars
+import yfinance as yf
+# from pstock import Bars
 import numpy as np
 from pprint import pprint
 from tqdm import tqdm
@@ -18,11 +19,20 @@ from utilities import yaml_get, yaml_db_get, filepath, gslice, getcode
 from ormlib import async_fetch
 from finaux import roundup
 from nta import Viewer
+from pref import fields
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
 Base = declarative_base()
 DB_NAME: Final[str] = yaml_db_get('name')
 DB_PATH: Final[str] = filepath(DB_NAME)
+
+
+# def extract(raw:pd.DataFrame) -> pd.DataFrame:
+#     t_dict = {}
+#     for f in [_.capitalize() for _ in fields]:
+#         if f in raw.columns:
+#             t_dict[f] = eval(f"raw.{f}['']")
+#     return pd.DataFrame(t_dict)
 
 
 async def get_data(
@@ -31,13 +41,20 @@ async def get_data(
         capitalize: bool = False
         ) -> pd.DataFrame:
     _ = getcode(ticker, boarse)
-    df = (await Bars.get(_, interval='1d')).df
-    df.drop(['adj_close', 'interval'], axis=1, inplace=True)
-    if capitalize:
-        df.columns = [c.capitalize() for c in df.columns]
-        df.index.name = df.index.name.capitalize()
-    df.index = df.index.astype('datetime64[ns]')
-    return df
+    # t_dict = {}
+    # df = (await Bars.get(_, interval='1d')).df
+    df = yf.download(_, interval='1d', period='max')
+    return df.xs(_, axis=1, level='Ticker')
+    # for f in [__.capitalize() for __ in fields]:
+    #     if f in df.columns:
+    #         t_dict[f] = eval(f"df.{f}[{_}]")
+    # return pd.DataFrame(t_dict)
+    # # df.drop(['adj_close', 'interval'], axis=1, inplace=True)
+    # if capitalize:
+    #     df.columns = [c.capitalize() for c in df.columns]
+    #     df.index.name = df.index.name.capitalize()
+    # df.index = df.index.astype('datetime64[ns]')
+    # return df
 
 
 class Record(Base):

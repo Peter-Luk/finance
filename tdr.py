@@ -3,25 +3,27 @@
 #!/bin/python3
 """
 import asyncio
-from tqdm import tqdm
 from benedict import benedict
 from pathlib import os
 from typing import Coroutine, Dict, List, Iterable, Final, Union
-from pstock import BarsMulti
+import yfinance as yf
+# from pstock import BarsMulti
 from utilities import getcode
 from fintools import hsirnd
 
 YAML_PREFERENCE: Final[str] = f'{os.sep}portfolio.yaml'
-clients: list = ['M213423', 'M241238', 'P724059', 'P772215', 'P851223']
+clients: list = ['M213423', 'P241238', 'P724059', 'P772215', 'P851223']
 
 
 async def daily_close(
         client_no: str,
         boarse: str = 'HKEx') -> None:
     _: List = Portfolio(client_no, boarse)()
-    _y = [getcode(__, boarse) for __ in tqdm(_)]
-    data = await BarsMulti.get(_y, period='5d', interval='1d')
-    result = [f'{i} {hsirnd(data[getcode(i, boarse)].df.close.iloc[-1]):0.2f}' for i in _]
+    _y = [getcode(__, boarse) for __ in _]
+    data = yf.download(_y, period='5d', interval='1d', auto_adjust=False)
+    result = [f'{i} {hsirnd(data.xs(getcode(i, boarse),axis=1,level="Ticker").Close.iloc[-1]):0.2f}' for i in _]
+    # data = await BarsMulti.get(_y, period='5d', interval='1d')
+    # result = [f'{i} {hsirnd(data[getcode(i, boarse)].df.close.iloc[-1]):0.2f}' for i in _]
     return {client_no: f"Close price, {', '.join(result)}"}
 
 async def main():
