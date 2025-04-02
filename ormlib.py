@@ -8,18 +8,20 @@ from sqlalchemy import asc, desc, create_engine, Column, Integer, Date, Time, St
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.future import select
-from utilities import today, futures_type, yaml_db_get, filepath, get_start, waf, ltd, yaml_get, YAML_PREFERENCE
+from benedict import benedict
+from utilities import today, futures_type, filepath, get_start, waf, ltd, YAML_PREFERENCE
 from pref import fields
 
 Base = declarative_base()
+YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 
 
 def trade_data(code: Any, derivative: bool = False, capitalize: bool = False) -> pd.DataFrame:
     fields = ['date', 'session'] if derivative else ['date']
-    fields.extend(yaml_get('fields', YAML_PREFERENCE))
+    fields.extend(YAML.fields)
     if derivative:
         query = select(*[eval(f'Derivatives.{_}') for _ in fields]).where(Derivatives.code ==  code)
-        holder = asyncio.run(async_fetch(query, yaml_db_get('name', 'Futures', YAML_PREFERENCE)))
+        holder = asyncio.run(async_fetch(query, YAML.db.Futures.name))
         tdf = pd.DataFrame(holder)
         tdf.columns = fields
         date_ = tdf.date.unique()
@@ -51,26 +53,26 @@ def trade_data(code: Any, derivative: bool = False, capitalize: bool = False) ->
         df['volume'] = volume_
     else:
         query = select(*[eval(f'Securities.{_}') for _ in fields]).where(Securities.eid == code)
-        holder = sync_fetch(query, yaml_db_get('name', 'Equities', YAML_PREFERENCE))
+        holder = sync_fetch(query, YAML.db.Equities.name)
         df = pd.DataFrame(holder)
         df.columns = fields
     df = df.set_index(pd.DatetimeIndex(df.date))
     df = df.drop(columns=['date'])
     if capitalize:
-        df.columns = [_.capitalize() for _ in yaml_get('fields', YAML_PREFERENCE)]
+        df.columns = [_.capitalize() for _ in YAML.fields]
     return df
 
 
 """"
 def entities(dbname: str = None):
     if dbname is None:
-        dbname = yaml_db_get('name', 'Equities', YAML_PREFERENCE)
-    if dbname == yaml_db_get('name', 'Equities', YAML_PREFERENCE):
+        dbname = YAML.db_Equities.name
+    if dbname == YAML.db.Equities.name:
         query = select(Securities.eid.distinct()).order_by(asc(Securities.eid))
         __ = asyncio.run(async_fetch(query, dbname))
-        exclude = yaml_db_get('exclude', 'Equities', YAML_PREFERENCE)
+        exclude = YAML.db.Equities.exclude
         res =  [_[0] for _ in __ if _ not in exclude]
-    if dbname == yaml_db_get('name', 'Futures', YAML_PREFERENCE):
+    if dbname == YAML.db.Futures.name:
         query = select(Derivatives.code.distinct()).order_by(asc(Derivatives.code))
         __ = asyncio.run(async_fetch(query, dbname))
         res =  [_[0] for _ in __]
@@ -79,8 +81,8 @@ def entities(dbname: str = None):
 
 def stored_eid():
     query = select(Securities.eid.distinct()).order_by(asc(Securities.eid))
-    res = asyncio.run(async_fetch(query, yaml_db_get('name')))
-    exclude = yaml_db_get('exclude')
+    res = asyncio.run(async_fetch(query, YAML.db.Equities.name))
+    exclude = YAML.db.Equities.exclude
     return [_ for _ in res if _ not in exclude]
 
 
@@ -160,10 +162,10 @@ def mtf(*args, **kwargs):
                 aft.append(__)
         try:
             nfv = sync_fetch(query.where(Derivatives.code == aft[1]),
-                    yaml_db_get('name', entity='Futures'))[0]
+                    YAML.db.Futures.name)[0]
 
             cfv = sync_fetch(query.where(Derivatives.code == aft[0]),
-                    yaml_db_get('name', entity='Futures'))[0]
+                    YAML.db.Futures.name)[0]
             if cfv > nfv:
                 fi.append(aft[0])
             else:
@@ -248,7 +250,7 @@ class Session(object):
         db_file = filepath(db_name)
         if os.path.isfile(db_file):
             if sync:
-                self.engine = create_engine(f'sqlite:///{db_file}')
+                self.engine = create_engine(f'sqlite+pysqlite:///{db_file}')
                 self.session = sessionmaker(self.engine, expire_on_commit=False)
             else:
                 self.engine = create_async_engine(f'sqlite+aiosqlite:///{db_file}')
