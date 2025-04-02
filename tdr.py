@@ -1,13 +1,15 @@
+#!/bin/python3
+
 """
 #!/data/data/com.termux/files/usr/bin/python
 #!/bin/python3
 """
+
 import asyncio
 from benedict import benedict
 from pathlib import os
 from typing import Coroutine, Dict, List, Iterable, Final, Union
 import yfinance as yf
-# from pstock import BarsMulti
 from utilities import getcode
 from fintools import hsirnd
 
@@ -22,8 +24,6 @@ async def daily_close(
     _y = [getcode(__, boarse) for __ in _]
     data = yf.download(_y, period='5d', interval='1d', auto_adjust=False)
     result = [f'{i} {hsirnd(data.xs(getcode(i, boarse),axis=1,level="Ticker").Close.iloc[-1]):0.2f}' for i in _]
-    # data = await BarsMulti.get(_y, period='5d', interval='1d')
-    # result = [f'{i} {hsirnd(data[getcode(i, boarse)].df.close.iloc[-1]):0.2f}' for i in _]
     return {client_no: f"Close price, {', '.join(result)}"}
 
 async def main():

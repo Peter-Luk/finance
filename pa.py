@@ -6,7 +6,8 @@ import pretty_errors
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, Date, Time, String, text
-from utilities import yaml_db_get, YAML_PREFERENCE
+from benedict import benedict
+from pathlib import os
 from ormlib import async_fetch, Session
 # from finance.ormlib import async_fetch, Session
 
@@ -120,7 +121,7 @@ if __name__ == "__main__":
         _modify_at = datetime.datetime.now()
         sj.date = _modify_at.date()
         sj.time = _modify_at.time()
-        pn = Session(yaml_db_get('name', 'Health', YAML_PREFERENCE))
+        pn = Session(benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}pref.yaml").db.Health.name)
         with pn.session() as session:
             with session.begin():
                 session.add(sj)
