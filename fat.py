@@ -3,13 +3,16 @@ import datetime
 from sqlalchemy.orm import declarative_base, deferred
 from sqlalchemy import Column, Integer, Date, String, text
 # from sqlalchemy.future import select
-from utilities import yaml_get, yaml_db_get, YAML_PREFERENCE, getcode, gslice, waf
+from pathlib import os
+from benedict import benedict
+from utilities import YAML_PREFERENCE, getcode, gslice, waf
 from fintools import FOA, get_periods, pd, np, gap, prefer_stock, mplot
 from ormlib import trade_data, Session
 from finaux import roundup
 
 Base = declarative_base()
 idx = []
+YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 
 
 class Record(Base):
@@ -53,8 +56,8 @@ class Record(Base):
 
 class Futures(FOA):
     def __init__(self, code):
-        self.__db = yaml_db_get('name', entity='Futures')
-        self.periods = yaml_get('periods', YAML_PREFERENCE).get(self.__db)
+        self.__db = YAML.db.Futures.name
+        self.periods = eval(f'YAML.{self.__db}.periods')
         self.code = code.upper()
         self.__data = trade_data(self.code, True)
         self.analyser = FOA(self.__data, int)
@@ -209,13 +212,13 @@ class Futures(FOA):
 
 class Equity(FOA):
     def __init__(self, code, static=True, exchange='HKEx'):
-        self.periods = yaml_get('periods', YAML_PREFERENCE).get('Equities')
+        self.periods = YAML.Equities.periods
 
         self.code = code
         self.exchange = exchange
         self.yahoo_code = getcode(self.code, self.exchange)
         self.__fields = ['date']
-        self.__fields.extend(yaml_get('fields', YAML_PREFERENCE))
+        self.__fields.extend(YAML.fields)
         self.__data = self.compose(static)
         self.analyser = FOA(self.__data, float)
         self.change = self.__data.close.diff(1)[-1] / self.__data.close[-2]
@@ -242,7 +245,7 @@ class Equity(FOA):
             today = datetime.datetime.today()
             start = today.replace(2000, 1, 1)
             __ = yf.download(self.yahoo_code, start, today, group_by='ticker')
-            __.drop('Adj Close', axis=1, inplace=True)
+            # __.drop('Adj Close', axis=1, inplace=True)
             __.columns = [_.lower() for _ in __.columns]
             __.index.name = __.index.name.lower()
         return __
@@ -418,11 +421,12 @@ class Equity(FOA):
         return pd.Series(np.unique(_a))
 
 
-def submit(values, db=yaml_db_get('name', entity='Futures')):
+def submit(values, db=YAML.db.Futures.name):
     from tqdm import tqdm
     s_Session = Session(db, True)
     with s_Session.session() as session:
         with session.begin():
+            # for i in values:
             for i in tqdm(values, desc='submitting'):
                 session.add(i)
         session.commit()

@@ -15,19 +15,27 @@ except ImportError:
 
 from datetime import datetime
 from time import sleep
-from utilities import yaml_db_get, YAML_PREFERENCE, filepath
+from utilities import YAML_PREFERENCE, filepath
+from pathlib import os
+from benedict import benedict
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
 from ormlib import Securities, Derivatives, trade_data, async_fetch, sync_fetch
 from sqlalchemy.future import select
 # pd, np, db, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
+YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
+B_scale = YAML.B_scale
+USHK = YAML.USHK
+
 
 class Futures(AF, Viewer):
-    periods = pref.periods['Futures']
+    # periods = pref.periods['Futures']
+    periods = YAML.periods.Futures
 
     def __init__(self, code):
-        self._conf = pref.db['Futures']
+        # self._conf = pref.db['Futures']
+        self._conf = YAML.db.Futures
         rc = entities(self._conf['name'])
         if code.upper() not in rc:
             code = rc[-1]
@@ -253,17 +261,19 @@ class Equities(AE, Viewer):
         if adhoc:
             while adhoc:
                 try:
-                    __ = yf.download(code.upper(), start, group_by='ticker')
+                    _code = code.upper()
+                    __ = yf.download(_code, start, group_by='ticker')
                     self.foreign = True
                 except Exception:
-                    __ = yf.download(
-                            f'{code:04d}.HK', start, group_by='ticker')
+                    _code = f'{code:04d}.HK'
+                    __ = yf.download(_code, start, group_by='ticker')
                 if len(__):
                     adhoc = not adhoc
                 else:
                     print('Retry in 30 seconds')
                     sleep(30)
-            __.drop(columns=['Adj Close'])
+            __.xs(_code, axis=1, level='Ticker')
+            # __.drop(columns=['Adj Close'])
         else:
             # from alchemy import AS
             # fields = ['date'] + pref.fields
@@ -416,13 +426,13 @@ def bqo(el, action='buy', bound=True, adhoc=False):
 
 def entities(dbname: str = None):
     if dbname is None:
-        dbname = yaml_db_get('name', 'Equities', YAML_PREFERENCE)
-    if dbname == yaml_db_get('name', 'Equities', YAML_PREFERENCE):
+        dbname = YAML.db.Equities.name
+    if dbname == YAML.db.Equities.name:
         query = select(Securities.eid.distinct()).order_by(db.asc(Securities.eid))
         __ = sync_fetch(query, dbname)
-        exclude = yaml_db_get('exclude', 'Equities', YAML_PREFERENCE)
+        exclude = YAML.db.Equities.exclude
         res =  [_[0] for _ in __ if _[0] not in exclude]
-    if dbname == yaml_db_get('name', 'Futures', YAML_PREFERENCE):
+    if dbname == YAML.db.Futures.name:
         query = select(Derivatives.code.distinct()).order_by(db.asc(Derivatives.code))
         __ = sync_fetch(query, dbname)
         res =  [_[0] for _ in __]
@@ -433,7 +443,7 @@ def entities(dbname=None, series=False):
     pF, pE = pref.db['Futures'], pref.db['Equities']
     if not dbname:
         dbname = pE['name']
-    engine = db.create_engine(f'sqlite:///{filepath(dbname)}')
+    engine = db.create_engine(f'sqlite+pysqlite:///{filepath(dbname)}')
     meta, conn = db.MetaData(), engine.connect()
     if dbname == pF['name']:
         rc = db.Table(

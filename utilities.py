@@ -5,6 +5,7 @@ from pytz import timezone
 from datetime import datetime
 from time import sleep
 from typing import Final, Any
+from benedict import benedict
 import sqlalchemy as db
 from pathlib import os, re, Path, sys, functools
 import pref
@@ -32,10 +33,12 @@ avail_indicators = ('wma', 'kama', 'ema', 'hv')
 cal_month = [x for x in range(1, 13) if not x % 3]
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
+YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 
 
 def tse_stock_code(name: str) -> Any:
-    _tse = yaml_get('prefer_stock', YAML_PREFERENCE).get('TSE')
+    # _tse = yaml_get('prefer_stock', YAML_PREFERENCE).get('TSE')
+    _tse = YAML.prefer_stock.TSE
     _code = [_tse.get(_) for _ in _tse.keys() if name.title() in _.title()]
     if len(_code) == 1:
         return f'{_code.pop():04d}.T'
@@ -76,7 +79,8 @@ def driver_path(browser, file="pref.yaml"):
     # with open(_f, encoding='utf-8') as f:
     #     _ = yaml.load(f, Loader=yaml.FullLoader)
     # __ = _.get('driver').get(browser.capitalize())
-    __ = yaml_get('driver', file).get(browser.capitalize())
+    # __ = yaml_get('driver', file).get(browser.capitalize())
+    __ = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{file}").driver.browser.capitalize()
     _ = []
     if platform == 'win32':
         _.append(os.environ.get('HOMEPATH'))
@@ -286,7 +290,7 @@ def web_collect(*args, **kwargs):
 
     def stored_eid():
         pE = pref.db['Equities']
-        s_engine = db.create_engine(f"sqlite:///{filepath(pE['name'])}")
+        s_engine = db.create_engine(f"sqlite+pysqlite:///{filepath(pE['name'])}")
         s_conn = s_engine.connect()
         rc = db.Table(
             pE['table'],
@@ -366,7 +370,7 @@ def mtf(*args, **kwargs):
             ftype = list(kwargs['type'])
     fi = []
     f_engine = db.create_engine(
-        f"sqlite:///{filepath(pref.db['Futures']['name'])}")
+        f"sqlite+pysqlite:///{filepath(pref.db['Futures']['name'])}")
     f_conn = f_engine.connect()
     rc = db.Table(
         pref.db['Futures']['table'],

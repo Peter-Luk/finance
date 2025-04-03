@@ -3,10 +3,12 @@ import uvicorn
 import pretty_errors
 from fastapi import FastAPI
 from asa import Equity
+from pathlib import os
+from benedict import benedict
 # from finance import Equity
 # from finance.fat import prefer_stock
 # from finance.utilities import IP, tse_stock_code
-from utilities import IP, yaml_get, YAML_PREFERENCE
+from utilities import IP, YAML_PREFERENCE
 
 app = FastAPI()
 
@@ -16,8 +18,9 @@ def ind_status(b: float, i: float) -> str:
 
 
 def get_name(c: int, b: str = '') -> str:
+    YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
     if b == 'TSE':
-        for k, v in yaml_get('prefer_stock', YAML_PREFERENCE).get(b).items():
+        for k, v in eval(f"YAML.prefer_stock.{b}.items()"):
             if c == v:
                 return k
 
