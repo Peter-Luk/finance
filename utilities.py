@@ -44,28 +44,28 @@ def tse_stock_code(name: str) -> Any:
         return f'{_code.pop():04d}.T'
 
 
-def yaml_get(field: str, file: str) -> Any:
-    """ Basic yaml config reader """
-    if file.split('.')[-1] == 'yaml':
-        import yaml
-        fpaths = [os.getcwd()]
-        fpaths.extend(PYTHON_PATH)
-        for f_p in fpaths:
-            _f = f'{f_p}{sep}{file}'
-            if os.path.isfile(_f):
-                with open(_f, encoding='utf-8') as y_f:
-                    _ = yaml.load(y_f, Loader=yaml.FullLoader)
-                res = _.get(field)
-    return res
+# def yaml_get(field: str, file: str) -> Any:
+#     """ Basic yaml config reader """
+#     if file.split('.')[-1] == 'yaml':
+#         import yaml
+#         fpaths = [os.getcwd()]
+#         fpaths.extend(PYTHON_PATH)
+#         for f_p in fpaths:
+#             _f = f'{f_p}{sep}{file}'
+#             if os.path.isfile(_f):
+#                 with open(_f, encoding='utf-8') as y_f:
+#                     _ = yaml.load(y_f, Loader=yaml.FullLoader)
+#                 res = _.get(field)
+#     return res
 
 
-def yaml_db_get(
-        field: str,
-        entity: str = 'Equities',
-        file: str = YAML_PREFERENCE) -> Any:
-    """ yaml db config reader """
-    _ = yaml_get('db', file)
-    return _.get(entity).get(field)
+# def yaml_db_get(
+#         field: str,
+#         entity: str = 'Equities',
+#         file: str = YAML_PREFERENCE) -> Any:
+#     """ yaml db config reader """
+#     _ = yaml_get('db', file)
+#     return _.get(entity).get(field)
 
 
 def driver_path(browser, file="pref.yaml"):
