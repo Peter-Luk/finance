@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import aiosqlite
 import pandas as pd
 from time import sleep
 from pathlib import os

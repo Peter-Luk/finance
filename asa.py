@@ -22,7 +22,7 @@ from pandasql import sqldf
 from benedict import benedict
 from finaux import roundup
 from nta import Viewer
-from pref import fields
+# from pref import fields
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
 YAML: Final[str] = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
@@ -65,7 +65,7 @@ async def stored_entities() -> List:
     entities = [_[0] for _ in await async_fetch(sql_stmt, DB_NAME) if _ not in YAML.db.Equities.exclude]
     return entities
 
-STORED: Final[List] = asyncio.run(stored_entities())
+# STORED: Final[List] = asyncio.run(stored_entities())
 fields = ['date']
 fields.extend(YAML.fields)
 data_fields = [eval(f"Record.{_}") for _ in fields]
@@ -79,6 +79,7 @@ b_scale = YAML.B_scale
 # class Equity(Viewer):
 class Equity(FOA, Viewer):
     """ base object (trial) """
+    STORED: Final[List] = asyncio.run(stored_entities())
     async def __init__(
             self,
             code: Union[int, str],
@@ -103,7 +104,7 @@ class Equity(FOA, Viewer):
         self.yahoo_code = getcode(self.code, self.exchange)
         self.__capitalize = capitalize
         await self.compose(static)
-        # self.view = Viewer(self.__data)
+        self.view = Viewer(self.__data)
 
     def __str__(self):
         return f"{self.yahoo_code} {self.date:%d-%m-%Y}: close @ {self.currency} {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, sar: {self.sar().iloc[-1]:,.2f} and KAMA: {self.kama().iloc[-1]:,.2f}"
@@ -149,34 +150,34 @@ class Equity(FOA, Viewer):
         return await async_fetch(sql_stmt, DB_NAME)
 
 # """
-    def sma(self, period: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
+    def sma(self, period: int = param.simple, data: Any = None) -> pd.DataFrame:
         # sma 
         return super().sma(period, data).astype('float64')
 
-    def ema(self, period: int = param.get('simple'), data: Any = None) -> pd.DataFrame:
+    def ema(self, period: int = param.simple, data: Any = None) -> pd.DataFrame:
         #  ema 
         return super().ema(period, data).astype('float64')
 
-    def atr(self, period: int = param.get('atr'), data: Any = None) -> pd.DataFrame:
+    def atr(self, period: int = param.atr, data: Any = None) -> pd.DataFrame:
         #  atr 
         return super().atr(period, data).astype('float64')
 
-    def kama(self, period: Dict = param.get('kama'), data: Any = None) -> pd.DataFrame:
+    def kama(self, period: Dict = param.kama, data: Any = None) -> pd.DataFrame:
         return super().kama(period, data).astype('float64')
 
-    def adx(self, period: int = param.get('adx'), astype: str = 'float64') -> pd.DataFrame:
+    def adx(self, period: int = param.adx, astype: str = 'float64') -> pd.DataFrame:
         #  adx 
         return super().adx(period).astype(astype)
 
-    def apz(self, period: int = param.get('apz'), astype: str = 'float64') -> pd.DataFrame:
+    def apz(self, period: int = param.apz, astype: str = 'float64') -> pd.DataFrame:
         #  apz 
         return super().apz(period).astype(astype)
 
-    def dc(self, period: int = param.get('dc'), astype: str = 'float64') -> pd.DataFrame:
+    def dc(self, period: int = param.dc, astype: str = 'float64') -> pd.DataFrame:
         #  dc 
         return super().dc(period).astype(astype)
 
-    def kc(self, period: Dict = param.get('kc'), astype: str = 'float64') -> pd.DataFrame:
+    def kc(self, period: Dict = param.kc, astype: str = 'float64') -> pd.DataFrame:
         #  kc 
         return super().kc(period).astype(astype)
 
@@ -184,45 +185,45 @@ class Equity(FOA, Viewer):
         #  obv 
         return super().obv().astype(astype)
 
-    def macd(self, period: Dict = param.get('macd'), astype: str = 'float64') -> pd.DataFrame:
+    def macd(self, period: Dict = param.macd, astype: str = 'float64') -> pd.DataFrame:
         #  macd 
         return super().macd(period).astype(astype)
 
-    def rsi(self, period: int = param.get('rsi'), astype: str = 'float64') -> pd.DataFrame:
+    def rsi(self, period: int = param.rsi, astype: str = 'float64') -> pd.DataFrame:
         #  rsi 
         return super().rsi(period).astype(astype)
 
-    def sar(self, period: Dict = param.get('sar'), astype: str = 'float64') -> pd.DataFrame:
+    def sar(self, period: Dict = param.sar, astype: str = 'float64') -> pd.DataFrame:
         #  ta-lib sar 
         return super().sar(
-                period.get('acceleration'),
-                period.get('maximum')
+                period.acceleration,
+                period.maximum
                 ).astype(astype)
 
-    def stc(self, period: Dict = param.get('stc'), astype: str = 'float64') -> pd.DataFrame:
+    def stc(self, period: Dict = param.stc, astype: str = 'float64') -> pd.DataFrame:
         #  stc 
         return super().stc(period).astype(astype)
 
-    def soc(self, period: Dict = param.get('soc'), astype: str = 'float64') -> pd.DataFrame:
+    def soc(self, period: Dict = param.soc, astype: str = 'float64') -> pd.DataFrame:
         #  soc 
         return super().soc(period).astype(astype)
+
+    def gat(self, date=None, period=param.atr):
+        date = self.date if (date is None) else date
+        return self.view.gat(self.__data, period, date).apply(hsirnd).unique()
 
     def maverick(self,
             date=None,
             period=param,
-            # period=yaml_get('periods',
-            #     YAML_PREFERENCE).get('Equities'),
             unbound=True,
             exclusive=True):
-        if date is None:
-            date = self.date
+        date = self.date if (date is None) else date
         return self.view.maverick(self.__data, period, date, unbound, exclusive)
 
     def optinum(self, date: str = None,
                 base: pd.DataFrame = None,
                 delta: pd.DataFrame = None) -> pd.DataFrame:
-        if date is None:
-            date = self.date
+        date = self.date if (date is None) else date
         if base is None:
             try:
                 base = self.__data.query(f'date <= "{date}"')
@@ -270,17 +271,37 @@ class Equity(FOA, Viewer):
 
 
 param = YAML.periods.Futures
+@asyncinit
 class Futures(FOA, Viewer):
-    def __init__(self, code):
+    async def __init__(self, code):
         self.code = code.upper()
-        self.compose()
+        await self.compose()
         self.periods = YAML.periods.Futures
+        self.view = Viewer(self.__data)
+        self.change = 0
+        if self.__data.shape[0] > 1:
+            self.change = self.__data.Close.diff(1).iloc[-1] / self.__data.Close.iloc[-2]
+        self.date = self.__data.index[-1].to_pydatetime().date()
         self.close = self.__data.Close.iloc[-1]
+
+    def __str__(self):
+        return f"{self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, SAR: {round(self.sar().iloc[-1], 0)} and KAMA: {round(self.kama().iloc[-1], 0)}"
+
+    def __call__(self, date=None):
+        if date is None:
+            date = self.date
+        _ = self.maverick(date=date, unbound=False)
+        _.name = self.code
+        return _
         
-    def compose(self):
+    async def compose(self):
         db_name = YAML.db.Futures.name
+        fields = ['date', 'session']
+        fields.extend(YAML.fields)
+        qstr = select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{self.code}'"))
         engine = create_engine(f"sqlite+pysqlite:///{filepath(db_name)}")
-        raw_data = pd.read_sql(f"SELECT date, session, open, high, low, close, volume  FROM records WHERE code='{self.code}'",
+        # raw_data = pd.read_sql(f"SELECT session, {', '.join(fields)} FROM records WHERE code='{self.code}'",
+        raw_data = pd.read_sql(qstr,
                 engine, index_col=['date', 'session'],
                 parse_dates={'date': {format: '%Y-%m-%d'}})
         trade_date = sqldf("SELECT DISTINCT date FROM raw_data").date.tolist()
@@ -359,8 +380,8 @@ class Futures(FOA, Viewer):
     def sar(self, period: Dict = param.sar, astype: str = 'float64') -> pd.DataFrame:
         #  ta-lib sar 
         return super().sar(
-                period.get('acceleration'),
-                period.get('maximum')
+                period.acceleration,
+                period.maximum
                 ).astype(astype)
 
     def stc(self, period: Dict = param.stc, astype: str = 'float64') -> pd.DataFrame:
@@ -370,6 +391,14 @@ class Futures(FOA, Viewer):
     def soc(self, period: Dict = param.soc, astype: str = 'float64') -> pd.DataFrame:
         #  soc 
         return super().soc(period).astype(astype)
+
+    def gat(self, date=None, period=param.atr):
+        date = self.date if (date is None) else date
+        return self.view.gat(self.__data, period, date).apply(hsirnd).unique()
+
+    def maverick(self, date=None, period=param, unbound=True, exclusive=True):
+        date = self.date if (date is None) else date
+        return self.view.maverick(self.__data, period, date, unbound, exclusive)
 
 
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
@@ -460,4 +489,4 @@ async def A2B(
 if __name__ == "__main__":
     sector = input('Sector: ')
     _ = asyncio.run(summary(sector))
-    pprint(_, width=50)
+    pprint(_, width=60)
