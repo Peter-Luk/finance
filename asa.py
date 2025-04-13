@@ -271,18 +271,21 @@ class Equity(FOA, Viewer):
 
 
 param = YAML.periods.Futures
-@asyncinit
+# @asyncinit
 class Futures(FOA, Viewer):
-    async def __init__(self, code):
+    # async def __init__(self, code):
+    def __init__(self, code):
         self.code = code.upper()
-        await self.compose()
+        # await self.compose()
+        self.compose()
         self.periods = YAML.periods.Futures
         self.view = Viewer(self.__data)
         self.change = 0
         if self.__data.shape[0] > 1:
             self.change = self.__data.Close.diff(1).iloc[-1] / self.__data.Close.iloc[-2]
-        self.date = self.__data.index[-1].to_pydatetime().date()
+        self.date = self.__data.index[-1]
         self.close = self.__data.Close.iloc[-1]
+        qstr = select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{self.code}'"))
 
     def __str__(self):
         return f"{self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, SAR: {round(self.sar().iloc[-1], 0)} and KAMA: {round(self.kama().iloc[-1], 0)}"
@@ -294,14 +297,14 @@ class Futures(FOA, Viewer):
         _.name = self.code
         return _
         
-    async def compose(self):
+    # async def compose(self):
+    def compose(self):
         db_name = YAML.db.Futures.name
         fields = ['date', 'session']
         fields.extend(YAML.fields)
-        qstr = select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{self.code}'"))
         engine = create_engine(f"sqlite+pysqlite:///{filepath(db_name)}")
-        # raw_data = pd.read_sql(f"SELECT session, {', '.join(fields)} FROM records WHERE code='{self.code}'",
-        raw_data = pd.read_sql(qstr,
+        raw_data = pd.read_sql(
+                select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{self.code}'")),
                 engine, index_col=['date', 'session'],
                 parse_dates={'date': {format: '%Y-%m-%d'}})
         trade_date = sqldf("SELECT DISTINCT date FROM raw_data").date.tolist()
