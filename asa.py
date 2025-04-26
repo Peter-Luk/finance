@@ -6,6 +6,7 @@ from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
 from pathlib import os
 import pandas as pd
 import yfinance as yf
+import shutil
 import numpy as np
 from pprint import pprint
 from tqdm import tqdm
@@ -18,18 +19,15 @@ from sqlalchemy import Column, Integer, Float, Date, text
 from fintools import FOA, get_periods, hsirnd
 from utilities import filepath, gslice, getcode
 from ormlib import async_fetch
-from pandasql import sqldf
 from benedict import benedict
 from finaux import roundup
 from nta import Viewer
-# from pref import fields
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
 YAML: Final[str] = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 Base = declarative_base()
 DB_NAME: Final[str] = YAML.db.Equities.name
 DB_PATH: Final[str] = filepath(DB_NAME)
-
 
 async def get_data(
         ticker: Any = 9988,
@@ -273,7 +271,6 @@ class Equity(FOA, Viewer):
 param = YAML.periods.Futures
 # @asyncinit
 class Futures(FOA, Viewer):
-    # async def __init__(self, code):
     def __init__(self, code):
         self.code = code.upper()
         # await self.compose()
@@ -297,17 +294,17 @@ class Futures(FOA, Viewer):
         _.name = self.code
         return _
         
-    # async def compose(self):
     def compose(self):
+        def fetch(fields, code, name):
+            engine = create_engine(f"sqlite+pysqlite:///{filepath(name)}")
+            qstr = select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{code}'"))
+            return pd.read_sql(qstr, engine, index_col=['date', 'session'], parse_dates={'date': {format: '%Y-%m-%d'}})
+
         db_name = YAML.db.Futures.name
         fields = ['date', 'session']
         fields.extend(YAML.fields)
-        engine = create_engine(f"sqlite+pysqlite:///{filepath(db_name)}")
-        raw_data = pd.read_sql(
-                select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{self.code}'")),
-                engine, index_col=['date', 'session'],
-                parse_dates={'date': {format: '%Y-%m-%d'}})
-        trade_date = sqldf("SELECT DISTINCT date FROM raw_data").date.tolist()
+        raw_data = fetch(fields, self.code, db_name)
+        trade_date = raw_data.index.get_level_values('date').unique().tolist()
         res = {'Date': [datetime.datetime.strptime(_, '%Y-%m-%d') for _ in trade_date]}
         _open, _high, _low, _close, _volume = [], [], [], [], []
 
@@ -492,4 +489,5 @@ async def A2B(
 if __name__ == "__main__":
     sector = input('Sector: ')
     _ = asyncio.run(summary(sector))
-    pprint(_, width=60)
+    columns, __ = shutil.get_terminal_size()
+    pprint(_, width=columns)
