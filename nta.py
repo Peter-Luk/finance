@@ -239,7 +239,8 @@ class ONA(object):
 
         upper = volatility + tr * gr
         lower = volatility - tr * gr
-        _ = pd.concat([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
+        # _ = pd.concat([upper.apply(hsirnd), lower.apply(hsirnd, axis=1)], axis=1)
+        _ = pd.concat([upper.apply(hsirnd), lower.apply(hsirnd)], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -269,7 +270,7 @@ class ONA(object):
         # lower = volatility - tr * gr
         # _ = pd.concat(
         #     [upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
-        _ = pd.concat([pax.apply(hsirnd, 1), pin.apply(hsirnd, 1)], axis=1)
+        _ = pd.concat([pax.apply(hsirnd), pin.apply(hsirnd)], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -289,7 +290,7 @@ class ONA(object):
         atr = self.atr(raw, period['atr'])
         upper = middle_line + (gr * atr)
         lower = middle_line - (gr * atr)
-        _ = pd.concat([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
+        _ = pd.concat([upper.apply(hsirnd), lower.apply(hsirnd)], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -309,7 +310,7 @@ class ONA(object):
         width = raw.Close.rolling(period).std()
         upper = middle_line + width
         lower = middle_line - width
-        _ = pd.concat([upper.apply(hsirnd, 1), lower.apply(hsirnd, 1)], axis=1)
+        _ = pd.concat([upper.apply(hsirnd), lower.apply(hsirnd)], axis=1)
         _.columns = ['Upper', 'Lower']
         return _
 
@@ -354,7 +355,7 @@ class ONA(object):
         pv = raw.drop(['Open', 'Volume'], 1).mean(axis=1) * raw.Volume
         _ = pd.Series(
                 pv.cumsum() / raw.Volume.cumsum(),
-                index=raw.index).apply(hsirnd, 1)
+                index=raw.index).apply(hsirnd, axis=1)
         _.name = 'VWAP'
         return _
 
@@ -491,7 +492,8 @@ class Viewer(ONA):
                     raw = raw.loc[:date]
                 except Exception:
                     pass
-        bare = self.gat(raw, period['atr'], date).apply(hsirnd, 1).unique()
+        # bare = self.gat(raw, period['atr'], date).apply(hsirnd, axis=1).unique()
+        bare = self.gat(raw, period['atr'], date).apply(hsirnd).unique()
         boundary = self.ovr(raw, period, date).T
         close = raw.Close.loc[date]
         inside = [

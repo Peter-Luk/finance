@@ -215,7 +215,7 @@ class Equities(AE, Viewer):
             self.__conn = self._ae.connect
         self.view = Viewer(self.data)
         self._date = self.data.index[-1]
-        self._close = hsirnd(self.data['Close'].iloc[-1])
+        self._close = self.data['Close'].map(hsirnd).iloc[-1]
 
     def __del__(self):
         self.foreign = self._conf = self.rc = self._ae = self.__conn = None
@@ -272,7 +272,7 @@ class Equities(AE, Viewer):
                 else:
                     print('Retry in 30 seconds')
                     sleep(30)
-            __.xs(_code, axis=1, level='Ticker')
+            __ = __.xs(_code, axis=1, level='Ticker')
             # __.drop(columns=['Adj Close'])
         else:
             # from alchemy import AS
@@ -392,7 +392,8 @@ class Equities(AE, Viewer):
             date = self._date
         if self.foreign:
             return self.view.gat(self.data, period, date).round(2).unique()
-        return self.view.gat(self.data, period, date).apply(hsirnd, 1).unique()
+        # return self.view.gat(self.data, period, date).apply(hsirnd, 1).unique()
+        return self.view.gat(self.data, period, date).apply(hsirnd).unique()
 
     def maverick(self, date=None, period=periods, unbound=True, exclusive=True):
         if date is None:
@@ -554,7 +555,7 @@ def A2B(_):
     if _ in B_scale.keys():
         __ = Equities(_)
         r = __.gat()
-        return [hsirnd(x * B_scale[_] * USHK) for x in [
+        return [hsirnd(x * B_scale[_].ratio * USHK) for x in [
             r[0],
             r[1],
             __._close,
