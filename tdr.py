@@ -21,8 +21,8 @@ async def daily_close(
         client_no: str,
         boarse: str = 'HKEx') -> None:
     _: List = Portfolio(client_no, boarse)()
-    _y = [getcode(__, boarse) for __ in _]
-    data = yf.download(_y, period='5d', interval='1d', auto_adjust=False)
+    data = yf.download([getcode(__, boarse) for __ in _],
+            period='5d', interval='1d', auto_adjust=False)
     result = [f'{i} {hsirnd(data.xs(getcode(i, boarse),axis=1,level="Ticker").Close.iloc[-1]):0.2f}' for i in _]
     return {client_no: f"Close price, {', '.join(result)}"}
 
