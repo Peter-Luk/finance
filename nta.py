@@ -10,7 +10,6 @@ try:
     from scipy.constants import golden_ratio as gr
 except ImportError:
     gr = 1.618
-# pd, np, datetime, gr = pref.nta
 
 
 class ONA(object):

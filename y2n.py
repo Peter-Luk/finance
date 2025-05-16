@@ -1,6 +1,5 @@
 import asyncio
 import pandas as pd
-# import numpy as np
 import sqlalchemy as db
 from tqdm import tqdm
 import pref
@@ -22,7 +21,6 @@ from nta import Viewer, hsirnd
 from alchemy import AF, AE
 from ormlib import Securities, Derivatives, trade_data, async_fetch, sync_fetch
 from sqlalchemy.future import select
-# pd, np, db, gr, datetime, tqdm, sleep, B_scale, USHK = pref.y2n
 
 YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 B_scale = YAML.B_scale
