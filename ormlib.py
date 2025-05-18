@@ -10,11 +10,8 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.future import select
 from benedict import benedict
-from utilities import today, futures_type, filepath, get_start, waf, ltd, YAML_PREFERENCE
-from pref import fields
-
+from utilities import today, futures_type, filepath, get_start, waf, ltd, YAML
 Base = declarative_base()
-YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 
 
 def trade_data(code: Any, derivative: bool = False, capitalize: bool = False) -> pd.DataFrame:
@@ -202,7 +199,7 @@ class Securities(Base):
     __tablename__ = 'records'
     id = Column(Integer, autoincrement=True, primary_key=True)
     eid = Column(Integer)
-    _data_fields = fields
+    _data_fields = YAML.fields
     _create_at = datetime.datetime.now()
     date = Column(Date, default=_create_at.date(), server_default=text(str(_create_at.date())))
     open = Column(Integer)
@@ -217,7 +214,7 @@ class Derivatives(Base):
     __tablename__ = 'records'
     id = Column(Integer, autoincrement=True, primary_key=True)
     code = Column(String)
-    _data_fields = fields
+    _data_fields = YAML.fields
     _create_at = datetime.datetime.now()
     date = Column(Date, default=_create_at.date(), server_default=text(str(_create_at.date())))
     _session = 'M' if _create_at.time() < datetime.time(12, 25, 0) else 'A'
