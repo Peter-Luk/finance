@@ -8,7 +8,7 @@
 import asyncio
 from benedict import benedict
 from pathlib import os
-from typing import Coroutine, Dict, List, Iterable, Final, Union
+from typing import List, Iterable, Final, Union
 import yfinance as yf
 from utilities import getcode
 from fintools import hsirnd
@@ -21,8 +21,7 @@ async def daily_close(
         client_no: str,
         boarse: str = 'HKEx') -> None:
     _: List = Portfolio(client_no, boarse)()
-    data = yf.download([getcode(__, boarse) for __ in _],
-            period='5d', interval='1d', auto_adjust=False)
+    data = yf.download([getcode(__, boarse) for __ in _], period='5d', interval='1d', auto_adjust=False)
     result = [f'{i} {hsirnd(data.xs(getcode(i, boarse),axis=1,level="Ticker").Close.iloc[-1]):0.2f}' for i in _]
     return {client_no: f"Close price, {', '.join(result)}"}
 

@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import pref
 
 from datetime import datetime
 from utilities import gslice
@@ -391,7 +390,7 @@ class ONA(object):
         return _
 
     def ovr(self, raw, period, date=None):
-        if date != None:
+        if date is not None:
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d')
@@ -426,6 +425,7 @@ class ONA(object):
         _ = pd.DataFrame(hdr, index=ols).T
         return _
         return hdr
+
 
 
 class Viewer(ONA):
@@ -480,7 +480,7 @@ class Viewer(ONA):
         return _
 
     def maverick(self, raw, period, date, unbound=False, exclusive=True):
-        if date != None:
+        if date is not None:
             if isinstance(date, str):
                 try:
                     date = datetime.strptime(date, '%Y%m%d').date()

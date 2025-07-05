@@ -1,11 +1,6 @@
-import asyncio
 import pandas as pd
 import sqlalchemy as db
 from tqdm import tqdm
-import pref
-
-B_scale = pref.B_scale
-USHK = pref.USHK
 
 try:
     from scipy.constants import golden_ratio as gr
@@ -14,21 +9,17 @@ except ImportError:
 
 from datetime import datetime
 from time import sleep
-from utilities import YAML_PREFERENCE, filepath
-from pathlib import os
-from benedict import benedict
+from utilities import YAML
 from nta import Viewer, hsirnd
 from alchemy import AF, AE
-from ormlib import Securities, Derivatives, trade_data, async_fetch, sync_fetch
+from ormlib import Securities, Derivatives, trade_data, sync_fetch
 from sqlalchemy.future import select
 
-YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 B_scale = YAML.B_scale
 USHK = YAML.USHK
 
 
 class Futures(AF, Viewer):
-    # periods = pref.periods['Futures']
     periods = YAML.periods.Futures
 
     def __init__(self, code):
@@ -197,11 +188,11 @@ class Futures(AF, Viewer):
 
 
 class Equities(AE, Viewer):
-    periods = pref.periods['Equities']
+    periods = YAML.periods.Equities
 
     def __init__(self, code, adhoc=False):
         self.foreign = False
-        self._conf = pref.db['Equities']
+        self._conf = YAML.db.Equities
         if code not in entities(self._conf['name']):
             adhoc = True
         self.code = code
@@ -243,8 +234,8 @@ class Equities(AE, Viewer):
         return self._ae.acquire(conditions)
 
     def fetch(
-            self, code=None, start=None, table=pref.db['Equities']['table'],
-            exclude=pref.db['Equities']['exclude'], years=4, adhoc=False):
+            self, code=None, start=None, table=YAML.db.Equities.table,
+            exclude=YAML.db.Equities.exclude, years=4, adhoc=False):
         import yfinance as yf
         if not start:
             # start = pd.datetime(pd.datetime.now().year - years, 12, 31)
@@ -260,11 +251,11 @@ class Equities(AE, Viewer):
             while adhoc:
                 try:
                     _code = code.upper()
-                    __ = yf.download(_code, start, group_by='ticker')
+                    __ = yf.download(_code, start, group_by='ticker', auto_adjust=False)
                     self.foreign = True
                 except Exception:
                     _code = f'{code:04d}.HK'
-                    __ = yf.download(_code, start, group_by='ticker')
+                    __ = yf.download(_code, start, group_by='ticker', auto_adjust=False)
                 if len(__):
                     adhoc = not adhoc
                 else:
@@ -405,13 +396,13 @@ def bqo(el, action='buy', bound=True, adhoc=False):
         el = [el]
     for _ in el:
         if isinstance(_, int):
-            pE = pref.db['Equities']
+            pE = YAML.db.Equities
             if _ in [
                     __ for __ in entities(pE['name'])
                     if __ not in pE['exclude']]:
                 o_ = Equities(_, adhoc)
         if isinstance(_, str):
-            pF = pref.db['Futures']
+            pF = YAML.db.Futures
             if _.upper() in entities(pF['name']):
                 o_ = Futures(_.upper())
         val = o_.maverick(unbound=True).T[action][o_._date]
@@ -474,13 +465,14 @@ def compose(code=None):
         pdhr = pd.concat(
             [e.rsi(), rd.High.sub(rd.Low),
                 rd.Close.diff(), e.atr(),
-                e.adx()[f"ADX{pref.periods['Equities']['adx']}"].diff()],
+                e.adx()[f"ADX{YAML.periods.Equities.adx}"].diff()],
             axis=1)
         pdhr.columns = ['RSI', 'dHL', 'dpC', 'ATR', 'dADX']
         return pdhr
 
     if code is None:
-        code = entities(pref.db['Equities']['name'])
+        code = entities(YAML.db.Equities.name)
+        # code = entities(pref.db['Equities']['name'])
     if isinstance(code, (int, float)):
         code = [int(code)]
     if isinstance(code, list):

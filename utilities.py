@@ -3,20 +3,19 @@ import socket
 from pytz import timezone
 # from scipy.optimize import newton
 from datetime import datetime
-from time import sleep
 from typing import Final, Any
 from benedict import benedict
-import sqlalchemy as db
 from pathlib import os, re, Path, sys, functools
-import pref
-
-driver = pref.driver
-ph = pref.public_holiday
-sep = os.sep
-linesep = os.linesep
+# sep = os.sep
+# linesep = os.linesep
 PYTHON_PATH = re.split(';|:', os.environ.get('PYTHONPATH'))
-platform = sys.platform
-reduce = functools.reduce
+
+YAML_PREFERENCE: Final[str] = 'pref.yaml'
+YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
+driver = YAML.driver
+ph = YAML.public_holiday
+# platform = sys.platform
+# reduce = functools.reduce
 
 try:
     from scipy.constants import golden_ratio as gr
@@ -31,9 +30,6 @@ month_initial = dict(zip(
     [_.upper() for _ in list('fghjkmnquvxz')]))
 avail_indicators = ('wma', 'kama', 'ema', 'hv')
 cal_month = [x for x in range(1, 13) if not x % 3]
-
-YAML_PREFERENCE: Final[str] = 'pref.yaml'
-YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 
 
 def tse_stock_code(name: str) -> Any:
@@ -73,7 +69,7 @@ def driver_path(browser, file="pref.yaml"):
     fpaths = [os.getcwd()]
     fpaths.extend(PYTHON_PATH)
     for fp in fpaths:
-        _f = f'{fp}{sep}{file}'
+        _f = f'{fp}{os.sep}{file}'
         if os.path.isfile(_f):
             break
     # with open(_f, encoding='utf-8') as f:
@@ -82,14 +78,14 @@ def driver_path(browser, file="pref.yaml"):
     # __ = yaml_get('driver', file).get(browser.capitalize())
     __ = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{file}").driver.browser.capitalize()
     _ = []
-    if platform == 'win32':
+    if sys.platform == 'win32':
         _.append(os.environ.get('HOMEPATH'))
     else:
         _.append(os.environ.get('HOME'))
     # __ = driver.get(browser.capitalize())
     _.extend(__.get('path'))
     _.append(__.get('name'))
-    return sep.join(_)
+    return os.sep.join(_)
 
 
 def filepath(*args, **kwargs):
@@ -98,41 +94,41 @@ def filepath(*args, **kwargs):
         file_type = kwargs['type']
     if 'subpath' in list(kwargs.keys()):
         data_path = kwargs['subpath']
-    if platform == 'win32':
+    if sys.platform == 'win32':
         if sys.version_info.major > 2 and sys.version_info.minor > 3:
-            return sep.join((os.environ.get('HOMEPATH'), file_type, data_path, name))
+            return os.sep.join((os.environ.get('HOMEPATH'), file_type, data_path, name))
         else:
-            file_path = sep.join((os.environ.get('HOMEPATH'), file_type, data_path))
-            _ = sep.join((file_path, name))
+            file_path = os.sep.join((os.environ.get('HOMEPATH'), file_type, data_path))
+            _ = os.sep.join((file_path, name))
             return _ if os.path.exists(_) else False
     # if platform == 'linux-armv7l':file_drive, file_path = '', sep.join(('mnt', 'sdcard', file_type, data_path))
-    if platform in ('linux', 'linux2'):
+    if sys.platform in ('linux', 'linux2'):
         if sys.version_info.major > 2 and sys.version_info.minor > 3:
             if os.environ.get('EXTERNAL_STORAGE'):
-                _ = sep.join((
+                _ = os.sep.join((
                     os.environ.get('HOME'), 'storage', 'external-1', file_type,
                     data_path, name))
                 if os.path.exists(_):
                     return _
-            _ = sep.join((os.environ.get('HOME'), file_type, data_path, name))
+            _ = os.sep.join((os.environ.get('HOME'), file_type, data_path, name))
             return _ if os.path.exists(_) else False
         else:
             place = 'shared'
             if os.environ.get('ACTUAL_HOME'):
-                file_path = sep.join((os.environ.get('HOME'), file_type, data_path))
+                file_path = os.sep.join((os.environ.get('HOME'), file_type, data_path))
             elif os.environ.get('EXTERNAL_STORAGE') and ('/' in os.environ['EXTERNAL_STORAGE']):
                 place = 'external-1'
-                file_path = sep.join(
+                file_path = os.sep.join(
                     (os.environ.get('HOME'), 'storage', place, file_type, data_path))
-            _ = sep.join((file_path, name))
+            _ = os.sep.join((file_path, name))
             return _ if os.path.exists(_) else False
     else:
         path_holder_list = ['..', file_type, data_path]
-        path_holder = sep.join(path_holder_list)
+        path_holder = os.sep.join(path_holder_list)
         if os.path.isfile(path_holder):
             return os.path.abspath(path_holder)
         else:
-            path_holder = sep.join(['..', '..'] + path_holder_list)
+            path_holder = os.sep.join(['..', '..'] + path_holder_list)
             return os.path.abspath(path_holder) if os.path.isfile(path_holder) else False
 
 
@@ -184,7 +180,7 @@ def dictfcomp(*args, **kwargs):
         rd = args[1]
     for _ in list(rd.keys()):
         try:
-            if not reduce(
+            if not functools.reduce(
                 (lambda x, y: x and y),
                 ['{:.3f}'.format(ad[_][__]) == '{:.3f}'.format(rd[_][__])
                     for __ in list(rd[_].keys())]):
@@ -206,8 +202,10 @@ def ltd(year=year, month=month, excluded={}):
                     t += 1
     while t < 1:
         if datetime(year, month, day).weekday() < 5:
-            if month in ph[year].keys():
-                if day not in ph[year][month]:
+            # if month in ph[year].keys():
+            #     if day not in ph[year][month]:
+            if month in ph[str(year)].keys():
+                if day not in ph[str(year)][str(month)]:
                     t += 1
             else:
                 t += 1
@@ -524,7 +522,7 @@ def xirr(values, dates):
     except ImportError:
         pass
 
-def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True):
+def order_report(stock_code, price, quantity, previous, /, *, sold, equity):
     action = '買入'
     require = '需'
     def bcls(price, quantity, equity, brokerage='.25/100', ccass='3/.01/300'):
@@ -532,14 +530,17 @@ def order_report(stock_code, price, quantity, previous=0, sold=True, equity=True
         amount = price * quantity
         b_rate, b_min = [float(_) for _ in brokerage.split('/')]
         broker = amount * b_rate / 100
-        if broker < b_min: broker = b_min
+        if broker < b_min:
+            broker = b_min
         s_duty = math.ceil(.13 * amount / 100) if equity else 0
         t_levy = .0027 * amount / 100
         t_fee = .005 * amount / 100
         c_min, c_rate, c_max = [float(_) for _ in ccass.split('/')]
         cas = c_rate * amount / 100
-        if cas < c_min: cas = c_min
-        if cas > c_max: cas = c_max
+        if cas < c_min:
+            cas = c_min
+        if cas > c_max:
+            cas = c_max
         return round(broker + s_duty + t_levy + t_fee + cas, 2)
 
     amount = price * quantity + bcls(price, quantity, equity)
@@ -565,7 +566,7 @@ def push2git(file_path, msg, *, login='Peter-Luk'):
                 absolute_path = f'{str(Path.home())}{file_path}'
                 if os.path.isfile(absolute_path):
                     filename = os.path.basename(absolute_path)
-                    repo = os.path.dirname(absolute_path).split(sep)[-1]
+                    repo = os.path.dirname(absolute_path).split(os.sep)[-1]
                     req_repo = user.get_repo(repo)
                     contents = req_repo.get_contents(filename, ref="test")
                     req_repo.update_file(contents.path, msg, filename, contents.sha, branch="test")

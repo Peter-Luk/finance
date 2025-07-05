@@ -2,13 +2,14 @@
 import asyncio
 import datetime
 import random
-from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
 from pathlib import os
 import pandas as pd
 import yfinance as yf
-import shutil
+# import shutil
 import numpy as np
-from pprint import pprint
+from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
+from functools import partial
+# from pprint import pprint
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atq
 from asyncinit import asyncinit
@@ -16,15 +17,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
-from fintools import FOA, get_periods, hsirnd
-from utilities import filepath, gslice, getcode
+from fintools import FOA, hsirnd
+from utilities import filepath, gslice, getcode, YAML
 from ormlib import async_fetch
 from benedict import benedict
 from finaux import roundup
 from nta import Viewer
 
-YAML_PREFERENCE: Final[str] = 'pref.yaml'
-YAML: Final[str] = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
 Base = declarative_base()
 DB_NAME: Final[str] = YAML.db.Equities.name
 DB_PATH: Final[str] = filepath(DB_NAME)
@@ -35,7 +34,7 @@ async def get_data(
         capitalize: bool = False
         ) -> pd.DataFrame:
     _ = getcode(ticker, boarse)
-    df = yf.download(_, interval='1d', period='max')
+    df = yf.download(_, interval='1d', period='max', auto_adjust=False)
     return df.xs(_, axis=1, level='Ticker')
 
 
@@ -63,7 +62,7 @@ async def stored_entities() -> List:
     entities = [_[0] for _ in await async_fetch(sql_stmt, DB_NAME) if _ not in YAML.db.Equities.exclude]
     return entities
 
-# STORED: Final[List] = asyncio.run(stored_entities())
+STORED: Final[List] = asyncio.run(stored_entities())
 fields = ['date']
 fields.extend(YAML.fields)
 data_fields = [eval(f"Record.{_}") for _ in fields]
@@ -77,7 +76,6 @@ b_scale = YAML.B_scale
 # class Equity(Viewer):
 class Equity(FOA, Viewer):
     """ base object (trial) """
-    STORED: Final[List] = asyncio.run(stored_entities())
     async def __init__(
             self,
             code: Union[int, str],
@@ -85,7 +83,7 @@ class Equity(FOA, Viewer):
             static: bool = True,
             capitalize: bool = True
             ) -> Coroutine:
-        self.periods = get_periods()
+        self.periods = YAML.periods.Equities
         self.code = code
         self.exchange = boarse
         match self.exchange:
@@ -225,7 +223,7 @@ class Equity(FOA, Viewer):
         if base is None:
             try:
                 base = self.__data.query(f'date <= "{date}"')
-            except:
+            except Exception:
                 base = self.__data.query(f'Date <= "{date}"')
         if delta is None:
             delta = self.atr(self.periods['atr'])
@@ -262,7 +260,7 @@ class Equity(FOA, Viewer):
 
             res['Buy'] = pd.Series(buy).unique().tolist() if buy else np.NaN
             res['Sell'] = pd.Series(sell).unique().tolist() if sell else np.NaN
-        except:
+        except Exception:
             pass
         return res
 # """
@@ -282,10 +280,10 @@ class Futures(FOA, Viewer):
             self.change = self.__data.Close.diff(1).iloc[-1] / self.__data.Close.iloc[-2]
         self.date = self.__data.index[-1]
         self.close = self.__data.Close.iloc[-1]
-        qstr = select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{self.code}'"))
+        # qstr = select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{self.code}'"))
 
     def __str__(self):
-        return f"{self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, SAR: {round(self.sar().iloc[-1], 0)} and KAMA: {round(self.kama().iloc[-1], 0)}"
+        return f"{self.code} {self.date:%d-%m-%Y}: close @ {self.close:d} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, SAR: {round(self.sar().iloc[-1], 0)} and KAMA: {round(self.kama().iloc[-1], 0)}"
 
     def __call__(self, date=None):
         if date is None:
@@ -401,6 +399,62 @@ class Futures(FOA, Viewer):
         return self.view.maverick(self.__data, period, date, unbound, exclusive)
 
 
+def main(target: str) -> str:
+    result = []
+    tp = []
+    params = YAML.periods.Equities
+    def get_currency(code: str) -> str:
+        currency = 'USD'
+        i_split = code.split('.')
+        if len(i_split) == 2:
+            match i_split[-1]:
+                case 'HK':
+                    currency = 'HKD'
+                case 'T':
+                    currency = 'JPY'
+                case 'DE':
+                    currency = 'EUR'
+                case 'L':
+                    currency = 'GBP'
+        return currency
+
+
+    def construct_dataframe(item) -> str:
+        currency = get_currency(item)
+        data = tp.xs(item, axis=1, level='Ticker')
+        last_trade = data.index[-1].to_pydatetime()
+        close = data.Close.loc[last_trade]
+        change = data.Close.pct_change(fill_method=None).loc[last_trade]
+        _ = FOA(data, dtype='float64')
+        sar = _.sar(params.sar.acceleration, params.sar.maximum).loc[last_trade]
+        kama = _.kama(params.kama).loc[last_trade]
+        rsi = _.rsi(params.rsi).loc[last_trade]
+        return f"{item} {last_trade:%d-%m-%Y}: close @ {currency} {close:,.2f} ({change:0.3%}), rsi: {rsi:0.3f}, sar: {currency} {sar:,.2f} and KAMA: {currency} {kama:,.2f}"
+
+
+    match target:
+        case 'nato_defence':
+            el = [getcode(k, boarse=v) for k, v in YAML.listing.nato_defence.items()]
+        case 'B_shares':
+            el = list(YAML.B_scale.keys())
+            tp = yf.download(el, interval='1d', period='max', threads=True, group_by='ticker', auto_adjust=False)
+        case 'TSE':
+            tse = partial(getcode, boarse=target)
+            el = [tse(k) for k in YAML.prefer_stock.TSE.keys()]
+            tp = yf.download(el, interval='1d', period='max', threads=True, group_by='ticker', auto_adjust=False)
+
+    if type(tp) is list:
+        for item in tqdm(el):
+            tp = yf.download(item, interval='1d', period='max', threads=True, group_by='ticker', auto_adjust=False)
+            result.append(construct_dataframe(item))
+    else:
+        try:
+            result = [construct_dataframe(item) for item in tqdm(el)]
+        except ValueError:
+            print(f'Content {tp} not recognized')
+    return os.linesep.join(result)
+
+
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
     """ fetch entities stored records """
     async def get(code: int) -> Coroutine:
@@ -408,7 +462,6 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
 
     ent_list = [get(_) for _ in entities]
     name_list = [f'{_:04d}.HK' for _ in entities]
-    # name_list = [f'{_:04d}.HK' for _ in entities if _ in STORED]
 
     result = await atq.gather(*ent_list)
     res_list = [eval(f"_.{indicator}()") for _ in tqdm(result)] \
@@ -419,8 +472,6 @@ async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
 async def get_summary(code: str, boarse: str) -> str:
     _ = await Equity(code, boarse)
     return f'{_}'
-    # return {_.yahoo_code: f'{_}'}
-    # print(f'{_.yahoo_code} - {_}')
 
 
 async def close_at(code: str, boarse: str) -> dict:
@@ -428,25 +479,12 @@ async def close_at(code: str, boarse: str) -> dict:
     return {_.code: _.close}
 
 
-async def summary(target: str = 'nato_defence') -> list:
-    match target:
-        case 'nato_defence':
-            subject = eval(f'YAML.listing.{target}')
-        case 'B_shares':
-            _ = YAML.B_scale.keys()
-            subject = dict(zip(_, ['NYSE' for __ in _]))
-        case 'TSE':
-            _ = eval(f'YAML.prefer_stock.{target}.keys()')
-            subject = dict(zip(_, [target for __ in _]))
-    return [await f for f in atq.as_completed([get_summary(c, b) for c, b in list(subject.items())])]
-
-
 async def daily_close(
         client_no: str,
         boarse: str = 'HKEx'):
     result = {}
-    PORTFOLIO = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}portfolio.yaml")
-    _ = eval(f'PORTFOLIO.client_no.{boarse}')
+    portfolio = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}portfolio.yaml")
+    _ = portfolio.client_no.boarse
     subject = dict(zip(_, [boarse for __ in _]))
     for f in asyncio.as_completed([close_at(c, b) for c, b in tqdm(list(subject.items()))]):
         holder = await f
@@ -460,34 +498,33 @@ async def daily_close(
     print(f'{client_no}\n' + ', '.join(res))
 
 
-async def A2B(
-        entities: Iterable = b_scale.keys(),
-        date: str = None) -> dict:
+async def summary(entities: Iterable,
+        boarse: str = 'HKEx') -> None:
+    _ = partial(Equity, boarse=boarse,
+            static=False)
+    return {getcode(__, boarse): (await _(__)).gat()
+            for __ in entities}
 
-    async def get(
-            code: str) -> tuple:
-        return (code, await Equity(code, boarse='NYSE', capitalize=False))
 
-    xhg = YAML.USHK
-    code_ = []
-    opt_ = []
-    ent_ = [get(_) for _ in entities]
-    res = dict(await atq.gather(*ent_))
+async def adhoc(entity: str) -> None:
+    _ = await Equity(entity, static=False)
+    print(f'{_}\n{_()}\n{_.gat()}')
 
-    for k, v in res.items():
-        yk = b_scale.get(k)
-        ratio = yk.get('ratio')
-        code_.append(f'{yk.get("code")}.HK')
-        hdr = v.maverick(date)
-        for k in hdr.keys():
-            hdr[k] = hdr[k] if len(hdr[k]) == 0 else (hdr[k] * xhg * ratio).apply(hsirnd)
-        opt_.append(hdr)
 
-    return dict(zip(code_, opt_))
-
+async def A2B(entity: str = None) -> Iterable:
+    entity = entity.upper()
+    if entity in YAML.B_scale.keys():
+        __ = await Equity(entity, boarse='NYSE')
+        r = __.gat()
+        return [hsirnd(x * YAML.B_scale[entity].ratio * YAML.USHK) for x in [
+            r[0],
+            r[1],
+            __.close,
+            r[-2],
+            r[-1]]]
 
 if __name__ == "__main__":
     sector = input('Sector: ')
-    _ = asyncio.run(summary(sector))
-    columns, __ = shutil.get_terminal_size()
-    pprint(_, width=columns)
+    print(main(sector))
+    # columns, __ = shutil.get_terminal_size()
+    # pprint(main(sector), width=columns)

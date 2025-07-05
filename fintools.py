@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import Iterable
 from finaux import stepper
-from utilities import PYTHON_PATH, os, sep
+from utilities import PYTHON_PATH, os
 # from finance.finaux import stepper
 # from finance.utilities import PYTHON_PATH, os, sep
 
@@ -92,7 +92,7 @@ def prefer_stock(exchange='TSE', file='pref.yaml'):
         fpaths = [os.getcwd()]
         fpaths.extend(PYTHON_PATH)
         for fp in fpaths:
-            _f = f'{fp}{sep}{file}'
+            _f = f'{fp}{os.sep}{file}'
             if os.path.isfile(_f):
                 break
         with open(_f, encoding='utf-8') as f:
@@ -100,18 +100,20 @@ def prefer_stock(exchange='TSE', file='pref.yaml'):
         return _.get('prefer_stock').get(exchange)
 
 
+"""
 def get_periods(entity='Equities', file='pref.yaml'):
     if file.split('.')[-1] == 'yaml':
         import yaml
         fpaths = [os.getcwd()]
         fpaths.extend(PYTHON_PATH)
         for fp in fpaths:
-            _f = f'{fp}{sep}{file}'
+            _f = f'{fp}{os.sep}{file}'
             if os.path.isfile(_f):
                 break
         with open(_f, encoding='utf-8') as f:
             _ = yaml.load(f, Loader=yaml.FullLoader)
         return _.get('periods').get(entity)
+"""
 
 
 def mplot(df, last=200, sar=True):
@@ -147,7 +149,7 @@ class FOA(object):
         if isinstance(data, type(None)):
             try:
                 data = self.__data.close
-            except:
+            except Exception:
                 data = self.__data.Close
         _ = data.rolling(period).mean()
         _.name = 'sma'
@@ -160,7 +162,7 @@ class FOA(object):
         _['res'] = np.nan
         try:
             result = self._ta.SAR(data.High, data.Low, acceleration=acceleration, maximum=maximum) if self._ta else _['res']
-        except:
+        except Exception:
             result = self._ta.SAR(data.high, data.low, acceleration=acceleration, maximum=maximum) if self._ta else _['res']
         result.name = 'SAR'
         return result
@@ -170,7 +172,7 @@ class FOA(object):
             data = self.__data
         try:
             _ = (data.close * data.volume).rolling(period).sum() / data.volume.rolling(period).sum()
-        except:
+        except Exception:
             _ = (data.Close * data.Volume).rolling(period).sum() / data.Volume.rolling(period).sum()
         _.name = 'wma'
         return _
@@ -179,7 +181,7 @@ class FOA(object):
         if isinstance(data, type(None)):
             try:
                 data = self.__data.close
-            except:
+            except Exception:
                 data = self.__data.Close
         _ = data.to_frame()
         y = stepper(period, data.to_numpy().astype(self.dtype))
@@ -192,14 +194,14 @@ class FOA(object):
         if self._ta:
             try:
                 _ = self._ta.RSI(data.close, period)
-            except:
+            except Exception:
                 _ = self._ta.RSI(data.Close, period)
             _.name = 'RSI'
             return _
         else:
             try:
                 fd = data.close.diff()
-            except:
+            except Exception:
                 fd = data.Close.diff()
 
             def avgstep(source, direction, period):
@@ -236,7 +238,7 @@ class FOA(object):
             try:
                 _ = self._ta.MACD(data.close, period['fast'], period['slow'], period['signal'])
                 return pd.DataFrame({'M Line':_[0], 'Signal':_[1], 'Histogram':_[-1]})
-            except:
+            except Exception:
                 _ = self._ta.MACD(data.Close, period['fast'], period['slow'], period['signal'])
                 return pd.DataFrame({'M Line':_[0], 'Signal':_[1], 'Histogram':_[-1]})
         else:
@@ -256,7 +258,7 @@ class FOA(object):
         if self._ta:
             try:
                 _ = self._ta.ATR(data.high, data.low, data.close, period)
-            except:
+            except Exception:
                 _ = self._ta.ATR(data.High, data.Low, data.Close, period)
             _.name = 'ATR'
             return _
@@ -264,7 +266,7 @@ class FOA(object):
             try:
                 pc = data.close.shift()
                 _ = pd.concat([data.high - data.low, (data.high - pc).abs(), (data.low - pc).abs()], axis=1).max(axis=1)
-            except:
+            except Exception:
                 pc = data.Close.shift()
                 _ = pd.concat([data.High - data.Low, (data.High - pc).abs(), (data.Low - pc).abs()], axis=1).max(axis=1)
             _['atr'] = self.ema(period, _)
@@ -275,7 +277,7 @@ class FOA(object):
         if isinstance(data, type(None)):
             try:
                 data = self.__data.close
-            except:
+            except Exception:
                 data = self.__data.Close
         sma = self.sma(period['er'], data)
         acp = data.diff(period['er']).abs()[period['er']:]
@@ -300,7 +302,7 @@ class FOA(object):
             ml = data.low.rolling(period['K']).min()
             mh = data.high.rolling(period['K']).max()
             data['kseries'] = np.apply_along_axis(lambda a, b, c: (a - c) /(b - c) * 100, 0, data.close, mh, ml)
-        except:
+        except Exception:
             ml = data.Low.rolling(period['K']).min()
             mh = data.High.rolling(period['K']).max()
             data['kseries'] = np.apply_along_axis(lambda a, b, c: (a - c) /(b - c) * 100, 0, data.Close, mh, ml)
@@ -317,7 +319,7 @@ class FOA(object):
             data = self.__data
         try:
             hl = (data.high + data.low) / 2
-        except:
+        except Exception:
             hl = (data.High + data.Low) / 2
         e_slow = self.ema(period['slow'], hl)
         e_fast = self.ema(period['fast'], hl)
@@ -339,13 +341,13 @@ class FOA(object):
         atr = self.atr(period)
         try:
             _ = data.high.diff(1)
-        except:
+        except Exception:
             _ = data.High.diff(1)
         _[_<0] = 0
         dm_plus = _[1:]
         try:
             _ = data.low.diff(1)
-        except:
+        except Exception:
             _ = data.Low.diff(1)
         _[_<0] = 0
         dm_minus = _[1:]
@@ -366,7 +368,7 @@ class FOA(object):
             data = self.__data
         try:
             hl = (data.high + data.low) / 2
-        except:
+        except Exception:
             hl = (data.High + data.Low) / 2
         middle_line = self.kama(period['kama'], hl)
         atr = self.atr(period['atr'], data)
@@ -381,7 +383,7 @@ class FOA(object):
             data = self.__data
         try:
             hl = (data.high + data.low) / 2
-        except:
+        except Exception:
             hl = (data.High + data.Low) / 2
         ehl = self.ema(period, hl)
         volatility = self.ema(2 * period, ehl[period:])
@@ -390,7 +392,7 @@ class FOA(object):
                 [data.high - data.low,
                     (data.high - data.close.shift(1)).abs(),
                     (data.low - data.close.shift(1)).abs()], axis=1).max(axis=1)
-        except:
+        except Exception:
             tr = pd.concat(
                 [data.High - data.Low,
                     (data.High - data.Close.shift(1)).abs(),
@@ -409,7 +411,7 @@ class FOA(object):
         try:
             pax = data.high.rolling(period).max()
             pin = data.low.rolling(period).min()
-        except:
+        except Exception:
             pax = data.High.rolling(period).max()
             pin = data.Low.rolling(period).min()
         _ = pd.concat([pax, pin], axis=1)
@@ -420,7 +422,7 @@ class FOA(object):
         if isinstance(data, type(None)):
             try:
                 data = self.__data.close
-            except:
+            except Exception:
                 data = self.__data.Close
         ml = self.sma(period, data)
         wd = data.rolling(period).std()
@@ -433,7 +435,7 @@ class FOA(object):
             data = self.__data
         try:
             dcp = data.close.diff()
-        except:
+        except Exception:
             dcp = data.Close.diff()
         tmp, i = [], 0
         try:
@@ -447,7 +449,7 @@ class FOA(object):
                         _ -= data.volume.iloc[i]
                 tmp.append(_)
                 i += 1
-        except:
+        except Exception:
             while i < len(data.Volume):
                 _ = data.Volume.iloc[i]
                 if i > 0:
@@ -467,7 +469,40 @@ class FOA(object):
         try:
             pv = data.drop(['open', 'volume'], 1).mean(axis=1) * data.volume
             data['vwap'] = pv.cumsum() / data.volume.cumsum()
-        except:
+        except Exception:
             pv = data.drop(['Open', 'Volume'], 1).mean(axis=1) * data.Volume
             data['vwap'] = pv.cumsum() / data.Volume.cumsum()
         return data['vwap']
+
+
+def parabolic_sar(high: pd.DataFrame,
+        low: pd.DataFrame,
+        af_start: float=0.02,
+        af_step: float=0.02,
+        af_max: float=0.2) -> pd.DataFrame:
+    sar = [low[0]]  # Initial SAR
+    trend = 1  # 1 for uptrend, -1 for downtrend
+    ep = high[0] if trend == 1 else low[0]  # Extreme point
+    af = af_start
+                        
+    for i in range(1, len(high)):
+        sar_current = sar[-1] + af * (ep - sar[-1])
+                                                
+        # Check reversal
+        if (trend == 1 and low[i] < sar_current) or (trend == -1 and high[i] > sar_current):
+            trend *= -1
+            sar_current = ep
+            af = af_start
+            ep = high[i] if trend == 1 else low[i]
+        else:
+            # Update EP and AF in trend
+            if trend == 1:
+                if high[i] > ep:
+                    ep = high[i]
+                    af = min(af + af_step, af_max)
+                else:
+                    if low[i] < ep:
+                        ep = low[i]
+                        af = min(af + af_step, af_max)
+        sar.append(sar_current)
+    return sar

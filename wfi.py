@@ -1,18 +1,19 @@
 import re
 import random
 import copy
-from utilities import PYTHON_PATH, os, sep, driver_path, today, ltd, waf, IP, datetime
+import pytz
+from datetime import datetime
+from utilities import today, ltd, waf, IP, YAML
 from ormlib import mtf
-from selenium import webdriver
+# from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from asa import Futures
-# from y2n import Futures
-from pref import xvsa, source, fields, subject, pytz
+from pref import source
 from pt_2 import festi
-
+"""
 def alias(subject, file='pref.yaml'):
     import yaml
     fpaths = [os.getcwd()]
@@ -24,10 +25,10 @@ def alias(subject, file='pref.yaml'):
     with open(_f, encoding='utf-8') as f:
         _ = yaml.load(f, Loader=yaml.FullLoader)
     return _.get('subject').get(subject).get('whatsapp').get('alias')
-
+"""
 local_tz = pytz.timezone('Asia/Hong_Kong')
 lf, preference = waf(), 'Firefox'
-milly = alias('Milly Ling')
+milly = YAML.subject.get('Milly Ling').whatsapp.alias
 fds = [_ for _ in source.keys() if _ not in ['SMS', 'WhatsApp']]
 if today.day == ltd(today.year, today.month):
     lf = waf(1)
@@ -38,7 +39,7 @@ def fan(__='mhi', mt=True):
     if mt:
         _ = mtf(__)
     _ = Futures(_)
-    return f'{_}\n{_()}\n{_.gat()}'
+    return f'{_}\nOptimize:\n{_()}\n{_.gat()}'
 
 
 class WFutures(object):
@@ -202,7 +203,7 @@ class WFutures(object):
 #             sxv = f"@{k}='{v}'"
 #         input_box = self.wait.until(EC.presence_of_element_located((
 #             By.XPATH, f"//p[{sxv}]")))
-        sxv = ' and '.join([f"contains(@{k}, '{v}')" for k, v in xvsa.items()])
+        sxv = ' and '.join([f"contains(@{k}, '{v}')" for k, v in YAML.xvsa.items()])
 #         input_box = self.wait.until(EC.presence_of_element_located((
 #             By.XPATH, f"//div[{sxv}]")))
         input_box = self.wait.until(EC.presence_of_element_located((
@@ -287,7 +288,7 @@ class WFutures(object):
             self.pivot.send_keys(_)
 
     def __update(self, tab, field, _):
-        if (tab in lf) and (field in fields):
+        if (tab in lf) and (field in YAML.fields):
             self.goto(tab)
             t = (tab[0] + tab[-2] + field[0]).lower()
             exec(f'self.{t}.clear()')
@@ -322,7 +323,7 @@ class WFutures(object):
                     break
             t = (_[0] + _[-2] + 'b').lower()
             exec(f"self.{t}=self.browser.find_element_by_tag_name('button')")
-            for __ in fields:
+            for __ in YAML.fields:
                 t = (_[0] + _[-2] + __[0]).lower()
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
                 exec(f"self.{t}.clear()")
@@ -368,7 +369,7 @@ class WFutures(object):
                 (By.TAG_NAME, 'button')))
             t = (_[0] + _[-2] + 'b').lower()
             exec(f"self.{t}=self.browser.find_element_by_tag_name('button')")
-            for __ in fields:
+            for __ in YAML.fields:
                 t = (_[0] + _[-2] + __[0]).lower()
                 exec(f"self.{t}=self.browser.find_element_by_name('{__}')")
 
@@ -427,6 +428,5 @@ def display(wf, interval=0):
             print(f'Sha C.:\t{_s[0]}\t{_s[1]}\t{_s[2]}\t{_s[-1]}\n')
         except Exception:
             pass
-        itv = interval
-        if interval <= 0: itv = random.randint(47,59)
+        itv = interval if interval > 0 else random.randint(47,59)
         sleep(itv)

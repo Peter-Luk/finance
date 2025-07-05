@@ -3,16 +3,16 @@ import datetime
 from sqlalchemy.orm import declarative_base, deferred
 from sqlalchemy import Column, Integer, Date, String, text
 # from sqlalchemy.future import select
-from pathlib import os
-from benedict import benedict
-from utilities import YAML_PREFERENCE, getcode, gslice, waf
-from fintools import FOA, get_periods, pd, np, gap, prefer_stock, mplot
+from pathlib import functools
+from utilities import YAML, getcode, gslice, waf, order_report
+from fintools import FOA, pd, np, gap
 from ormlib import trade_data, Session
 from finaux import roundup
 
 Base = declarative_base()
 idx = []
-YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
+sold = functools.partial(order_report, sold=True, equity=True)
+bought = functools.partial(order_report, sold=False, equity=True)
 
 
 class Record(Base):
@@ -57,7 +57,8 @@ class Record(Base):
 class Futures(FOA):
     def __init__(self, code):
         self.__db = YAML.db.Futures.name
-        self.periods = eval(f'YAML.{self.__db}.periods')
+        self.periods = YAML.periods.Futures
+        # self.periods = eval(f'YAML.{self.__db}.periods')
         self.code = code.upper()
         self.__data = trade_data(self.code, True)
         self.analyser = FOA(self.__data, int)
@@ -212,7 +213,7 @@ class Futures(FOA):
 
 class Equity(FOA):
     def __init__(self, code, static=True, exchange='HKEx'):
-        self.periods = YAML.Equities.periods
+        self.periods = YAML.periods.Equities
 
         self.code = code
         self.exchange = exchange
@@ -458,9 +459,9 @@ def baseplot(rdf, latest=None):
         _['kama'.upper()] = df.kama()
         _['close'.capitalize()] = df().close
         if latest is None:
-            latest = get_periods('Futures').get('simple')
+            latest = YAML.periods.Futures.simple
             if isinstance(df, Equity):
-                latest = get_periods('Equities').get('simple')
+                latest = YAML.periods.Equities.simple
         code = df.code
         if isinstance(df, Equity):
             code = df.yahoo_code

@@ -50,11 +50,11 @@ class Person(Subject):
         for field in Subject._data_fields:
             exec(f"_['{field}'] = [__.{field} for __ in holder]")
         _ = _.convert_dtypes()
-        _[[col for col in _.columns if _[col].dtypes == object]] = _[[col for col in _.columns if _[col].dtypes == object]].astype('string')
+        _[[col for col in _.columns if _[col].dtypes is object]] = _[[col for col in _.columns if _[col].dtypes is object]].astype('string')
         # _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format='ISO8601', dayfirst=True)
         try:
             _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], format='mixed', dayfirst=True)
-        except:
+        except Exception:
             _['Datetime'] = pd.to_datetime(_['date'] + ' ' + _['time'], dayfirst=True)
         _ = _.set_index(pd.DatetimeIndex(_['Datetime']))
         _ = _.drop(['subject_id', 'date', 'time', 'Datetime'], axis=1)
