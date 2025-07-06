@@ -399,39 +399,40 @@ class Futures(FOA, Viewer):
         return self.view.maverick(self.__data, period, date, unbound, exclusive)
 
 
+def get_currency(code: str) -> str:
+    currency = 'USD'
+    i_split = code.split('.')
+    if len(i_split) == 2:
+        match i_split[-1]:
+            case 'HK':
+                currency = 'HKD'
+            case 'T':
+                currency = 'JPY'
+            case 'DE':
+                currency = 'EUR'
+            case 'L':
+                currency = 'GBP'
+    return currency
+
+
+def construct_report(df: pd.DataFrame,
+        code: str) -> str:
+    params = YAML.periods.Equities
+    currency = get_currency(code)
+    data = df.xs(code, axis=1, level='Ticker')
+    last_trade = data.index[-1].to_pydatetime()
+    close = data.Close.loc[last_trade]
+    change = data.Close.pct_change(fill_method=None).loc[last_trade]
+    _ = FOA(data, dtype='float64')
+    sar = _.sar(params.sar.acceleration, params.sar.maximum).loc[last_trade]
+    kama = _.kama(params.kama).loc[last_trade]
+    rsi = _.rsi(params.rsi).loc[last_trade]
+    return f"{code} {last_trade:%d-%m-%Y}: close @ {currency} {close:,.2f} ({change:0.3%}), rsi: {rsi:0.3f}, sar: {currency} {sar:,.2f} and KAMA: {currency} {kama:,.2f}"
+
+
 def main(target: str) -> str:
     result = []
     tp = []
-    params = YAML.periods.Equities
-    def get_currency(code: str) -> str:
-        currency = 'USD'
-        i_split = code.split('.')
-        if len(i_split) == 2:
-            match i_split[-1]:
-                case 'HK':
-                    currency = 'HKD'
-                case 'T':
-                    currency = 'JPY'
-                case 'DE':
-                    currency = 'EUR'
-                case 'L':
-                    currency = 'GBP'
-        return currency
-
-
-    def construct_dataframe(item) -> str:
-        currency = get_currency(item)
-        data = tp.xs(item, axis=1, level='Ticker')
-        last_trade = data.index[-1].to_pydatetime()
-        close = data.Close.loc[last_trade]
-        change = data.Close.pct_change(fill_method=None).loc[last_trade]
-        _ = FOA(data, dtype='float64')
-        sar = _.sar(params.sar.acceleration, params.sar.maximum).loc[last_trade]
-        kama = _.kama(params.kama).loc[last_trade]
-        rsi = _.rsi(params.rsi).loc[last_trade]
-        return f"{item} {last_trade:%d-%m-%Y}: close @ {currency} {close:,.2f} ({change:0.3%}), rsi: {rsi:0.3f}, sar: {currency} {sar:,.2f} and KAMA: {currency} {kama:,.2f}"
-
-
     match target:
         case 'nato_defence':
             el = [getcode(k, boarse=v) for k, v in YAML.listing.nato_defence.items()]
@@ -446,10 +447,10 @@ def main(target: str) -> str:
     if type(tp) is list:
         for item in tqdm(el):
             tp = yf.download(item, interval='1d', period='max', threads=True, group_by='ticker', auto_adjust=False)
-            result.append(construct_dataframe(item))
+            result.append(construct_report(tp, item))
     else:
         try:
-            result = [construct_dataframe(item) for item in tqdm(el)]
+            result = [construct_report(tp, item) for item in tqdm(el)]
         except ValueError:
             print(f'Content {tp} not recognized')
     return os.linesep.join(result)
@@ -500,10 +501,12 @@ async def daily_close(
 
 async def summary(entities: Iterable,
         boarse: str = 'HKEx') -> None:
+    res = []
     _ = partial(Equity, boarse=boarse,
             static=False)
-    return {getcode(__, boarse): (await _(__)).gat()
-            for __ in entities}
+    holder = {getcode(__, boarse): await _(__) for __ in entities}
+    res = [f'{k}:{os.linesep}{v.gat()}' for k, v in holder.items()]
+    print(os.linesep.join(res))
 
 
 async def adhoc(entity: str) -> None:
