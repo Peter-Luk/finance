@@ -17,7 +17,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
-from fintools import FOA, hsirnd
+from fintools import FOA, hsirnd, construct_report
 from utilities import filepath, gslice, getcode, YAML
 from ormlib import async_fetch
 from benedict import benedict
@@ -263,7 +263,6 @@ class Equity(FOA, Viewer):
         except Exception:
             pass
         return res
-# """
 
 
 param = YAML.periods.Futures
@@ -397,37 +396,6 @@ class Futures(FOA, Viewer):
     def maverick(self, date=None, period=param, unbound=True, exclusive=True):
         date = self.date if (date is None) else date
         return self.view.maverick(self.__data, period, date, unbound, exclusive)
-
-
-def get_currency(code: str) -> str:
-    currency = 'USD'
-    i_split = code.split('.')
-    if len(i_split) == 2:
-        match i_split[-1]:
-            case 'HK':
-                currency = 'HKD'
-            case 'T':
-                currency = 'JPY'
-            case 'DE':
-                currency = 'EUR'
-            case 'L':
-                currency = 'GBP'
-    return currency
-
-
-def construct_report(df: pd.DataFrame,
-        code: str) -> str:
-    params = YAML.periods.Equities
-    currency = get_currency(code)
-    data = df.xs(code, axis=1, level='Ticker')
-    last_trade = data.index[-1].to_pydatetime()
-    close = data.Close.loc[last_trade]
-    change = data.Close.pct_change(fill_method=None).loc[last_trade]
-    _ = FOA(data, dtype='float64')
-    sar = _.sar(params.sar.acceleration, params.sar.maximum).loc[last_trade]
-    kama = _.kama(params.kama).loc[last_trade]
-    rsi = _.rsi(params.rsi).loc[last_trade]
-    return f"{code} {last_trade:%d-%m-%Y}: close @ {currency} {close:,.2f} ({change:0.3%}), rsi: {rsi:0.3f}, sar: {currency} {sar:,.2f} and KAMA: {currency} {kama:,.2f}"
 
 
 def main(target: str) -> str:

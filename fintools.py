@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import Iterable
 from finaux import stepper
-from utilities import PYTHON_PATH, os
+from utilities import PYTHON_PATH, os, YAML
 # from finance.finaux import stepper
 # from finance.utilities import PYTHON_PATH, os, sep
 
@@ -506,3 +506,32 @@ def parabolic_sar(high: pd.DataFrame,
                         af = min(af + af_step, af_max)
         sar.append(sar_current)
     return sar
+
+
+def construct_report(df: pd.DataFrame,
+        code: str) -> str:
+    def get_currency(code: str) -> str:
+        currency = 'USD'
+        i_split = code.split('.')
+        if len(i_split) == 2:
+            match i_split[-1]:
+                case 'HK':
+                    currency = 'HKD'
+                case 'T':
+                    currency = 'JPY'
+                case 'DE':
+                    currency = 'EUR'
+                case 'L':
+                    currency = 'GBP'
+        return currency
+    params = YAML.periods.Equities
+    currency = get_currency(code)
+    data = df.xs(code, axis=1, level='Ticker')
+    last_trade = data.index[-1].to_pydatetime()
+    close = data.Close.loc[last_trade]
+    change = data.Close.pct_change(fill_method=None).loc[last_trade]
+    _ = FOA(data, dtype='float64')
+    sar = _.sar(params.sar.acceleration, params.sar.maximum).loc[last_trade]
+    kama = _.kama(params.kama).loc[last_trade]
+    rsi = _.rsi(params.rsi).loc[last_trade]
+    return f"{code} {last_trade:%d-%m-%Y}: close @ {currency} {close:,.2f} ({change:0.3%}), rsi: {rsi:0.3f}, sar: {currency} {sar:,.2f} and KAMA: {currency} {kama:,.2f}"
