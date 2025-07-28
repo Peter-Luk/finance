@@ -18,7 +18,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.future import select
 from sqlalchemy import Column, Integer, Float, Date, text
 from fintools import FOA, hsirnd, construct_report
-from utilities import filepath, gslice, getcode, YAML
+from utilities import filepath, gslice, getcode, YAML, PORTFOLIO_PATH
 from ormlib import async_fetch
 from benedict import benedict
 from finaux import roundup
@@ -27,6 +27,7 @@ from nta import Viewer
 Base = declarative_base()
 DB_NAME: Final[str] = YAML.db.Equities.name
 DB_PATH: Final[str] = filepath(DB_NAME)
+
 
 async def get_data(
         ticker: Any = 9988,
@@ -102,11 +103,18 @@ class Equity(FOA, Viewer):
         await self.compose(static)
         self.view = Viewer(self.__data)
 
-    def __str__(self):
-        return f"{self.yahoo_code} {self.date:%d-%m-%Y}: close @ {self.currency} {self.close:,.2f} ({self.change:0.3%}), rsi: {self.rsi().iloc[-1]:0.3f}, sar: {self.sar().iloc[-1]:,.2f} and KAMA: {self.kama().iloc[-1]:,.2f}"
+    def __str__(self) -> str:
+        latest = partial(self.summary, date=self.date)
+        return latest()
 
-    def __call__(self, static: bool = True) -> pd.Series:
-        return self.maverick(date=self.date) if self.__capitalize else self.optinum(date=self.date)
+    def summary(self, date: datetime.datetime) -> str:
+        close = self.__data.Close
+        change = close.pct_change(fill_method=None)
+        return f"{self.yahoo_code} {date:%Y-%m-%d}: close @ {self.currency} {close[date]:,.2f} ({change[date]:0.3%}), rsi: {self.rsi()[date]:0.3f}, sar: {self.sar()[date]:,.2f} and KAMA: {self.kama()[date]:,.2f}"
+
+    def __call__(self, date=None) -> pd.Series:
+        date = self.date if (date is None) else date
+        return self.maverick(date) if self.__capitalize else self.optinum(date)
         # return self.__data
 
     async def compose(self, static: bool) -> pd.DataFrame:
@@ -240,6 +248,8 @@ class Equity(FOA, Viewer):
             _ = gslice([pivot + gap, pivot])
             _.extend(gslice([pivot, pivot - gap]))
             return _
+
+
         hdr = []
         res = pd.DataFrame(dict(
             Buy=pd.Series([]),
@@ -452,7 +462,7 @@ async def daily_close(
         client_no: str,
         boarse: str = 'HKEx'):
     result = {}
-    portfolio = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}portfolio.yaml")
+    portfolio = benedict.from_yaml(PORTFOLIO_PATH)
     _ = portfolio.client_no.boarse
     subject = dict(zip(_, [boarse for __ in _]))
     for f in asyncio.as_completed([close_at(c, b) for c, b in tqdm(list(subject.items()))]):
@@ -477,9 +487,10 @@ async def summary(entities: Iterable,
     print(os.linesep.join(res))
 
 
-async def adhoc(entity: str) -> None:
+async def adhoc(entity: str, date=None) -> None:
     _ = await Equity(entity, static=False)
-    print(f'{_}\n{_()}\n{_.gat()}')
+    date = _.date if (date is None) else date
+    print(f'{_.summary(date)}\n{_(date)}\n{_.gat(date)}')
 
 
 async def A2B(entity: str = None) -> Iterable:
@@ -494,6 +505,10 @@ async def A2B(entity: str = None) -> Iterable:
             r[-2],
             r[-1]]]
 
+
+nyse = partial(Equity, boarse='NYSE', static=False)
+tse = partial(Equity, boarse='TSE', static=False)
+hkex = partial(Equity, boarse='HKEx', static=False)
 if __name__ == "__main__":
     sector = input('Sector: ')
     print(main(sector))
