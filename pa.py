@@ -6,7 +6,8 @@ import pretty_errors
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, Date, Time, String, text
-from benedict import benedict
+# from benedict import benedict
+from utilities import YAML
 from pathlib import os
 from ormlib import async_fetch, Session
 # from finance.ormlib import async_fetch, Session
@@ -24,7 +25,7 @@ class Subject(Base):
     __tablename__ = 'records'
     _data_fields = ['date', 'time', 'sys', 'dia', 'pulse']
     id = Column(Integer, autoincrement=True, primary_key=True)
-    instrument_id = Column(Integer, default=1, server_default=text('1'))
+    instrument_id = Column(Integer, default=4, server_default=text('4'))
     subject_id = Column(Integer)
     _created_at = datetime.datetime.now()
     date = Column(Date, default=_created_at.date(), server_default=text(str(_created_at.date())))
@@ -121,7 +122,7 @@ if __name__ == "__main__":
         _modify_at = datetime.datetime.now()
         sj.date = _modify_at.date()
         sj.time = _modify_at.time()
-        pn = Session(benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}pref.yaml").db.Health.name)
+        pn = Session(YAML.db.Health.name)
         with pn.session() as session:
             with session.begin():
                 session.add(sj)

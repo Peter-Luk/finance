@@ -3,6 +3,9 @@ import asyncio
 import datetime
 import random
 from pathlib import os
+from rich import print
+# from rich.console import Console
+from rich.table import Table
 import pandas as pd
 import yfinance as yf
 # import shutil
@@ -103,14 +106,29 @@ class Equity(FOA, Viewer):
         await self.compose(static)
         self.view = Viewer(self.__data)
 
-    def __str__(self) -> str:
-        latest = partial(self.summary, date=self.date)
+    def __str__(self):
+        latest = partial(self.summary, date=self.date, return_type='str')
         return latest()
 
-    def summary(self, date: datetime.datetime) -> str:
+    def summary(self, date: datetime.datetime,
+            return_type: str='rich'):
         close = self.__data.Close
         change = close.pct_change(fill_method=None)
-        return f"{self.yahoo_code} {date:%Y-%m-%d}: close @ {self.currency} {close[date]:,.2f} ({change[date]:0.3%}), rsi: {self.rsi()[date]:0.3f}, sar: {self.sar()[date]:,.2f} and KAMA: {self.kama()[date]:,.2f}"
+        if return_type == 'rich':
+        # console = Console()
+            table = Table(title=f"{self.yahoo_code} {date:%Y-%m-%d} ({self.currency})")
+            table.add_column("Close", style="cyan")
+            table.add_column("RSI", justify="right", style="magenta")
+            table.add_column("SAR", justify="right", style="magenta")
+            table.add_column("KAMA", justify="right", style="magenta")
+            table.add_row(f"{close[date]:,.2f} ({change[date]:+0.3%})",
+                f"{self.rsi()[date]:0.3f}",
+                f"{self.sar()[date]:0.2f}",
+                f"{self.kama()[date]:0.2f}")
+            return table
+        # console.print(table)
+        if return_type == 'str':
+            return f"{self.yahoo_code} {date:%Y-%m-%d}: close @ {self.currency} {close[date]:,.2f} ({change[date]:+0.3%}), rsi: {self.rsi()[date]:0.3f}, sar: {self.sar()[date]:,.2f} and KAMA: {self.kama()[date]:,.2f}"
 
     def __call__(self, date=None) -> pd.Series:
         date = self.date if (date is None) else date
@@ -138,7 +156,8 @@ class Equity(FOA, Viewer):
                 self.__data = await get_data(self.code, self.exchange, self.__capitalize)
         else:
             self.__data = await get_data(self.code, self.exchange, self.__capitalize)
-        self.date = self.__data.index[-1]
+        self.trade_date = self.__data.index
+        self.date = self.trade_date[-1]
         if self.__capitalize:
             self.change = self.__data.Close.pct_change(fill_method=None).iloc[-1]
             self.close = self.__data.Close.iloc[-1]
@@ -408,8 +427,9 @@ class Futures(FOA, Viewer):
         return self.view.maverick(self.__data, period, date, unbound, exclusive)
 
 
-def main(target: str) -> str:
-    result = []
+def main(target: str) -> None:
+# def main(target: str) -> str:
+    # result = []
     tp = []
     match target:
         case 'nato_defence':
@@ -423,15 +443,19 @@ def main(target: str) -> str:
             tp = yf.download(el, interval='1d', period='max', threads=True, group_by='ticker', auto_adjust=False)
 
     if type(tp) is list:
-        for item in tqdm(el):
+        for item in el:
+        # for item in tqdm(el):
             tp = yf.download(item, interval='1d', period='max', threads=True, group_by='ticker', auto_adjust=False)
-            result.append(construct_report(tp, item))
+            print(construct_report(tp, item))
+            # result.append(construct_report(tp, item))
     else:
         try:
-            result = [construct_report(tp, item) for item in tqdm(el)]
+            for item in el:
+                print(construct_report(tp, item))
+            # result = [construct_report(tp, item) for item in tqdm(el)]
         except ValueError:
             print(f'Content {tp} not recognized')
-    return os.linesep.join(result)
+    # return os.linesep.join(result)
 
 
 async def fetch_data(entities: Iterable, indicator: str = '') -> zip:
@@ -490,7 +514,9 @@ async def summary(entities: Iterable,
 async def adhoc(entity: str, date=None) -> None:
     _ = await Equity(entity, static=False)
     date = _.date if (date is None) else date
-    print(f'{_.summary(date)}\n{_(date)}\n{_.gat(date)}')
+    print(_.summary(date))
+    print(f'{_(date)}\n{_.gat(date)}')
+    # print(f'{_.summary(date)}\n{_(date)}\n{_.gat(date)}')
 
 
 async def A2B(entity: str = None) -> Iterable:
@@ -510,7 +536,10 @@ nyse = partial(Equity, boarse='NYSE', static=False)
 tse = partial(Equity, boarse='TSE', static=False)
 hkex = partial(Equity, boarse='HKEx', static=False)
 if __name__ == "__main__":
-    sector = input('Sector: ')
-    print(main(sector))
+    import pzp
+    sectors = ['nato_defence', 'B_shares', 'TSE']
+    select_item = pzp.pzp(sectors)
+    # eval(f"main('{select_item}')")
+    print(eval(f"main('{select_item}')"))
     # columns, __ = shutil.get_terminal_size()
     # pprint(main(sector), width=columns)

@@ -1,11 +1,11 @@
-# import re
 import pandas as pd
 import numpy as np
 from typing import Iterable
+# from rich.console import Console
+from rich.table import Table
+from benedict import benedict
 from finaux import stepper
-from utilities import PYTHON_PATH, os, YAML
-# from finance.finaux import stepper
-# from finance.utilities import PYTHON_PATH, os, sep
+from utilities import YAML, PORTFOLIO_PATH
 
 try:
     from scipy.constants import golden_ratio as gr
@@ -42,19 +42,37 @@ def hsirnd(value: float) -> float:
         return np.round(value * 2, 1) / 2
 
 
-class Inspect(object):
-    def __init__(self, code=None, xhg='HKEx'):
-        from datetime import datetime
-        self.at = datetime.now().time()
-        if code is None:
-            code = list(prefer_stock(xhg).keys())
-        self.__data = latest(code, exchange=xhg)
+class Portfolio:
+    def __init__(self, client: str, boarse: str = 'HKEx'):
+        self.client = client.upper()
+        self.boarse = boarse
+        self.__filepath = PORTFOLIO_PATH
+        self.__porfolio = benedict.from_yaml(self.__filepath)
 
-    def close(self):
-        return (_['close'] for _ in self.__data)
+    def add(self, code: int|str|Iterable[str|int]):
+        holder = self.__porfolio[self.client][self.boarse]
+        match code:
+            case str()|int():
+                if code not in holder:
+                    holder.append(code)
+            case list():
+                if (c_ := [_ for _ in code if _ not in holder]):
+                    holder.extend(c_)
+        holder.sort()
+        self.__porfolio[self.client][self.boarse] = holder
+        self.__porfolio.to_yaml(filepath=self.__filepath)
 
-    def delta(self):
-        return (_['change'] for _ in self.__data)
+    def remove(self, code: int|str|Iterable[int|str]):
+        match code:
+            case str()|int():
+                holder = list(filter(lambda _: _ != code, self.__porfolio[self.client][self.boarse]))
+            case list():
+                holder = [_ for _ in self.__porfolio[self.client][self.boarse] if _ not in code]
+        self.__porfolio[self.client][self.boarse] = holder
+        self.__porfolio.to_yaml(filepath=self.__filepath)
+
+    def __call__(self) -> list:
+        return self.__porfolio[self.client][self.boarse]
 
 
 def latest(code, period='5d', exchange='HKEx'):
@@ -84,36 +102,6 @@ def gap(boundary: Iterable, ratio: float=gr) -> Iterable:
     _ = [low - value, low, low + value, high - value, high, high + value]
     _.sort()
     return _
-
-
-def prefer_stock(exchange='TSE', file='pref.yaml'):
-    if file.split('.')[-1] == 'yaml':
-        import yaml
-        fpaths = [os.getcwd()]
-        fpaths.extend(PYTHON_PATH)
-        for fp in fpaths:
-            _f = f'{fp}{os.sep}{file}'
-            if os.path.isfile(_f):
-                break
-        with open(_f, encoding='utf-8') as f:
-            _ = yaml.load(f, Loader=yaml.FullLoader)
-        return _.get('prefer_stock').get(exchange)
-
-
-"""
-def get_periods(entity='Equities', file='pref.yaml'):
-    if file.split('.')[-1] == 'yaml':
-        import yaml
-        fpaths = [os.getcwd()]
-        fpaths.extend(PYTHON_PATH)
-        for fp in fpaths:
-            _f = f'{fp}{os.sep}{file}'
-            if os.path.isfile(_f):
-                break
-        with open(_f, encoding='utf-8') as f:
-            _ = yaml.load(f, Loader=yaml.FullLoader)
-        return _.get('periods').get(entity)
-"""
 
 
 def mplot(df, last=200, sar=True):
@@ -524,6 +512,7 @@ def construct_report(df: pd.DataFrame,
                 case 'L':
                     currency = 'GBP'
         return currency
+
     params = YAML.periods.Equities
     currency = get_currency(code)
     data = df.xs(code, axis=1, level='Ticker')
@@ -534,4 +523,18 @@ def construct_report(df: pd.DataFrame,
     sar = _.sar(params.sar.acceleration, params.sar.maximum).loc[last_trade]
     kama = _.kama(params.kama).loc[last_trade]
     rsi = _.rsi(params.rsi).loc[last_trade]
-    return f"{code} {last_trade:%d-%m-%Y}: close @ {currency} {close:,.2f} ({change:0.3%}), rsi: {rsi:0.3f}, sar: {currency} {sar:,.2f} and KAMA: {currency} {kama:,.2f}"
+    # """
+    # console = Console()
+    table = Table(title=f"{code} {last_trade:%Y-%m-%d} ({currency})")
+    table.add_column("Close", style="cyan")
+    table.add_column("RSI", justify="right", style="magenta")
+    table.add_column("SAR", justify="right", style="magenta")
+    table.add_column("KAMA", justify="right", style="magenta")
+    table.add_row(f"{close:,.2f} ({change:+0.3%})",
+        f"{rsi:0.3f}",
+        f"{sar:0.2f}",
+        f"{kama:0.2f}")
+    return table
+    # console.print(table)
+    # """
+    # return f"{code} {last_trade:%d-%m-%Y}: close @ {currency} {close:,.2f} ({change:0.3%}), rsi: {rsi:0.3f}, sar: {currency} {sar:,.2f} and KAMA: {currency} {kama:,.2f}"

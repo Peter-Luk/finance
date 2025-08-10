@@ -1,0 +1,760 @@
+---
+driver:
+    Chrome:
+        name: 'chromedriver.exe'
+        path: ['browser', 'driver']
+    Firefox:
+        name: 'geckodriver.exe'
+        path: ['browser', 'driver']
+    Ie:
+        name: 'IEDriverServer.exe'
+        path: ['browser', 'driver']
+
+subject:
+    'Peter Luk':
+        mobile:
+            primary: 61752313
+            secondary: 90757228
+            home: 27600722
+        whatsapp:
+            input:
+                90757228: '_2_1wd'
+            alias: '"陸永原"'
+    'Grace Wu':
+        mobile:
+            primary: 54761657
+            home: 26150456
+        whatsapp:
+            alias: '"胡碧茜Grace"'
+        Phillip:
+            Securities: M213423
+    'Elsa Fung':
+        mobile:
+            primary: 93556260
+        whatsapp:
+            alias: '"馮麗金"'
+    'Kwok Chi Yui':
+        mobile:
+            primary: 97786426
+        whatsapp:
+            alias: '"郭熾鋭"'
+    'Wong Kit Ching':
+        mobile:
+            primary: 98804808
+        whatsapp:
+            alias: '"柳太黃"'
+    'Milly Ling':
+        mobile:
+            primary: 90107008
+            home: 21750098
+        whatsapp:
+            alias: '"凌月明"'
+        Phillip:
+            Securities: P241238
+            Options: M241238
+    'Mickey Wong':
+        mobile:
+            primary: '+65 83826103'
+        whatsapp:
+            alias: '"Wong Mickey"'
+    'Niana Mak':
+        mobile:
+            primary: 91096866
+        whatsapp:
+            alias: '"Ms Niana Siu Chu Mak"'
+    'Vincent Wong':
+        mobile:
+            primary: 66501982
+        whatsapp:
+            alias: '"Yau Chi Vincent Wong"'
+    'Eddie Chum':
+        mobile:
+            primary: '+853 65858338'
+        whatsapp:
+            alias: '"沈志明"'
+    'Ho Hung Sung':
+        mobile:
+            primary: 90818157
+        whatsapp:
+            alias: '"何雄紳"'
+    'Sou Wai Cheong':
+        mobile:
+            primary: 60189633
+        whatsapp:
+            alias: '"蘇偉章"'
+    'Chan Cheung Yiu':
+        mobile:
+            primary: 91031418
+        whatsapp:
+            alias: '"陳長耀"'
+    'Josephine Yuen':
+        mobile:
+            primary: 98682629
+        whatsapp:
+            alias: '"袁淑兒Josephine"'
+    'Philip Dymo':
+        mobile:
+            primary: 61248088
+        whatsapp:
+            alias: '"端木和祥"'
+    'Cheung Chi Ming':
+        mobile:
+            primary: 96720359
+        whatsapp:
+            alias: '"Chi Ming Cheung"'
+# ---
+periods:
+    Futures:
+        macd:
+            fast: 5
+            slow: 10
+            signal: 3
+        soc:
+            K: 14
+            D: 3
+        stc:
+            fast: 5
+            slow: 12
+            K: 3
+            D: 3
+        sar:
+            acceleration: .02
+            maximum: .2
+        atr: 7
+        rsi: 7
+        kama:
+            er: 7
+            fast: 2
+            slow: 12
+        kc:
+            kama:
+                er: 5
+                fast: 2
+                slow: 12
+            atr: 7
+        adx: 7
+        simple: 12
+        dc: 12
+        apz: 5
+    Equities:
+        macd:
+            fast: 12
+            slow: 26
+            signal: 9
+        soc:
+            K: 14
+            D: 3
+        stc:
+            fast: 23
+            slow: 50
+            K: 10
+            D: 10
+        sar:
+            acceleration: .02
+            maximum: .2
+        atr: 14
+        rsi: 14
+        kama:
+            er: 10
+            fast: 2
+            slow: 30
+        kc:
+            kama:
+                er: 5
+                fast: 2
+                slow: 20
+            atr: 10
+        adx: 14
+        simple: 20
+        dc: 20
+        apz: 5
+db:
+    Equities:
+        name: 'Securities'
+        table: 'records'
+        index: 'date'
+        freq: 'daily'
+        exclude:
+          - 122
+          - 368
+          - 417
+          - 543
+          - 611
+          - 805
+          - 973
+          - 1212
+          - 1337
+          - 1573
+          - 1828
+          - 2303
+          - 2606
+          - 8509
+    Futures:
+        name: 'Futures'
+        table: 'records'
+        index: 'date'
+        freq: 'bi-daily'
+    Health:
+        name: 'Health'
+        table: 'records'
+        index: 'Datetime'
+
+public_holiday: 
+    '2015':
+        '1':
+        - 1
+        '2':
+        - 19
+        - 20
+        '4':
+        - 3
+        - 6
+        - 7
+        '5':
+        - 25
+        '7':
+        - 1
+        '9':
+        - 28
+        '10':
+        - 1
+        - 21
+        '12':
+        - 25
+    '2016':
+        '1':
+        - 1
+        '2':
+        - 8
+        - 9
+        - 10
+        '3':
+        - 25
+        - 28
+        '4':
+        - 4
+        '5':
+        - 2
+        '6':
+        - 9
+        '7':
+        - 1
+        '9':
+        - 16
+        '10':
+        - 10
+        '12':
+        - 26
+        - 27
+    '2017':
+        '1':
+        - 2
+        - 30
+        - 31
+        '4':
+        - 4
+        - 14
+        - 17
+        '5':
+        - 1
+        - 3
+        - 30
+        '10':
+        - 2
+        - 5
+        '12':
+        - 25
+        - 26
+    '2018':
+        '1':
+        - 1
+        '2':
+        - 16
+        - 19
+        '3':
+        - 30
+        '4':
+        - 2
+        - 5
+        '5':
+        - 1
+        - 22
+        '6':
+        - 18
+        '7':
+        - 2
+        '9':
+        - 25
+        '10':
+        - 1
+        - 17
+        '12':
+        - 25
+        - 26
+    '2019':
+        '1':
+        - 1
+        '2':
+        - 5
+        - 6
+        - 7
+        '4':
+        - 5
+        - 19
+        - 20
+        - 22
+        '5':
+        - 1
+        - 12
+        - 13
+        '6':
+        - 7
+        '7':
+        - 1
+        '9':
+        - 14
+        '10':
+        - 1
+        - 7
+        '12':
+        - 25
+        - 26
+    '2020':
+        '1':
+        - 1
+        - 25
+        - 27
+        - 28
+        '2':
+        - 14
+        '3':
+        - 20
+        '4':
+        - 4
+        - 10
+        - 11
+        - 12
+        - 13
+        - 30
+        '5':
+        - 1
+        - 10
+        '6':
+        - 20
+        - 21
+        - 25
+        '7':
+        - 1
+        '9':
+        - 22
+        '10':
+        - 1
+        - 2
+        - 26
+        '12':
+        - 21
+        - 25
+        - 26
+    '2021':
+        '1':
+        - 1
+        '2':
+        - 12
+        - 13
+        - 14
+        - 15
+        '4': 
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        '5':
+        - 1
+        - 19
+        '6':
+        - 14
+        '7':
+        - 1
+        '9':
+        - 22
+        '10':
+        - 1
+        - 14
+        '12':
+        - 25
+        - 27
+    '2022':
+        '1':
+        - 1
+        '2':
+        - 1
+        - 2
+        - 3
+        '4':
+        - 5
+        - 15
+        - 16
+        - 18
+        '5':
+        - 2
+        - 9
+        '6':
+        - 3
+        '7':
+        - 1
+        '9':
+        - 12
+        '10':
+        - 1
+        - 4
+        '12':
+        - 26
+        - 27
+    '2023':
+        '1':
+        - 2
+        - 23
+        - 24
+        - 25
+        '4':
+        - 5
+        - 7
+        - 8
+        - 10
+        '5':
+        - 1
+        - 26
+        '6':
+        - 22
+        '7':
+        - 1
+        '9':
+        - 30
+        '10':
+        - 2
+        - 23
+        '12':
+        - 25
+        - 26
+    '2024':
+        '1':
+        - 1
+        '2':
+        - 10
+        - 12
+        - 13
+        '3':
+        - 29
+        - 30
+        '4':
+        - 1
+        - 4
+        '5':
+        - 1
+        - 15
+        '6':
+        - 10
+        '7':
+        - 1
+        '9':
+        - 18
+        '10':
+        - 1
+        - 11
+        '12':
+        - 25
+        - 26
+    '2025':
+        '1':
+        - 1
+        - 29
+        - 30
+        - 31
+        '4':
+        - 4
+        - 18
+        - 19
+        - 21
+        '5':
+        - 1
+        - 5
+        - 31
+        '7':
+        - 1
+        '10':
+        - 1
+        - 7
+        - 29
+        '12':
+        - 25
+        - 26
+    '2026':
+        '1':
+        - 1
+        '2':
+        - 17
+        - 18
+        - 19
+        '4':
+        - 3
+        - 4
+        - 6
+        - 7
+        '5':
+        - 1
+        - 25
+        '6':
+        - 19
+        '7':
+        - 1
+        '9':
+        - 26
+        '10':
+        - 1
+        - 19
+        '12':
+        - 25
+        - 26
+
+fields:
+  - open
+  - high
+  - low
+  - close
+  - volume
+indicators:
+  - sma
+  - ema
+  - kama
+  - macd
+  - adx
+  - rsi
+  - sar
+  - stc
+  - soc
+  - atr
+  - kc
+  - dc
+  - apz
+xvsa:
+    class: 'copyable-text selectable-text'
+    role: textbox
+    data-tab: 10
+    dir: ltr
+    spellcheck: 'true'
+    contenteditable: 'true'
+
+B_scale:
+    BABA:
+      code: 9988
+      ratio: .125
+    BIDU:
+      code: 9888
+      ratio: .125
+    BILI:
+      code: 9626
+      ratio: 1
+    XPEV:
+      code: 9868
+      ratio: .5
+    TCOM:
+      code: 9961
+      ratio: 1
+    YUMC:
+      code: 9987
+      ratio: 1
+    NTES:
+      code: 9999
+      ratio: .2
+    JD:
+      code: 9618
+      ratio: .5
+    WB:
+      code: 9898
+      ratio: 1
+    ZLAB:
+      code: 9688
+      ratio: .11
+
+USHK: 7.75
+
+listing:
+  nato_defence:
+    pltr: NYSE
+    rtx: NYSE
+    rhm: DAX
+    mitsubishi heavy: TSE
+    ba: LSE
+    noc: NYSE
+    lmt: NYSE
+    lhx: NYSE
+
+prefer_stock:
+  TSE:
+    'Kobayashi Pharmaceutical Co Ltd': 4967
+    'Nissan Motor Co Ltd': 7201
+    'Nissin Foods Holdings Co Ltd': 2897
+    'Sumitomo Chemical Company Limited': 4005
+    Mitsubishi Materials Corporation: 5711
+    Mitsubishi Chemical Group Corporation: 4188
+    Mitsubishi Electric Corporation: 6503
+    
+    OMRON Corporation: 6645
+    Sony Group Corporation: 6758
+    Tokyo Electron Limited: 8035
+    Toyota Motor Corporation: 7203
+    'Sumitomo Mitsui Financial Group Inc': 8316
+    Nikon Corporation: 7731
+    'Canon Inc': 7751
+    Yaskawa Electric Corporation: 6506
+    'Yamazaki Baking Co Ltd': 2212
+    Asahi Kasei Corporation: 3407
+    Sapporo Holdings Limited: 2501
+    'Sapporo Clinical Laboratory Inc': 9776
+    'Kirin Holdings Company Limited': 2503
+    Nippon Steel Corporation: 5401
+    Nippon Telegraph and Telephone Corporation: 9432
+    Mitsubishi Corporation: 8058
+    'Mitsubishi Heavy Industries Ltd': 7011
+    'Monato Holdings Inc': 6862
+    'Ashimori Industry Co Ltd': 3526
+    'Fast Retailing Co Ltd': 9983
+    'Nintendo Co Ltd': 7974
+  HKEx:
+    3:
+      size: 1000
+      margin: .85
+    5:
+      size: 400
+      margin: .8
+    27:
+      size: 1000
+      margin: .6
+    66:
+      size: 500
+      margin: .85
+    241:
+      size: 2000
+      margin: .6
+    285:
+      size: 500
+      margin: .5
+    388:
+      size: 100
+      margin: .8
+    700:
+      size: 100
+      margin: .8
+    880:
+      size: 1000
+      margin: .6
+    909:
+      size: 1000
+      margin: .4
+    910:
+      size: 5000
+      margin: .2
+    939:
+      size: 1000
+      margin: .8
+    941:
+      size: 500
+      margin: .8
+    1024:
+      size: 100
+      margin: .7
+    1288:
+      size: 1000
+      margin: .8
+    1299:
+      size: 200
+      margin: .8
+    1516:
+      size: 1000
+      margin: .1
+    1772:
+      size: 200
+      margin: .4
+    1800:
+      size: 1000
+      margin: .7
+    1898:
+      size: 1000
+      margin: .6
+    1988:
+      size: 500
+      margin: .3
+    2009:
+      size: 1000
+      margin: .2
+    2158:
+      size: 100
+      margin: .3
+    2318:
+      size: 500
+      margin: .8
+    2333:
+      size: 500
+      margin: .7
+    2616:
+      size: 500
+      margin: .2
+    2618:
+      size: 100
+      margin: .6
+    3968:
+      size: 500
+      margin: .8
+    6078:
+      size: 200
+      margin: .2
+    6098:
+      size: 1000
+      margin: .4
+    6185:
+      size: 200
+      margin: .2
+    6618:
+      size: 50
+      margin: .7
+    6669:
+      size: 1000
+      margin: .5
+    6862:
+      size: 1000
+      margin: .5
+    6993:
+      size: 500
+      margin: .4
+    9618:
+      size: 50
+      margin: .8
+    9988:
+      size: 100
+      margin: .8
+
+website:
+  Yahoo:
+    address: finance.yahoo.com
+    timeout: 90000
+    symbol:
+      S&P Futures: ES=F
+      Dow Futures: YM=F
+      Nasdaq Futures: NQ=F
+      Russell 2000 Futures: RTY=F
+      Crude Oil: CL=F
+      Gold: GC=F
+    fields:
+      latest: Price
+      change: Change
+      "% change": ChangePercent
+  Nikkei:
+    address: indexes.nikkei.co.jp/en/nkave/index/profile
+    timeout: 18000
+    fields:
+      latest: price
+      change: diff
+      "% change": diff
+      time: datedtime
+...

@@ -11,7 +11,8 @@ from pathlib import os, re, Path, sys, functools
 PYTHON_PATH = re.split(';|:', os.environ.get('PYTHONPATH'))
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
-YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
+YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}settings{os.sep}{YAML_PREFERENCE}")
+PORTFOLIO_PATH = f"{os.getenv('PYTHONPATH')}{os.sep}settings{os.sep}portfolio.yaml"
 driver = YAML.driver
 ph = YAML.public_holiday
 # platform = sys.platform
@@ -26,10 +27,10 @@ today = datetime.today().astimezone(timezone('Asia/Hong_Kong'))
 year, month, month_string = today.year, today.month, today.strftime('%B')
 futures_type = ('HSI', 'MHI', 'HHI', 'MCH')
 month_initial = dict(zip(
-    [datetime(year, _+1, 1).strftime('%B') for _ in list(range(12))],
-    [_.upper() for _ in list('fghjkmnquvxz')]))
+    [datetime(year, _, 1).strftime('%B') for _ in range(1, 13)],
+    [_.upper() for _ in 'fghjkmnquvxz']))
 avail_indicators = ('wma', 'kama', 'ema', 'hv')
-cal_month = [x for x in range(1, 13) if not x % 3]
+cal_month = list(filter(lambda _: _ % 3 == 0, range(1, 13)))
 
 
 def tse_stock_code(name: str) -> Any:
@@ -348,7 +349,6 @@ def waf(delta=0):
             print("Out of range (0 - 11)")
 
 
-# def waf(delta=0):
     futures = [''.join((f, dex(delta))) for f in futures_type[:-2]]
     futures += [''.join((f, dex(delta+1))) for f in futures_type[:-2]]
     return tuple(futures)
