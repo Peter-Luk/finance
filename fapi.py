@@ -3,12 +3,7 @@ import uvicorn
 import pretty_errors
 from fastapi import FastAPI
 from asa import Equity
-from pathlib import os
-from benedict import benedict
-# from finance import Equity
-# from finance.fat import prefer_stock
-# from finance.utilities import IP, tse_stock_code
-from utilities import IP, YAML_PREFERENCE
+from utilities import IP, YAML
 
 app = FastAPI()
 
@@ -18,9 +13,9 @@ def ind_status(b: float, i: float) -> str:
 
 
 def get_name(c: int, b: str = '') -> str:
-    YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{YAML_PREFERENCE}")
     if b == 'TSE':
-        for k, v in eval(f"YAML.prefer_stock.{b}.items()"):
+        # for k, v in eval(f"YAML.prefer_stock.{b}.items()"):
+        for k, v in YAML.prefer_stock[b].items():
             if c == v:
                 return k
 
@@ -29,7 +24,8 @@ def _processor(data, boarse: str) -> dict:
     ind_list: list = ['kama', 'sar', 'rsi', 'obv', 'kc']
     data_close = data._Equity__data.Close
     d0 = data.date
-    pct_change_spec = lambda d=2: f'+.{d}%'
+    pct_change_spec = '+.2%'
+    # pct_change_spec = lambda d=2: f'+.{d}%'
     # change = round(data.change * 100, 2)
     result = {f'{d0:%d-%m-%Y}': f'{data.change:{pct_change_spec()}}'}
     result['close'] = round(data.close, 2)
@@ -47,14 +43,14 @@ def _processor(data, boarse: str) -> dict:
                     round(val.Lower.diff().loc[d0], 3)]
             tsh = (data_close - val.Upper).diff()
             tsl = (data_close - val.Lower).diff()
-            res['delta'] = [ind_status(abs(tsh[-2]), abs(tsh[-1])),
-                    ind_status(abs(tsl[-2]), abs(tsl[-1]))]
+            res['delta'] = [ind_status(abs(tsh.iloc[-2]), abs(tsh.iloc[-1])),
+                    ind_status(abs(tsl.iloc[-2]), abs(tsl.iloc[-1]))]
         elif _ == 'obv':
             res['value'] = round(val.loc[d0], 1)
             res['change'] = f'{val.pct_change(fill_method=None).loc[d0]:{pct_change_spec()}}'
         else:
             ts = (data_close - val).diff()
-            res['delta'] = ind_status(abs(ts[-2]), abs(ts[-1]))
+            res['delta'] = ind_status(abs(ts.iloc[-2]), abs(ts.iloc[-1]))
         result[_] = res
     code = data.yahoo_code
     if boarse == 'TSE':

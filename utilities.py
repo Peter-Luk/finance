@@ -1,4 +1,3 @@
-# import re
 import socket
 from pytz import timezone
 # from scipy.optimize import newton
@@ -6,20 +5,14 @@ from datetime import datetime
 from typing import Final, Any
 from benedict import benedict
 from pathlib import os, re, Path, sys, functools
-# sep = os.sep
-# linesep = os.linesep
-PYTHON_PATH = re.split(';|:', os.environ.get('PYTHONPATH'))
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
-# YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}settings{os.sep}{YAML_PREFERENCE}")
-# PORTFOLIO_PATH = f"{os.getenv('PYTHONPATH')}{os.sep}settings{os.sep}portfolio.yaml"
 base_path = Path(__file__).resolve().parent
+PYTHON_PATH = re.split(';|:', str(base_path))
 YAML = benedict.from_yaml(f"{base_path}{os.sep}settings{os.sep}{YAML_PREFERENCE}")
 PORTFOLIO_PATH = f"{base_path}{os.sep}settings{os.sep}portfolio.yaml"
 driver = YAML.driver
 ph = YAML.public_holiday
-# platform = sys.platform
-# reduce = functools.reduce
 
 try:
     from scipy.constants import golden_ratio as gr
