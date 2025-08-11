@@ -11,8 +11,11 @@ from pathlib import os, re, Path, sys, functools
 PYTHON_PATH = re.split(';|:', os.environ.get('PYTHONPATH'))
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
-YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}settings{os.sep}{YAML_PREFERENCE}")
-PORTFOLIO_PATH = f"{os.getenv('PYTHONPATH')}{os.sep}settings{os.sep}portfolio.yaml"
+# YAML = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}settings{os.sep}{YAML_PREFERENCE}")
+# PORTFOLIO_PATH = f"{os.getenv('PYTHONPATH')}{os.sep}settings{os.sep}portfolio.yaml"
+base_path = Path(__file__).resolve().parent
+YAML = benedict.from_yaml(f"{base_path}{os.sep}settings{os.sep}{YAML_PREFERENCE}")
+PORTFOLIO_PATH = f"{base_path}{os.sep}settings{os.sep}portfolio.yaml"
 driver = YAML.driver
 ph = YAML.public_holiday
 # platform = sys.platform
@@ -77,7 +80,7 @@ def driver_path(browser, file="pref.yaml"):
     #     _ = yaml.load(f, Loader=yaml.FullLoader)
     # __ = _.get('driver').get(browser.capitalize())
     # __ = yaml_get('driver', file).get(browser.capitalize())
-    __ = benedict.from_yaml(f"{os.getenv('PYTHONPATH')}{os.sep}{file}").driver.browser.capitalize()
+    __ = benedict.from_yaml(f"{base_path}{os.sep}settings{os.sep}{file}").driver.browser.capitalize()
     _ = []
     if sys.platform == 'win32':
         _.append(os.environ.get('HOMEPATH'))
