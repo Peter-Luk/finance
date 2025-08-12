@@ -30,7 +30,6 @@ cal_month = list(filter(lambda _: _ % 3 == 0, range(1, 13)))
 
 
 def tse_stock_code(name: str) -> Any:
-    # _tse = yaml_get('prefer_stock', YAML_PREFERENCE).get('TSE')
     _tse = YAML.prefer_stock.TSE
     _code = [_tse.get(_) for _ in _tse.keys() if name.title() in _.title()]
     if len(_code) == 1:
