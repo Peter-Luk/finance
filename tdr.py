@@ -9,10 +9,10 @@ import asyncio
 from typing import List
 from rich import print
 import yfinance as yf
-from utilities import getcode
+from utilities import getcode, YAML
 from fintools import hsirnd, Portfolio
 
-clients: list = ['M213423', 'P241238', 'P724059', 'P772215', 'P851223']
+clients: list = YAML.prefer_customers
 
 
 async def daily_close(
@@ -26,7 +26,6 @@ async def daily_close(
 
 async def main():
     _ = await asyncio.gather(*[daily_close(c, 'HKEx') for c in iter(clients)])
-    # _ = iter([await daily_close(c, 'HKEx') for c in iter(clients)])
     for item in _:
         for k, v in item.items():
             print(f'{k}\n{v}')

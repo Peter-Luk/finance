@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from datetime import datetime
 from typing import Iterable
 # from rich.console import Console
 from rich.table import Table
@@ -17,7 +18,9 @@ def hsirnd(value: float) -> float:
     if np.isnan(value) or not value > 0:
         return np.nan
     _ = int(np.floor(np.log10(value)))
-    __ = np.divmod(value, 10 ** (_ - 1))[0]
+    # __ = np.divmod(value, 10 ** (_ - 1))[0]
+    q, r = np.divmod(value, 10 ** (_ - 1))
+    __ = q if (r / 10 ** (_ - 1)) < .5 else q + 1
     if _ < 0:
         if __ < 25:
             return np.round(value, 3)
@@ -29,6 +32,9 @@ def hsirnd(value: float) -> float:
     if _ > 3:
         return np.round(value, 0)
     if _ > 1:
+        if __ < 10:
+            return np.round(value, 1)
+        # return np.round(value * 50, 0) / 50
         if __ < 20:
             return np.round(value, 1)
         if __ < 50:
@@ -37,8 +43,10 @@ def hsirnd(value: float) -> float:
     if _ > 0:
         if __ < 10:
             return np.round(value, 2)
-        if __ < 20:
-            return np.round(value * 5, 1) / 5
+        if __ < 50:
+            return np.round(value * 50, 0) / 50
+        # if __ < 20:
+        #     return np.round(value * 5, 1) / 5
         return np.round(value * 2, 1) / 2
 
 
@@ -497,7 +505,7 @@ def parabolic_sar(high: pd.DataFrame,
 
 
 def construct_report(df: pd.DataFrame,
-        code: str) -> str:
+        code: str, date: datetime = None) -> str:
     def get_currency(code: str) -> str:
         currency = 'USD'
         i_split = code.split('.')
@@ -516,7 +524,8 @@ def construct_report(df: pd.DataFrame,
     params = YAML.periods.Equities
     currency = get_currency(code)
     data = df.xs(code, axis=1, level='Ticker')
-    last_trade = data.index[-1].to_pydatetime()
+    trade_date = data.index.to_pydatetime()
+    last_trade = trade_date[-1] if date is None else date
     close = data.Close.loc[last_trade]
     change = data.Close.pct_change(fill_method=None).loc[last_trade]
     _ = FOA(data, dtype='float64')
@@ -532,8 +541,8 @@ def construct_report(df: pd.DataFrame,
     table.add_column("KAMA", justify="right", style="magenta")
     table.add_row(f"{close:,.2f} ({change:+0.3%})",
         f"{rsi:0.3f}",
-        f"{sar:0.2f}",
-        f"{kama:0.2f}")
+        f"{sar:,.2f}",
+        f"{kama:,.2f}")
     return table
     # console.print(table)
     # """

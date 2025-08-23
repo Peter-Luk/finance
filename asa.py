@@ -2,7 +2,7 @@
 import asyncio
 import datetime
 import random
-from pathlib import os
+from pathlib import os, functools
 from rich import print
 # from rich.console import Console
 from rich.table import Table
@@ -11,7 +11,7 @@ import yfinance as yf
 # import shutil
 import numpy as np
 from typing import Any, Coroutine, Iterable, List, Dict, Final, Union
-from functools import partial
+# from functools import partial
 # from pprint import pprint
 from tqdm import tqdm
 from tqdm.asyncio import tqdm as atq
@@ -107,7 +107,7 @@ class Equity(FOA, Viewer):
         self.view = Viewer(self.__data)
 
     def __str__(self):
-        latest = partial(self.summary, date=self.date, return_type='str')
+        latest = functools.partial(self.summary, date=self.date, return_type='str')
         return latest()
 
     def summary(self, date: datetime.datetime,
@@ -123,8 +123,8 @@ class Equity(FOA, Viewer):
             table.add_column("KAMA", justify="right", style="magenta")
             table.add_row(f"{close[date]:,.2f} ({change[date]:+0.3%})",
                 f"{self.rsi()[date]:0.3f}",
-                f"{self.sar()[date]:0.2f}",
-                f"{self.kama()[date]:0.2f}")
+                f"{self.sar()[date]:,.2f}",
+                f"{self.kama()[date]:,.2f}")
             return table
         # console.print(table)
         if return_type == 'str':
@@ -438,7 +438,7 @@ def main(target: str) -> None:
             el = list(YAML.B_scale.keys())
             tp = yf.download(el, interval='1d', period='max', threads=True, group_by='ticker', auto_adjust=False)
         case 'TSE':
-            tse = partial(getcode, boarse=target)
+            tse = functools.partial(getcode, boarse=target)
             el = [tse(k) for k in YAML.prefer_stock.TSE.keys()]
             tp = yf.download(el, interval='1d', period='max', threads=True, group_by='ticker', auto_adjust=False)
 
@@ -504,7 +504,7 @@ async def daily_close(
 async def summary(entities: Iterable,
         boarse: str = 'HKEx') -> None:
     res = []
-    _ = partial(Equity, boarse=boarse,
+    _ = functools.partial(Equity, boarse=boarse,
             static=False)
     holder = {getcode(__, boarse): await _(__) for __ in entities}
     res = [f'{k}:{os.linesep}{v.gat()}' for k, v in holder.items()]
@@ -532,9 +532,11 @@ async def A2B(entity: str = None) -> Iterable:
             r[-1]]]
 
 
-nyse = partial(Equity, boarse='NYSE', static=False)
-tse = partial(Equity, boarse='TSE', static=False)
-hkex = partial(Equity, boarse='HKEx', static=False)
+nyse = functools.partial(Equity, boarse='NYSE', static=False)
+tse = functools.partial(Equity, boarse='TSE', static=False)
+lse = functools.partial(Equity, boarse='LSE', static=False)
+dax = functools.partial(Equity, boarse='DAX', static=False)
+hkex = functools.partial(Equity, boarse='HKEx', static=False)
 if __name__ == "__main__":
     import pzp
     sectors = ['nato_defence', 'B_shares', 'TSE']

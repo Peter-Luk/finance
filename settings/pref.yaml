@@ -757,4 +757,10 @@ website:
       change: diff
       "% change": diff
       time: datedtime
+prefer_customers:
+  - M213423
+  - P241238
+  - P724059
+  - P772215
+  - P851223
 ...
