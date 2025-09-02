@@ -11,7 +11,9 @@ from rich import print
 import yfinance as yf
 from utilities import getcode, YAML
 from fintools import hsirnd, Portfolio
+from functools import partial
 
+yfd = partial(yf.download, period='5d', interval='1d', auto_adjust=False)
 clients: list = YAML.prefer_customers
 
 
@@ -19,7 +21,16 @@ async def daily_close(
         client_no: str,
         boarse: str = 'HKEx') -> None:
     _: List = Portfolio(client_no, boarse)()
-    data = yf.download([getcode(__, boarse) for __ in _], period='5d', interval='1d', auto_adjust=False)
+    codes = [getcode(__, boarse) for __ in _]
+    # task = asyncio.create_task(asyncio.to_thread(yfd, codes))
+    # data = await task
+
+    # tasks = [asyncio.create_task(asyncio.to_thread(yfd, code)) for code in codes]
+    # data = await asyncio.gather(*tasks, return_exceptions=True)
+
+    data = yfd(codes)
+
+    # data = yf.download([getcode(__, boarse) for __ in _], period='5d', interval='1d', auto_adjust=False)
     result = []
     for i in _:
         close = data.xs(getcode(i, boarse),axis=1,level="Ticker").Close.iloc[-1]
@@ -29,7 +40,10 @@ async def daily_close(
 
 
 async def main():
-    _ = await asyncio.gather(*[daily_close(c, 'HKEx') for c in iter(clients)])
+    dc = partial(daily_close, boarse='HKEx')
+    # tasks = [asyncio.create_task(asyncio.to_thread(dc, client)) for client in clients]
+    # _ = await asyncio.gather(*tasks, return_exceptions=True)
+    _ = await asyncio.gather(*[dc(c) for c in iter(clients)])
     for item in _:
         for k, v in item.items():
             print(f'{k}\n{v}')

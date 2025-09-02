@@ -516,6 +516,34 @@ public_holiday:
         '12':
         - 25
         - 26
+    '2027':
+        '1':
+        - 1
+        '2':
+        - 6
+        - 8
+        - 9
+        '3':
+        - 26
+        - 27
+        - 29
+        '4':
+        - 5
+        '5':
+        - 1
+        - 13
+        '6':
+        - 9
+        '7':
+        - 1
+        '9':
+        - 16
+        '10':
+        - 1
+        - 8
+        '12':
+        - 25
+        - 27
 
 fields:
   - open
@@ -523,6 +551,7 @@ fields:
   - low
   - close
   - volume
+
 indicators:
   - sma
   - ema
@@ -537,6 +566,7 @@ indicators:
   - kc
   - dc
   - apz
+
 xvsa:
     class: 'copyable-text selectable-text'
     role: textbox
@@ -730,6 +760,9 @@ prefer_stock:
     9618:
       size: 50
       margin: .8
+    9898:
+      size: 20
+      margin: .5
     9988:
       size: 100
       margin: .8
