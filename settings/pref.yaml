@@ -790,9 +790,10 @@ website:
       change: diff
       "% change": diff
       time: datedtime
-prefer_customers:
+prefer_clients:
   - M213423
   - P241238
+  - P854665
   - P724059
   - P772215
   - P851223

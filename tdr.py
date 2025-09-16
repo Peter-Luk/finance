@@ -14,7 +14,7 @@ from fintools import hsirnd, Portfolio
 from functools import partial
 
 yfd = partial(yf.download, period='5d', interval='1d', auto_adjust=False)
-clients: list = YAML.prefer_customers
+clients: list = YAML.prefer_clients
 
 
 def daily_close(
@@ -42,4 +42,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    # asyncio.run(main())
