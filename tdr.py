@@ -21,8 +21,7 @@ def daily_close(
         client_no: str,
         boarse: str = 'HKEx') -> None:
     _: List = Portfolio(client_no, boarse)()
-    codes = [getcode(__, boarse) for __ in _]
-    data = yfd(codes)
+    data = yfd([getcode(__, boarse) for __ in _])
     result = []
     for i in _:
         close = data.xs(getcode(i, boarse),axis=1,level="Ticker").Close.iloc[-1]
