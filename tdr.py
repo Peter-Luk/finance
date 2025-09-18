@@ -25,7 +25,10 @@ def daily_close(
     result = []
     for i in _:
         close = data.xs(getcode(i, boarse),axis=1,level="Ticker").Close.iloc[-1]
-        item = f'{i} {close:0.3f}' if close < .1 else f'{i} {hsirnd(close):0.2f}'
+        val = close if close < .1 else hsirnd(close)
+        dp = '0.3' if close < .1 else '0.2'
+        item = f'{i} {val:{dp}f}'
+        # item = f'{i} {close:0.3f}' if close < .1 else f'{i} {hsirnd(close):0.2f}'
         result.append(item)
     return {client_no: f"Close price, {', '.join(result)}"}
 
