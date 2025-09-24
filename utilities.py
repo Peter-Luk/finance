@@ -11,7 +11,6 @@ base_path = Path(__file__).resolve().parent
 PYTHON_PATH = re.split(';|:', str(base_path))
 _prefile = f"{base_path}{os.sep}settings{os.sep}{YAML_PREFERENCE}"
 YAML = benedict.from_yaml(_prefile)
-# YAML = benedict.from_yaml(f"{base_path}{os.sep}settings{os.sep}{YAML_PREFERENCE}")
 PORTFOLIO_PATH = f"{base_path}{os.sep}settings{os.sep}portfolio.yaml"
 driver = YAML.driver
 ph = YAML.public_holiday
