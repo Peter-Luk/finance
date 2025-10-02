@@ -235,6 +235,21 @@ class Equity(FOA, Viewer):
         date = self.date if (date is None) else date
         return self.view.gat(self.__data, period, date).apply(hsirnd).unique()
 
+    def neighbour(self,
+            citeria:np.float64|None = None,
+            date:datetime.datetime|None = None,
+            direction:str = 'up') -> Iterable:
+        if date is None:
+            date = self.date
+        if citeria is None:
+            citeria = self.__data.Close[date]
+        index = self.trade_date.tolist().index(date)
+        _ = self.gat(self.trade_date[index - 1])
+        result = iter(_[_ > nearest(_, citeria)])
+        if direction == 'down':
+            result = iter(_[_ < nearest(_, citeria)][::-1])
+        return result
+
     def maverick(self,
             date=None,
             period=param,
@@ -306,7 +321,9 @@ class Futures(FOA, Viewer):
         self.change = 0
         if self.__data.shape[0] > 1:
             self.change = self.__data.Close.diff(1).iloc[-1] / self.__data.Close.iloc[-2]
-        self.date = self.__data.index[-1]
+        self.trade_date = self.__data.index
+        self.date = self.trade_date[-1]
+        # self.date = self.__data.index[-1]
         self.close = self.__data.Close.iloc[-1]
         # qstr = select(*[text(_) for _ in fields]).select_from(text('records')).where(text(f"code='{self.code}'"))
 
@@ -421,6 +438,21 @@ class Futures(FOA, Viewer):
     def gat(self, date=None, period=param.atr):
         date = self.date if (date is None) else date
         return self.view.gat(self.__data, period, date).apply(hsirnd).unique()
+
+    def neighbour(self,
+            citeria:np.float64|None = None,
+            date:datetime.datetime|None = None,
+            direction:str = 'up') -> Iterable:
+        if date is None:
+            date = self.date
+        if citeria is None:
+            citeria = self.__data.Close[date]
+        index = self.trade_date.tolist().index(date)
+        _ = self.gat(self.trade_date[index - 1])
+        result = iter(_[_ > nearest(_, citeria)])
+        if direction == 'down':
+            result = iter(_[_ < nearest(_, citeria)][::-1])
+        return result
 
     def maverick(self, date=None, period=param, unbound=True, exclusive=True):
         date = self.date if (date is None) else date
@@ -537,6 +569,11 @@ tse = functools.partial(Equity, boarse='TSE', static=False)
 lse = functools.partial(Equity, boarse='LSE', static=False)
 dax = functools.partial(Equity, boarse='DAX', static=False)
 hkex = functools.partial(Equity, boarse='HKEx', static=False)
+
+def nearest(n_range: np.ndarray, citeria: np.float64) -> np.float64:
+    _ = abs(n_range / citeria - 1)
+    return n_range[_.tolist().index(_.min())]
+
 if __name__ == "__main__":
     import pzp
     sectors = ['nato_defence', 'B_shares', 'TSE']
