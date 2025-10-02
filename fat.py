@@ -22,10 +22,14 @@ class Record(Base):
     _create_at = datetime.datetime.now()
     date = Column(Date, default=_create_at.date(),
             server_default=text(str(_create_at.date())))
-    if _create_at.time() < datetime.time(12, 25, 0):
-        session = deferred(Column(String, default='M', server_default=text('M')))
-    else:
-        session = deferred(Column(String, default='A', server_default=text('A')))
+
+    def deferred_session(period:str = 'Morning'):
+        result = deferred(Column(String, default='M', server_default=text('M')))
+        if period == 'Afternoon':
+            result = deferred(Column(String, default='A', server_default=text('A')))
+        return result
+
+    session = deferred_session('Morning') if _create_at.time() < datetime.time(12, 25, 0) else deferred_session('Afternoon')
     open = Column(Integer)
     high = Column(Integer)
     low = Column(Integer)
