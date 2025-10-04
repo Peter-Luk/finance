@@ -24,9 +24,12 @@ class Record(Base):
             server_default=text(str(_create_at.date())))
 
     def deferred_session(period:str = 'Morning'):
-        result = deferred(Column(String, default='M', server_default=text('M')))
-        if period == 'Afternoon':
-            result = deferred(Column(String, default='A', server_default=text('A')))
+        result = None
+        match period.capitalize():
+            case 'Morning' | 'Afternoon':
+                result = deferred(Column(String,
+                    default=period[0].upper(),
+                    server_default=text(period[0].upper())))
         return result
 
     session = deferred_session('Morning') if _create_at.time() < datetime.time(12, 25, 0) else deferred_session('Afternoon')
