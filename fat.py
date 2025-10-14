@@ -27,7 +27,14 @@ class Record(Base):
         match period.capitalize():
             case 'Morning' | 'Afternoon':
                 pi = period[0].upper()
-        return deferred(Column(String, default=pi, server_default=text(pi)))
+                result = deferred(Column(
+                    String,
+                    default=pi,
+                    server_default=text(pi)
+                    ))
+            case _:
+                result = f'{period} not recognized'
+        return result
 
     session = deferred_session('Morning') if _create_at.time() < datetime.time(12, 25, 0) else deferred_session('Afternoon')
     open = Column(Integer)
