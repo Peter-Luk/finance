@@ -13,7 +13,7 @@ try:
 except Exception:
     use_numba = False
 
-# @conditional_decorator(jit(nopython=True), use_numba)
+@conditional_decorator(jit(nopython=True), use_numba)
 def stepper(period, x):
     y = np.empty(len(x))
     y[:] = np.nan
