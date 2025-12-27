@@ -1,7 +1,9 @@
 B_scale:
   BABA:
     code: 9988
-    ratio: 0.1263694032502725
+    # ratio: 0.125
+    # ratio: 0.1256570302239028
+    ratio: 0.12410772225827385
   BIDU:
     code: 9888
     ratio: 0.125
