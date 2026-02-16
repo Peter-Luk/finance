@@ -3,12 +3,12 @@ from time import sleep
 from random import randint
 from c2lite3e import wap
 
-def fetch_data(hour: int=0, minute: int=0, second: int=0) -> None:
-    while datetime.datetime.now().time() < datetime.time(hour, minute, second):
+def fetch_data(half_day: bool=False) -> None:
+    hour: int = 12 if half_day else 16
+    while datetime.datetime.now().time() < datetime.time(hour, 25, 0):
         sleep(randint(2,5))
     return wap()
 
 if __name__ == "__main__":
-    # fetch_data()
-    # fetch_data(12, 25)
-    fetch_data(16, 25)
+    # fetch_data(half_day=True)
+    fetch_data()
