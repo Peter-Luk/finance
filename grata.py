@@ -10,5 +10,11 @@ def fetch_data(half_day: bool=False) -> None:
     return wap()
 
 if __name__ == "__main__":
+    td = input("Trade Duration 'F'ull/'H'alf (default: 'F'): ")
+    match td:
+        case 'h'| 'H':
+            hd = True
+        case _:
+            hd = False
     # fetch_data(half_day=True)
-    fetch_data()
+    fetch_data(hd)
