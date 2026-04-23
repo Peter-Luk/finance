@@ -1,13 +1,8 @@
 B_scale:
   BABA:
     code: 9988
-    ratio: 0.124191586222373
-    # ratio: 0.12721573199077493
-    # ratio: 0.12417471847705124
-    # ratio: 0.13023695046128483
-    # ratio: 0.12766309768537012
-    # ratio: 0.12496978338821041
-    # ratio: 0.12528616258666156
+    ratio: 0.12780542219344943
+    # ratio: 0.12437506193518966
     # ratio: 0.125
   BIDU:
     code: 9888
@@ -323,7 +318,7 @@ prefer_stock:
     Nissan Motor Co Ltd: 7201
     Nissin Foods Holdings Co Ltd: 2897
     OMRON Corporation: 6645
-    Sapporo Clinical Laboratory Inc: 9776
+    # Sapporo Clinical Laboratory Inc: 9776
     Sapporo Holdings Limited: 2501
     Sony Group Corporation: 6758
     Sumitomo Chemical Company Limited: 4005
