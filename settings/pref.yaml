@@ -1,10 +1,10 @@
 B_scale:
   BABA:
     code: 9988
-    ratio: 0.1267980050987519
-    # ratio: 0.12523981148770733
-    # ratio: 0.12780542219344943
-    # ratio: 0.12437506193518966
+    ratio: 0.12239675939482864
+    # ratio: 0.12796024845822995
+    # ratio: 0.12747259507233732
+    # ratio: 0.12360099005875078
     # ratio: 0.125
   BIDU:
     code: 9888
@@ -45,6 +45,7 @@ db:
     - 611
     - 805
     - 973
+    - 1137
     - 1212
     - 1337
     - 1558
@@ -53,6 +54,7 @@ db:
     - 2303
     - 2606
     - 2768
+    - 3331
     - 8509
     freq: daily
     index: date
@@ -302,7 +304,7 @@ prefer_stock:
       size: 100
   TSE:
     Asahi Kasei Corporation: 3407
-    Ashimori Industry Co Ltd: 3526
+    # Ashimori Industry Co Ltd: 3526
     Canon Inc: 7751
     Fast Retailing Co Ltd: 9983
     Kirin Holdings Company Limited: 2503
