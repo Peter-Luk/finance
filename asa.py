@@ -2,7 +2,8 @@
 import asyncio
 import datetime
 import random
-from pathlib import os, functools
+import functools
+from pathlib import os
 from rich import print
 # from rich.console import Console
 from rich.table import Table

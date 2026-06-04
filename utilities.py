@@ -1,10 +1,12 @@
+import re
 import socket
+import functools
 from pytz import timezone
 # from scipy.optimize import newton
 from datetime import datetime
 from typing import Final, Any
 from benedict import benedict
-from pathlib import os, re, Path, sys, functools
+from pathlib import os, Path, sys
 
 YAML_PREFERENCE: Final[str] = 'pref.yaml'
 base_path = Path(__file__).resolve().parent
