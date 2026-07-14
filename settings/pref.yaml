@@ -1,11 +1,11 @@
 B_scale:
   BABA:
     code: 9988
-    ratio: 0.12845750891918997
-    # ratio: 0.12906631227899656
-    # ratio: 0.126305535545756
-    # ratio: 0.12558555285127693
-    # ratio: 0.1245467972445666
+    ratio: 0.12710820079892055
+    # ratio: 0.12653408968420093
+    # ratio: 0.12538586745476174
+    # ratio: 0.12724343586149894
+    # ratio: 0.12594141000617198
     # ratio: 0.125
   BIDU:
     code: 9888
@@ -305,6 +305,7 @@ prefer_stock:
       margin: 0.8
       size: 100
   TSE:
+    Kioxia Holdings Corp: 285A
     Asahi Kasei Corporation: 3407
     # Ashimori Industry Co Ltd: 3526
     Canon Inc: 7751
@@ -799,4 +800,4 @@ xvsa:
   data-tab: 10
   dir: ltr
   role: textbox
-  spellcheck: 'true'
+  

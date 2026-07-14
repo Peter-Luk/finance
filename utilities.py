@@ -36,7 +36,8 @@ def tse_stock_code(name: str) -> Any:
     _tse = YAML.prefer_stock.TSE
     _code = [_tse.get(_) for _ in _tse.keys() if name.title() in _.title()]
     if len(_code) == 1:
-        return f'{_code.pop():04d}.T'
+        return f'{_code.pop()}.T'
+        # return f'{_code.pop():04d}.T'
 
 
 # def yaml_get(field: str, file: str) -> Any:
@@ -474,21 +475,26 @@ def getcode(code: Any,
         boarse: str = 'HKEx',
         source: str = 'yahoo') -> str:
     if source.lower() == 'yahoo':
-        if boarse == 'HKEx' and isinstance(code, int):
-            return f"{code:04}.HK"
-        if boarse == 'SHE' and isinstance(code, int):
-            return f"{code:06}.SS"
-        if boarse == 'SZE' and isinstance(code, int):
-            return f"{code:06}.SZ"
-        if boarse == 'TSE' and isinstance(code, str):
-            # return f"{code:04}.T"
-            return tse_stock_code(code)
-        if boarse == 'DAX':
-            return f"{code}.DE".upper()
-        if boarse == 'LSE':
-            return f"{code}.L".upper()
-        if boarse in ['NYSE', 'Nasdaq']:
-            return code.upper()
+        match boarse:
+            case 'HKEx':
+                r_str = f'{code:04d}.HK'
+            case 'SHE':
+                r_str = f'{code:06d}.SS'
+            case 'SZE':
+                r_str = f'{code:06d}.SZ'
+            case 'TSE':
+                r_str = tse_stock_code(code)
+            case 'SGX':
+                r_str = f'{code.upper()}.SI'
+            case 'KSE':
+                r_str = f'{code:06d}.KS'
+            case 'DAX':
+                r_str = f"{code.upper()}.DE"
+            case 'LSE':
+                r_str = f"{code.upper()}.L"
+            case 'NYSE' | 'Nasdaq':
+                r_str = f"{code.upper()}"
+        return r_str
 
 def dvs(d):
     res, values = [], list(d.values())
