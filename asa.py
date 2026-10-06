@@ -39,7 +39,8 @@ async def get_data(
         capitalize: bool = False
         ) -> pd.DataFrame:
     _ = getcode(ticker, boarse)
-    df = yf.download(_, interval='1d', period='max', auto_adjust=False)
+    df = yf.download(_, interval='1d', period='max', threads=True)
+    # df = yf.download(_, interval='1d', period='max', auto_adjust=False)
     return df.xs(_, axis=1, level='Ticker')
 
 
